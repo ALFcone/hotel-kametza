@@ -378,12 +378,14 @@ export default async function Home() {
             <div className="p-8 border border-rose-800/50 bg-rose-800/20 backdrop-blur-sm rounded-3xl hover:bg-rose-800/40 transition">
               <div className="text-4xl mb-4">📞</div>
               <h3 className="font-bold text-xl mb-2">Llámanos</h3>
-              <p className="text-rose-200 font-medium">+51 966 000 000</p>
+              <p className="text-rose-200 font-medium">+51 966 556 622</p>
+              <p className="text-rose-200 font-medium">+51 920 042 099</p>
             </div>
             <div className="p-8 border border-rose-800/50 bg-rose-800/20 backdrop-blur-sm rounded-3xl hover:bg-rose-800/40 transition">
               <div className="text-4xl mb-4">💬</div>
               <h3 className="font-bold text-xl mb-2">WhatsApp</h3>
-              <p className="text-rose-200 font-medium">966 000 000</p>
+              <p className="text-rose-200 font-medium">966 556 622</p>
+              <p className="text-rose-200 font-medium">920 042 099</p>
             </div>
             <div className="p-8 border border-rose-800/50 bg-rose-800/20 backdrop-blur-sm rounded-3xl hover:bg-rose-800/40 transition">
               <div className="text-4xl mb-4">✉️</div>
