@@ -63,23 +63,23 @@ export default async function Home() {
       </div>
 
       {/* --- NAVBAR RESPONSIVO --- */}
-      {/* --- NAVBAR CON LOGO GRANDE --- */}
-      <nav className="fixed top-0 w-full bg-[#FDFBF7]/95 backdrop-blur-md border-b border-stone-200/50 z-50 shadow-sm">
+      <nav className="fixed top-0 w-full bg-[#FDFBF7]/95 backdrop-blur-md border-b border-stone-200/50 z-[100] shadow-sm">
+        {/* Checkbox que controla el menú */}
         <input type="checkbox" id="menu-toggle" className="peer hidden" />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-28">
-            {" "}
-            {/* Aumentamos h-20 a h-28 para dar espacio al logo */}
-            {/* LOGO MAXIMIZADO */}
-            <div className="flex-shrink-0 flex items-center">
-              <a href="#inicio" className="group">
+          <div className="flex justify-between items-center h-24 md:h-28">
+            {/* LOGO */}
+            <div className="flex-shrink-0 flex items-center relative z-[110]">
+              <a href="#inicio">
                 <img
                   src="/logo.jpg"
                   alt="Hotel Kametza"
-                  className="h-20 md:h-24 w-auto object-contain mix-blend-multiply transform group-hover:scale-110 transition-transform duration-500"
+                  className="h-16 md:h-24 w-auto object-contain mix-blend-multiply transition-transform"
                 />
               </a>
             </div>
+
             {/* MENÚ DE ESCRITORIO */}
             <div className="hidden md:flex space-x-10 text-[13px] font-black uppercase tracking-widest text-stone-600 items-center">
               <a
@@ -107,7 +107,8 @@ export default async function Home() {
                 Contacto
               </a>
             </div>
-            {/* BOTÓN RESERVAR */}
+
+            {/* BOTÓN RESERVAR ESCRITORIO */}
             <div className="hidden md:block">
               <a
                 href="#habitaciones"
@@ -116,12 +117,45 @@ export default async function Home() {
                 Reservar
               </a>
             </div>
-            {/* MENÚ MÓVIL (HAMBURGUESA) */}
+
+            {/* BOTÓN HAMBURGUESA (MÓVIL) */}
             <label
               htmlFor="menu-toggle"
-              className="md:hidden text-3xl text-[#700824] cursor-pointer p-2"
+              className="md:hidden relative z-[110] p-2 cursor-pointer select-none"
             >
-              ☰
+              <div className="space-y-1.5">
+                <span className="block w-8 h-0.5 bg-[#700824]"></span>
+                <span className="block w-8 h-0.5 bg-[#700824]"></span>
+                <span className="block w-5 h-0.5 bg-[#700824]"></span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        {/* --- MENÚ DESPLEGABLE MÓVIL CORREGIDO --- */}
+        <div className="fixed inset-0 bg-[#FDFBF7] z-[105] translate-x-full peer-checked:translate-x-0 transition-transform duration-300 md:hidden">
+          <div className="flex flex-col items-center justify-center h-full space-y-8 text-2xl font-serif font-bold text-rose-950">
+            {/* El truco: Usamos etiquetas label para que al hacer clic se cierre el menú automáticamente */}
+            <label htmlFor="menu-toggle" className="cursor-pointer">
+              <a href="#inicio">Inicio</a>
+            </label>
+            <label htmlFor="menu-toggle" className="cursor-pointer">
+              <a href="#habitaciones">Habitaciones</a>
+            </label>
+            <label htmlFor="menu-toggle" className="cursor-pointer">
+              <a href="#servicios">Servicios</a>
+            </label>
+            <label htmlFor="menu-toggle" className="cursor-pointer">
+              <a href="#contacto">Contacto</a>
+            </label>
+
+            <label htmlFor="menu-toggle" className="mt-8">
+              <a
+                href="#habitaciones"
+                className="bg-[#700824] text-white px-10 py-4 rounded-full text-sm font-black uppercase tracking-widest shadow-xl"
+              >
+                Reservar Ahora
+              </a>
             </label>
           </div>
         </div>
