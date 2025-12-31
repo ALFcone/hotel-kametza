@@ -30,13 +30,14 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // 1. CARGA DE DATOS
+  // 1. CARGA DE DATOS (CLIENT SIDE)
   useEffect(() => {
     const fetchData = async () => {
       const { data: roomsData } = await supabase
         .from("rooms")
         .select("*")
         .order("id");
+
       const today = new Date().toISOString().split("T")[0];
       const { data: bookingsData } = await supabase
         .from("bookings")
@@ -48,13 +49,12 @@ export default function Home() {
       if (bookingsData) setBusyIds(bookingsData.map((b: any) => b.room_id));
       setLoading(false);
     };
+
     fetchData();
   }, []);
 
-  // Función para cerrar menú al dar click
   const closeMenu = () => setIsMenuOpen(false);
 
-  // Lógica de agrupación de habitaciones
   const roomTypes: any = {};
   rooms.forEach((room) => {
     if (!roomTypes[room.name]) {
@@ -66,8 +66,9 @@ export default function Home() {
     }
     if (!busyIds.includes(room.id)) {
       roomTypes[room.name].availableCount++;
-      if (!roomTypes[room.name].firstAvailableId)
+      if (!roomTypes[room.name].firstAvailableId) {
         roomTypes[room.name].firstAvailableId = room.id;
+      }
     }
   });
   const groupedRooms = Object.values(roomTypes);
@@ -86,25 +87,26 @@ export default function Home() {
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(#d6d3d1_1px,transparent_1px)] [background-size:20px_20px] opacity-30"></div>
         <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-200/30 rounded-full blur-[100px] mix-blend-multiply animate-pulse-slow"></div>
+        <div className="absolute top-[40%] right-0 w-[600px] h-[600px] bg-rose-200/20 rounded-full blur-[120px] mix-blend-multiply"></div>
       </div>
 
-      {/* --- NAVBAR (FONDO BLANCO PARA QUE EL LOGO SE VEA BIEN) --- */}
-      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-md border-b border-stone-200 z-[100] shadow-sm">
+      {/* --- NAVBAR PREMIUM (FONDO BLANCO PARA EL LOGO) --- */}
+      <nav className="fixed top-0 w-full bg-white z-[100] shadow-sm border-b border-stone-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20 md:h-24">
-            {/* LOGO: Sin trucos de mezcla, fondo blanco sobre fondo blanco = Transparente visualmente */}
+            {/* LOGO */}
             <div className="flex-shrink-0 z-[110]">
               <a href="#inicio" onClick={closeMenu}>
                 <img
                   src="/logo.jpg"
                   alt="Hotel Kametza"
-                  className="h-14 md:h-20 w-auto object-contain"
+                  className="h-14 md:h-20 w-auto object-contain transition-transform duration-300"
                 />
               </a>
             </div>
 
-            {/* MENÚ DE ESCRITORIO */}
-            <div className="hidden md:flex space-x-8 text-[11px] font-black uppercase tracking-[0.2em] text-stone-600 items-center">
+            {/* MENÚ ESCRITORIO */}
+            <div className="hidden md:flex space-x-10 text-[12px] font-black uppercase tracking-[0.2em] text-stone-600 items-center">
               <a
                 href="#inicio"
                 className="hover:text-[#700824] transition-colors"
@@ -129,9 +131,13 @@ export default function Home() {
               >
                 Contacto
               </a>
+            </div>
+
+            {/* BOTÓN RESERVAR (Escritorio) */}
+            <div className="hidden md:block">
               <a
                 href="#habitaciones"
-                className="bg-[#700824] text-white px-6 py-2.5 rounded-full hover:bg-black transition-all shadow-lg"
+                className="bg-[#700824] text-white px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-rose-900/20"
               >
                 Reservar
               </a>
@@ -142,53 +148,50 @@ export default function Home() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden z-[110] p-2 text-[#700824]"
             >
-              {isMenuOpen ? <X size={30} /> : <Menu size={30} />}
+              {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
             </button>
           </div>
         </div>
 
-        {/* --- MENÚ MÓVIL (PANTALLA COMPLETA) --- */}
-        {/* Usamos un fondo SÓLIDO blanco para tapar todo el contenido de atrás */}
+        {/* MENÚ MÓVIL DESPLEGABLE (FONDO SÓLIDO) */}
         <div
-          className={`fixed inset-0 bg-white z-[105] flex flex-col justify-center items-center transition-all duration-300 ease-in-out ${
+          className={`fixed inset-0 bg-white z-[105] flex flex-col justify-center items-center transition-opacity duration-300 ease-in-out ${
             isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
-          }`}
+          } md:hidden`}
         >
-          <div className="flex flex-col space-y-6 text-center">
+          <div className="flex flex-col space-y-8 text-center">
             <a
               href="#inicio"
               onClick={closeMenu}
-              className="text-xl font-bold uppercase tracking-widest text-stone-800 hover:text-[#700824]"
+              className="text-xl font-bold uppercase tracking-widest text-stone-800"
             >
               Inicio
             </a>
             <a
               href="#habitaciones"
               onClick={closeMenu}
-              className="text-xl font-bold uppercase tracking-widest text-stone-800 hover:text-[#700824]"
+              className="text-xl font-bold uppercase tracking-widest text-stone-800"
             >
               Habitaciones
             </a>
             <a
               href="#servicios"
               onClick={closeMenu}
-              className="text-xl font-bold uppercase tracking-widest text-stone-800 hover:text-[#700824]"
+              className="text-xl font-bold uppercase tracking-widest text-stone-800"
             >
               Servicios
             </a>
             <a
               href="#contacto"
               onClick={closeMenu}
-              className="text-xl font-bold uppercase tracking-widest text-stone-800 hover:text-[#700824]"
+              className="text-xl font-bold uppercase tracking-widest text-stone-800"
             >
               Contacto
             </a>
-
-            {/* Botón de reservar ajustado para móvil */}
             <a
               href="#habitaciones"
               onClick={closeMenu}
-              className="mt-4 bg-[#700824] text-white px-8 py-3 rounded-full text-sm font-black uppercase tracking-widest shadow-xl"
+              className="mt-4 bg-[#700824] text-white px-10 py-4 rounded-full text-sm font-black uppercase tracking-widest shadow-xl"
             >
               Reservar Ahora
             </a>
@@ -199,91 +202,96 @@ export default function Home() {
       {/* --- HERO SECTION --- */}
       <section
         id="inicio"
-        className="relative pt-32 pb-20 overflow-hidden z-10 px-4 text-center"
+        className="relative pt-40 pb-24 overflow-hidden z-10 px-4"
       >
-        <span className="inline-block py-1 px-4 rounded-full bg-rose-50 border border-rose-100 text-[#700824] text-[10px] font-bold tracking-widest uppercase mb-6 shadow-sm">
-          Ayacucho, Perú
-        </span>
-        <h1 className="text-4xl md:text-6xl font-serif font-medium mb-4 text-rose-950 leading-tight">
-          Descubre la magia <br /> de los Andes
-        </h1>
-        <p className="text-base md:text-xl text-stone-600 max-w-2xl mx-auto mb-8 font-light">
-          Un refugio donde la historia colonial se encuentra con el confort
-          contemporáneo.
-        </p>
-        <a
-          href="#habitaciones"
-          className="inline-block px-8 py-4 bg-[#700824] text-white rounded-xl font-bold shadow-xl"
-        >
-          Ver Habitaciones
-        </a>
-      </section>
-
-      {/* --- SERVICIOS --- */}
-      <section id="servicios" className="py-16 px-4">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
-          {[
-            {
-              icon: "☕",
-              title: "Desayuno Local",
-              desc: "Pan chapla y café recién pasado.",
-            },
-            {
-              icon: "📡",
-              title: "Wi-Fi Veloz",
-              desc: "Fibra óptica ideal para trabajar.",
-            },
-            {
-              icon: "🚕",
-              title: "Traslados",
-              desc: "Coordinación de tours seguros.",
-            },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="p-6 rounded-3xl bg-white border border-stone-100 shadow-lg flex flex-col items-center text-center"
+        <div className="max-w-7xl mx-auto text-center relative">
+          <span className="inline-block py-1.5 px-4 rounded-full bg-rose-50 border border-rose-100 text-[#700824] text-xs font-bold tracking-widest uppercase mb-6 shadow-sm">
+            Ayacucho, Perú
+          </span>
+          <h1 className="text-5xl md:text-7xl font-serif font-medium mb-6 text-rose-950 tracking-tight leading-tight">
+            Descubre la magia <br /> de los Andes
+          </h1>
+          <p className="text-lg md:text-xl text-stone-600 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
+            Un refugio donde la historia colonial se encuentra con el confort
+            contemporáneo.
+          </p>
+          <div className="flex flex-col md:flex-row justify-center gap-4">
+            <a
+              href="#habitaciones"
+              className="px-8 py-4 bg-[#700824] text-white rounded-xl font-bold hover:bg-rose-950 shadow-xl transition transform hover:scale-105"
             >
-              <div className="text-4xl mb-4">{item.icon}</div>
-              <h3 className="text-lg font-bold text-rose-950 mb-2">
-                {item.title}
-              </h3>
-              <p className="text-stone-500 text-sm">{item.desc}</p>
-            </div>
-          ))}
+              Ver Habitaciones
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* --- HABITACIONES --- */}
-      <section id="habitaciones" className="py-16 px-4">
+      {/* --- SECCIÓN SERVICIOS --- */}
+      <section id="servicios" className="py-20 relative z-10 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            {[
+              {
+                icon: "☕",
+                title: "Desayuno Local",
+                desc: "Pan chapla, quesos y café recién pasado.",
+              },
+              {
+                icon: "📡",
+                title: "Wi-Fi Veloz",
+                desc: "Fibra óptica ideal para trabajar o compartir.",
+              },
+              {
+                icon: "🚕",
+                title: "Traslados",
+                desc: "Coordinación de tours y taxis seguros.",
+              },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="p-8 rounded-3xl bg-white border border-stone-100 shadow-xl flex flex-col items-center"
+              >
+                <div className="text-4xl mb-6">{item.icon}</div>
+                <h3 className="text-xl font-serif font-bold mb-3 text-rose-950">
+                  {item.title}
+                </h3>
+                <p className="text-stone-500 text-sm">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- SECCIÓN HABITACIONES --- */}
+      <section id="habitaciones" className="py-20 relative z-10 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-rose-950">
               Nuestras Habitaciones
             </h2>
           </div>
-
-          <div className="grid gap-12 md:grid-cols-2">
+          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-2 max-w-5xl mx-auto">
             {groupedRooms.map((room: any) => (
               <div
                 key={room.name}
-                className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-stone-100"
+                className="group bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-stone-100 flex flex-col transition-all duration-500"
               >
-                <div className="relative h-64 md:h-80">
+                <div className="relative h-72 md:h-96 w-full overflow-hidden">
                   <img
                     src={room.image_url}
                     alt={room.name}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-4 left-4 bg-[#700824] text-white px-4 py-1.5 rounded-xl shadow-lg">
-                    <p className="text-[10px] uppercase font-bold opacity-80">
+                  <div className="absolute top-6 left-6 bg-[#700824] text-white px-5 py-2 rounded-2xl shadow-xl z-20">
+                    <p className="text-[10px] uppercase font-bold opacity-80 mb-0.5">
                       Desde
                     </p>
-                    <p className="text-lg font-black">
+                    <p className="text-xl font-black">
                       S/ {room.price_per_night}
                     </p>
                   </div>
                   <div
-                    className={`absolute top-4 right-4 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg ${
+                    className={`absolute top-6 right-6 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg text-white ${
                       room.availableCount > 0 ? "bg-emerald-500" : "bg-rose-600"
                     }`}
                   >
@@ -292,104 +300,96 @@ export default function Home() {
                       : "🔴 Agotado"}
                   </div>
                 </div>
-
-                <div className="p-6 md:p-8">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Star size={14} className="text-[#700824] fill-[#700824]" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">
-                      Premium
-                    </span>
-                  </div>
-                  <h3 className="text-2xl font-serif font-bold text-rose-950 mb-3">
+                <div className="p-8 md:p-10 flex flex-col flex-grow">
+                  <h3 className="text-3xl font-serif font-bold text-rose-950 mb-4">
                     {room.name}
                   </h3>
-                  <p className="text-stone-500 text-sm mb-6 font-light leading-relaxed">
-                    {room.description ||
-                      "Espacio confortable para tu descanso."}
+                  <p className="text-stone-500 text-sm mb-8 leading-relaxed font-light">
+                    {room.description}
                   </p>
-
-                  <div className="grid grid-cols-2 gap-3 mb-6 pt-4 border-t border-stone-100">
-                    <div className="flex items-center gap-2 text-[#700824]">
-                      <Tv size={16} />
-                      <span className="text-[10px] font-bold text-stone-600">
-                        TV Cable
+                  <div className="grid grid-cols-2 gap-4 mb-10 pt-8 border-t border-stone-100">
+                    <div className="flex items-center gap-3 text-[#700824]">
+                      <Tv size={18} />
+                      <span className="text-[11px] font-black text-stone-600 uppercase">
+                        Smart TV
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-[#700824]">
-                      <Wifi size={16} />
-                      <span className="text-[10px] font-bold text-stone-600">
+                    <div className="flex items-center gap-3 text-[#700824]">
+                      <Wifi size={18} />
+                      <span className="text-[11px] font-black text-stone-600 uppercase">
                         WiFi 5G
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-[#700824]">
-                      <Clock size={16} />
-                      <span className="text-[10px] font-bold text-stone-600">
+                    <div className="flex items-center gap-3 text-[#700824]">
+                      <Clock size={18} />
+                      <span className="text-[11px] font-black text-stone-600 uppercase">
                         Agua Caliente
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-[#700824]">
-                      <Users size={16} />
-                      <span className="text-[10px] font-bold text-stone-600">
+                    <div className="flex items-center gap-3 text-[#700824]">
+                      <Users size={18} />
+                      <span className="text-[11px] font-black text-stone-600 uppercase">
                         Baño Privado
                       </span>
                     </div>
                   </div>
-
-                  {room.availableCount > 0 ? (
-                    <form
-                      action={createBooking}
-                      className="flex flex-col gap-3"
-                    >
-                      <input
-                        type="hidden"
-                        name="roomId"
-                        value={room.firstAvailableId}
-                      />
-                      <input
-                        type="hidden"
-                        name="price"
-                        value={room.price_per_night}
-                      />
-                      <div className="grid grid-cols-2 gap-2">
-                        <input
-                          type="date"
-                          name="checkIn"
-                          required
-                          className="p-3 border rounded-xl text-xs bg-stone-50"
-                        />
-                        <input
-                          type="date"
-                          name="checkOut"
-                          required
-                          className="p-3 border rounded-xl text-xs bg-stone-50"
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        name="name"
-                        placeholder="Tu Nombre"
-                        required
-                        className="p-3 border rounded-xl text-xs bg-stone-50"
-                      />
-                      <input
-                        type="email"
-                        name="email"
-                        placeholder="Tu Correo"
-                        required
-                        className="p-3 border rounded-xl text-xs bg-stone-50"
-                      />
-                      <button
-                        type="submit"
-                        className="w-full bg-[#700824] text-white font-black py-4 rounded-xl hover:bg-black transition-all flex justify-center gap-2 uppercase text-xs tracking-widest"
+                  <div className="mt-auto">
+                    {room.availableCount > 0 ? (
+                      <form
+                        action={createBooking}
+                        className="flex flex-col gap-4"
                       >
-                        Reservar <ArrowRight size={16} />
-                      </button>
-                    </form>
-                  ) : (
-                    <div className="bg-stone-100 text-stone-400 p-4 rounded-xl text-center font-bold text-xs">
-                      Sin Disponibilidad Hoy
-                    </div>
-                  )}
+                        <input
+                          type="hidden"
+                          name="roomId"
+                          value={room.firstAvailableId}
+                        />
+                        <input
+                          type="hidden"
+                          name="price"
+                          value={room.price_per_night}
+                        />
+                        <div className="grid grid-cols-2 gap-3">
+                          <input
+                            type="date"
+                            name="checkIn"
+                            required
+                            className="p-4 border rounded-2xl text-xs bg-stone-50"
+                          />
+                          <input
+                            type="date"
+                            name="checkOut"
+                            required
+                            className="p-4 border rounded-2xl text-xs bg-stone-50"
+                          />
+                        </div>
+                        <input
+                          type="text"
+                          name="name"
+                          placeholder="Nombre completo"
+                          required
+                          className="p-4 border rounded-2xl text-xs bg-stone-50"
+                        />
+                        <input
+                          type="email"
+                          name="email"
+                          placeholder="Correo electrónico"
+                          required
+                          className="p-4 border rounded-2xl text-xs bg-stone-50"
+                        />
+                        <button
+                          type="submit"
+                          className="w-full bg-[#700824] text-white font-black py-5 rounded-2xl hover:bg-black transition-all flex items-center justify-center gap-2 uppercase text-xs tracking-widest"
+                        >
+                          Reservar <ArrowRight size={16} />
+                        </button>
+                      </form>
+                    ) : (
+                      <div className="bg-stone-100 text-stone-400 p-6 rounded-2xl text-center font-bold text-xs uppercase tracking-widest">
+                        Agotado Temporalmente
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -398,22 +398,25 @@ export default function Home() {
       </section>
 
       {/* --- UBICACIÓN --- */}
-      <section id="ubicacion" className="py-16 px-4 bg-white">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+      <section id="ubicacion" className="py-20 bg-white relative z-10 px-4">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl font-serif font-bold text-rose-950 mb-4">
-              Ubicación Perfecta
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-rose-950 mb-6">
+              Ubicación Estratégica
             </h2>
-            <div className="bg-[#FDFBF7] p-6 rounded-2xl border border-stone-100">
-              <p className="font-bold text-stone-800">
+            <div className="mb-8 bg-[#FDFBF7] p-6 rounded-2xl border border-stone-100">
+              <p className="text-sm text-stone-400 uppercase font-bold">
+                Dirección Exacta
+              </p>
+              <p className="text-xl font-bold text-stone-800">
                 Jirón Las Américas #154
               </p>
-              <p className="text-rose-700 text-sm">
+              <p className="text-rose-700 font-medium">
                 Ref. Óvalo Magdalena, Ayacucho
               </p>
             </div>
           </div>
-          <div className="h-64 bg-stone-200 rounded-3xl overflow-hidden border-4 border-stone-100">
+          <div className="h-96 bg-stone-200 rounded-3xl overflow-hidden border-4 border-white">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15550.00000000000!2d-74.223!3d-13.16!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDA5JzM2LjAiUyA3NMKwMTMnMjIuOCJX!5e0!3m2!1ses!2spe!4v1710000000000!5m2!1ses!2spe"
               width="100%"
@@ -421,69 +424,69 @@ export default function Home() {
               style={{ border: 0 }}
               allowFullScreen={true}
               loading="lazy"
-              title="Mapa"
+              title="Ubicación"
             ></iframe>
           </div>
         </div>
       </section>
 
       {/* --- CONTACTO --- */}
-      <section id="contacto" className="py-16 bg-[#700824] px-4 text-center">
-        <h2 className="text-3xl font-serif font-bold text-white mb-8">
-          Contáctanos
-        </h2>
-        <div className="grid gap-4 max-w-lg mx-auto mb-12">
-          <a
-            href="https://wa.me/51966556622"
-            className="flex items-center justify-center gap-3 bg-white/10 p-4 rounded-2xl text-white hover:bg-white/20"
-          >
-            <span>💬</span>{" "}
-            <span className="font-bold">WhatsApp: 966 556 622</span>
-          </a>
-          <a
-            href="tel:+51920042099"
-            className="flex items-center justify-center gap-3 bg-white/10 p-4 rounded-2xl text-white hover:bg-white/20"
-          >
-            <span>📞</span>{" "}
-            <span className="font-bold">Llamar: 920 042 099</span>
-          </a>
-        </div>
-        <div className="flex justify-center gap-4">
-          <a
-            href="https://facebook.com"
-            className="text-white text-xs font-bold uppercase tracking-widest border border-white/30 px-4 py-2 rounded-full"
-          >
-            Facebook
-          </a>
-          <a
-            href="https://instagram.com"
-            className="text-white text-xs font-bold uppercase tracking-widest border border-white/30 px-4 py-2 rounded-full"
-          >
-            Instagram
-          </a>
-          <a
-            href="https://tiktok.com"
-            className="text-white text-xs font-bold uppercase tracking-widest border border-white/30 px-4 py-2 rounded-full"
-          >
-            TikTok
-          </a>
+      <section id="contacto" className="py-24 bg-[#700824] relative z-10 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-4xl font-serif font-bold mb-12 text-white">
+            ¿Deseas atención directa?
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <a
+              href="https://wa.me/51966556622"
+              target="_blank"
+              className="p-8 bg-white/10 rounded-[2.5rem] hover:bg-white/20 transition text-white"
+            >
+              <div className="text-4xl mb-4">💬</div>
+              <h3 className="font-black text-xl mb-1 uppercase text-[10px]">
+                WhatsApp
+              </h3>
+              <p className="text-rose-200 font-black text-xl">966 556 622</p>
+            </a>
+            <a
+              href="tel:+51920042099"
+              className="p-8 bg-white/10 rounded-[2.5rem] hover:bg-white/20 transition text-white"
+            >
+              <div className="text-4xl mb-4">📞</div>
+              <h3 className="font-black text-xl mb-1 uppercase text-[10px]">
+                Llamar
+              </h3>
+              <p className="text-rose-200 font-black text-xl">920 042 099</p>
+            </a>
+            <a
+              href="mailto:reservas@hotelkametza.com"
+              className="p-8 bg-white/10 rounded-[2.5rem] hover:bg-white/20 transition text-white"
+            >
+              <div className="text-4xl mb-4">✉️</div>
+              <h3 className="font-black text-xl mb-1 uppercase text-[10px]">
+                Correo
+              </h3>
+              <p className="text-rose-200 font-black text-sm">
+                kametzahotelayacucho@gmail.com
+              </p>
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* --- FOOTER --- */}
-      <footer className="bg-stone-900 text-stone-500 py-12 text-center">
-        <img
-          src="/logo.jpg"
-          alt="Logo Footer"
-          className="h-32 mx-auto mb-6 object-contain opacity-80"
-        />
-        <p className="text-xs">© 2025 Hotel Kametza</p>
-        <a
-          href="/admin"
-          className="text-[10px] mt-2 inline-block opacity-50 hover:opacity-100"
-        >
-          Admin
-        </a>
+      {/* --- FOOTER (SIN LOGO) --- */}
+      <footer className="bg-stone-900 text-stone-400 py-16 px-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-xs uppercase tracking-widest mb-4">
+            © 2025 Hotel Kametza. Ayacucho.
+          </p>
+          <a
+            href="/admin"
+            className="text-[9px] bg-white/5 px-3 py-1 rounded-full hover:bg-white/10 transition"
+          >
+            Acceso Admin
+          </a>
+        </div>
       </footer>
     </div>
   );
