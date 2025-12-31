@@ -10,10 +10,10 @@ import {
   BedDouble,
   Clock,
   Download,
-  Search,
 } from "lucide-react";
 import Link from "next/link";
 
+// Forzamos que la página sea dinámica para que no cachee datos viejos
 export const dynamic = "force-dynamic";
 
 export default function AdminDashboard() {
@@ -21,7 +21,7 @@ export default function AdminDashboard() {
   const [rooms, setRooms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Cargar datos al entrar
+  // 1. CARGAR DATOS
   useEffect(() => {
     const fetchData = async () => {
       // Traer Reservas
@@ -43,77 +43,49 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
-  // 2. Lógica para Descargar Excel/CSV
-   const downloadReport = () => {
+  // 2. DESCARGAR EXCEL (Corregido para Español)
+  const downloadReport = () => {
     if (bookings.length === 0) return alert("No hay datos para descargar");
 
-    // Usamos PUNTO Y COMA (;) que es lo que Excel en español detecta para columnas
-    const separator = ";";
-    
+    const separator = ";"; // Clave para Excel en español
+
     // Encabezados
     const headers = [
-      "ID Reserva", 
-      "Nombre Huesped", 
-      "Email", 
-      "Habitacion", 
-      "Entrada", 
-      "Salida", 
-      "Total Pago", 
-      "Fecha Creacion"
+      "ID Reserva",
+      "Nombre Huesped",
+      "Email",
+      "Habitacion",
+      "Entrada",
+      "Salida",
+      "Total Pago",
+      "Fecha Creacion",
     ].join(separator);
-    
-    // Filas de datos
-    const rows = bookings.map(b => {
-      // Limpiamos los datos para evitar errores si son nulos
-      const nombre = b.guest_name ? b.guest_name.replace(/;/g, "") : "Sin Nombre";
+
+    // Filas
+    const rows = bookings.map((b) => {
+      const nombre = b.guest_name
+        ? b.guest_name.replace(/;/g, "")
+        : "Sin Nombre";
       const email = b.email ? b.email : "Sin Email";
       const habitacion = b.rooms?.name ? b.rooms.name : "Hab. General";
-      
+
       return [
         b.id,
-        `"${nombre}"`,      // Entre comillas por si tiene espacios
+        `"${nombre}"`,
         `"${email}"`,
         `"${habitacion}"`,
         b.check_in,
         b.check_out,
         b.total_price,
-        b.created_at
+        b.created_at,
       ].join(separator);
     });
 
-    // Unir todo con el BOM (\uFEFF) para que Excel reconozca tildes y ñ
+    // Unimos con BOM (\uFEFF) para que reconozca tildes
     const csvContent = "\uFEFF" + [headers, ...rows].join("\n");
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `Reporte_Kametza_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-    // Cabeceras del CSV
-    const headers = [
-      "ID Reserva, Nombre Huesped, Email, Habitacion, Entrada, Salida, Total Pago, Fecha Creacion",
-    ];
-
-    // Filas de datos
-    const rows = bookings.map(
-      (b) =>
-        `${b.id},"${b.guest_name}","${b.email}","${b.rooms?.name || "N/A"}",${
-          b.check_in
-        },${b.check_out},${b.total_price},${b.created_at}`
-    );
-
-    // Unir todo y crear archivo blob
-    const csvContent = [headers, ...rows].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
 
-    // Crear link invisible y dar click
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute(
@@ -125,7 +97,7 @@ export default function AdminDashboard() {
     document.body.removeChild(link);
   };
 
-  // 3. Cálculos de KPIs
+  // 3. CÁLCULOS (KPIs)
   const totalRevenue = bookings.reduce(
     (acc, curr) => acc + (curr.total_price || 0),
     0
@@ -146,19 +118,21 @@ export default function AdminDashboard() {
       ? Math.round((activeBookings.length / rooms.length) * 100)
       : 0;
 
+  // ESTADO DE CARGA
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50 text-rose-900">
-        <div className="animate-pulse flex flex-col items-center">
+        <div className="flex flex-col items-center animate-pulse">
           <BedDouble size={48} />
-          <p className="mt-4 font-bold">Cargando Sistema...</p>
+          <p className="mt-4 font-bold">Cargando Panel...</p>
         </div>
       </div>
     );
 
+  // RENDERIZADO (HTML)
   return (
     <div className="min-h-screen bg-stone-50 font-sans text-stone-800 pb-20">
-      {/* --- HEADER PREMIUM CON DEGRADADO --- */}
+      {/* HEADER */}
       <nav className="bg-gradient-to-r from-rose-900 to-rose-800 text-white shadow-lg sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
@@ -176,12 +150,6 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-6">
-              <div className="hidden md:block text-right">
-                <p className="text-sm font-medium text-white">Administrador</p>
-                <p className="text-xs text-rose-200">
-                  {new Date().toLocaleDateString()}
-                </p>
-              </div>
               <Link
                 href="/"
                 className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium transition backdrop-blur-sm border border-white/10"
@@ -194,7 +162,7 @@ export default function AdminDashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* --- KPI SECTION --- */}
+        {/* KPI CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
           <KpiCard
             title="Ingresos Totales"
@@ -223,7 +191,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* --- ESTADO VISUAL DE HABITACIONES --- */}
+          {/* ESTADO HABITACIONES */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white p-6 rounded-2xl shadow-xl shadow-stone-200/50 border border-stone-100">
               <h2 className="text-lg font-bold text-stone-800 mb-6 flex items-center gap-2">
@@ -236,13 +204,12 @@ export default function AdminDashboard() {
                 {roomStatusList.map((room) => (
                   <div
                     key={room.id}
-                    className={`relative overflow-hidden p-4 rounded-xl border transition-all duration-300 group ${
+                    className={`relative overflow-hidden p-4 rounded-xl border transition-all ${
                       room.status === "occupied"
                         ? "border-rose-200 bg-rose-50"
                         : "border-emerald-200 bg-emerald-50"
                     }`}
                   >
-                    {/* Indicador visual de estado */}
                     <div
                       className={`absolute top-2 right-2 w-2 h-2 rounded-full ${
                         room.status === "occupied"
@@ -250,7 +217,6 @@ export default function AdminDashboard() {
                           : "bg-emerald-500"
                       }`}
                     ></div>
-
                     <span
                       className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${
                         room.status === "occupied"
@@ -269,35 +235,31 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* --- TABLA DE RESERVAS --- */}
+          {/* TABLA DE RESERVAS */}
           <div className="lg:col-span-2">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
               <h2 className="text-lg font-bold text-stone-800 flex items-center gap-2">
                 <div className="p-1.5 bg-rose-100 text-rose-700 rounded-md">
                   <Clock size={18} />
                 </div>
-                Historial de Reservas
+                Historial
               </h2>
-
-              {/* BOTÓN FUNCIONAL DE DESCARGA */}
               <button
                 onClick={downloadReport}
-                className="flex items-center gap-2 bg-stone-900 text-white px-5 py-2.5 rounded-xl hover:bg-stone-800 transition shadow-lg hover:shadow-xl active:scale-95 text-sm font-bold"
+                className="flex items-center gap-2 bg-stone-900 text-white px-5 py-2.5 rounded-xl hover:bg-stone-800 transition shadow-lg text-sm font-bold"
               >
-                <Download size={16} />
-                Descargar Excel
+                <Download size={16} /> Descargar Excel
               </button>
             </div>
 
             <div className="bg-white rounded-2xl shadow-xl shadow-stone-200/50 border border-stone-100 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-stone-50/80 text-stone-500 font-bold uppercase text-[10px] tracking-wider border-b border-stone-100">
+                  <thead className="bg-stone-50 text-stone-500 font-bold uppercase text-[10px] tracking-wider border-b border-stone-100">
                     <tr>
                       <th className="px-6 py-4">Huésped</th>
                       <th className="px-6 py-4">Habitación</th>
-                      <th className="px-6 py-4">Estadía</th>
-                      <th className="px-6 py-4 text-center">Estado</th>
+                      <th className="px-6 py-4">Fechas</th>
                       <th className="px-6 py-4 text-right">Monto</th>
                     </tr>
                   </thead>
@@ -305,48 +267,41 @@ export default function AdminDashboard() {
                     {bookings.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={5}
+                          colSpan={4}
                           className="px-6 py-12 text-center text-stone-400"
                         >
-                          No hay reservas registradas aún.
+                          No hay reservas aún.
                         </td>
                       </tr>
                     ) : (
-                      bookings.map((booking) => (
+                      bookings.map((b) => (
                         <tr
-                          key={booking.id}
-                          className="hover:bg-rose-50/30 transition duration-150 group"
+                          key={b.id}
+                          className="hover:bg-rose-50/30 transition"
                         >
                           <td className="px-6 py-4">
-                            <p className="font-bold text-stone-800 group-hover:text-rose-900 transition">
-                              {booking.guest_name}
+                            <p className="font-bold text-stone-800">
+                              {b.guest_name || "Sin Nombre"}
                             </p>
                             <p className="text-stone-400 text-xs truncate max-w-[150px]">
-                              {booking.email}
+                              {b.email}
                             </p>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="bg-stone-100 text-stone-600 px-3 py-1 rounded-lg text-xs font-semibold border border-stone-200">
-                              {booking.rooms?.name || "Hab. General"}
+                            <span className="bg-stone-100 px-2 py-1 rounded text-xs font-semibold">
+                              {b.rooms?.name || "Gral"}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-stone-600">
-                            <div className="flex flex-col text-xs font-medium gap-1">
-                              <span className="flex items-center gap-1 text-emerald-600">
-                                IN: {booking.check_in}
-                              </span>
-                              <span className="flex items-center gap-1 text-rose-600">
-                                OUT: {booking.check_out}
-                              </span>
+                          <td className="px-6 py-4 text-xs font-medium text-stone-500">
+                            <div className="text-emerald-600">
+                              IN: {b.check_in}
+                            </div>
+                            <div className="text-rose-600">
+                              OUT: {b.check_out}
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide bg-emerald-100 text-emerald-700 border border-emerald-200">
-                              Confirmada
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-right font-bold text-stone-800 text-base">
-                            S/ {booking.total_price}
+                          <td className="px-6 py-4 text-right font-bold text-stone-800">
+                            S/ {b.total_price}
                           </td>
                         </tr>
                       ))
@@ -362,7 +317,6 @@ export default function AdminDashboard() {
   );
 }
 
-// Componente pequeño para las Tarjetas KPI
 function KpiCard({ title, value, icon, color }: any) {
   const colors: any = {
     emerald: "bg-emerald-100 text-emerald-700",
@@ -370,9 +324,8 @@ function KpiCard({ title, value, icon, color }: any) {
     rose: "bg-rose-100 text-rose-700",
     amber: "bg-amber-100 text-amber-700",
   };
-
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-lg shadow-stone-200/40 border border-stone-100 hover:-translate-y-1 transition duration-300 flex items-center gap-4">
+    <div className="bg-white p-6 rounded-2xl shadow-lg border border-stone-100 flex items-center gap-4">
       <div className={`p-4 rounded-2xl ${colors[color]}`}>{icon}</div>
       <div>
         <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">
