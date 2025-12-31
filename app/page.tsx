@@ -63,25 +63,25 @@ export default async function Home() {
       </div>
 
       {/* --- NAVBAR RESPONSIVO --- */}
+      {/* --- NAVBAR EQUILIBRADO Y FUNCIONAL --- */}
       <nav className="fixed top-0 w-full bg-[#FDFBF7]/95 backdrop-blur-md border-b border-stone-200/50 z-[100] shadow-sm">
-        {/* Checkbox que controla el menú */}
         <input type="checkbox" id="menu-toggle" className="peer hidden" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-24 md:h-28">
-            {/* LOGO */}
-            <div className="flex-shrink-0 flex items-center relative z-[110]">
+          <div className="flex justify-between items-center h-20 md:h-24">
+            {/* LOGO: Tamaño optimizado (No gigante para no desconfigurar) */}
+            <div className="flex-shrink-0 flex items-center">
               <a href="#inicio">
                 <img
                   src="/logo.jpg"
                   alt="Hotel Kametza"
-                  className="h-16 md:h-24 w-auto object-contain mix-blend-multiply transition-transform"
+                  className="h-14 md:h-20 w-auto object-contain mix-blend-multiply"
                 />
               </a>
             </div>
 
-            {/* MENÚ DE ESCRITORIO */}
-            <div className="hidden md:flex space-x-10 text-[13px] font-black uppercase tracking-widest text-stone-600 items-center">
+            {/* MENÚ ESCRITORIO: Espaciado elegante */}
+            <div className="hidden md:flex space-x-8 text-[11px] font-black uppercase tracking-[0.15em] text-stone-600 items-center">
               <a
                 href="#inicio"
                 className="hover:text-[#700824] transition-colors"
@@ -106,53 +106,53 @@ export default async function Home() {
               >
                 Contacto
               </a>
-            </div>
-
-            {/* BOTÓN RESERVAR ESCRITORIO */}
-            <div className="hidden md:block">
               <a
                 href="#habitaciones"
-                className="bg-[#700824] text-white px-8 py-3.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl shadow-rose-900/20"
+                className="bg-[#700824] text-white px-6 py-2.5 rounded-full hover:bg-black transition-all shadow-lg"
               >
                 Reservar
               </a>
             </div>
 
-            {/* BOTÓN HAMBURGUESA (MÓVIL) */}
+            {/* BOTÓN HAMBURGUESA: Icono compacto */}
             <label
               htmlFor="menu-toggle"
-              className="md:hidden relative z-[110] p-2 cursor-pointer select-none"
+              className="md:hidden p-2 cursor-pointer flex flex-col gap-1.5"
             >
-              <div className="space-y-1.5">
-                <span className="block w-8 h-0.5 bg-[#700824]"></span>
-                <span className="block w-8 h-0.5 bg-[#700824]"></span>
-                <span className="block w-5 h-0.5 bg-[#700824]"></span>
-              </div>
+              <span className="block w-6 h-0.5 bg-[#700824]"></span>
+              <span className="block w-6 h-0.5 bg-[#700824]"></span>
+              <span className="block w-4 h-0.5 bg-[#700824]"></span>
             </label>
           </div>
         </div>
 
-        {/* --- MENÚ DESPLEGABLE MÓVIL CORREGIDO --- */}
-        <div className="fixed inset-0 bg-[#FDFBF7] z-[105] translate-x-full peer-checked:translate-x-0 transition-transform duration-300 md:hidden">
-          <div className="flex flex-col items-center justify-center h-full space-y-8 text-2xl font-serif font-bold text-rose-950">
-            {/* El truco: Usamos etiquetas label para que al hacer clic se cierre el menú automáticamente */}
-            <label htmlFor="menu-toggle" className="cursor-pointer">
-              <a href="#inicio">Inicio</a>
+        {/* MENÚ MÓVIL: Ocupa solo el espacio necesario bajo el navbar */}
+        <div className="absolute top-full left-0 w-full bg-[#FDFBF7] border-b border-stone-200 shadow-xl overflow-hidden max-h-0 peer-checked:max-h-[400px] transition-all duration-500 md:hidden">
+          <div className="flex flex-col p-6 space-y-5 text-sm font-black uppercase tracking-widest text-stone-600">
+            <label htmlFor="menu-toggle">
+              <a href="#inicio" className="block">
+                Inicio
+              </a>
             </label>
-            <label htmlFor="menu-toggle" className="cursor-pointer">
-              <a href="#habitaciones">Habitaciones</a>
+            <label htmlFor="menu-toggle">
+              <a href="#habitaciones" className="block">
+                Habitaciones
+              </a>
             </label>
-            <label htmlFor="menu-toggle" className="cursor-pointer">
-              <a href="#servicios">Servicios</a>
+            <label htmlFor="menu-toggle">
+              <a href="#servicios" className="block">
+                Servicios
+              </a>
             </label>
-            <label htmlFor="menu-toggle" className="cursor-pointer">
-              <a href="#contacto">Contacto</a>
+            <label htmlFor="menu-toggle">
+              <a href="#contacto" className="block">
+                Contacto
+              </a>
             </label>
-
-            <label htmlFor="menu-toggle" className="mt-8">
+            <label htmlFor="menu-toggle">
               <a
                 href="#habitaciones"
-                className="bg-[#700824] text-white px-10 py-4 rounded-full text-sm font-black uppercase tracking-widest shadow-xl"
+                className="inline-block w-full text-center bg-[#700824] text-white py-4 rounded-xl shadow-lg"
               >
                 Reservar Ahora
               </a>
