@@ -397,36 +397,117 @@ export default async function Home() {
       {/* --- SECCIÓN CONTACTO --- */}
       <section
         id="contacto"
-        className="py-24 bg-rose-900 text-white relative overflow-hidden z-10 px-4"
+        className="py-24 bg-rose-950/90 relative overflow-hidden z-10 px-4"
       >
+        {/* Patrón de textura sutil para que no se vea vacío */}
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <span className="inline-block py-1 px-3 rounded-full bg-rose-800 border border-rose-700 text-rose-100 text-xs font-bold tracking-widest uppercase mb-6">
-            Atención 24/7
+
+        <div className="max-w-6xl mx-auto text-center relative z-10">
+          <span className="inline-block py-1 px-4 rounded-full bg-white/10 border border-white/20 text-white text-[10px] font-black tracking-[0.3em] uppercase mb-6 shadow-sm">
+            Atención Personalizada 24/7
           </span>
-          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6 text-white">
-            ¿Listo para reservar?
+          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-white drop-shadow-md">
+            ¿Deseas una atención directa?
           </h2>
-          <div className="grid md:grid-cols-3 gap-6 text-center mt-12">
-            <div className="p-8 border border-rose-800/50 bg-rose-800/20 backdrop-blur-sm rounded-3xl hover:bg-rose-800/40 transition">
-              <div className="text-4xl mb-4">📞</div>
-              <h3 className="font-bold text-xl mb-2">Llámanos</h3>
-              <p className="text-rose-200 font-medium">+51 966 556 622</p>
-              <p className="text-rose-200 font-medium">+51 920 042 099</p>
-            </div>
-            <div className="p-8 border border-rose-800/50 bg-rose-800/20 backdrop-blur-sm rounded-3xl hover:bg-rose-800/40 transition">
-              <div className="text-4xl mb-4">💬</div>
-              <h3 className="font-bold text-xl mb-2">WhatsApp</h3>
-              <p className="text-rose-200 font-medium">966 556 622</p>
-              <p className="text-rose-200 font-medium">920 042 099</p>
-            </div>
-            <div className="p-8 border border-rose-800/50 bg-rose-800/20 backdrop-blur-sm rounded-3xl hover:bg-rose-800/40 transition">
-              <div className="text-4xl mb-4">✉️</div>
-              <h3 className="font-bold text-xl mb-2">Email</h3>
-              <p className="text-rose-200 font-medium text-sm">
-                kametzahotelayacucho@gmail.com
+          <p className="text-rose-100/80 mb-12 text-lg font-medium max-w-2xl mx-auto">
+            Estamos listos para coordinar tu llegada o resolver cualquier duda
+            sobre tu estadía en Ayacucho.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8 text-center mb-16">
+            {/* WHATSAPP */}
+            <a
+              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20deseo%20información"
+              target="_blank"
+              className="p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-[2rem] hover:bg-white/10 transition duration-300 group shadow-2xl"
+            >
+              <div className="text-4xl mb-4 group-hover:scale-110 transition">
+                💬
+              </div>
+              <h3 className="font-black text-xl mb-2 text-white tracking-wide">
+                WhatsApp
+              </h3>
+              <p className="text-rose-300 font-black text-2xl">966 556 622</p>
+              <span className="text-[10px] text-white/40 mt-2 block uppercase font-bold">
+                Click para chatear
+              </span>
+            </a>
+
+            {/* LLAMADA */}
+            <a
+              href="tel:+51920042099"
+              className="p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-[2rem] hover:bg-white/10 transition duration-300 group shadow-2xl"
+            >
+              <div className="text-4xl mb-4 group-hover:scale-110 transition">
+                📞
+              </div>
+              <h3 className="font-black text-xl mb-2 text-white tracking-wide">
+                Llamar ahora
+              </h3>
+              <p className="text-rose-300 font-black text-2xl">920 042 099</p>
+              <span className="text-[10px] text-white/40 mt-2 block uppercase font-bold">
+                Atención inmediata
+              </span>
+            </a>
+
+            {/* EMAIL */}
+            <a
+              href="mailto:reservas@hotelkametza.com"
+              className="p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-[2rem] hover:bg-white/10 transition duration-300 group shadow-2xl"
+            >
+              <div className="text-4xl mb-4 group-hover:scale-110 transition">
+                ✉️
+              </div>
+              <h3 className="font-black text-xl mb-2 text-white tracking-wide">
+                Correo
+              </h3>
+              <p className="text-rose-300 font-black text-sm">
+                reservas@hotelkametza.com
               </p>
-            </div>
+              <span className="text-[10px] text-white/40 mt-2 block uppercase font-bold">
+                Envíanos un mensaje
+              </span>
+            </a>
+          </div>
+
+          {/* BOTONES REDES SOCIALES RESALTADOS */}
+          <div className="flex flex-wrap justify-center gap-4 pt-10 border-t border-white/10">
+            <a
+              href="https://facebook.com/HotelKametza"
+              target="_blank"
+              className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/10 hover:bg-[#1877F2] transition font-black text-white text-sm"
+            >
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/733/733547.png"
+                className="w-5 h-5 brightness-0 invert"
+                alt="Facebook"
+              />
+              FACEBOOK
+            </a>
+            <a
+              href="https://instagram.com/HotelKametza"
+              target="_blank"
+              className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/10 hover:bg-[#E4405F] transition font-black text-white text-sm"
+            >
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/174/174855.png"
+                className="w-5 h-5 brightness-0 invert"
+                alt="Instagram"
+              />
+              INSTAGRAM
+            </a>
+            <a
+              href="https://tiktok.com/@HotelKametza"
+              target="_blank"
+              className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/10 hover:bg-black transition font-black text-white text-sm"
+            >
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png"
+                className="w-5 h-5 brightness-0 invert"
+                alt="TikTok"
+              />
+              TIKTOK
+            </a>
           </div>
         </div>
       </section>
