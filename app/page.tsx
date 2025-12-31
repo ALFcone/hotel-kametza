@@ -63,14 +63,14 @@ export default async function Home() {
       </div>
 
       {/* --- NAVBAR RESPONSIVO --- */}
-      {/* --- NAVBAR EQUILIBRADO Y FUNCIONAL --- */}
+      {/* --- NAVBAR DEFINITIVO: CIERRE AUTOMÁTICO AL PULSAR --- */}
       <nav className="fixed top-0 w-full bg-[#FDFBF7]/95 backdrop-blur-md border-b border-stone-200/50 z-[100] shadow-sm">
         <input type="checkbox" id="menu-toggle" className="peer hidden" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20 md:h-24">
-            {/* LOGO: Tamaño optimizado (No gigante para no desconfigurar) */}
-            <div className="flex-shrink-0 flex items-center">
+            {/* LOGO */}
+            <div className="flex-shrink-0">
               <a href="#inicio">
                 <img
                   src="/logo.jpg"
@@ -80,7 +80,7 @@ export default async function Home() {
               </a>
             </div>
 
-            {/* MENÚ ESCRITORIO: Espaciado elegante */}
+            {/* MENÚ ESCRITORIO */}
             <div className="hidden md:flex space-x-8 text-[11px] font-black uppercase tracking-[0.15em] text-stone-600 items-center">
               <a
                 href="#inicio"
@@ -108,51 +108,48 @@ export default async function Home() {
               </a>
               <a
                 href="#habitaciones"
-                className="bg-[#700824] text-white px-6 py-2.5 rounded-full hover:bg-black transition-all shadow-lg"
+                className="bg-[#700824] text-white px-6 py-2.5 rounded-full hover:bg-black transition-all"
               >
                 Reservar
               </a>
             </div>
 
-            {/* BOTÓN HAMBURGUESA: Icono compacto */}
+            {/* BOTÓN HAMBURGUESA */}
             <label
               htmlFor="menu-toggle"
               className="md:hidden p-2 cursor-pointer flex flex-col gap-1.5"
             >
               <span className="block w-6 h-0.5 bg-[#700824]"></span>
               <span className="block w-6 h-0.5 bg-[#700824]"></span>
-              <span className="block w-4 h-0.5 bg-[#700824]"></span>
+              <span className="block w-6 h-0.5 bg-[#700824]"></span>
             </label>
           </div>
         </div>
 
-        {/* MENÚ MÓVIL: Ocupa solo el espacio necesario bajo el navbar */}
-        <div className="absolute top-full left-0 w-full bg-[#FDFBF7] border-b border-stone-200 shadow-xl overflow-hidden max-h-0 peer-checked:max-h-[400px] transition-all duration-500 md:hidden">
-          <div className="flex flex-col p-6 space-y-5 text-sm font-black uppercase tracking-widest text-stone-600">
-            <label htmlFor="menu-toggle">
-              <a href="#inicio" className="block">
-                Inicio
-              </a>
-            </label>
-            <label htmlFor="menu-toggle">
-              <a href="#habitaciones" className="block">
-                Habitaciones
-              </a>
-            </label>
-            <label htmlFor="menu-toggle">
-              <a href="#servicios" className="block">
-                Servicios
-              </a>
-            </label>
-            <label htmlFor="menu-toggle">
-              <a href="#contacto" className="block">
-                Contacto
-              </a>
-            </label>
-            <label htmlFor="menu-toggle">
+        {/* MENÚ MÓVIL DESPLEGABLE */}
+        <div className="absolute top-full left-0 w-full bg-[#FDFBF7] border-b border-stone-200 shadow-2xl overflow-hidden max-h-0 peer-checked:max-h-screen transition-all duration-500 md:hidden">
+          <div className="flex flex-col p-4 space-y-1">
+            {/* CADA ENLACE LLEVA UN LABEL QUE CIERRA EL CHECKBOX */}
+            {[
+              { name: "Inicio", href: "#inicio" },
+              { name: "Habitaciones", href: "#habitaciones" },
+              { name: "Servicios", href: "#servicios" },
+              { name: "Contacto", href: "#contacto" },
+            ].map((link) => (
+              <label key={link.name} htmlFor="menu-toggle" className="w-full">
+                <a
+                  href={link.href}
+                  className="block w-full p-4 text-sm font-black uppercase tracking-widest text-stone-600 active:bg-rose-50 rounded-lg"
+                >
+                  {link.name}
+                </a>
+              </label>
+            ))}
+
+            <label htmlFor="menu-toggle" className="pt-4">
               <a
                 href="#habitaciones"
-                className="inline-block w-full text-center bg-[#700824] text-white py-4 rounded-xl shadow-lg"
+                className="block w-full text-center bg-[#700824] text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest shadow-lg"
               >
                 Reservar Ahora
               </a>
