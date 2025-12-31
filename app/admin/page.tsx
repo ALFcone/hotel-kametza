@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { updateRoom } from "../actions"; // Importamos la función de servidor
+import { updateRoom } from "../actions"; // Importamos la nueva función
 import {
   Calendar,
   CheckCircle,
@@ -12,9 +12,9 @@ import {
   Clock,
   Download,
   AlertCircle,
-  Search,
   Edit3,
   Save,
+  ImageIcon,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -24,8 +24,6 @@ export default function AdminDashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [rooms, setRooms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Estados para filtros
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -35,44 +33,34 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     setLoading(true);
-    // 1. Traer reservas
     const { data: bData } = await supabase
       .from("bookings")
       .select(`*, rooms(name, room_number)`)
       .order("created_at", { ascending: false });
-
-    // 2. Traer habitaciones (ordenadas por número)
     const { data: rData } = await supabase
       .from("rooms")
       .select("*")
-      .order("id"); // Ordenar por ID para que no salten al editar
-
+      .order("id");
     if (bData) setBookings(bData);
     if (rData) setRooms(rData);
     setLoading(false);
   };
 
-  // --- LÓGICA DE FILTRADO Y CÁLCULOS ---
   const filteredBookings = bookings.filter((b) => {
     if (!startDate || !endDate) return true;
     return b.check_in >= startDate && b.check_in <= endDate;
   });
-
   const totalRevenue = filteredBookings.reduce(
     (acc, curr) => acc + (curr.total_price || 0),
     0
   );
-
   const today = new Date().toISOString().split("T")[0];
   const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1))
     .toISOString()
     .split("T")[0];
-
-  // Avisos de llegadas prontas (Hoy y Mañana)
   const upcomingArrivals = bookings.filter(
     (b) => b.check_in === today || b.check_in === tomorrow
   );
-
   const activeNow = bookings.filter(
     (b) => b.check_in <= today && b.check_out >= today
   );
@@ -113,7 +101,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-stone-100 text-stone-800 pb-20">
-      {/* NAVBAR ADMIN */}
       <nav className="bg-[#700824] text-white p-4 sticky top-0 z-50 shadow-xl">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="font-bold text-xl flex items-center gap-2 tracking-tighter">
@@ -137,7 +124,6 @@ export default function AdminDashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* FILTROS DE FECHA */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 mb-8 flex flex-wrap items-end gap-4">
           <div className="flex-1 min-w-[200px]">
             <label className="block text-[10px] font-black text-stone-400 uppercase mb-2">
@@ -178,7 +164,6 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        {/* KPIs DINÁMICOS */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <KpiCard
             title="Ingresos Filtrados"
@@ -208,88 +193,102 @@ export default function AdminDashboard() {
           />
         </div>
 
-        {/* --- NUEVA SECCIÓN: GESTIÓN DE HABITACIONES --- */}
+        {/* --- SECCIÓN: GESTIÓN COMPLETA (PRECIO, DESC, FOTO) --- */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-rose-100 text-[#700824] rounded-lg">
               <Edit3 size={24} />
             </div>
             <h2 className="text-xl font-bold text-[#700824]">
-              Gestión de Tarifas y Contenido
+              Gestión de Habitaciones
             </h2>
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {rooms.map((room) => (
               <form
                 key={room.id}
                 action={async (formData) => {
-                  // Llamada a la Server Action
                   await updateRoom(formData);
-                  // Feedback visual y recarga de datos locales
-                  alert(
-                    `Habitación ${room.room_number} actualizada correctamente.`
-                  );
+                  alert(`Habitación ${room.room_number} actualizada.`);
                   fetchData();
                 }}
-                className="bg-white p-5 rounded-2xl shadow-sm border border-stone-200 flex flex-wrap items-end gap-4 hover:shadow-md transition-shadow"
+                className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 flex flex-col md:flex-row items-start md:items-end gap-6 hover:shadow-md transition-shadow relative overflow-hidden"
               >
                 <input type="hidden" name="roomId" value={room.id} />
 
-                {/* Info Básica */}
-                <div className="w-40 pb-2">
-                  <p className="text-[10px] font-black text-stone-400 uppercase mb-1">
-                    Habitación
-                  </p>
-                  <p className="font-bold text-lg text-rose-900">{room.name}</p>
-                  <p className="text-xs text-stone-500 font-bold bg-stone-100 inline-block px-2 py-0.5 rounded">
-                    Nº {room.room_number}
-                  </p>
-                </div>
-
-                {/* Precio */}
-                <div className="w-32">
-                  <label className="text-[10px] font-black text-stone-400 uppercase block mb-1">
-                    Precio (S/)
-                  </label>
-                  <input
-                    type="number"
-                    name="price"
-                    defaultValue={room.price_per_night}
-                    className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl font-bold text-emerald-700 focus:ring-2 focus:ring-[#700824] outline-none"
+                {/* Info y Foto Actual */}
+                <div className="flex items-center gap-4 w-full md:w-auto">
+                  <img
+                    src={room.image_url}
+                    alt={room.name}
+                    className="w-20 h-20 object-cover rounded-xl shadow-sm border-2 border-white"
                   />
+                  <div>
+                    <p className="font-bold text-lg text-rose-900">
+                      {room.name}
+                    </p>
+                    <p className="text-xs font-bold bg-stone-100 inline-block px-2 py-1 rounded mt-1">
+                      Nº {room.room_number}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Descripción */}
-                <div className="flex-1 min-w-[300px]">
-                  <label className="text-[10px] font-black text-stone-400 uppercase block mb-1">
-                    Descripción Web
-                  </label>
-                  <textarea
-                    name="description"
-                    defaultValue={room.description}
-                    rows={1}
-                    className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:ring-2 focus:ring-[#700824] outline-none resize-none"
-                  />
+                {/* Campos Editables */}
+                <div className="flex-1 w-full md:w-auto grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Precio */}
+                  <div>
+                    <label className="text-[10px] font-black text-stone-400 uppercase block mb-1">
+                      Precio (S/)
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      defaultValue={room.price_per_night}
+                      className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl font-bold text-emerald-700 focus:ring-2 focus:ring-[#700824] outline-none"
+                    />
+                  </div>
+                  {/* Nueva Imagen */}
+                  <div className="md:col-span-2">
+                    <label className="text-[10px] font-black text-stone-400 uppercase block mb-1 flex items-center gap-1">
+                      <ImageIcon size={12} /> Cambiar Foto (Opcional)
+                    </label>
+                    <input
+                      type="file"
+                      name="image"
+                      accept="image/png, image/jpeg, image/jpg, image/webp"
+                      className="w-full text-xs text-stone-500 file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 cursor-pointer"
+                    />
+                  </div>
+                  {/* Descripción */}
+                  <div className="md:col-span-3">
+                    <label className="text-[10px] font-black text-stone-400 uppercase block mb-1">
+                      Descripción Web
+                    </label>
+                    <textarea
+                      name="description"
+                      defaultValue={room.description}
+                      rows={2}
+                      className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:ring-2 focus:ring-[#700824] outline-none resize-none"
+                    />
+                  </div>
                 </div>
 
-                {/* Botón de Acción */}
+                {/* Botón Guardar */}
                 <button
                   type="submit"
-                  className="bg-stone-800 text-white px-6 py-3.5 rounded-xl text-xs font-bold hover:bg-[#700824] transition shadow-lg flex items-center gap-2"
+                  className="w-full md:w-auto bg-stone-800 text-white px-6 py-3.5 rounded-xl text-xs font-bold hover:bg-[#700824] transition shadow-lg flex items-center justify-center gap-2"
                 >
-                  <Save size={16} /> Guardar
+                  <Save size={16} /> Guardar Cambios
                 </button>
               </form>
             ))}
           </div>
         </section>
 
-        {/* SECCIÓN INFORMATIVA (MAPA Y TABLA) */}
+        {/* SECCIÓN INFORMATIVA (MAPA Y TABLA - SIN CAMBIOS) */}
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* COLUMNA IZQUIERDA: LLEGADAS Y ESTADO */}
           <div className="space-y-8">
-            {/* PRÓXIMAS LLEGADAS */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-l-amber-500">
               <h2 className="font-bold mb-4 flex items-center gap-2 text-amber-700">
                 <AlertCircle size={18} /> Llegadas Próximas
@@ -297,7 +296,7 @@ export default function AdminDashboard() {
               <div className="space-y-3">
                 {upcomingArrivals.length === 0 ? (
                   <p className="text-xs text-stone-400 italic">
-                    No hay llegadas para hoy ni mañana.
+                    No hay llegadas.
                   </p>
                 ) : (
                   upcomingArrivals.map((b) => (
@@ -321,8 +320,6 @@ export default function AdminDashboard() {
                 )}
               </div>
             </div>
-
-            {/* GRID DE HABITACIONES (MAPA VISUAL) */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200">
               <h2 className="font-bold mb-4 flex items-center gap-2">
                 <CheckCircle size={18} className="text-[#700824]" /> Mapa Visual
@@ -352,8 +349,6 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
-
-          {/* TABLA PRINCIPAL DE RESERVAS */}
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
             <div className="p-4 border-b bg-stone-50 flex justify-between items-center">
               <h3 className="font-bold text-sm">Historial de Reservas</h3>
