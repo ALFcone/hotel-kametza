@@ -63,23 +63,25 @@ export default async function Home() {
       </div>
 
       {/* --- NAVBAR RESPONSIVO --- */}
+      {/* --- NAVBAR CON LOGO GRANDE --- */}
       <nav className="fixed top-0 w-full bg-[#FDFBF7]/95 backdrop-blur-md border-b border-stone-200/50 z-50 shadow-sm">
         <input type="checkbox" id="menu-toggle" className="peer hidden" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            {/* LOGO UBICADO Y OPTIMIZADO */}
+          <div className="flex justify-between items-center h-28">
+            {" "}
+            {/* Aumentamos h-20 a h-28 para dar espacio al logo */}
+            {/* LOGO MAXIMIZADO */}
             <div className="flex-shrink-0 flex items-center">
               <a href="#inicio" className="group">
                 <img
                   src="/logo.jpg"
                   alt="Hotel Kametza"
-                  className="h-16 w-auto object-contain mix-blend-multiply transform group-hover:scale-105 transition-transform duration-300"
+                  className="h-20 md:h-24 w-auto object-contain mix-blend-multiply transform group-hover:scale-110 transition-transform duration-500"
                 />
               </a>
             </div>
-
             {/* MENÚ DE ESCRITORIO */}
-            <div className="hidden md:flex space-x-8 text-sm font-bold text-stone-600 items-center">
+            <div className="hidden md:flex space-x-10 text-[13px] font-black uppercase tracking-widest text-stone-600 items-center">
               <a
                 href="#inicio"
                 className="hover:text-[#700824] transition-colors"
@@ -105,17 +107,15 @@ export default async function Home() {
                 Contacto
               </a>
             </div>
-
             {/* BOTÓN RESERVAR */}
             <div className="hidden md:block">
               <a
                 href="#habitaciones"
-                className="bg-[#700824] text-white px-7 py-3 rounded-full text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg shadow-rose-900/20"
+                className="bg-[#700824] text-white px-8 py-3.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl shadow-rose-900/20"
               >
                 Reservar
               </a>
             </div>
-
             {/* MENÚ MÓVIL (HAMBURGUESA) */}
             <label
               htmlFor="menu-toggle"
