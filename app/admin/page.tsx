@@ -1,6 +1,8 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { updateRoom } from "../actions"; // Importamos la función de servidor
 import {
   Calendar,
   CheckCircle,
@@ -11,6 +13,8 @@ import {
   Download,
   AlertCircle,
   Search,
+  Edit3,
+  Save,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -31,21 +35,24 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     setLoading(true);
+    // 1. Traer reservas
     const { data: bData } = await supabase
       .from("bookings")
       .select(`*, rooms(name, room_number)`)
       .order("created_at", { ascending: false });
+
+    // 2. Traer habitaciones (ordenadas por número)
     const { data: rData } = await supabase
       .from("rooms")
       .select("*")
-      .order("room_number");
+      .order("id"); // Ordenar por ID para que no salten al editar
 
     if (bData) setBookings(bData);
     if (rData) setRooms(rData);
     setLoading(false);
   };
 
-  // --- LÓGICA DE FILTRADO ---
+  // --- LÓGICA DE FILTRADO Y CÁLCULOS ---
   const filteredBookings = bookings.filter((b) => {
     if (!startDate || !endDate) return true;
     return b.check_in >= startDate && b.check_in <= endDate;
@@ -106,6 +113,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-stone-100 text-stone-800 pb-20">
+      {/* NAVBAR ADMIN */}
       <nav className="bg-[#700824] text-white p-4 sticky top-0 z-50 shadow-xl">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="font-bold text-xl flex items-center gap-2 tracking-tighter">
@@ -116,7 +124,7 @@ export default function AdminDashboard() {
               onClick={fetchData}
               className="text-xs bg-white/10 px-3 py-1 rounded-lg hover:bg-white/20 transition"
             >
-              Actualizar
+              Actualizar Datos
             </button>
             <Link
               href="/"
@@ -171,7 +179,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* KPIs DINÁMICOS */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <KpiCard
             title="Ingresos Filtrados"
             value={`S/ ${totalRevenue.toFixed(2)}`}
@@ -192,12 +200,92 @@ export default function AdminDashboard() {
           />
           <KpiCard
             title="Ocupación"
-            value={`${Math.round((activeNow.length / rooms.length) * 100)}%`}
+            value={`${Math.round(
+              (activeNow.length / (rooms.length || 1)) * 100
+            )}%`}
             icon={<BedDouble />}
             color="amber"
           />
         </div>
 
+        {/* --- NUEVA SECCIÓN: GESTIÓN DE HABITACIONES --- */}
+        <section className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-rose-100 text-[#700824] rounded-lg">
+              <Edit3 size={24} />
+            </div>
+            <h2 className="text-xl font-bold text-[#700824]">
+              Gestión de Tarifas y Contenido
+            </h2>
+          </div>
+
+          <div className="grid gap-4">
+            {rooms.map((room) => (
+              <form
+                key={room.id}
+                action={async (formData) => {
+                  // Llamada a la Server Action
+                  await updateRoom(formData);
+                  // Feedback visual y recarga de datos locales
+                  alert(
+                    `Habitación ${room.room_number} actualizada correctamente.`
+                  );
+                  fetchData();
+                }}
+                className="bg-white p-5 rounded-2xl shadow-sm border border-stone-200 flex flex-wrap items-end gap-4 hover:shadow-md transition-shadow"
+              >
+                <input type="hidden" name="roomId" value={room.id} />
+
+                {/* Info Básica */}
+                <div className="w-40 pb-2">
+                  <p className="text-[10px] font-black text-stone-400 uppercase mb-1">
+                    Habitación
+                  </p>
+                  <p className="font-bold text-lg text-rose-900">{room.name}</p>
+                  <p className="text-xs text-stone-500 font-bold bg-stone-100 inline-block px-2 py-0.5 rounded">
+                    Nº {room.room_number}
+                  </p>
+                </div>
+
+                {/* Precio */}
+                <div className="w-32">
+                  <label className="text-[10px] font-black text-stone-400 uppercase block mb-1">
+                    Precio (S/)
+                  </label>
+                  <input
+                    type="number"
+                    name="price"
+                    defaultValue={room.price_per_night}
+                    className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl font-bold text-emerald-700 focus:ring-2 focus:ring-[#700824] outline-none"
+                  />
+                </div>
+
+                {/* Descripción */}
+                <div className="flex-1 min-w-[300px]">
+                  <label className="text-[10px] font-black text-stone-400 uppercase block mb-1">
+                    Descripción Web
+                  </label>
+                  <textarea
+                    name="description"
+                    defaultValue={room.description}
+                    rows={1}
+                    className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:ring-2 focus:ring-[#700824] outline-none resize-none"
+                  />
+                </div>
+
+                {/* Botón de Acción */}
+                <button
+                  type="submit"
+                  className="bg-stone-800 text-white px-6 py-3.5 rounded-xl text-xs font-bold hover:bg-[#700824] transition shadow-lg flex items-center gap-2"
+                >
+                  <Save size={16} /> Guardar
+                </button>
+              </form>
+            ))}
+          </div>
+        </section>
+
+        {/* SECCIÓN INFORMATIVA (MAPA Y TABLA) */}
         <div className="grid lg:grid-cols-3 gap-8">
           {/* COLUMNA IZQUIERDA: LLEGADAS Y ESTADO */}
           <div className="space-y-8">
@@ -234,11 +322,10 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* GRID DE HABITACIONES */}
+            {/* GRID DE HABITACIONES (MAPA VISUAL) */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200">
               <h2 className="font-bold mb-4 flex items-center gap-2">
-                <CheckCircle size={18} className="text-[#700824]" /> Mapa del
-                Hotel
+                <CheckCircle size={18} className="text-[#700824]" /> Mapa Visual
               </h2>
               <div className="grid grid-cols-4 gap-2">
                 {rooms.map((room) => (
