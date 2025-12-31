@@ -44,8 +44,56 @@ export default function AdminDashboard() {
   }, []);
 
   // 2. Lógica para Descargar Excel/CSV
-  const downloadReport = () => {
+   const downloadReport = () => {
     if (bookings.length === 0) return alert("No hay datos para descargar");
+
+    // Usamos PUNTO Y COMA (;) que es lo que Excel en español detecta para columnas
+    const separator = ";";
+    
+    // Encabezados
+    const headers = [
+      "ID Reserva", 
+      "Nombre Huesped", 
+      "Email", 
+      "Habitacion", 
+      "Entrada", 
+      "Salida", 
+      "Total Pago", 
+      "Fecha Creacion"
+    ].join(separator);
+    
+    // Filas de datos
+    const rows = bookings.map(b => {
+      // Limpiamos los datos para evitar errores si son nulos
+      const nombre = b.guest_name ? b.guest_name.replace(/;/g, "") : "Sin Nombre";
+      const email = b.email ? b.email : "Sin Email";
+      const habitacion = b.rooms?.name ? b.rooms.name : "Hab. General";
+      
+      return [
+        b.id,
+        `"${nombre}"`,      // Entre comillas por si tiene espacios
+        `"${email}"`,
+        `"${habitacion}"`,
+        b.check_in,
+        b.check_out,
+        b.total_price,
+        b.created_at
+      ].join(separator);
+    });
+
+    // Unir todo con el BOM (\uFEFF) para que Excel reconozca tildes y ñ
+    const csvContent = "\uFEFF" + [headers, ...rows].join("\n");
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `Reporte_Kametza_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
     // Cabeceras del CSV
     const headers = [
