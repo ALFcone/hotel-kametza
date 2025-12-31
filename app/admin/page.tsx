@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-// Forzamos que la página sea dinámica para que no cachee datos viejos
 export const dynamic = "force-dynamic";
 
 export default function AdminDashboard() {
@@ -43,17 +42,16 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
-  // 2. DESCARGAR EXCEL (Corregido para Español)
+  // 2. DESCARGAR EXCEL (CORREGIDO CON TUS COLUMNAS REALES)
   const downloadReport = () => {
     if (bookings.length === 0) return alert("No hay datos para descargar");
 
-    const separator = ";"; // Clave para Excel en español
+    const separator = ";";
 
-    // Encabezados
     const headers = [
       "ID Reserva",
-      "Nombre Huesped",
-      "Email",
+      "Nombre Cliente", // Cambiado titulo
+      "Email Cliente", // Cambiado titulo
       "Habitacion",
       "Entrada",
       "Salida",
@@ -61,12 +59,12 @@ export default function AdminDashboard() {
       "Fecha Creacion",
     ].join(separator);
 
-    // Filas
     const rows = bookings.map((b) => {
-      const nombre = b.guest_name
-        ? b.guest_name.replace(/;/g, "")
+      // ⚠️ AQUÍ ESTABA EL ERROR: Usamos client_name y client_email
+      const nombre = b.client_name
+        ? b.client_name.replace(/;/g, "")
         : "Sin Nombre";
-      const email = b.email ? b.email : "Sin Email";
+      const email = b.client_email ? b.client_email : "Sin Email";
       const habitacion = b.rooms?.name ? b.rooms.name : "Hab. General";
 
       return [
@@ -81,7 +79,6 @@ export default function AdminDashboard() {
       ].join(separator);
     });
 
-    // Unimos con BOM (\uFEFF) para que reconozca tildes
     const csvContent = "\uFEFF" + [headers, ...rows].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -97,7 +94,7 @@ export default function AdminDashboard() {
     document.body.removeChild(link);
   };
 
-  // 3. CÁLCULOS (KPIs)
+  // 3. CÁLCULOS
   const totalRevenue = bookings.reduce(
     (acc, curr) => acc + (curr.total_price || 0),
     0
@@ -118,7 +115,6 @@ export default function AdminDashboard() {
       ? Math.round((activeBookings.length / rooms.length) * 100)
       : 0;
 
-  // ESTADO DE CARGA
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50 text-rose-900">
@@ -129,7 +125,6 @@ export default function AdminDashboard() {
       </div>
     );
 
-  // RENDERIZADO (HTML)
   return (
     <div className="min-h-screen bg-stone-50 font-sans text-stone-800 pb-20">
       {/* HEADER */}
@@ -280,11 +275,12 @@ export default function AdminDashboard() {
                           className="hover:bg-rose-50/30 transition"
                         >
                           <td className="px-6 py-4">
+                            {/* ⚠️ CORREGIDO AQUI TAMBIEN: client_name */}
                             <p className="font-bold text-stone-800">
-                              {b.guest_name || "Sin Nombre"}
+                              {b.client_name || "Sin Nombre"}
                             </p>
                             <p className="text-stone-400 text-xs truncate max-w-[150px]">
-                              {b.email}
+                              {b.client_email || "Sin Email"}
                             </p>
                           </td>
                           <td className="px-6 py-4">
