@@ -67,75 +67,62 @@ export default async function Home() {
         <input type="checkbox" id="menu-toggle" className="peer hidden" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
+            {/* LOGO UBICADO Y OPTIMIZADO */}
             <div className="flex-shrink-0 flex items-center">
-              <a href="#inicio" className="flex items-center gap-2">
+              <a href="#inicio" className="group">
                 <img
                   src="/logo.jpg"
                   alt="Hotel Kametza"
-                  className="h-14 w-auto object-contain mix-blend-multiply"
+                  className="h-16 w-auto object-contain mix-blend-multiply transform group-hover:scale-105 transition-transform duration-300"
                 />
               </a>
             </div>
-            <div className="hidden md:flex space-x-8 text-sm font-medium text-stone-600 items-center">
-              <a href="#inicio" className="hover:text-rose-800 transition">
+
+            {/* MENÚ DE ESCRITORIO */}
+            <div className="hidden md:flex space-x-8 text-sm font-bold text-stone-600 items-center">
+              <a
+                href="#inicio"
+                className="hover:text-[#700824] transition-colors"
+              >
                 Inicio
               </a>
               <a
                 href="#habitaciones"
-                className="hover:text-rose-800 transition"
+                className="hover:text-[#700824] transition-colors"
               >
                 Habitaciones
               </a>
-              <a href="#servicios" className="hover:text-rose-800 transition">
+              <a
+                href="#servicios"
+                className="hover:text-[#700824] transition-colors"
+              >
                 Servicios
               </a>
-              <a href="#ubicacion" className="hover:text-rose-800 transition">
-                Ubicación
-              </a>
-              <a href="#contacto" className="hover:text-rose-800 transition">
+              <a
+                href="#contacto"
+                className="hover:text-[#700824] transition-colors"
+              >
                 Contacto
               </a>
             </div>
+
+            {/* BOTÓN RESERVAR */}
             <div className="hidden md:block">
               <a
                 href="#habitaciones"
-                className="bg-rose-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-rose-800 transition shadow-lg shadow-rose-900/20"
+                className="bg-[#700824] text-white px-7 py-3 rounded-full text-xs font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg shadow-rose-900/20"
               >
                 Reservar
               </a>
             </div>
+
+            {/* MENÚ MÓVIL (HAMBURGUESA) */}
             <label
               htmlFor="menu-toggle"
-              className="md:hidden text-3xl text-rose-900 cursor-pointer select-none p-2"
+              className="md:hidden text-3xl text-[#700824] cursor-pointer p-2"
             >
               ☰
             </label>
-          </div>
-        </div>
-        <div className="hidden peer-checked:block md:hidden bg-[#FDFBF7] border-t border-stone-200 absolute w-full left-0 top-20 shadow-xl h-screen transition-all">
-          <div className="flex flex-col p-8 gap-6 text-center text-lg font-medium text-stone-600">
-            <a href="#inicio" className="hover:text-rose-900">
-              Inicio
-            </a>
-            <a href="#habitaciones" className="hover:text-rose-900">
-              Habitaciones
-            </a>
-            <a href="#servicios" className="hover:text-rose-900">
-              Servicios
-            </a>
-            <a href="#ubicacion" className="hover:text-rose-900">
-              Ubicación
-            </a>
-            <a href="#contacto" className="hover:text-rose-900">
-              Contacto
-            </a>
-            <hr className="border-stone-200 my-2" />
-            <a
-              href="#habitaciones"
-              className="bg-rose-900 text-white py-4 rounded-xl font-bold shadow-lg"
-            >
-              Reservar Ahora
-            </a>
           </div>
         </div>
       </nav>
