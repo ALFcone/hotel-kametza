@@ -4,8 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-// --- FUNCIÓN PARA CREAR RESERVA (CLIENTE) ---
-// (Esta función no cambia, sigue igual)
+// --- FUNCIÓN PARA CREAR RESERVA (CLIENTE) - SIN CAMBIOS ---
 export async function createBooking(formData: FormData) {
   const roomId = formData.get("roomId");
   const checkIn = formData.get("checkIn") as string;
@@ -35,39 +34,37 @@ export async function createBooking(formData: FormData) {
     status: "pendiente",
   });
 
-  if (error) {
-    console.error("Error al guardar:", error);
-    return;
-  }
-
+  if (error) return;
   redirect("/exito");
 }
 
-// --- NUEVA FUNCIÓN PARA ACTUALIZAR HABITACIÓN E IMAGEN (ADMIN) ---
+// --- FUNCIÓN MEJORADA PARA ACTUALIZAR HABITACIÓN ---
 export async function updateRoom(formData: FormData) {
   const roomId = formData.get("roomId");
   const price = formData.get("price");
   const description = formData.get("description");
-  const imageFile = formData.get("image") as File; // Obtenemos el archivo
+  const imageFile = formData.get("image") as File;
 
   let imageUrlToUpdate = null;
 
-  // 1. Verificar si se subió una imagen nueva
+  // 1. Verificar imagen
   if (imageFile && imageFile.size > 0 && imageFile.name !== "undefined") {
-    // Crear un nombre único para la imagen (usando la fecha actual)
+    // Usamos Date.now() para que el nombre sea siempre único y evitar caché
     const fileName = `${Date.now()}-${imageFile.name.replace(/\s/g, "-")}`;
 
-    // Subir al bucket "room-images"
+    // Subimos con upsert y cacheControl
     const { error: uploadError } = await supabase.storage
       .from("room-images")
-      .upload(fileName, imageFile);
+      .upload(fileName, imageFile, {
+        cacheControl: "3600",
+        upsert: true,
+      });
 
     if (uploadError) {
       console.error("Error subiendo imagen:", uploadError);
-      throw new Error("Fallo al subir la imagen");
+      throw new Error("Error al subir imagen");
     }
 
-    // Obtener la URL pública de la imagen subida
     const { data: publicUrlData } = supabase.storage
       .from("room-images")
       .getPublicUrl(fileName);
@@ -75,29 +72,28 @@ export async function updateRoom(formData: FormData) {
     imageUrlToUpdate = publicUrlData.publicUrl;
   }
 
-  // 2. Preparar los datos para actualizar
+  // 2. Preparar datos
   const updateData: any = {
     price_per_night: Number(price),
     description: description,
   };
 
-  // Solo si hubo una imagen nueva, añadimos el campo image_url a la actualización
   if (imageUrlToUpdate) {
     updateData.image_url = imageUrlToUpdate;
   }
 
-  // 3. Actualizar la base de datos
+  // 3. Actualizar BD
   const { error } = await supabase
     .from("rooms")
     .update(updateData)
     .eq("id", roomId);
 
   if (error) {
-    console.error("Error al actualizar BD:", error);
-    throw new Error("No se pudo actualizar la habitación");
+    console.error("Error BD:", error);
+    throw new Error("No se pudo actualizar");
   }
 
-  // Refrescar las páginas
-  revalidatePath("/admin");
-  revalidatePath("/");
+  // 4. Forzar revalidación de caché en todas las rutas posibles
+  revalidatePath("/admin", "layout");
+  revalidatePath("/", "layout");
 }
