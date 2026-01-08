@@ -445,6 +445,45 @@ export default function Home() {
                           required
                           className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
                         />
+                        {/* --- SELECTOR DE PAGO ACTUALIZADO (MERCADO PAGO) --- */}
+                        <div className="relative">
+                          <select
+                            name="paymentMethod"
+                            required
+                            defaultValue=""
+                            className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none appearance-none font-bold text-stone-600 cursor-pointer"
+                          >
+                            <option value="" disabled>
+                              Seleccione método de pago
+                            </option>
+                            {/* NUEVA OPCIÓN PARA PASARELA */}
+                            <option value="online">
+                              💳 Pago Online (Prueba - Visa/Mastercard)
+                            </option>
+                            <option disabled>-------------------</option>
+                            <option value="yape">
+                              📲 Yape / Plin (Manual)
+                            </option>
+                            <option value="card">
+                              💳 Tarjeta (POS al llegar)
+                            </option>
+                            <option value="bcp">🧡 Transferencia BCP</option>
+                            <option value="interbank">
+                              💚 Transferencia Interbank
+                            </option>
+                            <option value="bbva">💙 Transferencia BBVA</option>
+                            <option value="bn">❤️ Banco de la Nación</option>
+                            <option value="internacional">
+                              🌎 Transferencia Internacional (Swift)
+                            </option>
+                            <option value="recepcion">
+                              🏨 Pagar en Recepción
+                            </option>
+                          </select>
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400 text-xs">
+                            ▼
+                          </div>
+                        </div>
                         <button
                           type="submit"
                           className="w-full bg-[#700824] text-white font-black py-5 rounded-2xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest"
