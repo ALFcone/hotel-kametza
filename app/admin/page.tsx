@@ -1,431 +1,272 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { updateRoom } from "../actions"; // Importamos la nueva función
+import { revalidatePath } from "next/cache";
+import { updateRoom } from "../actions"; // Importamos la acción de actualizar cuarto
 import {
   Calendar,
   CheckCircle,
-  CreditCard,
-  Users,
-  BedDouble,
   Clock,
-  Download,
-  AlertCircle,
-  Edit3,
-  Save,
-  ImageIcon,
+  CreditCard,
+  DollarSign,
+  User,
+  Home as HomeIcon,
+  Search,
 } from "lucide-react";
-import Link from "next/link";
 
-export const dynamic = "force-dynamic";
+// --- ACCIÓN PARA MARCAR COMO PAGADO (Server Action) ---
+async function markAsPaid(formData: FormData) {
+  "use server";
+  const bookingId = formData.get("bookingId");
 
-export default function AdminDashboard() {
-  const [bookings, setBookings] = useState<any[]>([]);
-  const [rooms, setRooms] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  await supabase
+    .from("bookings")
+    .update({ status: "pagado" })
+    .eq("id", bookingId);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  revalidatePath("/admin");
+}
 
-  const fetchData = async () => {
-    setLoading(true);
-    const { data: bData } = await supabase
-      .from("bookings")
-      .select(`*, rooms(name, room_number)`)
-      .order("created_at", { ascending: false });
-    const { data: rData } = await supabase
-      .from("rooms")
-      .select("*")
-      .order("id");
-    if (bData) setBookings(bData);
-    if (rData) setRooms(rData);
-    setLoading(false);
-  };
+async function deleteBooking(formData: FormData) {
+  "use server";
+  const bookingId = formData.get("bookingId");
 
-  const filteredBookings = bookings.filter((b) => {
-    if (!startDate || !endDate) return true;
-    return b.check_in >= startDate && b.check_in <= endDate;
-  });
-  const totalRevenue = filteredBookings.reduce(
-    (acc, curr) => acc + (curr.total_price || 0),
-    0
-  );
-  const today = new Date().toISOString().split("T")[0];
-  const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1))
-    .toISOString()
-    .split("T")[0];
-  const upcomingArrivals = bookings.filter(
-    (b) => b.check_in === today || b.check_in === tomorrow
-  );
-  const activeNow = bookings.filter(
-    (b) => b.check_in <= today && b.check_out >= today
-  );
-  const occupiedIds = activeNow.map((b) => b.room_id);
+  await supabase.from("bookings").delete().eq("id", bookingId);
 
-  const downloadReport = () => {
-    const sep = ";";
-    const headers = [
-      "Cliente",
-      "Habitacion",
-      "Entrada",
-      "Salida",
-      "Total",
-    ].join(sep);
-    const rows = filteredBookings.map((b) =>
-      [
-        `"${b.client_name}"`,
-        b.rooms?.room_number,
-        b.check_in,
-        b.check_out,
-        b.total_price,
-      ].join(sep)
-    );
-    const csv = "\uFEFF" + [headers, ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.body.appendChild(document.createElement("a"));
-    link.href = URL.createObjectURL(blob);
-    link.download = `Reporte_Kametza.csv`;
-    link.click();
-  };
+  revalidatePath("/admin");
+}
 
-  if (loading)
-    return (
-      <div className="h-screen flex items-center justify-center text-rose-900 font-bold animate-pulse">
-        Cargando Gestión...
-      </div>
-    );
+export default async function AdminPage() {
+  // 1. OBTENER HABITACIONES
+  const { data: rooms } = await supabase.from("rooms").select("*").order("id");
+
+  // 2. OBTENER RESERVAS (Ordenadas por las más nuevas primero)
+  // Hacemos un 'join' manual simple obteniendo todo
+  const { data: bookings } = await supabase
+    .from("bookings")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  // Función auxiliar para buscar el nombre del cuarto
+  const getRoomName = (id: number) =>
+    rooms?.find((r) => r.id === id)?.name || "Habitación desconocida";
 
   return (
-    <div className="min-h-screen bg-stone-100 text-stone-800 pb-20">
-      <nav className="bg-[#700824] text-white p-4 sticky top-0 z-50 shadow-xl">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="font-bold text-xl flex items-center gap-2 tracking-tighter">
-            <BedDouble /> KAMETZA ADMIN
-          </h1>
-          <div className="flex gap-4">
-            <button
-              onClick={fetchData}
-              className="text-xs bg-white/10 px-3 py-1 rounded-lg hover:bg-white/20 transition"
-            >
-              Actualizar Datos
-            </button>
-            <Link
-              href="/"
-              className="text-xs bg-white/20 px-3 py-1 rounded-lg hover:bg-white/30 transition font-bold"
-            >
-              Ver Web
-            </Link>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-stone-50 text-stone-800 p-6 md:p-12 font-sans">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-serif font-bold text-rose-950 mb-8 flex items-center gap-3">
+          <User className="bg-rose-900 text-white p-2 rounded-lg" size={48} />
+          Panel de Administración
+        </h1>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 mb-8 flex flex-wrap items-end gap-4">
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-[10px] font-black text-stone-400 uppercase mb-2">
-              Desde (Check-in)
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full p-2 bg-stone-50 border border-stone-200 rounded-lg text-sm"
-            />
-          </div>
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-[10px] font-black text-stone-400 uppercase mb-2">
-              Hasta (Check-in)
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full p-2 bg-stone-50 border border-stone-200 rounded-lg text-sm"
-            />
-          </div>
-          <button
-            onClick={() => {
-              setStartDate("");
-              setEndDate("");
-            }}
-            className="p-2.5 bg-stone-100 text-stone-500 rounded-lg hover:bg-stone-200"
-          >
-            <Clock size={18} />
-          </button>
-          <button
-            onClick={downloadReport}
-            className="bg-[#700824] text-white px-6 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-rose-900 shadow-lg shadow-rose-900/20"
-          >
-            <Download size={16} /> Descargar Filtrados
-          </button>
-        </div>
+        {/* --- SECCIÓN 1: GESTIÓN DE RESERVAS (LO NUEVO) --- */}
+        <section className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-stone-100 mb-12">
+          <h2 className="text-2xl font-bold text-stone-700 mb-6 flex items-center gap-2">
+            <Calendar className="text-rose-600" /> Últimas Reservas
+          </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <KpiCard
-            title="Ingresos Filtrados"
-            value={`S/ ${totalRevenue.toFixed(2)}`}
-            icon={<CreditCard />}
-            color="emerald"
-          />
-          <KpiCard
-            title="Reservas en Periodo"
-            value={filteredBookings.length}
-            icon={<Calendar />}
-            color="blue"
-          />
-          <KpiCard
-            title="Huéspedes Hoy"
-            value={activeNow.length}
-            icon={<Users />}
-            color="rose"
-          />
-          <KpiCard
-            title="Ocupación"
-            value={`${Math.round(
-              (activeNow.length / (rooms.length || 1)) * 100
-            )}%`}
-            icon={<BedDouble />}
-            color="amber"
-          />
-        </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-stone-100">
+                  <th className="p-4">Estado</th>
+                  <th className="p-4">Cliente</th>
+                  <th className="p-4">Habitación</th>
+                  <th className="p-4">Fechas (In - Out)</th>
+                  <th className="p-4">Total</th>
+                  <th className="p-4">Método</th>
+                  <th className="p-4 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {bookings?.map((booking) => (
+                  <tr
+                    key={booking.id}
+                    className="border-b border-stone-50 hover:bg-stone-50 transition"
+                  >
+                    {/* ESTADO CON COLORES */}
+                    <td className="p-4">
+                      {booking.status === "pagado" ||
+                      booking.status === "approved" ? (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
+                          <CheckCircle size={12} /> PAGADO
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+                          <Clock size={12} /> PENDIENTE
+                        </span>
+                      )}
+                    </td>
 
-        {/* --- SECCIÓN: GESTIÓN COMPLETA (PRECIO, DESC, FOTO) --- */}
-        <section className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-rose-100 text-[#700824] rounded-lg">
-              <Edit3 size={24} />
-            </div>
-            <h2 className="text-xl font-bold text-[#700824]">
-              Gestión de Habitaciones
-            </h2>
+                    <td className="p-4 font-bold text-stone-700">
+                      {booking.client_name}
+                      <div className="text-[10px] text-stone-400 font-normal">
+                        {booking.client_email}
+                      </div>
+                    </td>
+
+                    <td className="p-4 text-rose-900 font-medium">
+                      {getRoomName(booking.room_id)}
+                    </td>
+
+                    <td className="p-4">
+                      <div className="flex flex-col">
+                        <span className="font-bold">📅 {booking.check_in}</span>
+                        <span className="text-stone-400">
+                          al {booking.check_out}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="p-4 font-black text-stone-700">
+                      S/ {booking.total_price}
+                    </td>
+
+                    <td className="p-4 capitalize text-stone-500">
+                      {booking.payment_method === "online"
+                        ? "💳 Tarjeta/Web"
+                        : booking.payment_method}
+                    </td>
+
+                    {/* BOTONES DE ACCIÓN */}
+                    <td className="p-4 flex gap-2 justify-center">
+                      {/* Botón para confirmar pago manualmente (si pagaron por Yape) */}
+                      {booking.status !== "pagado" &&
+                        booking.status !== "approved" && (
+                          <form action={markAsPaid}>
+                            <input
+                              type="hidden"
+                              name="bookingId"
+                              value={booking.id}
+                            />
+                            <button
+                              title="Marcar como Pagado"
+                              className="p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition shadow-sm"
+                            >
+                              <DollarSign size={16} />
+                            </button>
+                          </form>
+                        )}
+
+                      {/* Botón Eliminar (Cuidado) */}
+                      <form action={deleteBooking}>
+                        <input
+                          type="hidden"
+                          name="bookingId"
+                          value={booking.id}
+                        />
+                        <button
+                          title="Eliminar Reserva"
+                          className="p-2 bg-stone-200 text-stone-500 rounded-lg hover:bg-rose-500 hover:text-white transition shadow-sm"
+                        >
+                          <X size={16} />
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+
+                {(!bookings || bookings.length === 0) && (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center text-stone-400">
+                      No hay reservas registradas todavía.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
+        </section>
 
-          <div className="grid gap-6">
-            {rooms.map((room) => (
-              <form
+        {/* --- SECCIÓN 2: EDITAR HABITACIONES (YA EXISTÍA) --- */}
+        <section>
+          <h2 className="text-2xl font-bold text-stone-700 mb-6 flex items-center gap-2">
+            <HomeIcon className="text-rose-600" /> Editar Habitaciones
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {rooms?.map((room) => (
+              <div
                 key={room.id}
-                action={async (formData) => {
-                  await updateRoom(formData);
-                  alert(`Habitación ${room.room_number} actualizada.`);
-                  fetchData();
-                }}
-                className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 flex flex-col md:flex-row items-start md:items-end gap-6 hover:shadow-md transition-shadow relative overflow-hidden"
+                className="bg-white p-6 rounded-[2rem] shadow-lg border border-stone-100 flex flex-col gap-4"
               >
-                <input type="hidden" name="roomId" value={room.id} />
-
-                {/* Info y Foto Actual */}
-                <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="relative h-40 rounded-xl overflow-hidden bg-stone-200">
                   <img
                     src={room.image_url}
                     alt={room.name}
-                    className="w-20 h-20 object-cover rounded-xl shadow-sm border-2 border-white"
+                    className="w-full h-full object-cover"
                   />
-                  <div>
-                    <p className="font-bold text-lg text-rose-900">
-                      {room.name}
-                    </p>
-                    <p className="text-xs font-bold bg-stone-100 inline-block px-2 py-1 rounded mt-1">
-                      Nº {room.room_number}
-                    </p>
+                  <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur-md">
+                    ID: {room.id}
                   </div>
                 </div>
 
-                {/* Campos Editables */}
-                <div className="flex-1 w-full md:w-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Precio */}
+                <h3 className="font-bold text-xl text-rose-900">{room.name}</h3>
+
+                <form action={updateRoom} className="flex flex-col gap-3">
+                  <input type="hidden" name="roomId" value={room.id} />
+
                   <div>
-                    <label className="text-[10px] font-black text-stone-400 uppercase block mb-1">
+                    <label className="text-xs font-bold uppercase text-stone-400 ml-1">
                       Precio (S/)
                     </label>
                     <input
-                      type="number"
                       name="price"
                       defaultValue={room.price_per_night}
-                      className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl font-bold text-emerald-700 focus:ring-2 focus:ring-[#700824] outline-none"
+                      type="number"
+                      className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 font-bold text-stone-700"
                     />
                   </div>
-                  {/* Nueva Imagen */}
-                  <div className="md:col-span-2">
-                    <label className="text-[10px] font-black text-stone-400 uppercase block mb-1 flex items-center gap-1">
-                      <ImageIcon size={12} /> Cambiar Foto (Opcional)
-                    </label>
-                    <input
-                      type="file"
-                      name="image"
-                      accept="image/png, image/jpeg, image/jpg, image/webp"
-                      className="w-full text-xs text-stone-500 file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200 cursor-pointer"
-                    />
-                  </div>
-                  {/* Descripción */}
-                  <div className="md:col-span-3">
-                    <label className="text-[10px] font-black text-stone-400 uppercase block mb-1">
-                      Descripción Web
+
+                  <div>
+                    <label className="text-xs font-bold uppercase text-stone-400 ml-1">
+                      Descripción
                     </label>
                     <textarea
                       name="description"
                       defaultValue={room.description}
-                      rows={2}
-                      className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:ring-2 focus:ring-[#700824] outline-none resize-none"
+                      rows={3}
+                      className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs resize-none"
                     />
                   </div>
-                </div>
 
-                {/* Botón Guardar */}
-                <button
-                  type="submit"
-                  className="w-full md:w-auto bg-stone-800 text-white px-6 py-3.5 rounded-xl text-xs font-bold hover:bg-[#700824] transition shadow-lg flex items-center justify-center gap-2"
-                >
-                  <Save size={16} /> Guardar Cambios
-                </button>
-              </form>
+                  <div>
+                    <label className="text-xs font-bold uppercase text-stone-400 ml-1">
+                      Actualizar Foto
+                    </label>
+                    <input
+                      type="file"
+                      name="image"
+                      accept="image/*"
+                      className="w-full text-xs text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100"
+                    />
+                  </div>
+
+                  <button className="bg-stone-900 text-white font-bold py-3 rounded-xl mt-2 hover:bg-rose-900 transition">
+                    Guardar Cambios
+                  </button>
+                </form>
+              </div>
             ))}
           </div>
         </section>
-
-        {/* SECCIÓN INFORMATIVA (MAPA Y TABLA - SIN CAMBIOS) */}
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="space-y-8">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-l-amber-500">
-              <h2 className="font-bold mb-4 flex items-center gap-2 text-amber-700">
-                <AlertCircle size={18} /> Llegadas Próximas
-              </h2>
-              <div className="space-y-3">
-                {upcomingArrivals.length === 0 ? (
-                  <p className="text-xs text-stone-400 italic">
-                    No hay llegadas.
-                  </p>
-                ) : (
-                  upcomingArrivals.map((b) => (
-                    <div
-                      key={b.id}
-                      className="p-3 bg-amber-50 rounded-xl border border-amber-100 flex justify-between items-center"
-                    >
-                      <div>
-                        <p className="text-sm font-bold text-stone-800">
-                          {b.client_name}
-                        </p>
-                        <p className="text-[10px] text-amber-600 font-bold uppercase">
-                          {b.check_in === today ? "Llega Hoy" : "Llega Mañana"}
-                        </p>
-                      </div>
-                      <span className="bg-white px-2 py-1 rounded text-xs font-bold shadow-sm">
-                        Hab. {b.rooms?.room_number}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-200">
-              <h2 className="font-bold mb-4 flex items-center gap-2">
-                <CheckCircle size={18} className="text-[#700824]" /> Mapa Visual
-              </h2>
-              <div className="grid grid-cols-4 gap-2">
-                {rooms.map((room) => (
-                  <div
-                    key={room.id}
-                    className={`p-2 rounded-lg border text-center transition ${
-                      occupiedIds.includes(room.id)
-                        ? "bg-rose-100 border-rose-300"
-                        : "bg-emerald-50 border-emerald-200"
-                    }`}
-                  >
-                    <div className="text-sm font-black text-stone-800">
-                      {room.room_number}
-                    </div>
-                    <div
-                      className={`w-1.5 h-1.5 mx-auto rounded-full mt-1 ${
-                        occupiedIds.includes(room.id)
-                          ? "bg-rose-500 animate-pulse"
-                          : "bg-emerald-500"
-                      }`}
-                    ></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
-            <div className="p-4 border-b bg-stone-50 flex justify-between items-center">
-              <h3 className="font-bold text-sm">Historial de Reservas</h3>
-              <span className="text-[10px] bg-stone-200 px-2 py-1 rounded-full font-bold text-stone-500">
-                {filteredBookings.length} Resultados
-              </span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-stone-50 text-[10px] uppercase text-stone-400 font-black border-b">
-                  <tr>
-                    <th className="p-4">Huésped</th>
-                    <th className="p-4">Habitación</th>
-                    <th className="p-4">Fechas</th>
-                    <th className="p-4 text-right">Monto</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {filteredBookings.map((b) => (
-                    <tr
-                      key={b.id}
-                      className="hover:bg-stone-50 transition-colors"
-                    >
-                      <td className="p-4">
-                        <p className="font-bold text-stone-800">
-                          {b.client_name}
-                        </p>
-                        <p className="text-[10px] text-stone-400">
-                          {b.client_email}
-                        </p>
-                      </td>
-                      <td className="p-4">
-                        <span className="text-xs font-bold bg-stone-100 border px-2 py-1 rounded">
-                          H-{b.rooms?.room_number}
-                        </span>
-                      </td>
-                      <td className="p-4 text-xs font-medium">
-                        <div className="flex items-center gap-1 text-emerald-600 font-bold">
-                          IN: {b.check_in}
-                        </div>
-                        <div className="flex items-center gap-1 text-rose-600 font-bold">
-                          OUT: {b.check_out}
-                        </div>
-                      </td>
-                      <td className="p-4 text-right font-black text-stone-700">
-                        S/ {b.total_price}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
 
-function KpiCard({ title, value, icon, color }: any) {
-  const colors: any = {
-    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
-    blue: "bg-blue-50 text-blue-600 border-blue-100",
-    rose: "bg-rose-50 text-rose-600 border-rose-100",
-    amber: "bg-amber-50 text-amber-600 border-amber-100",
-  };
+// Icono X pequeño para el botón eliminar
+function X({ size }: { size: number }) {
   return (
-    <div
-      className={`bg-white p-5 rounded-2xl border-b-4 ${colors[color]} shadow-sm`}
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <div className="flex justify-between items-start mb-2">
-        <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">
-          {title}
-        </span>
-        <div className="p-2 rounded-lg bg-white shadow-sm">{icon}</div>
-      </div>
-      <div className="text-2xl font-black text-stone-800">{value}</div>
-    </div>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
   );
 }
