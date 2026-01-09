@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { updateRoom } from "../actions";
-import DownloadButton from "./DownloadButton"; // Importamos el botón
+import DownloadButton from "./DownloadButton";
 import {
   Calendar,
   CheckCircle,
@@ -14,16 +14,20 @@ import {
   LogIn,
   LogOut,
   Brush,
+  BedDouble,
+  AlertCircle,
+  Bed,
 } from "lucide-react";
 
-// --- ACTIONS ---
+// --- SERVER ACTIONS ---
 async function markAsPaid(formData: FormData) {
   "use server";
   const bookingId = formData.get("bookingId");
-  await supabase
+  const { error } = await supabase
     .from("bookings")
     .update({ status: "pagado" })
     .eq("id", bookingId);
+  if (error) console.error(error);
   revalidatePath("/admin");
 }
 
@@ -42,32 +46,45 @@ export default async function AdminPage() {
     .select("*")
     .order("created_at", { ascending: false });
 
-  // 2. CÁLCULOS DE ESTADÍSTICAS
-  const today = new Date().toISOString().split("T")[0]; // Fecha de hoy (YYYY-MM-DD)
+  // 2. ESTADÍSTICAS
+  const today = new Date().toISOString().split("T")[0];
 
-  // A. Ganancias Totales (Solo pagados)
-  const totalRevenue =
-    bookings
-      ?.filter((b) => b.status === "pagado" || b.status === "approved")
-      .reduce((sum, b) => sum + b.total_price, 0) || 0;
-
-  // B. Ocupación Actual (Reservas activas hoy)
   const occupiedCount =
     bookings?.filter((b) => b.check_in <= today && b.check_out > today)
       .length || 0;
-  const totalRooms = rooms?.length || 0;
-  const freeRooms = totalRooms - occupiedCount;
-
-  // C. Llegadas y Salidas de Hoy
-  const arrivalsToday =
+  const arrivalsCount =
     bookings?.filter((b) => b.check_in === today).length || 0;
-
-  // D. POR LIMPIAR (Salidas de hoy)
-  const departuresToday = bookings?.filter((b) => b.check_out === today) || [];
-  const cleaningCount = departuresToday.length;
+  const confirmedCount =
+    bookings?.filter((b) => b.status === "pagado" || b.status === "approved")
+      .length || 0;
+  const cleaningList = bookings?.filter((b) => b.check_out === today) || [];
+  const cleaningCount = cleaningList.length;
 
   const getRoomName = (id: number) =>
     rooms?.find((r) => r.id === id)?.name || "Habitación desconocida";
+
+  // Función para saber el estado de UNA habitación específica hoy
+  const getRoomStatus = (roomId: number) => {
+    // 1. ¿Sale hoy? (Limpieza)
+    const leaving = bookings?.find(
+      (b) => b.room_id === roomId && b.check_out === today
+    );
+    if (leaving) return { status: "checkout", guest: leaving.client_name };
+
+    // 2. ¿Está ocupada hoy?
+    const occupied = bookings?.find(
+      (b) => b.room_id === roomId && b.check_in <= today && b.check_out > today
+    );
+    if (occupied)
+      return {
+        status: "occupied",
+        guest: occupied.client_name,
+        paid: occupied.status === "pagado" || occupied.status === "approved",
+      };
+
+    // 3. Libre
+    return { status: "free", guest: null };
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F5F4] text-stone-800 p-6 md:p-10 font-sans">
@@ -78,119 +95,169 @@ export default async function AdminPage() {
             <User className="bg-rose-900 text-white p-2 rounded-xl" size={48} />
             Panel de Control
           </h1>
-          {/* BOTÓN DE DESCARGA */}
           {bookings && <DownloadButton data={bookings} />}
         </div>
 
-        {/* --- SECCIÓN 1: TARJETAS DE RESUMEN (KPIs) --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          {/* Card 1: Ganancias */}
-          <div className="bg-white p-6 rounded-[2rem] shadow-lg border border-stone-100 flex items-center gap-4">
-            <div className="p-4 bg-emerald-100 text-emerald-700 rounded-full">
-              <TrendingUp size={24} />
+        {/* --- 1. KPIs (RESUMEN) --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="bg-white p-6 rounded-[2rem] shadow-lg border-b-4 border-blue-500 flex items-center gap-4 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <BedDouble size={80} />
+            </div>
+            <div className="p-4 bg-blue-100 text-blue-700 rounded-2xl">
+              <HomeIcon size={32} />
             </div>
             <div>
-              <p className="text-xs font-bold text-stone-400 uppercase">
-                Ganancias Totales
+              <p className="text-xs font-black text-stone-400 uppercase tracking-wider">
+                Ocupadas
               </p>
-              <p className="text-2xl font-black text-stone-800">
-                S/ {totalRevenue}
+              <p className="text-4xl font-black text-blue-900">
+                {occupiedCount}
               </p>
             </div>
           </div>
-
-          {/* Card 2: Habitaciones */}
-          <div className="bg-white p-6 rounded-[2rem] shadow-lg border border-stone-100 flex items-center gap-4">
-            <div className="p-4 bg-blue-100 text-blue-700 rounded-full">
-              <HomeIcon size={24} />
+          <div className="bg-white p-6 rounded-[2rem] shadow-lg border-b-4 border-purple-500 flex items-center gap-4 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <LogIn size={80} />
+            </div>
+            <div className="p-4 bg-purple-100 text-purple-700 rounded-2xl">
+              <LogIn size={32} />
             </div>
             <div>
-              <p className="text-xs font-bold text-stone-400 uppercase">
-                Estado Hotel
+              <p className="text-xs font-black text-stone-400 uppercase tracking-wider">
+                Llegadas
               </p>
-              <p className="text-sm font-bold">
-                <span className="text-rose-600">{occupiedCount} Ocupadas</span>{" "}
-                / <span className="text-emerald-600">{freeRooms} Libres</span>
+              <p className="text-4xl font-black text-purple-900">
+                {arrivalsCount}
               </p>
             </div>
           </div>
-
-          {/* Card 3: Movimientos Hoy */}
-          <div className="bg-white p-6 rounded-[2rem] shadow-lg border border-stone-100 flex items-center gap-4">
-            <div className="p-4 bg-purple-100 text-purple-700 rounded-full">
-              <Calendar size={24} />
+          <div className="bg-white p-6 rounded-[2rem] shadow-lg border-b-4 border-emerald-500 flex items-center gap-4 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <CheckCircle size={80} />
+            </div>
+            <div className="p-4 bg-emerald-100 text-emerald-700 rounded-2xl">
+              <CheckCircle size={32} />
             </div>
             <div>
-              <p className="text-xs font-bold text-stone-400 uppercase">
-                Movimientos Hoy
+              <p className="text-xs font-black text-stone-400 uppercase tracking-wider">
+                Confirmadas
               </p>
-              <div className="flex gap-3 text-sm font-bold">
-                <span className="flex items-center gap-1 text-emerald-600">
-                  <LogIn size={14} /> {arrivalsToday} Entran
-                </span>
-                <span className="flex items-center gap-1 text-rose-600">
-                  <LogOut size={14} /> {cleaningCount} Salen
-                </span>
-              </div>
+              <p className="text-4xl font-black text-emerald-900">
+                {confirmedCount}
+              </p>
             </div>
           </div>
-
-          {/* Card 4: LIMPIEZA */}
-          <div className="bg-white p-6 rounded-[2rem] shadow-lg border border-stone-100 flex items-center gap-4 relative overflow-hidden">
+          <div className="bg-white p-6 rounded-[2rem] shadow-lg border-b-4 border-amber-500 flex items-center gap-4 relative overflow-hidden">
             {cleaningCount > 0 && (
-              <div className="absolute top-0 right-0 w-3 h-3 bg-rose-500 rounded-full animate-ping m-4"></div>
+              <span className="absolute top-4 right-4 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+              </span>
             )}
-            <div className="p-4 bg-amber-100 text-amber-700 rounded-full">
-              <Brush size={24} />
+            <div className="p-4 bg-amber-100 text-amber-700 rounded-2xl">
+              <Brush size={32} />
             </div>
             <div>
-              <p className="text-xs font-bold text-stone-400 uppercase">
-                Por Limpiar
+              <p className="text-xs font-black text-stone-400 uppercase tracking-wider">
+                Salidas / Limpieza
               </p>
-              <p className="text-2xl font-black text-stone-800">
-                {cleaningCount}{" "}
-                <span className="text-xs font-normal text-stone-400">
-                  Habitaciones
-                </span>
+              <p className="text-4xl font-black text-amber-900">
+                {cleaningCount}
               </p>
             </div>
           </div>
         </div>
 
-        {/* --- SECCIÓN 2: ALERTA DE LIMPIEZA --- */}
+        {/* --- NUEVO: MAPA DE HABITACIONES (GRID VISUAL) --- */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-stone-700 mb-6 flex items-center gap-2">
+            <Bed className="text-rose-600" /> Mapa de Habitaciones (Hoy)
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {rooms?.map((room) => {
+              const info = getRoomStatus(room.id);
+
+              // Definir colores según estado
+              let cardClass = "bg-white border-stone-200 text-stone-600"; // Libre
+              let statusText = "Libre";
+              let icon = <CheckCircle size={16} className="text-emerald-400" />;
+
+              if (info.status === "occupied") {
+                cardClass = "bg-rose-900 text-white border-rose-950"; // Ocupada
+                statusText = info.paid ? "Pagado" : "Pendiente Pago";
+                icon = <User size={16} className="text-rose-200" />;
+              } else if (info.status === "checkout") {
+                cardClass = "bg-amber-100 text-amber-900 border-amber-300"; // Salida
+                statusText = "Salida Hoy";
+                icon = <LogOut size={16} className="text-amber-600" />;
+              }
+
+              return (
+                <div
+                  key={room.id}
+                  className={`p-4 rounded-2xl border-2 shadow-sm flex flex-col justify-between h-32 transition hover:scale-105 ${cardClass}`}
+                >
+                  <div className="flex justify-between items-start">
+                    <span className="font-black text-lg leading-tight">
+                      {room.name}
+                    </span>
+                    {icon}
+                  </div>
+                  <div>
+                    {info.status === "free" ? (
+                      <span className="text-xs font-bold uppercase tracking-wider opacity-60">
+                        Disponible
+                      </span>
+                    ) : (
+                      <>
+                        <p className="text-sm font-bold truncate">
+                          {info.guest}
+                        </p>
+                        <p className="text-[10px] uppercase font-bold opacity-70">
+                          {statusText}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* --- ALERTA DE LIMPIEZA DETALLADA --- */}
         {cleaningCount > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-10 flex flex-col md:flex-row items-center gap-4 shadow-sm">
-            <div className="bg-amber-500 text-white p-3 rounded-full">
-              <Brush size={24} />
+          <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 mb-10 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+            <div className="bg-amber-500 text-white p-4 rounded-full shadow-lg animate-pulse">
+              <Brush size={32} />
             </div>
-            <div className="flex-grow">
-              <h3 className="font-bold text-amber-900 text-lg">
-                ⚠️ Atención: Habitaciones requieren limpieza hoy
+            <div className="flex-grow text-center md:text-left">
+              <h3 className="font-bold text-amber-900 text-xl mb-1">
+                ⚠️ Prioridad: Limpieza
               </h3>
-              <p className="text-amber-800 text-sm">
-                Las siguientes habitaciones tienen salida programada para hoy (
-                {today}):
+              <p className="text-amber-800 text-sm opacity-80">
+                Habitaciones que se liberan hoy ({today}).
               </p>
             </div>
-            <div className="flex gap-2">
-              {departuresToday.map((b) => (
-                <span
+            <div className="flex flex-wrap gap-2 justify-center">
+              {cleaningList.map((b) => (
+                <div
                   key={b.id}
-                  className="bg-white text-amber-900 font-bold px-4 py-2 rounded-lg border border-amber-200 shadow-sm"
+                  className="bg-white text-amber-900 font-bold px-6 py-3 rounded-xl border-2 border-amber-100 shadow-sm flex items-center gap-2"
                 >
-                  Hab. {getRoomName(b.room_id)}
-                </span>
+                  <HomeIcon size={16} /> {getRoomName(b.room_id)}
+                </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* --- SECCIÓN 3: GESTIÓN DE RESERVAS --- */}
+        {/* --- HISTORIAL (TABLA) --- */}
         <section className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-stone-100 mb-12">
           <h2 className="text-2xl font-bold text-stone-700 mb-6 flex items-center gap-2">
             <Calendar className="text-rose-600" /> Historial de Reservas
           </h2>
-
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -213,11 +280,11 @@ export default async function AdminPage() {
                     <td className="p-4">
                       {booking.status === "pagado" ||
                       booking.status === "approved" ? (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200">
                           <CheckCircle size={12} /> PAGADO
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold border border-amber-200">
                           <Clock size={12} /> PENDIENTE
                         </span>
                       )}
@@ -232,19 +299,19 @@ export default async function AdminPage() {
                       {getRoomName(booking.room_id)}
                     </td>
                     <td className="p-4">
-                      <div className="flex flex-col text-xs font-bold">
-                        <span className="text-emerald-600">
+                      <div className="flex flex-col text-xs font-bold gap-1">
+                        <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md w-fit">
                           IN: {booking.check_in}
                         </span>
-                        <span className="text-rose-600">
+                        <span className="text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md w-fit">
                           OUT: {booking.check_out}
                         </span>
                       </div>
                     </td>
-                    <td className="p-4 font-black text-stone-700">
+                    <td className="p-4 font-black text-stone-700 text-base">
                       S/ {booking.total_price}
                     </td>
-                    <td className="p-4 capitalize text-stone-500 text-xs">
+                    <td className="p-4 capitalize text-stone-500 text-xs font-bold">
                       {booking.payment_method === "online"
                         ? "💳 Web"
                         : booking.payment_method}
@@ -259,10 +326,11 @@ export default async function AdminPage() {
                               value={booking.id}
                             />
                             <button
-                              title="Marcar Pagado"
-                              className="p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition shadow-sm"
+                              type="submit"
+                              title="Confirmar Pago"
+                              className="p-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition shadow-lg hover:-translate-y-1"
                             >
-                              <DollarSign size={16} />
+                              <DollarSign size={18} />
                             </button>
                           </form>
                         )}
@@ -273,10 +341,11 @@ export default async function AdminPage() {
                           value={booking.id}
                         />
                         <button
+                          type="submit"
                           title="Eliminar"
-                          className="p-2 bg-stone-200 text-stone-500 rounded-lg hover:bg-rose-500 hover:text-white transition shadow-sm"
+                          className="p-2 bg-white border border-stone-200 text-stone-400 rounded-xl hover:bg-rose-500 hover:text-white transition shadow-sm hover:-translate-y-1"
                         >
-                          <X size={16} />
+                          <X size={18} />
                         </button>
                       </form>
                     </td>
@@ -287,7 +356,7 @@ export default async function AdminPage() {
           </div>
         </section>
 
-        {/* --- SECCIÓN 4: EDITAR HABITACIONES --- */}
+        {/* --- EDITAR HABITACIONES --- */}
         <section>
           <h2 className="text-2xl font-bold text-stone-700 mb-6 flex items-center gap-2">
             <HomeIcon className="text-rose-600" /> Gestionar Habitaciones
@@ -298,54 +367,51 @@ export default async function AdminPage() {
                 key={room.id}
                 className="bg-white p-6 rounded-[2rem] shadow-lg border border-stone-100 flex flex-col gap-4"
               >
-                <div className="relative h-40 rounded-xl overflow-hidden bg-stone-200">
+                <div className="relative h-40 rounded-xl overflow-hidden bg-stone-200 group">
                   <img
                     src={room.image_url}
                     alt={room.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
                   />
-                  <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded backdrop-blur-md">
-                    ID: {room.id}
-                  </div>
                 </div>
                 <h3 className="font-bold text-xl text-rose-900">{room.name}</h3>
                 <form action={updateRoom} className="flex flex-col gap-3">
                   <input type="hidden" name="roomId" value={room.id} />
                   <div>
                     <label className="text-xs font-bold uppercase text-stone-400 ml-1">
-                      Precio (S/)
+                      Precio
                     </label>
                     <input
                       name="price"
                       defaultValue={room.price_per_night}
                       type="number"
-                      className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 font-bold text-stone-700"
+                      className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 font-bold"
                     />
                   </div>
                   <div>
                     <label className="text-xs font-bold uppercase text-stone-400 ml-1">
-                      Descripción
+                      Desc
                     </label>
                     <textarea
                       name="description"
                       defaultValue={room.description}
-                      rows={3}
+                      rows={2}
                       className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs resize-none"
                     />
                   </div>
                   <div>
                     <label className="text-xs font-bold uppercase text-stone-400 ml-1">
-                      Actualizar Foto
+                      Foto
                     </label>
                     <input
                       type="file"
                       name="image"
                       accept="image/*"
-                      className="w-full text-xs text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100"
+                      className="w-full text-xs text-stone-500"
                     />
                   </div>
-                  <button className="bg-stone-900 text-white font-bold py-3 rounded-xl mt-2 hover:bg-rose-900 transition">
-                    Guardar Cambios
+                  <button className="bg-stone-900 text-white font-bold py-3 rounded-xl mt-2 hover:bg-rose-900 transition shadow-lg">
+                    Guardar
                   </button>
                 </form>
               </div>
