@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Importante para la redirección
+import { useRouter } from "next/navigation"; // <--- ÚNICO IMPORT NUEVO
 import { supabase } from "@/lib/supabase";
 import { createBooking } from "./actions";
 import {
@@ -25,16 +25,16 @@ interface Room {
   room_number: string;
 }
 
-// --- COMPONENTE TARJETA DE HABITACIÓN (Con Lógica de Pago) ---
+// --- COMPONENTE INTERNO: TARJETA DE HABITACIÓN ---
 function RoomCard({ room }: { room: any }) {
-  const router = useRouter();
+  const router = useRouter(); // <--- Hook para redirección
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [totalPrice, setTotalPrice] = useState(room.price_per_night);
   const [nights, setNights] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // <--- Estado de carga
 
-  // Calcular precio
+  // Lógica de precios (Original)
   useEffect(() => {
     if (checkIn && checkOut) {
       const start = new Date(checkIn);
@@ -52,7 +52,7 @@ function RoomCard({ room }: { room: any }) {
     }
   }, [checkIn, checkOut, room.price_per_night]);
 
-  // Manejar el envío del formulario (Pago)
+  // --- NUEVA LÓGICA DE ENVÍO (Solo esto cambia) ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -61,7 +61,7 @@ function RoomCard({ room }: { room: any }) {
     const formData = new FormData(e.currentTarget);
     const method = formData.get("paymentMethod");
 
-    // 1. Si es online, abrir pestaña nueva inmediatamente
+    // 1. Abrir pestaña nueva si es pago online
     let newTab: Window | null = null;
     if (method === "online") {
       newTab = window.open("", "_blank");
@@ -80,7 +80,7 @@ function RoomCard({ room }: { room: any }) {
         alert(response.error);
         if (newTab) newTab.close();
       } else if (response?.success && response.url) {
-        // 3. Éxito
+        // 3. Redirigir según el método
         if (method === "online" && newTab) {
           newTab.location.href = response.url;
           router.push(
@@ -92,7 +92,7 @@ function RoomCard({ room }: { room: any }) {
       }
     } catch (err) {
       console.error(err);
-      alert("Error al procesar la solicitud.");
+      alert("Error al procesar la reserva.");
       if (newTab) newTab.close();
     }
 
@@ -127,12 +127,6 @@ function RoomCard({ room }: { room: any }) {
       </div>
 
       <div className="p-8 md:p-10 flex flex-col flex-grow">
-        <div className="flex items-center gap-2 mb-4">
-          <Star size={14} className="fill-[#700824] text-[#700824]" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">
-            Categoría Premium
-          </span>
-        </div>
         <h3 className="text-3xl font-serif font-bold text-rose-950 mb-4">
           {room.name}
         </h3>
@@ -140,6 +134,7 @@ function RoomCard({ room }: { room: any }) {
           {room.description}
         </div>
 
+        {/* ICONOS */}
         <div className="grid grid-cols-2 gap-4 mb-8 pt-6 border-t border-stone-100">
           <div className="flex items-center gap-2 text-[#700824]">
             <Tv size={18} />
@@ -169,6 +164,7 @@ function RoomCard({ room }: { room: any }) {
 
         <div className="mt-auto">
           {room.availableCount > 0 ? (
+            // CAMBIO: action -> onSubmit
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <input
                 type="hidden"
@@ -176,6 +172,7 @@ function RoomCard({ room }: { room: any }) {
                 value={room.firstAvailableId}
               />
               <input type="hidden" name="price" value={totalPrice} />
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] font-bold text-stone-400 uppercase ml-2">
@@ -202,6 +199,7 @@ function RoomCard({ room }: { room: any }) {
                   />
                 </div>
               </div>
+
               <div className="flex justify-between items-center bg-rose-50 p-3 rounded-xl border border-rose-100">
                 <span className="text-xs font-bold text-rose-800 uppercase">
                   Total ({nights} noches):
@@ -210,6 +208,7 @@ function RoomCard({ room }: { room: any }) {
                   S/ {totalPrice}
                 </span>
               </div>
+
               <input
                 type="text"
                 name="name"
@@ -335,7 +334,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen font-sans text-stone-800 bg-[#FDFBF7] selection:bg-rose-200 selection:text-rose-900">
-      {/* FONDO DECORATIVO ORIGINAL */}
+      {/* FONDO ORIGINAL */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(#d6d3d1_1px,transparent_1px)] [background-size:20px_20px] opacity-30"></div>
         <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-200/30 rounded-full blur-[100px] mix-blend-multiply animate-pulse-slow"></div>
@@ -573,7 +572,6 @@ export default function Home() {
             {" "}
             ¿Deseas una atención directa?{" "}
           </h2>
-
           <div className="grid md:grid-cols-3 gap-8 text-center mb-16">
             <a
               href="https://wa.me/51966556622"
