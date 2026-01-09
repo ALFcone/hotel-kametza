@@ -15,19 +15,18 @@ import {
   LogOut,
   Brush,
   BedDouble,
-  AlertCircle,
   Bed,
+  Info,
 } from "lucide-react";
 
 // --- SERVER ACTIONS ---
 async function markAsPaid(formData: FormData) {
   "use server";
   const bookingId = formData.get("bookingId");
-  const { error } = await supabase
+  await supabase
     .from("bookings")
     .update({ status: "pagado" })
     .eq("id", bookingId);
-  if (error) console.error(error);
   revalidatePath("/admin");
 }
 
@@ -36,6 +35,15 @@ async function deleteBooking(formData: FormData) {
   const bookingId = formData.get("bookingId");
   await supabase.from("bookings").delete().eq("id", bookingId);
   revalidatePath("/admin");
+}
+
+// Función auxiliar para calcular días entre fechas
+function calculateNights(checkIn: string, checkOut: string) {
+  const start = new Date(checkIn);
+  const end = new Date(checkOut);
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
 }
 
 export default async function AdminPage() {
@@ -61,17 +69,19 @@ export default async function AdminPage() {
   const cleaningCount = cleaningList.length;
 
   const getRoomName = (id: number) =>
-    rooms?.find((r) => r.id === id)?.name || "Habitación desconocida";
+    rooms?.find((r) => r.id === id)?.name || "Habitación";
+  // Usamos room_number si existe, si no usamos el ID para mostrar en el cuadro
+  const getRoomNumber = (id: number) => {
+    const r = rooms?.find((r) => r.id === id);
+    return r?.room_number || r?.id || "#";
+  };
 
-  // Función para saber el estado de UNA habitación específica hoy
   const getRoomStatus = (roomId: number) => {
-    // 1. ¿Sale hoy? (Limpieza)
     const leaving = bookings?.find(
       (b) => b.room_id === roomId && b.check_out === today
     );
     if (leaving) return { status: "checkout", guest: leaving.client_name };
 
-    // 2. ¿Está ocupada hoy?
     const occupied = bookings?.find(
       (b) => b.room_id === roomId && b.check_in <= today && b.check_out > today
     );
@@ -82,7 +92,6 @@ export default async function AdminPage() {
         paid: occupied.status === "pagado" || occupied.status === "approved",
       };
 
-    // 3. Libre
     return { status: "free", guest: null };
   };
 
@@ -169,54 +178,93 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        {/* --- NUEVO: MAPA DE HABITACIONES (GRID VISUAL) --- */}
+        {/* --- NUEVO: MAPA DE HABITACIONES (GRID) --- */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-stone-700 mb-6 flex items-center gap-2">
-            <Bed className="text-rose-600" /> Mapa de Habitaciones (Hoy)
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-6">
+            <h2 className="text-2xl font-bold text-stone-700 flex items-center gap-2">
+              <Bed className="text-rose-600" /> Mapa de Habitaciones (Hoy)
+            </h2>
+
+            {/* LEYENDA DE COLORES */}
+            <div className="flex gap-4 text-xs font-bold uppercase bg-white px-4 py-2 rounded-xl shadow-sm border border-stone-200">
+              <span className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-white border-2 border-stone-300"></div>{" "}
+                Libre
+              </span>
+              <span className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-rose-900"></div> Ocupada
+              </span>
+              <span className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-amber-100 border border-amber-300"></div>{" "}
+                Limpieza
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {rooms?.map((room) => {
               const info = getRoomStatus(room.id);
 
               // Definir colores según estado
               let cardClass = "bg-white border-stone-200 text-stone-600"; // Libre
-              let statusText = "Libre";
-              let icon = <CheckCircle size={16} className="text-emerald-400" />;
+              let numClass = "text-stone-300"; // Color del número
+              let icon = null;
 
               if (info.status === "occupied") {
-                cardClass = "bg-rose-900 text-white border-rose-950"; // Ocupada
-                statusText = info.paid ? "Pagado" : "Pendiente Pago";
+                cardClass = "bg-rose-900 text-white border-rose-950";
+                numClass = "text-rose-800 opacity-50";
                 icon = <User size={16} className="text-rose-200" />;
               } else if (info.status === "checkout") {
-                cardClass = "bg-amber-100 text-amber-900 border-amber-300"; // Salida
-                statusText = "Salida Hoy";
+                cardClass = "bg-amber-100 text-amber-900 border-amber-300";
+                numClass = "text-amber-800 opacity-20";
                 icon = <LogOut size={16} className="text-amber-600" />;
               }
 
               return (
                 <div
                   key={room.id}
-                  className={`p-4 rounded-2xl border-2 shadow-sm flex flex-col justify-between h-32 transition hover:scale-105 ${cardClass}`}
+                  className={`p-4 rounded-2xl border-2 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden transition hover:scale-105 ${cardClass}`}
                 >
-                  <div className="flex justify-between items-start">
-                    <span className="font-black text-lg leading-tight">
+                  {/* NÚMERO DE HABITACIÓN GRANDE DE FONDO */}
+                  <span
+                    className={`absolute -bottom-2 -right-2 text-6xl font-black tracking-tighter select-none ${numClass}`}
+                  >
+                    {room.room_number || room.id}
+                  </span>
+
+                  <div className="flex justify-between items-start z-10">
+                    <span className="font-bold text-sm leading-tight truncate w-full">
                       {room.name}
                     </span>
                     {icon}
                   </div>
-                  <div>
+
+                  <div className="z-10 mt-auto">
                     {info.status === "free" ? (
-                      <span className="text-xs font-bold uppercase tracking-wider opacity-60">
+                      <span className="text-[10px] font-bold uppercase tracking-wider opacity-60 bg-stone-100 px-2 py-1 rounded-md text-stone-500">
                         Disponible
                       </span>
                     ) : (
                       <>
-                        <p className="text-sm font-bold truncate">
+                        <p className="text-xs font-bold truncate mb-0.5">
                           {info.guest}
                         </p>
-                        <p className="text-[10px] uppercase font-bold opacity-70">
-                          {statusText}
-                        </p>
+                        {info.status === "occupied" && (
+                          <span
+                            className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${
+                              info.paid
+                                ? "bg-emerald-500/20 text-emerald-100"
+                                : "bg-white/20 text-white"
+                            }`}
+                          >
+                            {info.paid ? "Pagado" : "Pendiente"}
+                          </span>
+                        )}
+                        {info.status === "checkout" && (
+                          <span className="text-[9px] uppercase font-bold text-amber-700">
+                            Salida Hoy
+                          </span>
+                        )}
                       </>
                     )}
                   </div>
@@ -225,33 +273,6 @@ export default async function AdminPage() {
             })}
           </div>
         </section>
-
-        {/* --- ALERTA DE LIMPIEZA DETALLADA --- */}
-        {cleaningCount > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 mb-10 flex flex-col md:flex-row items-center gap-6 shadow-sm">
-            <div className="bg-amber-500 text-white p-4 rounded-full shadow-lg animate-pulse">
-              <Brush size={32} />
-            </div>
-            <div className="flex-grow text-center md:text-left">
-              <h3 className="font-bold text-amber-900 text-xl mb-1">
-                ⚠️ Prioridad: Limpieza
-              </h3>
-              <p className="text-amber-800 text-sm opacity-80">
-                Habitaciones que se liberan hoy ({today}).
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2 justify-center">
-              {cleaningList.map((b) => (
-                <div
-                  key={b.id}
-                  className="bg-white text-amber-900 font-bold px-6 py-3 rounded-xl border-2 border-amber-100 shadow-sm flex items-center gap-2"
-                >
-                  <HomeIcon size={16} /> {getRoomName(b.room_id)}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* --- HISTORIAL (TABLA) --- */}
         <section className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-stone-100 mb-12">
@@ -266,6 +287,7 @@ export default async function AdminPage() {
                   <th className="p-4">Cliente</th>
                   <th className="p-4">Habitación</th>
                   <th className="p-4">Fechas</th>
+                  <th className="p-4">Noches</th> {/* NUEVA COLUMNA */}
                   <th className="p-4">Total</th>
                   <th className="p-4">Método</th>
                   <th className="p-4 text-center">Acciones</th>
@@ -296,6 +318,10 @@ export default async function AdminPage() {
                       </div>
                     </td>
                     <td className="p-4 text-rose-900 font-medium">
+                      {/* Mostrar número y nombre */}
+                      <span className="font-bold mr-1">
+                        #{getRoomNumber(booking.room_id)}
+                      </span>
                       {getRoomName(booking.room_id)}
                     </td>
                     <td className="p-4">
@@ -308,6 +334,13 @@ export default async function AdminPage() {
                         </span>
                       </div>
                     </td>
+
+                    {/* COLUMNA NOCHES */}
+                    <td className="p-4 text-stone-600 font-bold">
+                      {calculateNights(booking.check_in, booking.check_out)}{" "}
+                      noches
+                    </td>
+
                     <td className="p-4 font-black text-stone-700 text-base">
                       S/ {booking.total_price}
                     </td>
@@ -373,6 +406,10 @@ export default async function AdminPage() {
                     alt={room.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
                   />
+                  {/* Número visible al editar también */}
+                  <div className="absolute top-2 left-2 bg-white/90 text-stone-800 font-black px-3 py-1 rounded-lg text-sm">
+                    #{room.room_number || room.id}
+                  </div>
                 </div>
                 <h3 className="font-bold text-xl text-rose-900">{room.name}</h3>
                 <form action={updateRoom} className="flex flex-col gap-3">
