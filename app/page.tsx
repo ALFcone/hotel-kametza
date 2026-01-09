@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Necesario para redirección manual
+import { useRouter } from "next/navigation"; // Importante para la redirección
 import { supabase } from "@/lib/supabase";
 import { createBooking } from "./actions";
 import {
@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 
+// --- TIPOS DE DATOS ---
 interface Room {
   id: number;
   name: string;
@@ -24,21 +25,23 @@ interface Room {
   room_number: string;
 }
 
-// --- COMPONENTE ROOM CARD (Con lógica de Pestaña Nueva) ---
+// --- COMPONENTE TARJETA DE HABITACIÓN (Con Lógica de Pago) ---
 function RoomCard({ room }: { room: any }) {
   const router = useRouter();
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [totalPrice, setTotalPrice] = useState(room.price_per_night);
   const [nights, setNights] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Para evitar doble clic
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Calcular precio
   useEffect(() => {
     if (checkIn && checkOut) {
       const start = new Date(checkIn);
       const end = new Date(checkOut);
       const diffTime = end.getTime() - start.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
       if (diffDays > 0) {
         setNights(diffDays);
         setTotalPrice(diffDays * room.price_per_night);
@@ -49,7 +52,7 @@ function RoomCard({ room }: { room: any }) {
     }
   }, [checkIn, checkOut, room.price_per_night]);
 
-  // --- MANEJADOR DEL FORMULARIO ---
+  // Manejar el envío del formulario (Pago)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -58,34 +61,39 @@ function RoomCard({ room }: { room: any }) {
     const formData = new FormData(e.currentTarget);
     const method = formData.get("paymentMethod");
 
-    // TRUCO: Si es pago online, abrimos la pestaña ANTES de ir al servidor
-    // Esto evita que el navegador bloquee el popup.
+    // 1. Si es online, abrir pestaña nueva inmediatamente
     let newTab: Window | null = null;
     if (method === "online") {
       newTab = window.open("", "_blank");
       if (newTab) {
-        newTab.document.write("Cargando pasarela de pagos segura...");
+        newTab.document.write(
+          "<div style='height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;'><h2>Cargando pasarela segura...</h2></div>"
+        );
       }
     }
 
-    // Llamamos al servidor
-    const response = await createBooking(formData);
+    try {
+      // 2. Llamar al servidor
+      const response = await createBooking(formData);
 
-    if (response?.error) {
-      alert(response.error);
-      if (newTab) newTab.close(); // Si falló, cerramos la pestaña
-    } else if (response?.success && response.url) {
-      if (method === "online" && newTab) {
-        // 1. En la pestaña nueva, cargamos Mercado Pago
-        newTab.location.href = response.url;
-        // 2. En la pestaña actual, mostramos mensaje de espera
-        router.push(
-          `/exito?method=online&status=pending&id=${response.bookingId}&amount=${response.price}`
-        );
-      } else {
-        // Pago manual: redirección normal en la misma pestaña
-        router.push(response.url);
+      if (response?.error) {
+        alert(response.error);
+        if (newTab) newTab.close();
+      } else if (response?.success && response.url) {
+        // 3. Éxito
+        if (method === "online" && newTab) {
+          newTab.location.href = response.url;
+          router.push(
+            `/exito?method=online&status=pending&id=${response.bookingId}&amount=${response.price}`
+          );
+        } else {
+          router.push(response.url);
+        }
       }
+    } catch (err) {
+      console.error(err);
+      alert("Error al procesar la solicitud.");
+      if (newTab) newTab.close();
     }
 
     setIsSubmitting(false);
@@ -117,13 +125,21 @@ function RoomCard({ room }: { room: any }) {
             : "🔴 Agotado"}
         </div>
       </div>
+
       <div className="p-8 md:p-10 flex flex-col flex-grow">
+        <div className="flex items-center gap-2 mb-4">
+          <Star size={14} className="fill-[#700824] text-[#700824]" />
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">
+            Categoría Premium
+          </span>
+        </div>
         <h3 className="text-3xl font-serif font-bold text-rose-950 mb-4">
           {room.name}
         </h3>
         <div className="text-stone-500 text-sm mb-8 leading-relaxed font-light">
           {room.description}
         </div>
+
         <div className="grid grid-cols-2 gap-4 mb-8 pt-6 border-t border-stone-100">
           <div className="flex items-center gap-2 text-[#700824]">
             <Tv size={18} />
@@ -150,6 +166,7 @@ function RoomCard({ room }: { room: any }) {
             </span>
           </div>
         </div>
+
         <div className="mt-auto">
           {room.availableCount > 0 ? (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -207,6 +224,7 @@ function RoomCard({ room }: { room: any }) {
                 required
                 className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
               />
+
               <div className="relative">
                 <select
                   name="paymentMethod"
@@ -235,6 +253,7 @@ function RoomCard({ room }: { room: any }) {
                   ▼
                 </div>
               </div>
+
               <button
                 disabled={isSubmitting}
                 type="submit"
@@ -260,6 +279,7 @@ function RoomCard({ room }: { room: any }) {
   );
 }
 
+// --- COMPONENTE PRINCIPAL ---
 export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [busyIds, setBusyIds] = useState<number[]>([]);
@@ -278,6 +298,7 @@ export default function Home() {
         .select("room_id")
         .lte("check_in", today)
         .gte("check_out", today);
+
       if (roomsData) setRooms(roomsData);
       if (bookingsData) setBusyIds(bookingsData.map((b: any) => b.room_id));
       setLoading(false);
@@ -286,18 +307,21 @@ export default function Home() {
   }, []);
 
   const closeMenu = () => setIsMenuOpen(false);
+
   const roomTypes: any = {};
   rooms.forEach((room) => {
-    if (!roomTypes[room.name])
+    if (!roomTypes[room.name]) {
       roomTypes[room.name] = {
         ...room,
         availableCount: 0,
         firstAvailableId: null,
       };
+    }
     if (!busyIds.includes(room.id)) {
       roomTypes[room.name].availableCount++;
-      if (!roomTypes[room.name].firstAvailableId)
+      if (!roomTypes[room.name].firstAvailableId) {
         roomTypes[room.name].firstAvailableId = room.id;
+      }
     }
   });
   const groupedRooms = Object.values(roomTypes);
@@ -311,9 +335,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen font-sans text-stone-800 bg-[#FDFBF7] selection:bg-rose-200 selection:text-rose-900">
+      {/* FONDO DECORATIVO ORIGINAL */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(#d6d3d1_1px,transparent_1px)] [background-size:20px_20px] opacity-30"></div>
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-200/30 rounded-full blur-[100px] mix-blend-multiply animate-pulse-slow"></div>
+        <div className="absolute top-[40%] right-0 w-[600px] h-[600px] bg-rose-200/20 rounded-full blur-[120px] mix-blend-multiply"></div>
       </div>
+
       <nav className="fixed top-0 w-full bg-white z-[100] shadow-2xl border-b border-stone-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24 md:h-32">
@@ -486,10 +514,56 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="ubicacion" className="py-20 bg-white relative z-10 px-4">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <span className="text-rose-700 font-bold tracking-wider text-sm uppercase">
+              {" "}
+              Ubicación Estratégica{" "}
+            </span>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-rose-950 mt-2 mb-6">
+              {" "}
+              Tranquilidad y Fácil Acceso{" "}
+            </h2>
+            <div className="mb-8 bg-[#FDFBF7] p-6 rounded-2xl border border-stone-100">
+              <p className="text-sm text-stone-400 uppercase font-bold mb-1">
+                {" "}
+                Dirección Exacta{" "}
+              </p>
+              <p className="text-xl font-bold text-stone-800">
+                {" "}
+                Jirón Las Américas #154{" "}
+              </p>
+              <p className="text-rose-700 font-medium mt-1">
+                {" "}
+                Ref. Óvalo Magdalena, Ayacucho{" "}
+              </p>
+            </div>
+            <p className="text-stone-600 mb-6 leading-relaxed">
+              {" "}
+              Ubicados en una zona apacible cerca al Óvalo Magdalena, ideal para
+              descansar lejos del bullicio pero conectados con toda la ciudad.{" "}
+            </p>
+          </div>
+          <div className="h-96 w-full bg-stone-200 rounded-3xl overflow-hidden shadow-2xl shadow-stone-300 border-4 border-white">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.995393240292!2d-74.2235946851765!3d-13.16222699072975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91127d8e8e7e7e7f%3A0x7e7e7e7e7e7e7e7e!2sJir%C3%B3n%20Las%20Am%C3%A9ricas%20154%2C%20Ayacucho%2005001!5e0!3m2!1ses-419!2spe!4v1620000000000!5m2!1ses-419!2spe"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen={true}
+              loading="lazy"
+              title="Ubicación Hotel Kametza"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+
       <section
         id="contacto"
         className="py-24 bg-[#700824]/90 relative overflow-hidden z-10 px-4"
       >
+        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <span className="inline-block py-1 px-4 rounded-full bg-white/10 border border-white/20 text-white text-[10px] font-black tracking-[0.3em] uppercase mb-6 shadow-sm">
             {" "}
@@ -499,13 +573,16 @@ export default function Home() {
             {" "}
             ¿Deseas una atención directa?{" "}
           </h2>
+
           <div className="grid md:grid-cols-3 gap-8 text-center mb-16">
             <a
               href="https://wa.me/51966556622"
               target="_blank"
               className="p-8 bg-white/10 backdrop-blur-md border border-white/10 rounded-[2.5rem] hover:bg-white/20 transition duration-300 group shadow-2xl"
             >
-              <div className="text-4xl mb-4">💬</div>
+              <div className="text-4xl mb-4 group-hover:scale-110 transition">
+                💬
+              </div>
               <h3 className="font-black text-xl mb-2 text-white">WhatsApp</h3>
               <p className="text-rose-200 font-black text-2xl">966 556 622</p>
             </a>
@@ -513,7 +590,9 @@ export default function Home() {
               href="tel:+51920042099"
               className="p-8 bg-white/10 backdrop-blur-md border border-white/10 rounded-[2.5rem] hover:bg-white/20 transition duration-300 group shadow-2xl"
             >
-              <div className="text-4xl mb-4">📞</div>
+              <div className="text-4xl mb-4 group-hover:scale-110 transition">
+                📞
+              </div>
               <h3 className="font-black text-xl mb-2 text-white">Llamar</h3>
               <p className="text-rose-200 font-black text-2xl">920 042 099</p>
             </a>
@@ -521,11 +600,53 @@ export default function Home() {
               href="mailto:kametzahotelayacucho@gmail.com"
               className="p-8 bg-white/10 backdrop-blur-md border border-white/10 rounded-[2.5rem] hover:bg-white/20 transition duration-300 group shadow-2xl"
             >
-              <div className="text-4xl mb-4">✉️</div>
+              <div className="text-4xl mb-4 group-hover:scale-110 transition">
+                ✉️
+              </div>
               <h3 className="font-black text-xl mb-2 text-white">Correo</h3>
               <p className="text-rose-200 font-black text-sm">
                 kametzahotelayacucho@gmail.com
               </p>
+            </a>
+          </div>
+
+          {/* --- ICONOS SOCIALES RESTAURADOS --- */}
+          <div className="flex flex-wrap justify-center gap-4 pt-10 border-t border-white/20">
+            <a
+              href="https://www.facebook.com/share/1KhmvycDcR/"
+              target="_blank"
+              className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/20 hover:bg-[#1877F2] transition font-black text-white text-sm"
+            >
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/124/124010.png"
+                className="w-5 h-5"
+                alt="Facebook"
+              />{" "}
+              FACEBOOK
+            </a>
+            <a
+              href="https://www.instagram.com/kametzahotelayacucho/"
+              target="_blank"
+              className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/20 hover:bg-[#E4405F] transition font-black text-white text-sm"
+            >
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/174/174855.png"
+                className="w-5 h-5"
+                alt="Instagram"
+              />{" "}
+              INSTAGRAM
+            </a>
+            <a
+              href="https://tiktok.com/@HotelKametza"
+              target="_blank"
+              className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/20 hover:bg-black transition font-black text-white text-sm"
+            >
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png"
+                className="w-5 h-5 brightness-0 invert"
+                alt="TikTok"
+              />{" "}
+              TIKTOK
             </a>
           </div>
         </div>
