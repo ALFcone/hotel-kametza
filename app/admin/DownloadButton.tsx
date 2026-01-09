@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 
 export default function DownloadButton({ data }: { data: any[] }) {
   const downloadReport = () => {
-    // Convertir datos a CSV
+    // 1. Definir cabeceras
     const headers = [
       "ID",
       "Cliente",
@@ -16,30 +16,40 @@ export default function DownloadButton({ data }: { data: any[] }) {
       "Metodo",
       "Estado",
     ];
-    const rows = data.map((b) => [
-      b.id,
-      `"${b.client_name}"`, // Comillas para evitar errores con tildes/comas
-      b.client_email,
-      b.room_id,
-      b.check_in,
-      b.check_out,
-      b.total_price,
-      b.payment_method,
-      b.status,
-    ]);
 
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      headers.join(",") +
-      "\n" +
-      rows.map((e) => e.join(",")).join("\n");
+    // 2. Construir filas usando PUNTO Y COMA (;) para que Excel Perú lo lea bien
+    const rows = data.map((b) => {
+      // Limpiamos datos para evitar errores si tienen comillas o saltos de línea
+      const cleanName = b.client_name ? b.client_name.replace(/"/g, '""') : "";
 
-    const encodedUri = encodeURI(csvContent);
+      return [
+        b.id,
+        `"${cleanName}"`, // Ponemos comillas por si el nombre tiene espacios
+        b.client_email,
+        b.room_id,
+        b.check_in,
+        b.check_out,
+        b.total_price, // Excel reconocerá esto como número si tu sistema usa punto decimal
+        b.payment_method,
+        b.status,
+      ].join(";"); // <--- IMPORTANTE: Separador punto y coma
+    });
+
+    // 3. Unir cabecera y filas con saltos de línea
+    const csvContent = [headers.join(";"), ...rows].join("\n");
+
+    // 4. Crear Blob con BOM (\uFEFF) para que salgan bien las TILDES y Ñ
+    const blob = new Blob(["\uFEFF" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    // 5. Crear enlace de descarga
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.href = url;
     link.setAttribute(
       "download",
-      `reporte_hotel_${new Date().toISOString().split("T")[0]}.csv`
+      `Reporte_Kametza_${new Date().toISOString().split("T")[0]}.csv`
     );
     document.body.appendChild(link);
     link.click();
@@ -51,7 +61,7 @@ export default function DownloadButton({ data }: { data: any[] }) {
       onClick={downloadReport}
       className="flex items-center gap-2 bg-stone-800 text-white px-5 py-3 rounded-xl hover:bg-black transition shadow-lg font-bold text-sm"
     >
-      <Download size={18} /> Descargar Reporte Completo
+      <Download size={18} /> Descargar Reporte Excel
     </button>
   );
 }
