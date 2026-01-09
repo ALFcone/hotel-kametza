@@ -4,46 +4,56 @@ import { Download } from "lucide-react";
 
 export default function DownloadButton({ data }: { data: any[] }) {
   const downloadReport = () => {
-    // 1. Definir cabeceras
+    // 1. Definir cabeceras (Agregamos "Documento")
     const headers = [
       "ID",
       "Cliente",
+      "Documento",
       "Email",
       "Habitacion",
       "Entrada",
       "Salida",
+      "Noches",
       "Total",
       "Metodo",
       "Estado",
     ];
 
-    // 2. Construir filas usando PUNTO Y COMA (;) para que Excel Perú lo lea bien
+    // 2. Construir filas
     const rows = data.map((b) => {
-      // Limpiamos datos para evitar errores si tienen comillas o saltos de línea
       const cleanName = b.client_name ? b.client_name.replace(/"/g, '""') : "";
+
+      // Calcular noches para el reporte
+      const start = new Date(b.check_in);
+      const end = new Date(b.check_out);
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      // Formatear documento (Ej: "DNI: 12345678")
+      const docString = b.document_number
+        ? `${b.document_type || "DNI"}: ${b.document_number}`
+        : "No registrado";
 
       return [
         b.id,
-        `"${cleanName}"`, // Ponemos comillas por si el nombre tiene espacios
+        `"${cleanName}"`,
+        `"${docString}"`, // <--- NUEVA COLUMNA
         b.client_email,
         b.room_id,
         b.check_in,
         b.check_out,
-        b.total_price, // Excel reconocerá esto como número si tu sistema usa punto decimal
+        nights,
+        b.total_price,
         b.payment_method,
         b.status,
-      ].join(";"); // <--- IMPORTANTE: Separador punto y coma
+      ].join(";");
     });
 
-    // 3. Unir cabecera y filas con saltos de línea
     const csvContent = [headers.join(";"), ...rows].join("\n");
-
-    // 4. Crear Blob con BOM (\uFEFF) para que salgan bien las TILDES y Ñ
     const blob = new Blob(["\uFEFF" + csvContent], {
       type: "text/csv;charset=utf-8;",
     });
 
-    // 5. Crear enlace de descarga
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -59,9 +69,9 @@ export default function DownloadButton({ data }: { data: any[] }) {
   return (
     <button
       onClick={downloadReport}
-      className="flex items-center gap-2 bg-stone-800 text-white px-5 py-3 rounded-xl hover:bg-black transition shadow-lg font-bold text-sm"
+      className="flex items-center gap-2 bg-stone-800 text-white px-4 py-2 rounded-lg hover:bg-black transition shadow-md font-bold text-xs"
     >
-      <Download size={18} /> Descargar Reporte Excel
+      <Download size={16} /> Descargar Reporte Excel
     </button>
   );
 }
