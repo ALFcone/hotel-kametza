@@ -5,14 +5,13 @@ import { revalidatePath } from "next/cache";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 // ------------------------------------------------------------------
-// 1. CONFIGURACIÓN DE MERCADO PAGO
-// ⚠️ PEGA TU TOKEN DE PRUEBA AQUÍ ABAJO (Dentro de las comillas)
+// ⚠️ NO OLVIDES VERIFICAR QUE TU TOKEN ESTÉ AQUÍ:
 // ------------------------------------------------------------------
 const client = new MercadoPagoConfig({
-  accessToken: "PEGAR_AQUI_TU_TOKEN_TEST_QUE_EMPIEZA_CON_TEST",
+  accessToken:
+    "TEST-7434598007363249-102513-e453188d9076f03407c57077a988d519-195979069",
 });
 
-// --- FUNCIÓN CREAR RESERVA (EXPORTADA) ---
 export async function createBooking(formData: FormData) {
   const roomId = formData.get("roomId");
   const checkIn = formData.get("checkIn") as string;
@@ -22,6 +21,10 @@ export async function createBooking(formData: FormData) {
   const price = formData.get("price");
   const paymentMethod = formData.get("paymentMethod") as string;
 
+  // DATOS NUEVOS
+  const documentType = formData.get("documentType") as string;
+  const documentNumber = formData.get("documentNumber") as string;
+
   // 1. Verificar disponibilidad
   const { data: isAvailable } = await supabase.rpc("check_availability", {
     room_id_input: Number(roomId),
@@ -30,10 +33,10 @@ export async function createBooking(formData: FormData) {
   });
 
   if (!isAvailable) {
-    return { error: "Esas fechas ya están ocupadas. Por favor elige otras." };
+    return { error: "Fechas ocupadas. Por favor elige otras." };
   }
 
-  // 2. Crear reserva en Base de Datos (Estado: Pendiente)
+  // 2. Crear reserva
   const { data: booking, error } = await supabase
     .from("bookings")
     .insert({
@@ -45,6 +48,9 @@ export async function createBooking(formData: FormData) {
       total_price: Number(price),
       payment_method: paymentMethod,
       status: "pendiente",
+      // GUARDAMOS LOS CAMPOS NUEVOS
+      document_type: documentType,
+      document_number: documentNumber,
     })
     .select()
     .single();
@@ -53,7 +59,7 @@ export async function createBooking(formData: FormData) {
     return { error: "Error interno al guardar la reserva." };
   }
 
-  // 3. MERCADO PAGO (Solo si eligió Pago Online)
+  // 3. MERCADO PAGO
   if (paymentMethod === "online") {
     try {
       const preference = new Preference(client);
@@ -69,9 +75,7 @@ export async function createBooking(formData: FormData) {
               currency_id: "PEN",
             },
           ],
-          payer: {
-            email: email as string,
-          },
+          payer: { email: email as string },
           back_urls: {
             success: `https://hotel-kametza.vercel.app/exito?method=online&status=approved&amount=${price}&id=${booking.id}`,
             failure: `https://hotel-kametza.vercel.app/exito?method=online&status=failure&id=${booking.id}`,
@@ -95,7 +99,7 @@ export async function createBooking(formData: FormData) {
       }
     } catch (e: any) {
       console.error("ERROR MERCADO PAGO:", e);
-      return { error: `Error MP: ${e.message || "Credenciales inválidas"}` };
+      return { error: `Error MP: ${e.message}` };
     }
   }
 
@@ -107,7 +111,6 @@ export async function createBooking(formData: FormData) {
   };
 }
 
-// --- FUNCIÓN ACTUALIZAR HABITACIÓN (EXPORTADA) ---
 export async function updateRoom(formData: FormData) {
   const roomId = formData.get("roomId");
   const price = formData.get("price");

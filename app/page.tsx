@@ -34,6 +34,9 @@ function RoomCard({ room }: { room: any }) {
   const [nights, setNights] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // --- NUEVO ESTADO: TIPO DE DOCUMENTO ---
+  const [docType, setDocType] = useState("DNI");
+
   // Lógica de precios
   useEffect(() => {
     if (checkIn && checkOut) {
@@ -52,7 +55,7 @@ function RoomCard({ room }: { room: any }) {
     }
   }, [checkIn, checkOut, room.price_per_night]);
 
-  // Manejador de envío (Pago)
+  // Manejador de envío (Pago + Validación)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -60,6 +63,18 @@ function RoomCard({ room }: { room: any }) {
 
     const formData = new FormData(e.currentTarget);
     const method = formData.get("paymentMethod");
+
+    // --- NUEVA VALIDACIÓN DE DNI ---
+    const dType = formData.get("documentType");
+    const dNum = formData.get("documentNumber") as string;
+
+    // Si es DNI, debe tener 8 dígitos y ser numérico
+    if (dType === "DNI" && (dNum.length !== 8 || isNaN(Number(dNum)))) {
+      alert("⚠️ Error: El DNI debe tener exactamente 8 números.");
+      setIsSubmitting(false);
+      return; // Detenemos todo si el DNI está mal
+    }
+    // -----------------------------
 
     // 1. Si es online, abrir pestaña nueva
     let newTab: Window | null = null;
@@ -210,6 +225,35 @@ function RoomCard({ room }: { room: any }) {
                   S/ {totalPrice}
                 </span>
               </div>
+
+              {/* --- AQUÍ INSERTÉ LA SECCIÓN DE DOCUMENTO (CON ESTILO IDÉNTICO AL RESTO) --- */}
+              <div className="flex gap-2">
+                <div className="w-1/3">
+                  <select
+                    name="documentType"
+                    className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 font-bold text-stone-600 outline-none appearance-none"
+                    onChange={(e) => setDocType(e.target.value)}
+                  >
+                    <option value="DNI">DNI</option>
+                    <option value="CE">C.E.</option>
+                    <option value="PASAPORTE">Pasaporte</option>
+                  </select>
+                </div>
+                <div className="w-2/3">
+                  <input
+                    type="text"
+                    name="documentNumber"
+                    placeholder={
+                      docType === "DNI" ? "DNI (8 dígitos)" : "N° Documento"
+                    }
+                    required
+                    maxLength={docType === "DNI" ? 8 : 15}
+                    className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+                  />
+                </div>
+              </div>
+              {/* ------------------------------------------------------------------------- */}
+
               <input
                 type="text"
                 name="name"
@@ -226,7 +270,6 @@ function RoomCard({ room }: { room: any }) {
               />
 
               <div className="relative">
-                {/* --- AQUÍ HE QUITADO TODAS LAS OPCIONES MANUALES --- */}
                 <select
                   name="paymentMethod"
                   required
@@ -273,7 +316,7 @@ function RoomCard({ room }: { room: any }) {
   );
 }
 
-// --- COMPONENTE PRINCIPAL ---
+// --- COMPONENTE PRINCIPAL (INTACTO CON TU DISEÑO) ---
 export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [busyIds, setBusyIds] = useState<number[]>([]);
@@ -329,7 +372,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen font-sans text-stone-800 bg-[#FDFBF7] selection:bg-rose-200 selection:text-rose-900">
-      {/* FONDO DECORATIVO */}
+      {/* FONDO DECORATIVO ORIGINAL */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(#d6d3d1_1px,transparent_1px)] [background-size:20px_20px] opacity-30"></div>
         <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-200/30 rounded-full blur-[100px] mix-blend-multiply animate-pulse-slow"></div>

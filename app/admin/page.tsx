@@ -284,10 +284,11 @@ export default async function AdminPage() {
               <thead>
                 <tr className="text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-stone-100">
                   <th className="p-4">Estado</th>
-                  <th className="p-4">Cliente</th>
+                  <th className="p-4">Cliente / Documento</th>{" "}
+                  {/* CAMBIO EN TÍTULO */}
                   <th className="p-4">Habitación</th>
                   <th className="p-4">Fechas</th>
-                  <th className="p-4">Noches</th> {/* NUEVA COLUMNA */}
+                  <th className="p-4">Noches</th>
                   <th className="p-4">Total</th>
                   <th className="p-4">Método</th>
                   <th className="p-4 text-center">Acciones</th>
@@ -316,6 +317,14 @@ export default async function AdminPage() {
                       <div className="text-[10px] text-stone-400 font-normal">
                         {booking.client_email}
                       </div>
+
+                      {/* --- AQUI AGREGAMOS EL DOCUMENTO --- */}
+                      {booking.document_number && (
+                        <div className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md w-fit mt-1 border border-rose-100 uppercase">
+                          {booking.document_type}: {booking.document_number}
+                        </div>
+                      )}
+                      {/* ----------------------------------- */}
                     </td>
                     <td className="p-4 text-rose-900 font-medium">
                       {/* Mostrar número y nombre */}
