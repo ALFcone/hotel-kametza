@@ -1,521 +1,179 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { revalidatePath } from "next/cache";
-import { updateRoom } from "../actions";
-import DownloadButton from "./DownloadButton";
 import {
-  Calendar,
+  LayoutDashboard,
+  Users,
+  Calendar as CalendarIcon,
   CheckCircle,
   Clock,
-  DollarSign,
-  User,
-  Home as HomeIcon,
-  X,
-  TrendingUp,
-  LogIn,
   LogOut,
-  Brush,
-  BedDouble,
-  Bed,
-  Wallet,
-  CreditCard,
-  Coins,
+  Home,
+  Search,
+  Filter,
 } from "lucide-react";
 
-async function markAsPaid(formData: FormData) {
-  "use server";
-  const bookingId = formData.get("bookingId");
-  await supabase
-    .from("bookings")
-    .update({ status: "pagado" })
-    .eq("id", bookingId);
-  revalidatePath("/admin");
-}
+export default function StaffAdmin() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
-async function deleteBooking(formData: FormData) {
-  "use server";
-  const bookingId = formData.get("bookingId");
-  await supabase.from("bookings").delete().eq("id", bookingId);
-  revalidatePath("/admin");
-}
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      // Verificación básica: Si no hay usuario, fuera.
+      // Podrías añadir: if (user.email !== 'tu-staff@mail.com') router.push('/')
+      if (!user) {
+        router.push("/");
+        return;
+      }
 
-function calculateNights(checkIn: string, checkOut: string) {
-  const start = new Date(checkIn);
-  const end = new Date(checkOut);
-  const diffTime = Math.abs(end.getTime() - start.getTime());
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-}
+      const { data } = await supabase
+        .from("bookings")
+        .select("*, rooms(name)")
+        .order("created_at", { ascending: false });
 
-export default async function AdminPage() {
-  const { data: rooms } = await supabase.from("rooms").select("*").order("id");
-  const { data: bookings } = await supabase
-    .from("bookings")
-    .select("*")
-    .order("created_at", { ascending: false });
+      if (data) setBookings(data);
+      setLoading(false);
+    };
+    checkAuth();
+  }, [router]);
 
-  const today = new Date().toISOString().split("T")[0];
+  const filteredBookings = bookings.filter(
+    (b) =>
+      b.client_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.document_number?.includes(searchTerm)
+  );
 
-  // 1. ESTADÍSTICAS GENERALES
-  const occupiedCount =
-    bookings?.filter((b) => b.check_in <= today && b.check_out > today)
-      .length || 0;
-  const arrivalsCount =
-    bookings?.filter((b) => b.check_in === today).length || 0;
-  const confirmedCount =
-    bookings?.filter((b) => b.status === "pagado" || b.status === "approved")
-      .length || 0;
-  const cleaningList = bookings?.filter((b) => b.check_out === today) || [];
-  const cleaningCount = cleaningList.length;
-
-  // 2. LÓGICA DE CIERRE DE CAJA (NUEVO)
-  // Filtramos reservas creadas HOY que estén PAGADAS
-  const salesToday =
-    bookings?.filter(
-      (b) =>
-        b.created_at.startsWith(today) &&
-        (b.status === "pagado" || b.status === "approved")
-    ) || [];
-
-  const totalIncome = salesToday.reduce((acc, b) => acc + b.total_price, 0);
-
-  // Dinero que debe estar en el cajón (Efectivo)
-  const cashIncome = salesToday
-    .filter((b) => b.payment_method === "recepcion")
-    .reduce((acc, b) => acc + b.total_price, 0);
-
-  // Dinero que entró al banco (Web/Yape)
-  const digitalIncome = salesToday
-    .filter((b) => b.payment_method === "online")
-    .reduce((acc, b) => acc + b.total_price, 0);
-
-  const getRoomName = (id: number) =>
-    rooms?.find((r) => r.id === id)?.name || "Habitación";
-  const getRoomNumber = (id: number) => {
-    const r = rooms?.find((r) => r.id === id);
-    return r?.room_number || r?.id || "#";
-  };
-
-  const getRoomStatus = (roomId: number) => {
-    const leaving = bookings?.find(
-      (b) => b.room_id === roomId && b.check_out === today
+  if (loading)
+    return (
+      <div className="h-screen flex items-center justify-center bg-slate-50 text-slate-600 font-bold">
+        Cargando Panel Staff...
+      </div>
     );
-    if (leaving) return { status: "checkout", guest: leaving.client_name };
-    const occupied = bookings?.find(
-      (b) => b.room_id === roomId && b.check_in <= today && b.check_out > today
-    );
-    if (occupied)
-      return {
-        status: "occupied",
-        guest: occupied.client_name,
-        paid: occupied.status === "pagado" || occupied.status === "approved",
-      };
-    return { status: "free", guest: null };
-  };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F4] text-stone-800 p-4 md:p-8 font-sans">
-      <div className="max-w-7xl mx-auto">
-        {/* HEADER */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-          <h1 className="text-3xl font-serif font-bold text-rose-950 flex items-center gap-2">
-            <User className="bg-rose-900 text-white p-2 rounded-lg" size={40} />
-            Panel de Control
-          </h1>
-          {bookings && <DownloadButton data={bookings} />}
+    <div className="min-h-screen bg-slate-50 flex">
+      {/* SIDEBAR IZQUIERDO */}
+      <aside className="w-64 bg-slate-900 text-white hidden md:flex flex-col">
+        <div className="p-8">
+          <h2 className="text-xl font-bold tracking-tighter">
+            KAMETZA <span className="text-blue-400">STAFF</span>
+          </h2>
         </div>
-
-        {/* --- 1. KPIs OPERATIVOS --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-5 rounded-2xl shadow-md border-b-4 border-blue-500 flex items-center gap-3 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-2 opacity-10">
-              <BedDouble size={60} />
-            </div>
-            <div className="p-3 bg-blue-100 text-blue-700 rounded-xl">
-              <HomeIcon size={24} />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-stone-400 uppercase tracking-wider">
-                Ocupadas
-              </p>
-              <p className="text-3xl font-black text-blue-900">
-                {occupiedCount}
-              </p>
-            </div>
+        <nav className="flex-1 px-4 space-y-2">
+          <div className="bg-blue-600 p-3 rounded-xl flex items-center gap-3 cursor-pointer">
+            <LayoutDashboard size={20} />{" "}
+            <span className="text-sm font-medium">Reservas</span>
           </div>
-          <div className="bg-white p-5 rounded-2xl shadow-md border-b-4 border-purple-500 flex items-center gap-3 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-2 opacity-10">
-              <LogIn size={60} />
-            </div>
-            <div className="p-3 bg-purple-100 text-purple-700 rounded-xl">
-              <LogIn size={24} />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-stone-400 uppercase tracking-wider">
-                Llegadas
-              </p>
-              <p className="text-3xl font-black text-purple-900">
-                {arrivalsCount}
-              </p>
-            </div>
-          </div>
-          <div className="bg-white p-5 rounded-2xl shadow-md border-b-4 border-emerald-500 flex items-center gap-3 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-2 opacity-10">
-              <CheckCircle size={60} />
-            </div>
-            <div className="p-3 bg-emerald-100 text-emerald-700 rounded-xl">
-              <CheckCircle size={24} />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-stone-400 uppercase tracking-wider">
-                Confirmadas
-              </p>
-              <p className="text-3xl font-black text-emerald-900">
-                {confirmedCount}
-              </p>
-            </div>
-          </div>
-          <div className="bg-white p-5 rounded-2xl shadow-md border-b-4 border-amber-500 flex items-center gap-3 relative overflow-hidden">
-            {cleaningCount > 0 && (
-              <span className="absolute top-3 right-3 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-              </span>
-            )}
-            <div className="p-3 bg-amber-100 text-amber-700 rounded-xl">
-              <Brush size={24} />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-stone-400 uppercase tracking-wider">
-                Limpieza
-              </p>
-              <p className="text-3xl font-black text-amber-900">
-                {cleaningCount}
-              </p>
-            </div>
-          </div>
+          <a
+            href="/"
+            className="p-3 rounded-xl flex items-center gap-3 hover:bg-slate-800 transition text-slate-400"
+          >
+            <Home size={20} />{" "}
+            <span className="text-sm font-medium">Ver Web</span>
+          </a>
+        </nav>
+        <div className="p-6 border-t border-slate-800">
+          <button
+            onClick={() => supabase.auth.signOut().then(() => router.push("/"))}
+            className="flex items-center gap-3 text-slate-400 hover:text-white transition"
+          >
+            <LogOut size={20} />{" "}
+            <span className="text-sm font-medium">Cerrar Sesión</span>
+          </button>
         </div>
+      </aside>
 
-        {/* --- 2. SECCIÓN FINANCIERA (CIERRE DE CAJA) --- */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-stone-900 text-white p-5 rounded-2xl shadow-xl flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute -right-4 -top-4 opacity-10">
-              <Wallet size={100} />
-            </div>
-            <div>
-              <p className="text-stone-400 text-[10px] font-bold uppercase tracking-widest mb-1">
-                Total Ventas Hoy
-              </p>
-              <p className="text-3xl font-black">S/ {totalIncome.toFixed(2)}</p>
-            </div>
-            <div className="mt-4 text-xs font-medium text-stone-500 bg-stone-800 py-1 px-2 rounded w-fit">
-              Fecha: {today}
+      {/* CONTENIDO PRINCIPAL */}
+      <main className="flex-1 p-8 overflow-y-auto">
+        <header className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800">
+              Control de Reservas
+            </h1>
+            <p className="text-slate-500 text-sm">
+              Gestiona los ingresos y pagos del día.
+            </p>
+          </div>
+          <div className="flex gap-4">
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-2.5 text-slate-400"
+                size={18}
+              />
+              <input
+                type="text"
+                placeholder="Buscar por nombre o DNI..."
+                className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-64"
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
+        </header>
 
-          <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-emerald-100 text-emerald-700 rounded-full">
-              <Coins size={24} />
-            </div>
-            <div>
-              <p className="text-emerald-800 text-[10px] font-bold uppercase tracking-widest">
-                En Caja (Efectivo)
-              </p>
-              <p className="text-2xl font-black text-emerald-900">
-                S/ {cashIncome.toFixed(2)}
-              </p>
-              <p className="text-[10px] text-emerald-600 font-medium">
-                Debe haber en cajón
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-sky-50 border border-sky-100 p-5 rounded-2xl shadow-sm flex items-center gap-4">
-            <div className="p-3 bg-sky-100 text-sky-700 rounded-full">
-              <CreditCard size={24} />
-            </div>
-            <div>
-              <p className="text-sky-800 text-[10px] font-bold uppercase tracking-widest">
-                Banco (Web/Yape)
-              </p>
-              <p className="text-2xl font-black text-sky-900">
-                S/ {digitalIncome.toFixed(2)}
-              </p>
-              <p className="text-[10px] text-sky-600 font-medium">
-                Ingreso digital
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* --- 3. MAPA DE HABITACIONES --- */}
-        <section className="mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-4">
-            <h2 className="text-xl font-bold text-stone-700 flex items-center gap-2">
-              <Bed className="text-rose-600" size={20} /> Mapa (Hoy)
-            </h2>
-            <div className="flex gap-3 text-[10px] font-bold uppercase bg-white px-3 py-1.5 rounded-lg shadow-sm border border-stone-200">
-              <span className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-white border border-stone-300"></div>{" "}
-                Libre
-              </span>
-              <span className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-rose-900"></div> Ocupada
-              </span>
-              <span className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-amber-100 border border-amber-300"></div>{" "}
-                Limpieza
-              </span>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {rooms?.map((room) => {
-              const info = getRoomStatus(room.id);
-              let cardClass = "bg-white border-stone-200 text-stone-600";
-              let numClass = "text-stone-300";
-              let icon = null;
-              if (info.status === "occupied") {
-                cardClass = "bg-rose-900 text-white border-rose-950";
-                numClass = "text-rose-800 opacity-50";
-                icon = <User size={14} className="text-rose-200" />;
-              } else if (info.status === "checkout") {
-                cardClass = "bg-amber-100 text-amber-900 border-amber-300";
-                numClass = "text-amber-800 opacity-20";
-                icon = <LogOut size={14} className="text-amber-600" />;
-              }
-              return (
-                <div
-                  key={room.id}
-                  className={`p-3 rounded-xl border shadow-sm flex flex-col justify-between h-24 relative overflow-hidden transition hover:scale-105 ${cardClass}`}
-                >
-                  <span
-                    className={`absolute -bottom-2 -right-1 text-5xl font-black tracking-tighter select-none ${numClass}`}
-                  >
-                    {room.room_number || room.id}
-                  </span>
-                  <div className="flex justify-between items-start z-10">
-                    <span className="font-bold text-xs leading-tight truncate w-full">
-                      {room.name}
-                    </span>
-                    {icon}
-                  </div>
-                  <div className="z-10 mt-auto">
-                    {info.status === "free" ? (
-                      <span className="text-[9px] font-bold uppercase tracking-wider opacity-60 bg-stone-100 px-1.5 py-0.5 rounded text-stone-500">
-                        Libre
+        {/* TABLA DE RESERVAS */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <table className="w-full text-left">
+            <thead className="bg-slate-50 border-b border-slate-100">
+              <tr className="text-[11px] uppercase font-black text-slate-400 tracking-wider">
+                <th className="px-6 py-4">Huésped</th>
+                <th className="px-6 py-4">Habitación</th>
+                <th className="px-6 py-4">Fechas</th>
+                <th className="px-6 py-4">Estado</th>
+                <th className="px-6 py-4">Total</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredBookings.map((b) => (
+                <tr key={b.id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-6 py-4">
+                    <p className="font-bold text-slate-700 text-sm">
+                      {b.client_name}
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-mono">
+                      {b.document_type}: {b.document_number}
+                    </p>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-slate-600">
+                    {b.rooms?.name}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                      <CalendarIcon size={14} className="text-blue-500" />
+                      {b.check_in} - {b.check_out}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    {b.status === "pagado" ? (
+                      <span className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg text-[10px] font-black uppercase">
+                        <CheckCircle size={12} /> Pagado
                       </span>
                     ) : (
-                      <>
-                        <p className="text-[10px] font-bold truncate mb-0.5">
-                          {info.guest}
-                        </p>
-                        {info.status === "occupied" && (
-                          <span
-                            className={`text-[8px] uppercase font-bold px-1 py-0.5 rounded ${
-                              info.paid
-                                ? "bg-emerald-500/20 text-emerald-100"
-                                : "bg-white/20 text-white"
-                            }`}
-                          >
-                            {info.paid ? "Pagado" : "Pendiente"}
-                          </span>
-                        )}
-                        {info.status === "checkout" && (
-                          <span className="text-[8px] uppercase font-bold text-amber-700">
-                            Salida Hoy
-                          </span>
-                        )}
-                      </>
+                      <span className="flex items-center gap-1.5 text-amber-600 bg-amber-50 px-2 py-1 rounded-lg text-[10px] font-black uppercase">
+                        <Clock size={12} /> Pendiente
+                      </span>
                     )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* --- 4. TABLA DE RESERVAS --- */}
-        <section className="bg-white p-6 rounded-3xl shadow-lg border border-stone-100 mb-8">
-          <h2 className="text-xl font-bold text-stone-700 mb-4 flex items-center gap-2">
-            <Calendar className="text-rose-600" size={20} /> Reservas Recientes
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="text-[10px] font-bold text-stone-400 uppercase tracking-wider border-b border-stone-100">
-                  <th className="p-3">Estado</th>
-                  <th className="p-3">Cliente / Doc</th>
-                  <th className="p-3">Habitación</th>
-                  <th className="p-3">Fechas</th>
-                  <th className="p-3">Noches</th>
-                  <th className="p-3">Total</th>
-                  <th className="p-3">Método</th>
-                  <th className="p-3 text-center">Acciones</th>
+                  </td>
+                  <td className="px-6 py-4 font-bold text-slate-800">
+                    S/ {b.total_price}
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="text-xs">
-                {bookings?.map((booking) => (
-                  <tr
-                    key={booking.id}
-                    className="border-b border-stone-50 hover:bg-stone-50 transition"
-                  >
-                    <td className="p-3">
-                      {booking.status === "pagado" ||
-                      booking.status === "approved" ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold border border-emerald-200">
-                          <CheckCircle size={10} /> PAGADO
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold border border-amber-200">
-                          <Clock size={10} /> PENDIENTE
-                        </span>
-                      )}
-                    </td>
-                    <td className="p-3">
-                      <div className="font-bold text-stone-700">
-                        {booking.client_name}
-                      </div>
-                      {booking.document_number && (
-                        <div className="text-[9px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded w-fit mt-0.5 border border-rose-100 uppercase">
-                          {booking.document_type}: {booking.document_number}
-                        </div>
-                      )}
-                    </td>
-                    <td className="p-3 text-rose-900 font-medium">
-                      <span className="font-bold mr-1">
-                        #{getRoomNumber(booking.room_id)}
-                      </span>{" "}
-                      {getRoomName(booking.room_id)}
-                    </td>
-                    <td className="p-3">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-emerald-600 font-bold">
-                          IN: {booking.check_in}
-                        </span>
-                        <span className="text-rose-600 font-bold">
-                          OUT: {booking.check_out}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="p-3 text-stone-500 font-bold">
-                      {calculateNights(booking.check_in, booking.check_out)} n.
-                    </td>
-                    <td className="p-3 font-black text-stone-700">
-                      S/ {booking.total_price}
-                    </td>
-                    <td className="p-3 capitalize text-stone-500 font-bold">
-                      {booking.payment_method === "online"
-                        ? "Web"
-                        : booking.payment_method}
-                    </td>
-                    <td className="p-3 flex gap-1 justify-center">
-                      {booking.status !== "pagado" &&
-                        booking.status !== "approved" && (
-                          <form action={markAsPaid}>
-                            <input
-                              type="hidden"
-                              name="bookingId"
-                              value={booking.id}
-                            />
-                            <button
-                              type="submit"
-                              title="Confirmar Pago"
-                              className="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition shadow"
-                            >
-                              <DollarSign size={14} />
-                            </button>
-                          </form>
-                        )}
-                      <form action={deleteBooking}>
-                        <input
-                          type="hidden"
-                          name="bookingId"
-                          value={booking.id}
-                        />
-                        <button
-                          type="submit"
-                          title="Eliminar"
-                          className="p-1.5 bg-white border border-stone-200 text-stone-400 rounded-lg hover:bg-rose-500 hover:text-white transition shadow"
-                        >
-                          <X size={14} />
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* --- 5. EDITAR HABITACIONES --- */}
-        <section>
-          <h2 className="text-xl font-bold text-stone-700 mb-4 flex items-center gap-2">
-            <HomeIcon className="text-rose-600" size={20} /> Habitaciones
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {rooms?.map((room) => (
-              <div
-                key={room.id}
-                className="bg-white p-4 rounded-2xl shadow-md border border-stone-100 flex flex-col gap-3"
-              >
-                <div className="relative h-32 rounded-lg overflow-hidden bg-stone-200 group">
-                  <img
-                    src={room.image_url}
-                    alt={room.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                  />
-                  <div className="absolute top-2 left-2 bg-white/90 text-stone-800 font-black px-2 py-0.5 rounded text-xs">
-                    #{room.room_number || room.id}
-                  </div>
-                </div>
-                <h3 className="font-bold text-lg text-rose-900 leading-tight">
-                  {room.name}
-                </h3>
-                <form action={updateRoom} className="flex flex-col gap-2">
-                  <input type="hidden" name="roomId" value={room.id} />
-                  <div className="flex gap-2">
-                    <div className="w-1/3">
-                      <label className="text-[10px] font-bold uppercase text-stone-400">
-                        Precio
-                      </label>
-                      <input
-                        name="price"
-                        defaultValue={room.price_per_night}
-                        type="number"
-                        className="w-full p-2 bg-stone-50 rounded-lg border border-stone-200 font-bold text-sm"
-                      />
-                    </div>
-                    <div className="w-2/3">
-                      <label className="text-[10px] font-bold uppercase text-stone-400">
-                        Foto
-                      </label>
-                      <input
-                        type="file"
-                        name="image"
-                        accept="image/*"
-                        className="w-full text-[10px] text-stone-500 mt-1"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold uppercase text-stone-400">
-                      Descripción
-                    </label>
-                    <textarea
-                      name="description"
-                      defaultValue={room.description}
-                      rows={2}
-                      className="w-full p-2 bg-stone-50 rounded-lg border border-stone-200 text-xs resize-none"
-                    />
-                  </div>
-                  <button className="bg-stone-900 text-white font-bold py-2 rounded-lg mt-1 hover:bg-rose-900 transition text-xs shadow">
-                    Guardar Cambios
-                  </button>
-                </form>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
+              ))}
+            </tbody>
+          </table>
+          {filteredBookings.length === 0 && (
+            <div className="p-20 text-center text-slate-400 text-sm italic">
+              No se encontraron reservas con esos datos.
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
