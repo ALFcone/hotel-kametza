@@ -3,14 +3,38 @@
 import { supabase } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { MercadoPagoConfig, Preference } from "mercadopago";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 // ------------------------------------------------------------------
-// ⚠️ NO OLVIDES VERIFICAR QUE TU TOKEN ESTÉ AQUÍ:
+// TU TOKEN
 // ------------------------------------------------------------------
 const client = new MercadoPagoConfig({
   accessToken:
     "TEST-7434598007363249-102513-e453188d9076f03407c57077a988d519-195979069",
 });
+
+// --- FUNCIÓN CORREGIDA PARA NEXT.JS 15 ---
+async function getUser() {
+  // AQUI ESTABA EL ERROR: En Next.js 15 cookies() lleva await
+  const cookieStore = await cookies();
+
+  const supabaseServer = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
+  const {
+    data: { user },
+  } = await supabaseServer.auth.getUser();
+  return user;
+}
 
 export async function createBooking(formData: FormData) {
   const roomId = formData.get("roomId");
@@ -21,11 +45,13 @@ export async function createBooking(formData: FormData) {
   const price = formData.get("price");
   const paymentMethod = formData.get("paymentMethod") as string;
 
-  // DATOS NUEVOS
   const documentType = formData.get("documentType") as string;
   const documentNumber = formData.get("documentNumber") as string;
 
-  // 1. Verificar disponibilidad
+  // 1. OBTENER USUARIO (Con la corrección)
+  const user = await getUser();
+
+  // 2. Verificar disponibilidad
   const { data: isAvailable } = await supabase.rpc("check_availability", {
     room_id_input: Number(roomId),
     check_in_input: checkIn,
@@ -36,7 +62,7 @@ export async function createBooking(formData: FormData) {
     return { error: "Fechas ocupadas. Por favor elige otras." };
   }
 
-  // 2. Crear reserva
+  // 3. Crear reserva
   const { data: booking, error } = await supabase
     .from("bookings")
     .insert({
@@ -48,9 +74,9 @@ export async function createBooking(formData: FormData) {
       total_price: Number(price),
       payment_method: paymentMethod,
       status: "pendiente",
-      // GUARDAMOS LOS CAMPOS NUEVOS
       document_type: documentType,
       document_number: documentNumber,
+      user_id: user ? user.id : null,
     })
     .select()
     .single();
@@ -59,7 +85,7 @@ export async function createBooking(formData: FormData) {
     return { error: "Error interno al guardar la reserva." };
   }
 
-  // 3. MERCADO PAGO
+  // 4. MERCADO PAGO
   if (paymentMethod === "online") {
     try {
       const preference = new Preference(client);
@@ -103,7 +129,7 @@ export async function createBooking(formData: FormData) {
     }
   }
 
-  // 4. MÉTODOS MANUALES
+  // 5. MÉTODOS MANUALES
   return {
     success: true,
     url: `/exito?method=${paymentMethod}&amount=${price}&id=${booking.id}`,

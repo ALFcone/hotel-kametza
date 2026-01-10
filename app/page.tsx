@@ -13,9 +13,126 @@ import {
   ArrowRight,
   Menu,
   X,
+  LogIn,
 } from "lucide-react";
 
-// --- TIPOS DE DATOS ---
+// --- NUEVO: COMPONENTE MODAL DE LOGIN/REGISTRO ---
+function AuthModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  if (!isOpen) return null;
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        alert("Cuenta creada. ¡Bienvenido!");
+      }
+      onSuccess(); // Login exitoso
+    } catch (err: any) {
+      setError(
+        "Error: " +
+          (err.message === "Invalid login credentials"
+            ? "Contraseña incorrecta"
+            : err.message)
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-stone-400 hover:text-stone-800"
+        >
+          <X size={24} />
+        </button>
+
+        <h2 className="text-2xl font-serif font-bold text-rose-950 mb-2 text-center">
+          {isLogin ? "Inicia Sesión" : "Regístrate"}
+        </h2>
+        <p className="text-stone-500 text-xs text-center mb-6">
+          {isLogin
+            ? "Para asegurar tu reserva, ingresa a tu cuenta."
+            : "Crea una cuenta para gestionar tus reservas."}
+        </p>
+
+        {error && (
+          <div className="bg-red-50 text-red-600 text-xs p-3 rounded-xl mb-4 text-center font-bold">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleAuth} className="flex flex-col gap-3">
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm"
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm"
+          />
+
+          <button
+            disabled={loading}
+            className="w-full bg-rose-900 text-white font-bold py-3 rounded-xl hover:bg-rose-800 transition shadow-lg disabled:opacity-50 text-sm mt-2"
+          >
+            {loading
+              ? "Cargando..."
+              : isLogin
+              ? "Ingresar y Reservar"
+              : "Crear Cuenta"}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center text-xs text-stone-500">
+          {isLogin ? "¿Nuevo aquí? " : "¿Ya tienes cuenta? "}
+          <button
+            onClick={() => setIsLogin(!isLogin)}
+            className="font-bold text-rose-900 hover:underline"
+          >
+            {isLogin ? "Crear cuenta" : "Ingresar"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface Room {
   id: number;
   name: string;
@@ -25,26 +142,28 @@ interface Room {
   room_number: string;
 }
 
-// --- COMPONENTE INTERNO: TARJETA DE HABITACIÓN ---
-function RoomCard({ room }: { room: any }) {
+// --- ROOM CARD MODIFICADA PARA PEDIR AUTH ---
+function RoomCard({
+  room,
+  onRequireAuth,
+}: {
+  room: any;
+  onRequireAuth: (callback: () => void) => void;
+}) {
   const router = useRouter();
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [totalPrice, setTotalPrice] = useState(room.price_per_night);
   const [nights, setNights] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // --- NUEVO ESTADO: TIPO DE DOCUMENTO ---
   const [docType, setDocType] = useState("DNI");
 
-  // Lógica de precios
   useEffect(() => {
     if (checkIn && checkOut) {
       const start = new Date(checkIn);
       const end = new Date(checkOut);
       const diffTime = end.getTime() - start.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
       if (diffDays > 0) {
         setNights(diffDays);
         setTotalPrice(diffDays * room.price_per_night);
@@ -55,47 +174,25 @@ function RoomCard({ room }: { room: any }) {
     }
   }, [checkIn, checkOut, room.price_per_night]);
 
-  // Manejador de envío (Pago + Validación)
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-
-    const formData = new FormData(e.currentTarget);
+  // Función separada para procesar el pago (se llama directo o después del login)
+  const executeBooking = async (formData: FormData) => {
     const method = formData.get("paymentMethod");
 
-    // --- NUEVA VALIDACIÓN DE DNI ---
-    const dType = formData.get("documentType");
-    const dNum = formData.get("documentNumber") as string;
-
-    // Si es DNI, debe tener 8 dígitos y ser numérico
-    if (dType === "DNI" && (dNum.length !== 8 || isNaN(Number(dNum)))) {
-      alert("⚠️ Error: El DNI debe tener exactamente 8 números.");
-      setIsSubmitting(false);
-      return; // Detenemos todo si el DNI está mal
-    }
-    // -----------------------------
-
-    // 1. Si es online, abrir pestaña nueva
     let newTab: Window | null = null;
     if (method === "online") {
       newTab = window.open("", "_blank");
-      if (newTab) {
+      if (newTab)
         newTab.document.write(
           "<div style='height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;'><h2>Cargando pasarela segura...</h2></div>"
         );
-      }
     }
 
     try {
-      // 2. Llamar al servidor
       const response = await createBooking(formData);
-
       if (response?.error) {
         alert(response.error);
         if (newTab) newTab.close();
       } else if (response?.success && response.url) {
-        // 3. Redirigir
         if (method === "online" && newTab) {
           newTab.location.href = response.url;
           router.push(
@@ -107,11 +204,41 @@ function RoomCard({ room }: { room: any }) {
       }
     } catch (err) {
       console.error(err);
-      alert("Error al procesar la reserva.");
+      alert("Error inesperado.");
       if (newTab) newTab.close();
     }
-
     setIsSubmitting(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    const formData = new FormData(e.currentTarget);
+    const dType = formData.get("documentType");
+    const dNum = formData.get("documentNumber") as string;
+
+    if (dType === "DNI" && (dNum.length !== 8 || isNaN(Number(dNum)))) {
+      alert("⚠️ Error: El DNI debe tener 8 dígitos numéricos.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // 1. VERIFICAR SI HAY USUARIO LOGUEADO
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      // 2. SI NO HAY USUARIO, ABRIR MODAL
+      // Pasamos la función executeBooking para que se ejecute apenas se loguee
+      onRequireAuth(() => executeBooking(formData));
+      setIsSubmitting(false); // Detenemos el loading visual del botón por ahora
+    } else {
+      // 3. SI YA ESTÁ LOGUEADO, SEGUIR NORMAL
+      await executeBooking(formData);
+    }
   };
 
   return (
@@ -140,7 +267,6 @@ function RoomCard({ room }: { room: any }) {
             : "🔴 Agotado"}
         </div>
       </div>
-
       <div className="p-8 md:p-10 flex flex-col flex-grow">
         <div className="flex items-center gap-2 mb-4">
           <Star size={14} className="fill-[#700824] text-[#700824]" />
@@ -154,7 +280,6 @@ function RoomCard({ room }: { room: any }) {
         <div className="text-stone-500 text-sm mb-8 leading-relaxed font-light">
           {room.description}
         </div>
-
         <div className="grid grid-cols-2 gap-4 mb-8 pt-6 border-t border-stone-100">
           <div className="flex items-center gap-2 text-[#700824]">
             <Tv size={18} />
@@ -181,7 +306,6 @@ function RoomCard({ room }: { room: any }) {
             </span>
           </div>
         </div>
-
         <div className="mt-auto">
           {room.availableCount > 0 ? (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -226,7 +350,6 @@ function RoomCard({ room }: { room: any }) {
                 </span>
               </div>
 
-              {/* --- AQUÍ INSERTÉ LA SECCIÓN DE DOCUMENTO (CON ESTILO IDÉNTICO AL RESTO) --- */}
               <div className="flex gap-2">
                 <div className="w-1/3">
                   <select
@@ -252,7 +375,6 @@ function RoomCard({ room }: { room: any }) {
                   />
                 </div>
               </div>
-              {/* ------------------------------------------------------------------------- */}
 
               <input
                 type="text"
@@ -316,12 +438,18 @@ function RoomCard({ room }: { room: any }) {
   );
 }
 
-// --- COMPONENTE PRINCIPAL (INTACTO CON TU DISEÑO) ---
 export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [busyIds, setBusyIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // --- ESTADOS DE AUTENTICACIÓN ---
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [pendingBookingAction, setPendingBookingAction] = useState<
+    (() => void) | null
+  >(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -339,12 +467,37 @@ export default function Home() {
       if (roomsData) setRooms(roomsData);
       if (bookingsData) setBusyIds(bookingsData.map((b: any) => b.room_id));
       setLoading(false);
+
+      // Verificar usuario actual
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setCurrentUser(user);
     };
     fetchData();
   }, []);
 
-  const closeMenu = () => setIsMenuOpen(false);
+  // Callback para cuando el login es exitoso
+  const handleLoginSuccess = () => {
+    setShowAuthModal(false);
+    // Refrescamos el usuario
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUser(data.user);
+      // Si había una reserva pendiente, la ejecutamos ahora
+      if (pendingBookingAction) {
+        pendingBookingAction();
+        setPendingBookingAction(null);
+      }
+    });
+  };
 
+  // Función que RoomCard llama si no hay usuario
+  const triggerAuthFlow = (continueBooking: () => void) => {
+    setPendingBookingAction(() => continueBooking);
+    setShowAuthModal(true);
+  };
+
+  const closeMenu = () => setIsMenuOpen(false);
   const roomTypes: any = {};
   rooms.forEach((room) => {
     if (!roomTypes[room.name]) {
@@ -372,13 +525,18 @@ export default function Home() {
 
   return (
     <div className="min-h-screen font-sans text-stone-800 bg-[#FDFBF7] selection:bg-rose-200 selection:text-rose-900">
-      {/* FONDO DECORATIVO ORIGINAL */}
+      {/* MODAL DE LOGIN (Solo aparece si se requiere) */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={handleLoginSuccess}
+      />
+
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(#d6d3d1_1px,transparent_1px)] [background-size:20px_20px] opacity-30"></div>
         <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-200/30 rounded-full blur-[100px] mix-blend-multiply animate-pulse-slow"></div>
         <div className="absolute top-[40%] right-0 w-[600px] h-[600px] bg-rose-200/20 rounded-full blur-[120px] mix-blend-multiply"></div>
       </div>
-
       <nav className="fixed top-0 w-full bg-white z-[100] shadow-2xl border-b border-stone-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24 md:h-32">
@@ -411,7 +569,21 @@ export default function Home() {
                 Contacto
               </a>
             </div>
-            <div className="hidden md:block">
+            <div className="hidden md:flex items-center gap-4">
+              {/* INDICADOR DE USUARIO EN NAVBAR */}
+              {currentUser ? (
+                <span className="text-xs font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-full">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>{" "}
+                  Hola, Cliente
+                </span>
+              ) : (
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="text-xs font-bold text-stone-500 hover:text-stone-900 flex items-center gap-1"
+                >
+                  <LogIn size={14} /> Acceder
+                </button>
+              )}
               <a
                 href="#habitaciones"
                 className="bg-rose-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-rose-800 transition shadow-lg"
@@ -457,7 +629,6 @@ export default function Home() {
           </div>
         </div>
       </nav>
-
       <section
         id="inicio"
         className="relative pt-48 pb-24 lg:pt-56 lg:pb-32 overflow-hidden z-10 px-4 text-center"
@@ -494,7 +665,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <section id="servicios" className="py-20 relative z-10 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
@@ -530,7 +700,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
       <section id="habitaciones" className="py-20 relative z-10 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -545,12 +714,15 @@ export default function Home() {
           </div>
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-2 max-w-5xl mx-auto">
             {groupedRooms.map((room: any) => (
-              <RoomCard key={room.name} room={room} />
+              <RoomCard
+                key={room.name}
+                room={room}
+                onRequireAuth={triggerAuthFlow}
+              />
             ))}
           </div>
         </div>
       </section>
-
       <section id="ubicacion" className="py-20 bg-white relative z-10 px-4">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div>
@@ -595,7 +767,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <section
         id="contacto"
         className="py-24 bg-[#700824]/90 relative overflow-hidden z-10 px-4"
@@ -610,7 +781,6 @@ export default function Home() {
             {" "}
             ¿Deseas una atención directa?{" "}
           </h2>
-
           <div className="grid md:grid-cols-3 gap-8 text-center mb-16">
             <a
               href="https://wa.me/51966556622"
@@ -646,7 +816,6 @@ export default function Home() {
               </p>
             </a>
           </div>
-
           <div className="flex flex-wrap justify-center gap-4 pt-10 border-t border-white/20">
             <a
               href="https://www.facebook.com/share/1KhmvycDcR/"
@@ -687,7 +856,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <footer className="bg-stone-900 text-stone-400 py-12 text-sm relative z-10 px-4 text-center md:text-left">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
