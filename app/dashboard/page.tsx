@@ -69,101 +69,187 @@ export default function UserDashboard() {
       </div>
     );
 
-  // --- VISTA PARA STAFF / ADMIN (COLORES DE TRABAJO) ---
+  // --- VISTA PROFESIONAL PARA STAFF / ADMIN ---
   if (role === "admin" || role === "staff") {
+    const totalMonto = data.reduce((acc, b) => acc + (b.total_price || 0), 0);
+    const pendientes = data.filter(
+      (b) => b.status !== "pagado" && b.status !== "approved"
+    ).length;
+
     return (
       <div
         className={`min-h-screen ${
-          role === "admin" ? "bg-slate-50" : "bg-blue-50"
-        } p-6 md:p-12 font-sans`}
+          role === "admin" ? "bg-[#f8fafc]" : "bg-[#f0f7ff]"
+        } font-sans pb-20`}
       >
-        <div className="max-w-6xl mx-auto">
-          {/* Header de Gestión */}
-          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100 flex justify-between items-center mb-8">
+        {/* BARRA SUPERIOR */}
+        <nav className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-50 shadow-sm">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex items-center gap-4">
               <div
-                className={`p-3 rounded-2xl ${
-                  role === "admin" ? "bg-red-600" : "bg-blue-600"
-                } text-white`}
+                className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  role === "admin" ? "bg-slate-900" : "bg-blue-600"
+                } text-white shadow-lg`}
               >
-                {role === "admin" ? <ShieldCheck /> : <Briefcase />}
+                {role === "admin" ? (
+                  <ShieldCheck size={22} />
+                ) : (
+                  <Briefcase size={22} />
+                )}
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-800">
-                  Panel de {role === "admin" ? "Administración" : "Recepción"}
+                <h1 className="text-slate-900 font-bold leading-tight">
+                  Kametza{" "}
+                  <span className="text-slate-400 font-normal">
+                    | Central de Reservas
+                  </span>
                 </h1>
-                <p className="text-sm text-slate-500">{user.email}</p>
+                <div className="flex items-center gap-2 text-[10px] uppercase font-black tracking-widest text-slate-400">
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      role === "admin" ? "bg-red-500" : "bg-blue-500"
+                    }`}
+                  ></span>
+                  {role} Mode
+                </div>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-3">
               <a
                 href="/"
-                className="p-3 hover:bg-slate-100 rounded-xl transition"
+                className="p-2 text-slate-400 hover:bg-slate-100 rounded-lg transition"
               >
                 <Home size={20} />
               </a>
+              <div className="h-6 w-[1px] bg-slate-200 mx-2"></div>
               <button
                 onClick={handleLogout}
-                className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition"
+                className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-lg font-bold text-xs hover:bg-rose-100 transition"
               >
-                <LogOut size={20} />
+                <LogOut size={14} /> Salir
               </button>
             </div>
           </div>
+        </nav>
 
-          <h2 className="text-lg font-bold text-slate-700 mb-6 uppercase tracking-widest flex items-center gap-2">
-            <Eye size={18} /> Todas las Reservas
-          </h2>
-
-          <div className="grid gap-4">
-            {data.map((b) => (
-              <div
-                key={b.id}
-                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between hover:border-blue-300 transition-all"
-              >
-                <div className="flex items-center gap-4">
-                  <img
-                    src={b.rooms?.image_url}
-                    className="w-16 h-16 rounded-xl object-cover"
-                  />
-                  <div>
-                    <p className="font-bold text-slate-800 text-sm">
-                      {b.client_name}
-                    </p>
-                    <p className="text-[11px] text-slate-500">
-                      {b.rooms?.name} • {b.check_in} al {b.check_out}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="text-xs font-black text-slate-900 uppercase">
-                      S/ {b.total_price}
-                    </p>
-                    <span
-                      className={`text-[9px] font-bold px-2 py-0.5 rounded-md ${
-                        b.status === "pagado"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-orange-100 text-orange-700"
-                      }`}
-                    >
-                      {b.status === "pagado" ? "PAGADO" : "PENDIENTE"}
-                    </span>
-                  </div>
-                  {role === "admin" && (
-                    <button className="p-2 text-slate-400 hover:text-blue-600 transition">
-                      <ShieldCheck size={18} />
-                    </button>
-                  )}
-                </div>
+        <div className="max-w-7xl mx-auto px-8 pt-10">
+          {/* TARJETAS DE MÉTRICAS */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="bg-white p-6 rounded-[1.5rem] border border-slate-200 shadow-sm">
+              <p className="text-slate-400 text-[10px] uppercase font-black tracking-wider mb-2">
+                Total Recaudado
+              </p>
+              <p className="text-3xl font-bold text-slate-900">
+                S/ {totalMonto.toLocaleString()}
+              </p>
+              <div className="mt-2 text-xs text-emerald-600 font-bold">
+                ↑ Ingresos totales
               </div>
-            ))}
+            </div>
+            <div className="bg-white p-6 rounded-[1.5rem] border border-slate-200 shadow-sm">
+              <p className="text-slate-400 text-[10px] uppercase font-black tracking-wider mb-2">
+                Reservas Totales
+              </p>
+              <p className="text-3xl font-bold text-slate-900">{data.length}</p>
+              <div className="mt-2 text-xs text-slate-500 font-medium">
+                En historial
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-[1.5rem] border border-slate-200 shadow-sm">
+              <p className="text-slate-400 text-[10px] uppercase font-black tracking-wider mb-2">
+                Por Confirmar
+              </p>
+              <p className="text-3xl font-bold text-orange-600">{pendientes}</p>
+              <div className="mt-2 text-xs text-orange-500 font-medium italic">
+                Acción requerida
+              </div>
+            </div>
+          </div>
+
+          {/* TABLA DE GESTIÓN */}
+          <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <Calendar size={18} className="text-slate-400" /> Listado de
+                Huéspedes
+              </h3>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Buscar huésped..."
+                  className="text-xs border border-slate-200 rounded-lg px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                />
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="text-[10px] uppercase font-black text-slate-400 tracking-widest border-b border-slate-100">
+                    <th className="px-6 py-4">Huésped</th>
+                    <th className="px-6 py-4">Habitación</th>
+                    <th className="px-6 py-4">Estancia</th>
+                    <th className="px-6 py-4">Estado</th>
+                    <th className="px-6 py-4">Total</th>
+                    <th className="px-6 py-4 text-center">Acción</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {data.map((b) => (
+                    <tr
+                      key={b.id}
+                      className="hover:bg-slate-50 transition-colors group"
+                    >
+                      <td className="px-6 py-4">
+                        <p className="font-bold text-slate-800 text-sm">
+                          {b.client_name}
+                        </p>
+                        <p className="text-[10px] text-slate-400">
+                          {b.client_email}
+                        </p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={b.rooms?.image_url}
+                            className="w-8 h-8 rounded-lg object-cover shadow-sm"
+                          />
+                          <span className="text-xs font-medium text-slate-600">
+                            {b.rooms?.name}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-xs font-medium text-slate-500">
+                        {b.check_in} <br /> {b.check_out}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`text-[9px] font-black px-3 py-1 rounded-full ${
+                            b.status === "pagado" || b.status === "approved"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-amber-100 text-amber-700"
+                          }`}
+                        >
+                          {b.status?.toUpperCase() || "PENDIENTE"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 font-bold text-slate-900 text-sm">
+                        S/ {b.total_price}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <button className="p-2 text-slate-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                          <Eye size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     );
   }
-
   // --- VISTA PARA CLIENTE (ESTRUCTURA ORIGINAL KAMETZA) ---
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-stone-800 font-sans">
