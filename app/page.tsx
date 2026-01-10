@@ -14,9 +14,10 @@ import {
   Menu,
   X,
   LogIn,
+  LogOut, // <--- NUEVO ICONO
 } from "lucide-react";
 
-// --- AUTH MODAL (EMAIL + GOOGLE) ---
+// --- AUTH MODAL ---
 function AuthModal({
   isOpen,
   onClose,
@@ -34,7 +35,6 @@ function AuthModal({
 
   if (!isOpen) return null;
 
-  // 1. LÓGICA GOOGLE (NUEVO)
   const handleGoogleLogin = async () => {
     setLoading(true);
     await supabase.auth.signInWithOAuth({
@@ -43,7 +43,6 @@ function AuthModal({
     });
   };
 
-  // 2. LÓGICA EMAIL
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -61,7 +60,7 @@ function AuthModal({
         if (error) throw error;
         alert("Cuenta creada. ¡Bienvenido!");
       }
-      onSuccess(); // Login exitoso
+      onSuccess();
     } catch (err: any) {
       setError(
         "Error: " +
@@ -76,7 +75,7 @@ function AuthModal({
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative">
+      <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative border border-stone-100">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-stone-400 hover:text-stone-800"
@@ -93,7 +92,6 @@ function AuthModal({
             : "Crea una cuenta para gestionar tus reservas."}
         </p>
 
-        {/* --- BOTÓN GOOGLE (AGREGADO) --- */}
         <button
           onClick={handleGoogleLogin}
           className="flex items-center justify-center gap-3 w-full bg-white border border-stone-200 text-stone-700 font-bold py-3 rounded-xl hover:bg-stone-50 transition text-sm mb-6 shadow-sm"
@@ -126,7 +124,6 @@ function AuthModal({
           </span>
           <div className="h-px bg-stone-100 flex-1"></div>
         </div>
-        {/* ---------------------------------- */}
 
         {error && (
           <div className="bg-red-50 text-red-600 text-xs p-3 rounded-xl mb-4 text-center font-bold">
@@ -187,7 +184,7 @@ interface Room {
   room_number: string;
 }
 
-// --- ROOM CARD MODIFICADA PARA PEDIR AUTH ---
+// --- ROOM CARD ---
 function RoomCard({
   room,
   onRequireAuth,
@@ -219,7 +216,6 @@ function RoomCard({
     }
   }, [checkIn, checkOut, room.price_per_night]);
 
-  // Función separada para procesar el pago (se llama directo o después del login)
   const executeBooking = async (formData: FormData) => {
     const method = formData.get("paymentMethod");
 
@@ -270,18 +266,14 @@ function RoomCard({
       return;
     }
 
-    // 1. VERIFICAR SI HAY USUARIO LOGUEADO
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-      // 2. SI NO HAY USUARIO, ABRIR MODAL
-      // Pasamos la función executeBooking para que se ejecute apenas se loguee
       onRequireAuth(() => executeBooking(formData));
-      setIsSubmitting(false); // Detenemos el loading visual del botón por ahora
+      setIsSubmitting(false);
     } else {
-      // 3. SI YA ESTÁ LOGUEADO, SEGUIR NORMAL
       await executeBooking(formData);
     }
   };
@@ -483,13 +475,13 @@ function RoomCard({
   );
 }
 
+// --- HOME ---
 export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [busyIds, setBusyIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // --- ESTADOS DE AUTENTICACIÓN ---
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [pendingBookingAction, setPendingBookingAction] = useState<
@@ -513,7 +505,6 @@ export default function Home() {
       if (bookingsData) setBusyIds(bookingsData.map((b: any) => b.room_id));
       setLoading(false);
 
-      // Verificar usuario actual
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -522,13 +513,10 @@ export default function Home() {
     fetchData();
   }, []);
 
-  // Callback para cuando el login es exitoso
   const handleLoginSuccess = () => {
     setShowAuthModal(false);
-    // Refrescamos el usuario
     supabase.auth.getUser().then(({ data }) => {
       setCurrentUser(data.user);
-      // Si había una reserva pendiente, la ejecutamos ahora
       if (pendingBookingAction) {
         pendingBookingAction();
         setPendingBookingAction(null);
@@ -536,7 +524,13 @@ export default function Home() {
     });
   };
 
-  // Función que RoomCard llama si no hay usuario
+  // --- FUNCIÓN CERRAR SESIÓN (NUEVA) ---
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setCurrentUser(null);
+    alert("Has cerrado sesión.");
+  };
+
   const triggerAuthFlow = (continueBooking: () => void) => {
     setPendingBookingAction(() => continueBooking);
     setShowAuthModal(true);
@@ -570,7 +564,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen font-sans text-stone-800 bg-[#FDFBF7] selection:bg-rose-200 selection:text-rose-900">
-      {/* MODAL DE LOGIN (Solo aparece si se requiere) */}
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
@@ -615,12 +608,21 @@ export default function Home() {
               </a>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              {/* INDICADOR DE USUARIO EN NAVBAR */}
+              {/* INDICADOR DE USUARIO + BOTÓN LOGOUT */}
               {currentUser ? (
-                <span className="text-xs font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-full">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>{" "}
-                  Hola, Cliente
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-full">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>{" "}
+                    Hola, Cliente
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    title="Cerrar Sesión"
+                    className="p-1.5 rounded-full bg-stone-100 text-stone-400 hover:bg-rose-100 hover:text-rose-600 transition"
+                  >
+                    <LogOut size={16} />
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={() => setShowAuthModal(true)}
@@ -674,6 +676,7 @@ export default function Home() {
           </div>
         </div>
       </nav>
+      {/* SE MANTIENE EL RESTO DEL CÓDIGO (SECCIONES) IGUAL */}
       <section
         id="inicio"
         className="relative pt-48 pb-24 lg:pt-56 lg:pb-32 overflow-hidden z-10 px-4 text-center"
