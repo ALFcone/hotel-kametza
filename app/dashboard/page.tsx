@@ -8,20 +8,22 @@ import {
   User,
   Clock,
   CheckCircle,
-  MapPin,
   LogOut,
   Home,
+  ShieldCheck,
+  Briefcase,
+  Eye,
 } from "lucide-react";
 
 export default function UserDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [role, setRole] = useState<"cliente" | "staff" | "admin">("cliente");
+  const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
     const getData = async () => {
-      // 1. Verificar Usuario
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -31,14 +33,24 @@ export default function UserDashboard() {
       }
       setUser(user);
 
-      // 2. Cargar sus reservas
-      const { data: bookingData } = await supabase
-        .from("bookings")
-        .select("*, rooms(name, image_url)")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+      // Determinar ROL
+      const userRole =
+        user.email === "alfesco86@gmail.com"
+          ? "admin"
+          : user.user_metadata?.role || "cliente";
+      setRole(userRole);
 
-      if (bookingData) setBookings(bookingData);
+      // Cargar Datos según ROL
+      let query = supabase.from("bookings").select("*, rooms(name, image_url)");
+
+      if (userRole === "cliente") {
+        query = query.eq("user_id", user.id); // Solo sus reservas
+      } else {
+        query = query.order("created_at", { ascending: false }); // Todo para staff/admin
+      }
+
+      const { data: results } = await query;
+      setData(results || []);
       setLoading(false);
     };
 
@@ -52,15 +64,110 @@ export default function UserDashboard() {
 
   if (loading)
     return (
-      <div className="h-screen flex items-center justify-center text-rose-900 font-bold">
-        Cargando tu perfil...
+      <div className="h-screen flex items-center justify-center text-rose-900 font-bold animate-pulse">
+        Cargando Kametza...
       </div>
     );
 
+  // --- VISTA PARA STAFF / ADMIN (COLORES DE TRABAJO) ---
+  if (role === "admin" || role === "staff") {
+    return (
+      <div
+        className={`min-h-screen ${
+          role === "admin" ? "bg-slate-50" : "bg-blue-50"
+        } p-6 md:p-12 font-sans`}
+      >
+        <div className="max-w-6xl mx-auto">
+          {/* Header de Gestión */}
+          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100 flex justify-between items-center mb-8">
+            <div className="flex items-center gap-4">
+              <div
+                className={`p-3 rounded-2xl ${
+                  role === "admin" ? "bg-red-600" : "bg-blue-600"
+                } text-white`}
+              >
+                {role === "admin" ? <ShieldCheck /> : <Briefcase />}
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-slate-800">
+                  Panel de {role === "admin" ? "Administración" : "Recepción"}
+                </h1>
+                <p className="text-sm text-slate-500">{user.email}</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <a
+                href="/"
+                className="p-3 hover:bg-slate-100 rounded-xl transition"
+              >
+                <Home size={20} />
+              </a>
+              <button
+                onClick={handleLogout}
+                className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
+          </div>
+
+          <h2 className="text-lg font-bold text-slate-700 mb-6 uppercase tracking-widest flex items-center gap-2">
+            <Eye size={18} /> Todas las Reservas
+          </h2>
+
+          <div className="grid gap-4">
+            {data.map((b) => (
+              <div
+                key={b.id}
+                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between hover:border-blue-300 transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <img
+                    src={b.rooms?.image_url}
+                    className="w-16 h-16 rounded-xl object-cover"
+                  />
+                  <div>
+                    <p className="font-bold text-slate-800 text-sm">
+                      {b.client_name}
+                    </p>
+                    <p className="text-[11px] text-slate-500">
+                      {b.rooms?.name} • {b.check_in} al {b.check_out}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-6">
+                  <div className="text-right">
+                    <p className="text-xs font-black text-slate-900 uppercase">
+                      S/ {b.total_price}
+                    </p>
+                    <span
+                      className={`text-[9px] font-bold px-2 py-0.5 rounded-md ${
+                        b.status === "pagado"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-orange-100 text-orange-700"
+                      }`}
+                    >
+                      {b.status === "pagado" ? "PAGADO" : "PENDIENTE"}
+                    </span>
+                  </div>
+                  {role === "admin" && (
+                    <button className="p-2 text-slate-400 hover:text-blue-600 transition">
+                      <ShieldCheck size={18} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- VISTA PARA CLIENTE (ESTRUCTURA ORIGINAL KAMETZA) ---
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-stone-800 font-sans">
       <div className="max-w-5xl mx-auto p-6 md:p-12">
-        {/* ENCABEZADO */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 bg-white p-8 rounded-[2.5rem] shadow-xl border border-stone-100">
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center text-rose-900 shadow-inner">
@@ -89,14 +196,13 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        {/* HISTORIAL DE RESERVAS */}
         <h2 className="text-xl font-serif font-bold text-stone-700 mb-6 flex items-center gap-2">
           <Calendar className="text-rose-900" size={20} /> Mis Estancias
         </h2>
 
         <div className="grid gap-6">
-          {bookings.length > 0 ? (
-            bookings.map((booking) => (
+          {data.length > 0 ? (
+            data.map((booking) => (
               <div
                 key={booking.id}
                 className="bg-white p-6 rounded-3xl shadow-md border border-stone-100 flex flex-col md:flex-row gap-6 hover:shadow-xl transition duration-300"
@@ -148,7 +254,7 @@ export default function UserDashboard() {
                         Total
                       </p>
                       <p className="font-bold text-rose-900">
-                        S/ {booking.price || booking.total_price}
+                        S/ {booking.total_price}
                       </p>
                     </div>
                     <div>
