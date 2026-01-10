@@ -16,6 +16,9 @@ import {
   Brush,
   BedDouble,
   Bed,
+  Wallet,
+  CreditCard,
+  Coins,
 } from "lucide-react";
 
 async function markAsPaid(formData: FormData) {
@@ -50,6 +53,8 @@ export default async function AdminPage() {
     .order("created_at", { ascending: false });
 
   const today = new Date().toISOString().split("T")[0];
+
+  // 1. ESTADÍSTICAS GENERALES
   const occupiedCount =
     bookings?.filter((b) => b.check_in <= today && b.check_out > today)
       .length || 0;
@@ -60,6 +65,27 @@ export default async function AdminPage() {
       .length || 0;
   const cleaningList = bookings?.filter((b) => b.check_out === today) || [];
   const cleaningCount = cleaningList.length;
+
+  // 2. LÓGICA DE CIERRE DE CAJA (NUEVO)
+  // Filtramos reservas creadas HOY que estén PAGADAS
+  const salesToday =
+    bookings?.filter(
+      (b) =>
+        b.created_at.startsWith(today) &&
+        (b.status === "pagado" || b.status === "approved")
+    ) || [];
+
+  const totalIncome = salesToday.reduce((acc, b) => acc + b.total_price, 0);
+
+  // Dinero que debe estar en el cajón (Efectivo)
+  const cashIncome = salesToday
+    .filter((b) => b.payment_method === "recepcion")
+    .reduce((acc, b) => acc + b.total_price, 0);
+
+  // Dinero que entró al banco (Web/Yape)
+  const digitalIncome = salesToday
+    .filter((b) => b.payment_method === "online")
+    .reduce((acc, b) => acc + b.total_price, 0);
 
   const getRoomName = (id: number) =>
     rooms?.find((r) => r.id === id)?.name || "Habitación";
@@ -87,24 +113,18 @@ export default async function AdminPage() {
 
   return (
     <div className="min-h-screen bg-[#F5F5F4] text-stone-800 p-4 md:p-8 font-sans">
-      {" "}
-      {/* Padding reducido */}
       <div className="max-w-7xl mx-auto">
-        {/* HEADER MÁS COMPACTO */}
+        {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <h1 className="text-3xl font-serif font-bold text-rose-950 flex items-center gap-2">
-            {" "}
-            {/* Texto más pequeño */}
             <User className="bg-rose-900 text-white p-2 rounded-lg" size={40} />
             Panel de Control
           </h1>
           {bookings && <DownloadButton data={bookings} />}
         </div>
 
-        {/* --- 1. KPIs (RESUMEN) COMPACTOS --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {" "}
-          {/* Gap reducido */}
+        {/* --- 1. KPIs OPERATIVOS --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-5 rounded-2xl shadow-md border-b-4 border-blue-500 flex items-center gap-3 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-2 opacity-10">
               <BedDouble size={60} />
@@ -174,7 +194,59 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        {/* --- 2. MAPA DE HABITACIONES --- */}
+        {/* --- 2. SECCIÓN FINANCIERA (CIERRE DE CAJA) --- */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="bg-stone-900 text-white p-5 rounded-2xl shadow-xl flex flex-col justify-between relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 opacity-10">
+              <Wallet size={100} />
+            </div>
+            <div>
+              <p className="text-stone-400 text-[10px] font-bold uppercase tracking-widest mb-1">
+                Total Ventas Hoy
+              </p>
+              <p className="text-3xl font-black">S/ {totalIncome.toFixed(2)}</p>
+            </div>
+            <div className="mt-4 text-xs font-medium text-stone-500 bg-stone-800 py-1 px-2 rounded w-fit">
+              Fecha: {today}
+            </div>
+          </div>
+
+          <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl shadow-sm flex items-center gap-4">
+            <div className="p-3 bg-emerald-100 text-emerald-700 rounded-full">
+              <Coins size={24} />
+            </div>
+            <div>
+              <p className="text-emerald-800 text-[10px] font-bold uppercase tracking-widest">
+                En Caja (Efectivo)
+              </p>
+              <p className="text-2xl font-black text-emerald-900">
+                S/ {cashIncome.toFixed(2)}
+              </p>
+              <p className="text-[10px] text-emerald-600 font-medium">
+                Debe haber en cajón
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-sky-50 border border-sky-100 p-5 rounded-2xl shadow-sm flex items-center gap-4">
+            <div className="p-3 bg-sky-100 text-sky-700 rounded-full">
+              <CreditCard size={24} />
+            </div>
+            <div>
+              <p className="text-sky-800 text-[10px] font-bold uppercase tracking-widest">
+                Banco (Web/Yape)
+              </p>
+              <p className="text-2xl font-black text-sky-900">
+                S/ {digitalIncome.toFixed(2)}
+              </p>
+              <p className="text-[10px] text-sky-600 font-medium">
+                Ingreso digital
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* --- 3. MAPA DE HABITACIONES --- */}
         <section className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-end mb-4">
             <h2 className="text-xl font-bold text-stone-700 flex items-center gap-2">
@@ -194,14 +266,12 @@ export default async function AdminPage() {
               </span>
             </div>
           </div>
-
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {rooms?.map((room) => {
               const info = getRoomStatus(room.id);
               let cardClass = "bg-white border-stone-200 text-stone-600";
               let numClass = "text-stone-300";
               let icon = null;
-
               if (info.status === "occupied") {
                 cardClass = "bg-rose-900 text-white border-rose-950";
                 numClass = "text-rose-800 opacity-50";
@@ -211,7 +281,6 @@ export default async function AdminPage() {
                 numClass = "text-amber-800 opacity-20";
                 icon = <LogOut size={14} className="text-amber-600" />;
               }
-
               return (
                 <div
                   key={room.id}
@@ -263,7 +332,7 @@ export default async function AdminPage() {
           </div>
         </section>
 
-        {/* --- 3. TABLA DE RESERVAS (COMPACTA) --- */}
+        {/* --- 4. TABLA DE RESERVAS --- */}
         <section className="bg-white p-6 rounded-3xl shadow-lg border border-stone-100 mb-8">
           <h2 className="text-xl font-bold text-stone-700 mb-4 flex items-center gap-2">
             <Calendar className="text-rose-600" size={20} /> Reservas Recientes
@@ -273,7 +342,7 @@ export default async function AdminPage() {
               <thead>
                 <tr className="text-[10px] font-bold text-stone-400 uppercase tracking-wider border-b border-stone-100">
                   <th className="p-3">Estado</th>
-                  <th className="p-3">Cliente / DNI</th>
+                  <th className="p-3">Cliente / Doc</th>
                   <th className="p-3">Habitación</th>
                   <th className="p-3">Fechas</th>
                   <th className="p-3">Noches</th>
@@ -377,7 +446,7 @@ export default async function AdminPage() {
           </div>
         </section>
 
-        {/* --- 4. EDITAR HABITACIONES (COMPACTO) --- */}
+        {/* --- 5. EDITAR HABITACIONES --- */}
         <section>
           <h2 className="text-xl font-bold text-stone-700 mb-4 flex items-center gap-2">
             <HomeIcon className="text-rose-600" size={20} /> Habitaciones
