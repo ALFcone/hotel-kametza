@@ -15,6 +15,7 @@ import {
   X,
   LogIn,
   LogOut,
+  User, // Icono para el perfil
 } from "lucide-react";
 
 // --- AUTH MODAL ---
@@ -218,7 +219,6 @@ function RoomCard({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [docType, setDocType] = useState("DNI");
 
-  // FECHA DE HOY (Para bloquear días pasados)
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
@@ -313,7 +313,6 @@ function RoomCard({
           </p>
           <p className="text-xl font-black">S/ {room.price_per_night}</p>
         </div>
-        {/* Badge siempre verde porque validamos fechas despues */}
         <div className="absolute top-6 right-6 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg backdrop-blur-md z-20 bg-emerald-500/90 text-white">
           🟢 Disponible
         </div>
@@ -358,7 +357,6 @@ function RoomCard({
           </div>
         </div>
         <div className="mt-auto">
-          {/* FORMULARIO SIEMPRE VISIBLE */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input type="hidden" name="roomId" value={room.firstAvailableId} />
             <input type="hidden" name="price" value={totalPrice} />
@@ -371,7 +369,7 @@ function RoomCard({
                   type="date"
                   name="checkIn"
                   required
-                  min={today} // Bloquea fechas anteriores a hoy
+                  min={today}
                   onChange={(e) => setCheckIn(e.target.value)}
                   className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
                 />
@@ -384,7 +382,7 @@ function RoomCard({
                   type="date"
                   name="checkOut"
                   required
-                  min={today} // Bloquea fechas anteriores a hoy
+                  min={checkIn || today}
                   onChange={(e) => setCheckOut(e.target.value)}
                   className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
                 />
@@ -501,7 +499,6 @@ export default function Home() {
         .from("rooms")
         .select("*")
         .order("id");
-      // YA NO FILTRAMOS POR FECHA, CARGAMOS TODAS
       if (roomsData) setRooms(roomsData);
       setLoading(false);
 
@@ -536,21 +533,18 @@ export default function Home() {
   };
 
   const closeMenu = () => setIsMenuOpen(false);
-
-  // Agrupar habitaciones
   const roomTypes: any = {};
   rooms.forEach((room) => {
     if (!roomTypes[room.name]) {
       roomTypes[room.name] = {
         ...room,
-        availableCount: 99, // Forzamos disponible en UI
+        availableCount: 99,
         firstAvailableId: room.id,
       };
     }
   });
   const groupedRooms = Object.values(roomTypes);
 
-  // Nombre de usuario
   const userName =
     currentUser?.user_metadata?.full_name ||
     currentUser?.email?.split("@")[0] ||
@@ -619,10 +613,13 @@ export default function Home() {
                       PANEL
                     </a>
                   )}
-                  <span className="text-xs font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-full">
+                  <a
+                    href="/dashboard"
+                    className="text-xs font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-full hover:bg-rose-100 transition"
+                  >
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>{" "}
                     Hola, {userName}
-                  </span>
+                  </a>
                   <button
                     onClick={handleLogout}
                     title="Cerrar Sesión"
@@ -702,10 +699,12 @@ export default function Home() {
 
             {currentUser ? (
               <div className="flex flex-col items-center gap-4">
-                <span className="text-sm font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-full">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  Hola, {userName}
-                </span>
+                <a
+                  href="/dashboard"
+                  className="text-sm font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-full hover:bg-rose-100 transition"
+                >
+                  <User size={16} /> Hola, {userName}
+                </a>
                 <button
                   onClick={() => {
                     handleLogout();
@@ -739,7 +738,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* --- RESTO DE SECCIONES --- */}
+      {/* --- SECCIONES WEB (IGUALES) --- */}
       <section
         id="inicio"
         className="relative pt-48 pb-24 lg:pt-56 lg:pb-32 overflow-hidden z-10 px-4 text-center"
