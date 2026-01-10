@@ -17,7 +17,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-// --- AUTH MODAL (AHORA PIDE NOMBRE EN EL REGISTRO) ---
+// --- AUTH MODAL ---
 function AuthModal({
   isOpen,
   onClose,
@@ -30,7 +30,7 @@ function AuthModal({
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState(""); // <--- NUEVO: Estado para el nombre
+  const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -51,21 +51,17 @@ function AuthModal({
 
     try {
       if (isLogin) {
-        // INICIAR SESIÓN
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
       } else {
-        // REGISTRARSE (GUARDAMOS EL NOMBRE AQUÍ)
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: {
-              full_name: fullName, // <--- Guardamos el nombre en los metadatos
-            },
+            data: { full_name: fullName },
           },
         });
         if (error) throw error;
@@ -143,7 +139,6 @@ function AuthModal({
         )}
 
         <form onSubmit={handleAuth} className="flex flex-col gap-3">
-          {/* --- INPUT DE NOMBRE (SOLO EN REGISTRO) --- */}
           {!isLogin && (
             <input
               type="text"
@@ -154,7 +149,6 @@ function AuthModal({
               className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm animate-in slide-in-from-top-2"
             />
           )}
-          {/* ------------------------------------------ */}
 
           <input
             type="email"
@@ -579,10 +573,10 @@ export default function Home() {
   });
   const groupedRooms = Object.values(roomTypes);
 
-  // --- OBTENER NOMBRE DEL USUARIO (LÓGICA NUEVA) ---
+  // Nombre del usuario
   const userName =
-    currentUser?.user_metadata?.full_name || // Para Google o registro completo
-    currentUser?.email?.split("@")[0] || // Fallback al email
+    currentUser?.user_metadata?.full_name ||
+    currentUser?.email?.split("@")[0] ||
     "Cliente";
 
   if (loading)
@@ -638,7 +632,6 @@ export default function Home() {
               </a>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              {/* INDICADOR DE USUARIO CON NOMBRE REAL */}
               {currentUser ? (
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-full">
@@ -676,36 +669,93 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+        {/* --- MENÚ MÓVIL (CORREGIDO Y ACTUALIZADO) --- */}
         <div
           className={`fixed inset-0 bg-white z-[105] flex flex-col justify-center items-center transition-all duration-300 ${
             isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
           } md:hidden`}
         >
-          <div className="flex flex-col space-y-8 text-center">
+          <div className="flex flex-col space-y-8 text-center items-center">
             <a
               href="#inicio"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-800"
+              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Inicio
             </a>
             <a
               href="#habitaciones"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-800"
+              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Habitaciones
             </a>
             <a
+              href="#servicios"
+              onClick={closeMenu}
+              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
+            >
+              Servicios
+            </a>
+            <a
+              href="#ubicacion"
+              onClick={closeMenu}
+              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
+            >
+              Ubicación
+            </a>
+            <a
+              href="#contacto"
+              onClick={closeMenu}
+              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
+            >
+              Contacto
+            </a>
+
+            <div className="w-16 h-px bg-stone-200 my-4"></div>
+
+            {/* LÓGICA DE USUARIO EN MÓVIL */}
+            {currentUser ? (
+              <div className="flex flex-col items-center gap-4">
+                <span className="text-sm font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-full">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  Hola, {userName}
+                </span>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    closeMenu();
+                  }}
+                  className="text-stone-400 hover:text-rose-600 flex items-center gap-2 font-bold text-sm"
+                >
+                  <LogOut size={18} /> Cerrar Sesión
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setShowAuthModal(true);
+                  closeMenu();
+                }}
+                className="text-xl font-bold text-stone-600 hover:text-rose-900 flex items-center gap-2"
+              >
+                <LogIn size={24} /> Iniciar Sesión
+              </button>
+            )}
+
+            <a
               href="#habitaciones"
               onClick={closeMenu}
-              className="mt-4 bg-rose-900 text-white px-10 py-4 rounded-full font-bold shadow-lg"
+              className="mt-4 bg-rose-900 text-white px-12 py-4 rounded-full font-bold shadow-lg uppercase tracking-widest text-sm"
             >
               Reservar Ahora
             </a>
           </div>
         </div>
       </nav>
+
+      {/* --- RESTO DE SECCIONES (IGUAL) --- */}
       <section
         id="inicio"
         className="relative pt-48 pb-24 lg:pt-56 lg:pb-32 overflow-hidden z-10 px-4 text-center"
