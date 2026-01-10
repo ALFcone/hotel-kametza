@@ -218,6 +218,9 @@ function RoomCard({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [docType, setDocType] = useState("DNI");
 
+  // FECHA DE HOY (Para bloquear días pasados)
+  const today = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     if (checkIn && checkOut) {
       const start = new Date(checkIn);
@@ -310,16 +313,9 @@ function RoomCard({
           </p>
           <p className="text-xl font-black">S/ {room.price_per_night}</p>
         </div>
-        <div
-          className={`absolute top-6 right-6 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg backdrop-blur-md z-20 ${
-            room.availableCount > 0
-              ? "bg-emerald-500/90 text-white"
-              : "bg-rose-600/90 text-white"
-          }`}
-        >
-          {room.availableCount > 0
-            ? `🟢 ${room.availableCount} Libres`
-            : "🔴 Agotado"}
+        {/* Badge siempre verde porque validamos fechas despues */}
+        <div className="absolute top-6 right-6 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg backdrop-blur-md z-20 bg-emerald-500/90 text-white">
+          🟢 Disponible
         </div>
       </div>
       <div className="p-8 md:p-10 flex flex-col flex-grow">
@@ -362,131 +358,124 @@ function RoomCard({
           </div>
         </div>
         <div className="mt-auto">
-          {room.availableCount > 0 ? (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <input
-                type="hidden"
-                name="roomId"
-                value={room.firstAvailableId}
-              />
-              <input type="hidden" name="price" value={totalPrice} />
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[10px] font-bold text-stone-400 uppercase ml-2">
-                    Llegada
-                  </label>
-                  <input
-                    type="date"
-                    name="checkIn"
-                    required
-                    onChange={(e) => setCheckIn(e.target.value)}
-                    className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold text-stone-400 uppercase ml-2">
-                    Salida
-                  </label>
-                  <input
-                    type="date"
-                    name="checkOut"
-                    required
-                    onChange={(e) => setCheckOut(e.target.value)}
-                    className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-between items-center bg-rose-50 p-3 rounded-xl border border-rose-100">
-                <span className="text-xs font-bold text-rose-800 uppercase">
-                  Total ({nights} noches):
-                </span>
-                <span className="text-xl font-black text-[#700824]">
-                  S/ {totalPrice}
-                </span>
-              </div>
-
-              <div className="flex gap-2">
-                <div className="w-1/3">
-                  <select
-                    name="documentType"
-                    className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 font-bold text-stone-600 outline-none appearance-none"
-                    onChange={(e) => setDocType(e.target.value)}
-                  >
-                    <option value="DNI">DNI</option>
-                    <option value="CE">C.E.</option>
-                    <option value="PASAPORTE">Pasaporte</option>
-                  </select>
-                </div>
-                <div className="w-2/3">
-                  <input
-                    type="text"
-                    name="documentNumber"
-                    placeholder={
-                      docType === "DNI" ? "DNI (8 dígitos)" : "N° Documento"
-                    }
-                    required
-                    maxLength={docType === "DNI" ? 8 : 15}
-                    className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
-                  />
-                </div>
-              </div>
-
-              <input
-                type="text"
-                name="name"
-                placeholder="Nombre completo"
-                required
-                className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Correo electrónico"
-                required
-                className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
-              />
-
-              <div className="relative">
-                <select
-                  name="paymentMethod"
+          {/* FORMULARIO SIEMPRE VISIBLE */}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <input type="hidden" name="roomId" value={room.firstAvailableId} />
+            <input type="hidden" name="price" value={totalPrice} />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] font-bold text-stone-400 uppercase ml-2">
+                  Llegada
+                </label>
+                <input
+                  type="date"
+                  name="checkIn"
                   required
-                  defaultValue=""
-                  className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none appearance-none font-bold text-stone-600 cursor-pointer"
-                >
-                  <option value="" disabled>
-                    Seleccione método de pago
-                  </option>
-                  <option value="online">
-                    💳 Pago Online (Tarjetas, Yape, Plin)
-                  </option>
-                  <option value="recepcion">
-                    🏨 Pagar en Recepción (Efectivo)
-                  </option>
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400 text-xs">
-                  ▼
-                </div>
+                  min={today} // Bloquea fechas anteriores a hoy
+                  onChange={(e) => setCheckIn(e.target.value)}
+                  className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+                />
               </div>
-
-              <button
-                disabled={isSubmitting}
-                type="submit"
-                className="w-full bg-[#700824] text-white font-black py-5 rounded-2xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  "Procesando..."
-                ) : (
-                  <>
-                    Reservar Ahora <ArrowRight size={16} />
-                  </>
-                )}
-              </button>
-            </form>
-          ) : (
-            <div className="bg-stone-100 text-stone-400 p-6 rounded-2xl text-center font-bold text-xs uppercase tracking-widest">
-              Agotado Temporalmente
+              <div>
+                <label className="text-[10px] font-bold text-stone-400 uppercase ml-2">
+                  Salida
+                </label>
+                <input
+                  type="date"
+                  name="checkOut"
+                  required
+                  min={today} // Bloquea fechas anteriores a hoy
+                  onChange={(e) => setCheckOut(e.target.value)}
+                  className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+                />
+              </div>
             </div>
-          )}
+            <div className="flex justify-between items-center bg-rose-50 p-3 rounded-xl border border-rose-100">
+              <span className="text-xs font-bold text-rose-800 uppercase">
+                Total ({nights} noches):
+              </span>
+              <span className="text-xl font-black text-[#700824]">
+                S/ {totalPrice}
+              </span>
+            </div>
+
+            <div className="flex gap-2">
+              <div className="w-1/3">
+                <select
+                  name="documentType"
+                  className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 font-bold text-stone-600 outline-none appearance-none"
+                  onChange={(e) => setDocType(e.target.value)}
+                >
+                  <option value="DNI">DNI</option>
+                  <option value="CE">C.E.</option>
+                  <option value="PASAPORTE">Pasaporte</option>
+                </select>
+              </div>
+              <div className="w-2/3">
+                <input
+                  type="text"
+                  name="documentNumber"
+                  placeholder={
+                    docType === "DNI" ? "DNI (8 dígitos)" : "N° Documento"
+                  }
+                  required
+                  maxLength={docType === "DNI" ? 8 : 15}
+                  className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+                />
+              </div>
+            </div>
+
+            <input
+              type="text"
+              name="name"
+              placeholder="Nombre completo"
+              required
+              className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Correo electrónico"
+              required
+              className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+            />
+
+            <div className="relative">
+              <select
+                name="paymentMethod"
+                required
+                defaultValue=""
+                className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none appearance-none font-bold text-stone-600 cursor-pointer"
+              >
+                <option value="" disabled>
+                  Seleccione método de pago
+                </option>
+                <option value="online">
+                  💳 Pago Online (Tarjetas, Yape, Plin)
+                </option>
+                <option value="recepcion">
+                  🏨 Pagar en Recepción (Efectivo)
+                </option>
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400 text-xs">
+                ▼
+              </div>
+            </div>
+
+            <button
+              disabled={isSubmitting}
+              type="submit"
+              className="w-full bg-[#700824] text-white font-black py-5 rounded-2xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                "Procesando..."
+              ) : (
+                <>
+                  Reservar Ahora <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
         </div>
       </div>
     </div>
@@ -496,7 +485,6 @@ function RoomCard({
 // --- HOME ---
 export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [busyIds, setBusyIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -513,15 +501,8 @@ export default function Home() {
         .from("rooms")
         .select("*")
         .order("id");
-      const today = new Date().toISOString().split("T")[0];
-      const { data: bookingsData } = await supabase
-        .from("bookings")
-        .select("room_id")
-        .lte("check_in", today)
-        .gte("check_out", today);
-
+      // YA NO FILTRAMOS POR FECHA, CARGAMOS TODAS
       if (roomsData) setRooms(roomsData);
-      if (bookingsData) setBusyIds(bookingsData.map((b: any) => b.room_id));
       setLoading(false);
 
       const {
@@ -555,25 +536,21 @@ export default function Home() {
   };
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  // Agrupar habitaciones
   const roomTypes: any = {};
   rooms.forEach((room) => {
     if (!roomTypes[room.name]) {
       roomTypes[room.name] = {
         ...room,
-        availableCount: 0,
-        firstAvailableId: null,
+        availableCount: 99, // Forzamos disponible en UI
+        firstAvailableId: room.id,
       };
-    }
-    if (!busyIds.includes(room.id)) {
-      roomTypes[room.name].availableCount++;
-      if (!roomTypes[room.name].firstAvailableId) {
-        roomTypes[room.name].firstAvailableId = room.id;
-      }
     }
   });
   const groupedRooms = Object.values(roomTypes);
 
-  // Nombre del usuario
+  // Nombre de usuario
   const userName =
     currentUser?.user_metadata?.full_name ||
     currentUser?.email?.split("@")[0] ||
@@ -634,6 +611,14 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-4">
               {currentUser ? (
                 <div className="flex items-center gap-3">
+                  {currentUser.user_metadata?.role === "admin" && (
+                    <a
+                      href="/admin/dashboard"
+                      className="text-[10px] font-black bg-black text-white px-3 py-1 rounded-lg hover:bg-rose-900 transition"
+                    >
+                      PANEL
+                    </a>
+                  )}
                   <span className="text-xs font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-full">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>{" "}
                     Hola, {userName}
@@ -670,7 +655,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* --- MENÚ MÓVIL (CORREGIDO Y ACTUALIZADO) --- */}
+        {/* --- MENÚ MÓVIL --- */}
         <div
           className={`fixed inset-0 bg-white z-[105] flex flex-col justify-center items-center transition-all duration-300 ${
             isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
@@ -715,7 +700,6 @@ export default function Home() {
 
             <div className="w-16 h-px bg-stone-200 my-4"></div>
 
-            {/* LÓGICA DE USUARIO EN MÓVIL */}
             {currentUser ? (
               <div className="flex flex-col items-center gap-4">
                 <span className="text-sm font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-full">
@@ -755,7 +739,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* --- RESTO DE SECCIONES (IGUAL) --- */}
+      {/* --- RESTO DE SECCIONES --- */}
       <section
         id="inicio"
         className="relative pt-48 pb-24 lg:pt-56 lg:pb-32 overflow-hidden z-10 px-4 text-center"
