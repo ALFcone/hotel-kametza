@@ -19,7 +19,6 @@ import {
   Wallet,
   CreditCard,
   Coins,
-  AlertCircle,
   LayoutDashboard,
   Filter,
 } from "lucide-react";
@@ -48,12 +47,12 @@ const formatMoney = (amount: number) =>
     amount
   );
 
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr + "T00:00:00");
-  return date
-    .toLocaleDateString("es-PE", { day: "2-digit", month: "short" })
-    .replace(".", "");
-};
+function calculateNights(checkIn: string, checkOut: string) {
+  const start = new Date(checkIn);
+  const end = new Date(checkOut);
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
 
 export default async function AdminPage({
   searchParams,
@@ -66,10 +65,11 @@ export default async function AdminPage({
     .select("*")
     .order("created_at", { ascending: false });
 
+  // Manejo de fecha (Hoy o la seleccionada en el filtro)
   const today = new Date().toISOString().split("T")[0];
   const filterDate = searchParams.date || today;
 
-  // 1. ESTADÍSTICAS OPERATIVAS (Basadas en la fecha seleccionada o hoy)
+  // 1. ESTADÍSTICAS OPERATIVAS (Basadas en la fecha del filtro)
   const occupiedCount =
     allBookings?.filter(
       (b) => b.check_in <= filterDate && b.check_out > filterDate
@@ -79,7 +79,7 @@ export default async function AdminPage({
   const cleaningList =
     allBookings?.filter((b) => b.check_out === filterDate) || [];
 
-  // 2. CIERRE DE CAJA (Específico de la fecha seleccionada)
+  // 2. CIERRE DE CAJA (Ventas realizadas en la fecha del filtro)
   const salesOnDate =
     allBookings?.filter(
       (b) =>
@@ -95,6 +95,8 @@ export default async function AdminPage({
     .filter((b) => b.payment_method === "online")
     .reduce((acc, b) => acc + b.total_price, 0);
 
+  const getRoomName = (id: number) =>
+    rooms?.find((r) => r.id === id)?.name || "Habitación";
   const getRoomNumber = (id: number) => {
     const r = rooms?.find((r) => r.id === id);
     return r?.room_number || r?.id || "#";
@@ -115,7 +117,7 @@ export default async function AdminPage({
       return {
         status: "occupied",
         guest: occupied.client_name,
-        paid: occupied.status === "pagado",
+        paid: occupied.status === "pagado" || occupied.status === "approved",
       };
     return { status: "free", guest: null };
   };
@@ -123,7 +125,7 @@ export default async function AdminPage({
   return (
     <div className="min-h-screen bg-[#F5F5F4] text-stone-800 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* HEADER & FILTRO */}
+        {/* HEADER CON FILTRO DE FECHA */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <div className="flex items-center gap-4">
             <div className="bg-rose-900 text-white p-3 rounded-2xl shadow-lg shadow-rose-200">
@@ -150,16 +152,16 @@ export default async function AdminPage({
           </div>
         </div>
 
-        {/* ALERTA DE LIMPIEZA */}
-        {cleaningList.length > 0 && filterDate === today && (
-          <div className="mb-6 bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-center justify-between shadow-sm">
+        {/* INDICADOR DE LIMPIEZA DINÁMICO */}
+        {cleaningList.length > 0 && (
+          <div className="mb-6 bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center gap-3">
               <div className="bg-amber-500 text-white p-2 rounded-lg">
                 <Brush size={18} />
               </div>
               <div>
                 <p className="text-amber-900 font-bold text-sm">
-                  Atención: {cleaningList.length} salidas hoy
+                  Salidas para Limpieza: {cleaningList.length}
                 </p>
                 <p className="text-amber-700 text-[10px] uppercase font-medium">
                   Habitaciones:{" "}
@@ -170,15 +172,16 @@ export default async function AdminPage({
           </div>
         )}
 
-        {/* KPIs */}
+        {/* KPIs OPERATIVOS Y FINANCIEROS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {/* CIERRE DE CAJA */}
           <div className="bg-stone-900 text-white p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
             <TrendingUp
               className="absolute right-4 top-4 text-white/5"
               size={80}
             />
-            <p className="text-stone-400 text-[10px] font-bold uppercase tracking-widest mb-1 font-mono">
-              Cierre de Caja ({filterDate})
+            <p className="text-stone-400 text-[10px] font-bold uppercase tracking-widest mb-1">
+              Ventas: {filterDate}
             </p>
             <p className="text-4xl font-black">{formatMoney(totalIncome)}</p>
             <div className="flex gap-4 mt-4 border-t border-white/10 pt-4">
@@ -207,7 +210,7 @@ export default async function AdminPage({
             </div>
             <div>
               <p className="text-stone-400 text-[10px] font-black uppercase tracking-widest">
-                Check-In
+                Llegadas
               </p>
               <p className="text-3xl font-black">{arrivalsCount}</p>
             </div>
@@ -219,19 +222,19 @@ export default async function AdminPage({
             </div>
             <div>
               <p className="text-stone-400 text-[10px] font-black uppercase tracking-widest">
-                Ocupadas
+                En Casa
               </p>
               <p className="text-3xl font-black">{occupiedCount}</p>
             </div>
           </div>
         </div>
 
-        {/* MAPA VISUAL */}
+        {/* MAPA DE HABITACIONES */}
         <section className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <div className="h-1 w-10 bg-rose-600 rounded-full"></div>
             <h2 className="text-lg font-bold text-stone-700 uppercase tracking-tight">
-              Estado de Habitaciones
+              Estado Actual
             </h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -245,19 +248,17 @@ export default async function AdminPage({
                   key={room.id}
                   className={`p-4 rounded-3xl border transition-all duration-300 flex flex-col justify-between h-32 relative overflow-hidden ${
                     isOccupied
-                      ? "bg-rose-950 text-white border-rose-950 shadow-lg shadow-rose-100"
+                      ? "bg-rose-950 text-white border-rose-950 shadow-lg"
                       : isCheckout
                       ? "bg-amber-100 text-amber-900 border-amber-200 border-dashed"
                       : "bg-white border-stone-100 text-stone-600"
                   }`}
                 >
-                  <span
-                    className={`absolute -bottom-2 -right-2 text-7xl font-black tracking-tighter opacity-10 select-none`}
-                  >
+                  <span className="absolute -bottom-2 -right-2 text-7xl font-black tracking-tighter opacity-10 select-none">
                     {room.room_number || room.id}
                   </span>
                   <div className="z-10">
-                    <p className="font-black text-[10px] uppercase tracking-widest">
+                    <p className="font-black text-[10px] uppercase tracking-widest truncate">
                       {room.name}
                     </p>
                     {info.guest && (
@@ -269,11 +270,13 @@ export default async function AdminPage({
                   <div className="z-10">
                     <span
                       className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${
-                        isOccupied
-                          ? info.paid
-                            ? "bg-emerald-500"
-                            : "bg-rose-500"
-                          : "bg-stone-100 text-stone-400"
+                        info.status === "free"
+                          ? "bg-stone-100 text-stone-400"
+                          : isCheckout
+                          ? "bg-amber-500 text-white"
+                          : info.paid
+                          ? "bg-emerald-500 text-white"
+                          : "bg-rose-500 text-white"
                       }`}
                     >
                       {info.status === "free"
@@ -291,15 +294,12 @@ export default async function AdminPage({
           </div>
         </section>
 
-        {/* TABLA DE RESERVAS */}
+        {/* TABLA DE RESERVAS (Últimas 15) */}
         <section className="bg-white rounded-[2.5rem] shadow-xl border border-stone-100 overflow-hidden mb-10">
-          <div className="p-8 border-b border-stone-50 flex justify-between items-center">
+          <div className="p-8 border-b border-stone-50">
             <h2 className="font-bold text-xl text-stone-800">
-              Historial Reciente
+              Historial de Reservas
             </h2>
-            <span className="text-[10px] font-black bg-stone-100 px-3 py-1 rounded-full text-stone-500 uppercase tracking-widest">
-              Mostrando: {filterDate}
-            </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -332,16 +332,12 @@ export default async function AdminPage({
                         #{getRoomNumber(booking.room_id)}
                       </span>
                     </td>
-                    <td className="py-5 px-4">
-                      <div className="font-bold text-[10px] flex items-center gap-1">
-                        <span className="text-emerald-600">
-                          {formatDate(booking.check_in)}
-                        </span>
-                        <span className="text-stone-300">→</span>
-                        <span className="text-rose-600">
-                          {formatDate(booking.check_out)}
-                        </span>
-                      </div>
+                    <td className="py-5 px-4 font-bold text-[10px]">
+                      <span className="text-emerald-600">
+                        {booking.check_in}
+                      </span>
+                      <span className="text-stone-300 mx-1">→</span>
+                      <span className="text-rose-600">{booking.check_out}</span>
                     </td>
                     <td className="py-5 px-4 text-right font-black text-stone-900">
                       {formatMoney(booking.total_price)}
@@ -354,10 +350,7 @@ export default async function AdminPage({
                           className="text-emerald-500 mx-auto"
                         />
                       ) : (
-                        <Clock
-                          size={18}
-                          className="text-amber-400 mx-auto animate-pulse"
-                        />
+                        <Clock size={18} className="text-amber-400 mx-auto" />
                       )}
                     </td>
                     <td className="py-5 px-8 text-right">
@@ -372,7 +365,7 @@ export default async function AdminPage({
                               />
                               <button
                                 type="submit"
-                                className="p-2 bg-emerald-500 text-white rounded-xl shadow-md"
+                                className="p-2 bg-emerald-500 text-white rounded-xl"
                               >
                                 <DollarSign size={14} />
                               </button>
@@ -386,7 +379,7 @@ export default async function AdminPage({
                           />
                           <button
                             type="submit"
-                            className="p-2 bg-stone-100 text-stone-400 rounded-xl hover:bg-rose-600 hover:text-white transition-colors"
+                            className="p-2 bg-stone-100 text-stone-400 rounded-xl hover:bg-rose-600 hover:text-white"
                           >
                             <X size={14} />
                           </button>
@@ -405,7 +398,7 @@ export default async function AdminPage({
           <div className="flex items-center gap-2 mb-6">
             <div className="h-1 w-10 bg-stone-800 rounded-full"></div>
             <h2 className="text-lg font-bold text-stone-700 uppercase tracking-tight">
-              Inventario de Habitaciones
+              Inventario
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -414,48 +407,48 @@ export default async function AdminPage({
                 key={room.id}
                 className="bg-white rounded-[2.5rem] shadow-lg border border-stone-100 overflow-hidden group"
               >
-                <div className="h-48 overflow-hidden relative">
+                <div className="h-40 overflow-hidden relative">
                   <img
                     src={room.image_url}
                     alt={room.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
                   />
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-4 py-1.5 rounded-2xl text-[10px] font-black shadow-sm">
+                  <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-xl text-[10px] font-black">
                     #{room.room_number || room.id}
                   </div>
                 </div>
-                <div className="p-8">
-                  <h3 className="font-black text-xl text-stone-800 mb-6 uppercase tracking-tighter">
+                <div className="p-6">
+                  <h3 className="font-black text-lg text-stone-800 mb-4 uppercase">
                     {room.name}
                   </h3>
                   <form action={updateRoom} className="space-y-4">
                     <input type="hidden" name="roomId" value={room.id} />
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[9px] font-black uppercase text-stone-400 tracking-widest block mb-2">
-                          Precio Noche
+                        <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
+                          Precio
                         </label>
                         <input
                           name="price"
                           defaultValue={room.price_per_night}
                           type="number"
-                          className="w-full p-4 bg-stone-50 rounded-2xl border border-stone-100 font-black text-rose-900 focus:ring-2 ring-rose-100 outline-none transition-all"
+                          className="w-full p-3 bg-stone-50 rounded-xl border border-stone-100 font-bold"
                         />
                       </div>
                       <div>
-                        <label className="text-[9px] font-black uppercase text-stone-400 tracking-widest block mb-2">
+                        <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
                           Imagen URL
                         </label>
                         <input
                           name="image"
                           type="text"
                           defaultValue={room.image_url}
-                          className="w-full p-4 bg-stone-50 rounded-2xl border border-stone-100 text-[10px] outline-none"
+                          className="w-full p-3 bg-stone-50 rounded-xl border border-stone-100 text-[10px]"
                         />
                       </div>
                     </div>
-                    <button className="w-full bg-stone-900 text-white font-black py-5 rounded-2xl hover:bg-rose-900 transition-all shadow-xl shadow-stone-200 text-[10px] uppercase tracking-[0.2em]">
-                      Actualizar Habitación
+                    <button className="w-full bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-rose-900 transition-all text-[10px] uppercase tracking-widest">
+                      Guardar Cambios
                     </button>
                   </form>
                 </div>
