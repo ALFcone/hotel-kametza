@@ -14,10 +14,10 @@ import {
   Menu,
   X,
   LogIn,
-  LogOut, // <--- NUEVO ICONO
+  LogOut,
 } from "lucide-react";
 
-// --- AUTH MODAL ---
+// --- AUTH MODAL (AHORA PIDE NOMBRE EN EL REGISTRO) ---
 function AuthModal({
   isOpen,
   onClose,
@@ -30,6 +30,7 @@ function AuthModal({
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState(""); // <--- NUEVO: Estado para el nombre
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -50,13 +51,23 @@ function AuthModal({
 
     try {
       if (isLogin) {
+        // INICIAR SESIÓN
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        // REGISTRARSE (GUARDAMOS EL NOMBRE AQUÍ)
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName, // <--- Guardamos el nombre en los metadatos
+            },
+          },
+        });
         if (error) throw error;
         alert("Cuenta creada. ¡Bienvenido!");
       }
@@ -132,6 +143,19 @@ function AuthModal({
         )}
 
         <form onSubmit={handleAuth} className="flex flex-col gap-3">
+          {/* --- INPUT DE NOMBRE (SOLO EN REGISTRO) --- */}
+          {!isLogin && (
+            <input
+              type="text"
+              placeholder="Tu Nombre"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm animate-in slide-in-from-top-2"
+            />
+          )}
+          {/* ------------------------------------------ */}
+
           <input
             type="email"
             placeholder="Correo electrónico"
@@ -482,6 +506,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // --- ESTADOS DE AUTENTICACIÓN ---
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [pendingBookingAction, setPendingBookingAction] = useState<
@@ -524,7 +549,6 @@ export default function Home() {
     });
   };
 
-  // --- FUNCIÓN CERRAR SESIÓN (NUEVA) ---
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setCurrentUser(null);
@@ -554,6 +578,12 @@ export default function Home() {
     }
   });
   const groupedRooms = Object.values(roomTypes);
+
+  // --- OBTENER NOMBRE DEL USUARIO (LÓGICA NUEVA) ---
+  const userName =
+    currentUser?.user_metadata?.full_name || // Para Google o registro completo
+    currentUser?.email?.split("@")[0] || // Fallback al email
+    "Cliente";
 
   if (loading)
     return (
@@ -608,12 +638,12 @@ export default function Home() {
               </a>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              {/* INDICADOR DE USUARIO + BOTÓN LOGOUT */}
+              {/* INDICADOR DE USUARIO CON NOMBRE REAL */}
               {currentUser ? (
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-full">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>{" "}
-                    Hola, Cliente
+                    Hola, {userName}
                   </span>
                   <button
                     onClick={handleLogout}
@@ -676,7 +706,6 @@ export default function Home() {
           </div>
         </div>
       </nav>
-      {/* SE MANTIENE EL RESTO DEL CÓDIGO (SECCIONES) IGUAL */}
       <section
         id="inicio"
         className="relative pt-48 pb-24 lg:pt-56 lg:pb-32 overflow-hidden z-10 px-4 text-center"
