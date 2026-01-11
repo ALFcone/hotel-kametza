@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+// Actualización forzada v3
 import { revalidatePath } from "next/cache";
 import { updateRoom } from "../actions";
 import DownloadButton from "./DownloadButton";
