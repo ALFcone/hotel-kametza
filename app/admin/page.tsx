@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase";
-// Actualización forzada v3
 import { revalidatePath } from "next/cache";
 import { updateRoom } from "../actions";
 import DownloadButton from "./DownloadButton";
@@ -28,6 +27,7 @@ import {
 async function markAsPaid(formData: FormData) {
   "use server";
   const bookingId = formData.get("bookingId");
+  if (!bookingId) return;
   await supabase
     .from("bookings")
     .update({ status: "pagado" })
@@ -38,6 +38,7 @@ async function markAsPaid(formData: FormData) {
 async function deleteBooking(formData: FormData) {
   "use server";
   const bookingId = formData.get("bookingId");
+  if (!bookingId) return;
   await supabase.from("bookings").delete().eq("id", bookingId);
   revalidatePath("/admin");
 }
@@ -55,25 +56,28 @@ function calculateNights(checkIn: string, checkOut: string) {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: { date?: string };
-}) {
+// Usamos 'any' en props para evitar conflictos de versiones de Next.js (14 vs 15) durante el build
+export default async function AdminPage(props: any) {
+  // Lógica segura para obtener searchParams (funciona en Next 14 y 15)
+  const searchParams = props.searchParams;
+  const today = new Date().toISOString().split("T")[0];
+  const filterDate = searchParams?.date || today;
+
   const { data: rooms } = await supabase.from("rooms").select("*").order("id");
   const { data: allBookings } = await supabase
     .from("bookings")
     .select("*")
     .order("created_at", { ascending: false });
 
-  // Manejo de fecha (Hoy o la seleccionada en el filtro)
-  const today = new Date().toISOString().split("T")[0];
-  const filterDate = searchParams.date || today;
-
   // 1. ESTADÍSTICAS OPERATIVAS (Basadas en la fecha del filtro)
+  // Añadimos comprobaciones extra (b.check_in &&) para evitar errores si el dato es nulo
   const occupiedCount =
     allBookings?.filter(
-      (b) => b.check_in <= filterDate && b.check_out > filterDate
+      (b) =>
+        b.check_in &&
+        b.check_out &&
+        b.check_in <= filterDate &&
+        b.check_out > filterDate
     ).length || 0;
   const arrivalsCount =
     allBookings?.filter((b) => b.check_in === filterDate).length || 0;
@@ -84,17 +88,21 @@ export default async function AdminPage({
   const salesOnDate =
     allBookings?.filter(
       (b) =>
+        b.created_at &&
         b.created_at.startsWith(filterDate) &&
         (b.status === "pagado" || b.status === "approved")
     ) || [];
 
-  const totalIncome = salesOnDate.reduce((acc, b) => acc + b.total_price, 0);
+  const totalIncome = salesOnDate.reduce(
+    (acc, b) => acc + (b.total_price || 0),
+    0
+  );
   const cashIncome = salesOnDate
     .filter((b) => b.payment_method === "recepcion")
-    .reduce((acc, b) => acc + b.total_price, 0);
+    .reduce((acc, b) => acc + (b.total_price || 0), 0);
   const digitalIncome = salesOnDate
     .filter((b) => b.payment_method === "online")
-    .reduce((acc, b) => acc + b.total_price, 0);
+    .reduce((acc, b) => acc + (b.total_price || 0), 0);
 
   const getRoomName = (id: number) =>
     rooms?.find((r) => r.id === id)?.name || "Habitación";
@@ -142,9 +150,11 @@ export default async function AdminPage({
                   type="date"
                   name="date"
                   defaultValue={filterDate}
-                  onChange={(e) => e.target.form?.requestSubmit()}
                   className="bg-transparent text-[10px] font-black uppercase tracking-widest text-rose-800 outline-none cursor-pointer"
                 />
+                <button type="submit" className="hidden">
+                  Filtrar
+                </button>
               </form>
             </div>
           </div>
