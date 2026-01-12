@@ -29,10 +29,10 @@ function getSimpleDescription(name: string, originalDesc: string) {
   const n = name.toLowerCase();
 
   if (n.includes("simple") || n.includes("individual")) {
-    return "Ideal para viajero solo. Cama de 2 plazas, baño privado completo, agua caliente 24h, Smart TV y WiFi.";
+    return "Ideal para viajero solo. Cama amplia, baño privado completo, agua caliente 24h, Smart TV y WiFi.";
   }
   if (n.includes("matrimonial") || n.includes("queen") || n.includes("king")) {
-    return "Ideal para parejas. Cama Queen confortable, ambiente tranquilo, baño privado con agua caliente y Smart TV.";
+    return "Especial para parejas. Cama de 2 plazas confortables, ambiente tranquilo, baño privado con agua caliente y Smart TV.";
   }
   if (n.includes("doble") || n.includes("twin")) {
     return "Para compartir. Dos camas cómodas, baño privado completo, WiFi rápido y Smart TV con cable.";
