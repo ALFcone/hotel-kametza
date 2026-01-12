@@ -15,10 +15,13 @@ import {
   X,
   LogIn,
   LogOut,
-  User, // Icono para el perfil
+  User,
+  Phone, // <--- Icono para celular
+  Globe, // <--- Icono para país
+  Calendar, // <--- Icono para fechas
 } from "lucide-react";
 
-// --- AUTH MODAL ---
+// --- AUTH MODAL (SIN CAMBIOS) ---
 function AuthModal({
   isOpen,
   onClose,
@@ -194,20 +197,15 @@ function AuthModal({
   );
 }
 
-interface Room {
-  id: number;
-  name: string;
-  description: string;
-  price_per_night: number;
-  image_url: string | null;
-  room_number: string;
-}
-
-// --- ROOM CARD ---
-function RoomCard({
+// --- BOOKING MODAL (NUEVO COMPONENTE CON EL FORMULARIO DETALLADO) ---
+function BookingModal({
+  isOpen,
+  onClose,
   room,
   onRequireAuth,
 }: {
+  isOpen: boolean;
+  onClose: () => void;
   room: any;
   onRequireAuth: (callback: () => void) => void;
 }) {
@@ -237,9 +235,10 @@ function RoomCard({
     }
   }, [checkIn, checkOut, room.price_per_night]);
 
+  if (!isOpen) return null;
+
   const executeBooking = async (formData: FormData) => {
     const method = formData.get("paymentMethod");
-
     let newTab: Window | null = null;
     if (method === "online") {
       newTab = window.open("", "_blank");
@@ -292,6 +291,7 @@ function RoomCard({
     } = await supabase.auth.getUser();
 
     if (!user) {
+      // Pasamos una función anónima que recibirá el callback después
       onRequireAuth(() => executeBooking(formData));
       setIsSubmitting(false);
     } else {
@@ -300,69 +300,61 @@ function RoomCard({
   };
 
   return (
-    <div className="group bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-stone-100 flex flex-col hover:shadow-[0_20px_50px_rgba(112,8,36,0.2)] transition-all duration-500">
-      <div className="relative h-64 md:h-80 w-full overflow-hidden">
-        <img
-          src={room.image_url}
-          alt={room.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-        />
-        <div className="absolute top-6 left-6 bg-[#700824] text-white px-5 py-2 rounded-2xl shadow-xl z-20">
-          <p className="text-[10px] uppercase font-bold opacity-80 mb-0.5">
-            Precio Noche
-          </p>
-          <p className="text-xl font-black">S/ {room.price_per_night}</p>
-        </div>
-        <div className="absolute top-6 right-6 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg backdrop-blur-md z-20 bg-emerald-500/90 text-white">
-          🟢 Disponible
-        </div>
-      </div>
-      <div className="p-8 md:p-10 flex flex-col flex-grow">
-        <div className="flex items-center gap-2 mb-4">
-          <Star size={14} className="fill-[#700824] text-[#700824]" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">
-            Categoría Premium
-          </span>
-        </div>
-        <h3 className="text-3xl font-serif font-bold text-rose-950 mb-4">
-          {room.name}
-        </h3>
-        <div className="text-stone-500 text-sm mb-8 leading-relaxed font-light">
-          {room.description}
-        </div>
-        <div className="grid grid-cols-2 gap-4 mb-8 pt-6 border-t border-stone-100">
-          <div className="flex items-center gap-2 text-[#700824]">
-            <Tv size={18} />
-            <span className="text-[10px] font-bold text-stone-600 uppercase">
-              Smart TV
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-[#700824]">
-            <Wifi size={18} />
-            <span className="text-[10px] font-bold text-stone-600 uppercase">
-              WiFi Fibra
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-[#700824]">
-            <Clock size={18} />
-            <span className="text-[10px] font-bold text-stone-600 uppercase">
-              Agua Caliente
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-[#700824]">
-            <Users size={18} />
-            <span className="text-[10px] font-bold text-stone-600 uppercase">
-              Baño Privado
-            </span>
+    <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+        {/* Lado Izquierdo: Resumen (Visible en Desktop) */}
+        <div className="hidden md:block w-1/3 bg-stone-100 p-8 relative overflow-hidden">
+          <div className="absolute inset-0 bg-rose-900/10 mix-blend-multiply"></div>
+          <img
+            src={room.image_url}
+            className="absolute inset-0 w-full h-full object-cover opacity-50 grayscale"
+            alt=""
+          />
+          <div className="relative z-10 flex flex-col h-full justify-between">
+            <div>
+              <h3 className="text-2xl font-serif font-bold text-rose-950 mb-2">
+                {room.name}
+              </h3>
+              <p className="text-xs text-stone-600 font-medium line-clamp-4">
+                {room.description}
+              </p>
+            </div>
+            <div className="bg-white/90 backdrop-blur p-4 rounded-2xl shadow-lg">
+              <p className="text-[10px] uppercase font-bold text-stone-500 mb-1">
+                Total a Pagar
+              </p>
+              <p className="text-3xl font-black text-[#700824]">
+                S/ {totalPrice}
+              </p>
+              <p className="text-[10px] text-stone-400 font-bold mt-1">
+                {nights} Noche(s)
+              </p>
+            </div>
           </div>
         </div>
-        <div className="mt-auto">
+
+        {/* Lado Derecho: Formulario Completo */}
+        <div className="flex-1 p-8 md:p-10 overflow-y-auto relative">
+          <button
+            onClick={onClose}
+            className="absolute top-6 right-6 p-2 bg-stone-100 rounded-full hover:bg-stone-200 transition text-stone-500"
+          >
+            <X size={20} />
+          </button>
+
+          <h2 className="text-xl font-bold text-stone-800 mb-6 flex items-center gap-2">
+            <Calendar className="text-rose-600" size={20} />
+            Completa tu Reserva
+          </h2>
+
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input type="hidden" name="roomId" value={room.firstAvailableId} />
             <input type="hidden" name="price" value={totalPrice} />
-            <div className="grid grid-cols-2 gap-3">
+
+            {/* FECHAS */}
+            <div className="grid grid-cols-2 gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-100">
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase ml-2">
+                <label className="text-[10px] font-bold text-stone-400 uppercase ml-1">
                   Llegada
                 </label>
                 <input
@@ -371,11 +363,11 @@ function RoomCard({
                   required
                   min={today}
                   onChange={(e) => setCheckIn(e.target.value)}
-                  className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+                  className="w-full bg-transparent text-sm font-bold text-stone-800 outline-none mt-1"
                 />
               </div>
-              <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase ml-2">
+              <div className="border-l border-stone-200 pl-3">
+                <label className="text-[10px] font-bold text-stone-400 uppercase ml-1">
                   Salida
                 </label>
                 <input
@@ -384,66 +376,97 @@ function RoomCard({
                   required
                   min={checkIn || today}
                   onChange={(e) => setCheckOut(e.target.value)}
-                  className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+                  className="w-full bg-transparent text-sm font-bold text-stone-800 outline-none mt-1"
                 />
               </div>
             </div>
-            <div className="flex justify-between items-center bg-rose-50 p-3 rounded-xl border border-rose-100">
-              <span className="text-xs font-bold text-rose-800 uppercase">
-                Total ({nights} noches):
-              </span>
-              <span className="text-xl font-black text-[#700824]">
-                S/ {totalPrice}
-              </span>
-            </div>
 
-            <div className="flex gap-2">
-              <div className="w-1/3">
+            {/* DOCUMENTOS */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-1">
                 <select
                   name="documentType"
-                  className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 font-bold text-stone-600 outline-none appearance-none"
                   onChange={(e) => setDocType(e.target.value)}
+                  className="w-full p-3 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none"
                 >
                   <option value="DNI">DNI</option>
                   <option value="CE">C.E.</option>
                   <option value="PASAPORTE">Pasaporte</option>
                 </select>
               </div>
-              <div className="w-2/3">
+              <div className="col-span-2">
                 <input
                   type="text"
                   name="documentNumber"
-                  placeholder={
-                    docType === "DNI" ? "DNI (8 dígitos)" : "N° Documento"
-                  }
+                  placeholder="Número de Documento"
                   required
                   maxLength={docType === "DNI" ? 8 : 15}
-                  className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+                  className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
                 />
               </div>
             </div>
 
+            {/* DATOS PERSONALES */}
             <input
               type="text"
               name="name"
               placeholder="Nombre completo"
               required
-              className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+              className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
             />
             <input
               type="email"
               name="email"
               placeholder="Correo electrónico"
               required
-              className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none"
+              className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
             />
 
+            {/* NUEVOS CAMPOS: PAÍS Y CELULAR */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="relative">
+                <Globe
+                  size={14}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
+                />
+                <select
+                  name="country"
+                  className="w-full p-3 pl-9 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none appearance-none"
+                  required
+                >
+                  <option value="Perú">Perú</option>
+                  <option value="Argentina">Argentina</option>
+                  <option value="Chile">Chile</option>
+                  <option value="Colombia">Colombia</option>
+                  <option value="Brasil">Brasil</option>
+                  <option value="EEUU">EE.UU.</option>
+                  <option value="España">España</option>
+                  <option value="Mexico">México</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              <div className="relative">
+                <Phone
+                  size={14}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
+                />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Celular / WhatsApp"
+                  required
+                  className="w-full p-3 pl-9 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
+                />
+              </div>
+            </div>
+
+            {/* PAGO */}
             <div className="relative">
               <select
                 name="paymentMethod"
                 required
                 defaultValue=""
-                className="w-full p-4 border border-stone-200 rounded-2xl text-xs bg-stone-50 focus:bg-white focus:ring-2 focus:ring-[#700824]/20 outline-none appearance-none font-bold text-stone-600 cursor-pointer"
+                className="w-full p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs font-bold text-rose-900 outline-none appearance-none cursor-pointer"
               >
                 <option value="" disabled>
                   Seleccione método de pago
@@ -455,21 +478,27 @@ function RoomCard({
                   🏨 Pagar en Recepción (Efectivo)
                 </option>
               </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400 text-xs">
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-rose-800 text-xs">
                 ▼
               </div>
+            </div>
+
+            {/* RESUMEN MOVIL */}
+            <div className="md:hidden flex justify-between items-center text-xs font-bold text-stone-500 border-t pt-2">
+              <span>Total ({nights} noches):</span>
+              <span className="text-lg text-[#700824]">S/ {totalPrice}</span>
             </div>
 
             <button
               disabled={isSubmitting}
               type="submit"
-              className="w-full bg-[#700824] text-white font-black py-5 rounded-2xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50"
+              className="w-full bg-[#700824] text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50 mt-2"
             >
               {isSubmitting ? (
                 "Procesando..."
               ) : (
                 <>
-                  Reservar Ahora <ArrowRight size={16} />
+                  Confirmar Reserva <ArrowRight size={16} />
                 </>
               )}
             </button>
@@ -480,7 +509,119 @@ function RoomCard({
   );
 }
 
-// --- HOME ---
+interface Room {
+  id: number;
+  name: string;
+  description: string;
+  price_per_night: number;
+  image_url: string | null;
+  room_number: string;
+}
+
+// --- ROOM CARD (SIMPLIFICADA) ---
+function RoomCard({
+  room,
+  onRequireAuth,
+}: {
+  room: any;
+  onRequireAuth: (callback: () => void) => void;
+}) {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <>
+      <div className="group bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-stone-100 flex flex-col hover:shadow-[0_20px_50px_rgba(112,8,36,0.2)] transition-all duration-500 h-full">
+        <div className="relative h-64 w-full overflow-hidden">
+          <img
+            src={room.image_url}
+            alt={room.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+          />
+          <div className="absolute top-6 left-6 bg-[#700824] text-white px-4 py-2 rounded-2xl shadow-xl z-20">
+            <p className="text-[10px] uppercase font-bold opacity-80 mb-0.5">
+              Precio Noche
+            </p>
+            <p className="text-lg font-black">S/ {room.price_per_night}</p>
+          </div>
+        </div>
+
+        <div className="p-8 flex flex-col flex-grow">
+          <div className="flex items-center gap-2 mb-3">
+            <Star size={12} className="fill-[#700824] text-[#700824]" />
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400">
+              Categoría Premium
+            </span>
+          </div>
+
+          <h3 className="text-2xl font-serif font-bold text-rose-950 mb-3">
+            {room.name}
+          </h3>
+
+          {/* DESCRIPCIÓN VISIBLE AHORA */}
+          <p className="text-stone-500 text-sm mb-6 leading-relaxed font-light line-clamp-3">
+            {room.description ||
+              "Disfruta de una experiencia inolvidable con todas las comodidades."}
+          </p>
+
+          {/* ICONOS */}
+          <div className="flex gap-4 mb-8 border-t border-stone-100 pt-4">
+            <div className="flex flex-col items-center gap-1">
+              <div className="bg-rose-50 p-2 rounded-full text-rose-800">
+                <Tv size={14} />
+              </div>
+              <span className="text-[8px] font-bold uppercase text-stone-400">
+                TV
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <div className="bg-rose-50 p-2 rounded-full text-rose-800">
+                <Wifi size={14} />
+              </div>
+              <span className="text-[8px] font-bold uppercase text-stone-400">
+                WiFi
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <div className="bg-rose-50 p-2 rounded-full text-rose-800">
+                <Clock size={14} />
+              </div>
+              <span className="text-[8px] font-bold uppercase text-stone-400">
+                Agua
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <div className="bg-rose-50 p-2 rounded-full text-rose-800">
+                <Users size={14} />
+              </div>
+              <span className="text-[8px] font-bold uppercase text-stone-400">
+                Baño
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-auto">
+            <button
+              onClick={() => setShowModal(true)}
+              className="w-full bg-stone-900 text-white font-black py-4 rounded-2xl hover:bg-[#700824] transition-all shadow-lg flex items-center justify-center gap-2 uppercase text-xs tracking-widest"
+            >
+              Ver Detalles y Reservar <ArrowRight size={14} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* MODAL DE RESERVA DETALLADA */}
+      <BookingModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        room={room}
+        onRequireAuth={onRequireAuth}
+      />
+    </>
+  );
+}
+
+// --- HOME (SIN CAMBIOS ESTRUCTURALES) ---
 export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -607,7 +748,7 @@ export default function Home() {
                 <div className="flex items-center gap-3">
                   {currentUser.user_metadata?.role === "admin" && (
                     <a
-                      href="/admin/dashboard"
+                      href="/admin"
                       className="text-[10px] font-black bg-black text-white px-3 py-1 rounded-lg hover:bg-rose-900 transition"
                     >
                       PANEL
@@ -738,7 +879,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* --- SECCIONES WEB (IGUALES) --- */}
+      {/* --- SECCIONES WEB --- */}
       <section
         id="inicio"
         className="relative pt-48 pb-24 lg:pt-56 lg:pb-32 overflow-hidden z-10 px-4 text-center"
