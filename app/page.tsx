@@ -1005,10 +1005,11 @@ export default function Home() {
       </section>
 
       {/* --- SECCIÓN SERVICIOS ACTUALIZADA --- */}
-      <section id="servicios" className="py-24 bg-stone-50 relative z-10 px-4">
+
+      <section id="servicios" className="py-24 relative z-10 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-rose-700 font-bold tracking-widest text-xs uppercase bg-rose-50 px-4 py-2 rounded-full border border-rose-100">
+            <span className="text-rose-700 font-bold tracking-widest text-xs uppercase bg-rose-50 px-4 py-2 rounded-full border border-rose-100 shadow-sm">
               Experiencia Kametza
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-medium text-rose-950 mt-4">
@@ -1017,124 +1018,131 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[250px]">
-            {/* 1. COCHERA (Tarjeta Grande con Foto) */}
-            <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500 cursor-default">
+            {/* 1. COCHERA (Tarjeta Grande Horizontal) */}
+            <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-default">
               <img
                 src=""
                 alt="Cochera"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-105 bg-stone-200"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
               <div className="absolute bottom-0 left-0 p-8">
                 <div className="flex items-center gap-3 mb-2 text-rose-400">
                   <Car size={24} />
-                  <span className="text-xs font-bold uppercase tracking-wider">
+                  <span className="text-xs font-bold uppercase tracking-wider bg-white/10 px-2 py-1 rounded-md backdrop-blur-sm">
                     Gratuito
                   </span>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-1">
                   Cochera Privada
                 </h3>
-                <p className="text-stone-300 text-sm font-light">
-                  Estacionamiento seguro 24/7 dentro de nuestras instalaciones.
+                <p className="text-stone-300 text-sm font-light max-w-sm">
+                  Estacionamiento seguro 24/7 dentro de nuestras instalaciones
+                  para tu total tranquilidad.
                 </p>
               </div>
             </div>
 
-            {/* 2. DESAYUNOS (Tarjeta Vertical) */}
-            <div className="group relative lg:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500 bg-[#700824]">
+            {/* 2. DESAYUNOS (Tarjeta Alta Vertical) */}
+            <div className="group relative lg:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 bg-[#700824]">
               <img
                 src=""
                 alt="Desayuno"
-                className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition duration-700 group-hover:scale-110"
+                className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition duration-700 group-hover:scale-110 bg-rose-900"
               />
               <div className="relative h-full flex flex-col justify-end p-8 z-10">
-                <div className="bg-white/10 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center mb-4 text-white">
-                  <Coffee size={24} />
+                <div className="bg-white/10 backdrop-blur-md w-14 h-14 rounded-full flex items-center justify-center mb-6 text-white border border-white/20">
+                  <Coffee size={28} />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">
+                <h3 className="text-2xl font-bold text-white mb-3">
                   Desayuno Regional
                 </h3>
                 <p className="text-rose-100 text-sm leading-relaxed">
                   Empieza el día con el aroma del café ayacuchano y nuestro
-                  famoso pan chapla recién horneado.
+                  famoso pan chapla recién horneado, quesos frescos y jugos
+                  naturales.
                 </p>
               </div>
             </div>
 
-            {/* 3. ROOM SERVICE (Tarjeta Simple Elegante) */}
-            <div className="group bg-white rounded-[2rem] p-8 flex flex-col justify-between shadow-sm border border-stone-100 hover:border-rose-200 transition duration-300">
-              <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-700 group-hover:scale-110 transition">
+            {/* 3. ROOM SERVICE (Tarjeta Pequeña Blanca) */}
+            <div className="group bg-white rounded-[2rem] p-8 flex flex-col justify-between shadow-sm border border-stone-100 hover:border-rose-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+              <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-700 group-hover:scale-110 transition duration-300">
                 <Bell size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-stone-800 mb-1">
+                <h3 className="text-xl font-bold text-stone-800 mb-2">
                   Room Service
                 </h3>
-                <p className="text-stone-500 text-xs">
-                  Atención a la habitación para tu máxima comodidad y
-                  privacidad.
+                <p className="text-stone-500 text-xs leading-relaxed">
+                  Atención directa a tu habitación para tu máxima comodidad y
+                  privacidad cuando lo desees.
                 </p>
               </div>
             </div>
 
-            {/* 4. LAVANDERÍA (Tarjeta Simple Elegante) */}
-            <div className="group bg-white rounded-[2rem] p-8 flex flex-col justify-between shadow-sm border border-stone-100 hover:border-rose-200 transition duration-300">
-              <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-700 group-hover:scale-110 transition">
+            {/* 4. LAVANDERÍA (Tarjeta Pequeña Blanca) */}
+            <div className="group bg-white rounded-[2rem] p-8 flex flex-col justify-between shadow-sm border border-stone-100 hover:border-blue-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+              <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-700 group-hover:scale-110 transition duration-300">
                 <Shirt size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-stone-800 mb-1">
+                <h3 className="text-xl font-bold text-stone-800 mb-2">
                   Lavandería
                 </h3>
-                <p className="text-stone-500 text-xs">
-                  Servicio de lavado y secado rápido para que viajes ligero.
+                <p className="text-stone-500 text-xs leading-relaxed">
+                  Servicio de lavado y secado rápido y cuidadoso para que viajes
+                  ligero y sin preocupaciones.
                 </p>
               </div>
             </div>
 
-            {/* 5. TRASLADOS (Tarjeta con Foto) */}
-            <div className="group relative rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500">
+            {/* 5. TRASLADOS (Tarjeta Pequeña con Foto) */}
+            <div className="group relative rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
               <img
                 src=""
                 alt="Traslados"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110 bg-stone-300"
               />
-              <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition"></div>
-              <div className="absolute bottom-0 left-0 p-6 w-full">
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition duration-500"></div>
+              <div className="absolute bottom-0 left-0 p-6 w-full z-10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-white">Traslados</h3>
-                    <p className="text-stone-200 text-xs">Aeropuerto - Hotel</p>
+                    <h3 className="text-lg font-bold text-white leading-tight">
+                      Traslados
+                    </h3>
+                    <p className="text-stone-200 text-[10px] uppercase tracking-wider mt-1">
+                      Aeropuerto - Hotel
+                    </p>
                   </div>
-                  <Plane size={24} className="text-white opacity-80" />
+                  <Plane size={24} className="text-white opacity-90" />
                 </div>
               </div>
             </div>
 
-            {/* 6. TOURS (Tarjeta Grande final) */}
-            <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500 cursor-pointer">
+            {/* 6. TOURS (Tarjeta Grande Final) */}
+            <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-pointer">
               <img
                 src=""
-                alt="Tours"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
+                alt="Tours Ayacucho"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-105 bg-stone-400"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#700824]/90 to-transparent"></div>
-              <div className="absolute inset-0 p-8 flex flex-col justify-center max-w-xs">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#700824]/95 via-[#700824]/60 to-transparent"></div>
+              <div className="absolute inset-0 p-8 flex flex-col justify-center max-w-sm">
                 <div className="flex items-center gap-2 text-amber-400 mb-3">
                   <Map size={20} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">
-                    Empresas Garantizadas
+                  <span className="text-[10px] font-black uppercase tracking-widest bg-black/20 px-2 py-1 rounded">
+                    Garantía y Seguridad
                   </span>
                 </div>
-                <h3 className="text-3xl font-serif font-medium text-white mb-2">
+                <h3 className="text-3xl font-serif font-medium text-white mb-2 leading-tight">
                   Descubre Ayacucho
                 </h3>
-                <p className="text-stone-200 text-sm mb-6">
+                <p className="text-stone-200 text-sm mb-6 font-light">
                   Coordinamos tus tours a las aguas turquesas, iglesias y
-                  miradores con agencias de total confianza.
+                  miradores con agencias aliadas de total confianza.
                 </p>
-                <span className="inline-flex items-center gap-2 text-white font-bold text-sm group-hover:gap-4 transition-all">
+                <span className="inline-flex items-center gap-2 text-white font-bold text-sm group-hover:gap-4 transition-all bg-white/20 w-fit px-4 py-2 rounded-full backdrop-blur-sm border border-white/30 hover:bg-white/30">
                   Coordinar Tour <ArrowRight size={16} />
                 </span>
               </div>
