@@ -57,6 +57,10 @@ function calculateNights(checkIn: string, checkOut: string) {
   const diffTime = Math.abs(end.getTime() - start.getTime());
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
+// Nueva utilidad: ID desde 100 con ceros a la izquierda
+const formatTicket = (id: number) => {
+  return (100 + id).toString().padStart(5, "0");
+};
 
 // Usamos 'any' en props para evitar conflictos de versiones de Next.js (14 vs 15) durante el build
 export default async function AdminPage(props: any) {
@@ -308,24 +312,26 @@ export default async function AdminPage(props: any) {
         </section>
 
         {/* TABLA DE RESERVAS PROFESIONAL */}
+        {/* TABLA DE RESERVAS CON FILTRO Y TICKET ID */}
         <section className="bg-white rounded-[2.5rem] shadow-xl border border-stone-100 overflow-hidden mb-10">
-          <div className="p-8 border-b border-stone-50 flex justify-between items-center bg-white">
+          <div className="p-8 border-b border-stone-50 flex justify-between items-center">
             <div>
               <h2 className="font-bold text-xl text-stone-800">
                 Control Maestro de Reservas
               </h2>
               <p className="text-stone-400 text-[10px] uppercase font-bold tracking-widest mt-1">
-                Gestión completa de huéspedes
+                Mostrando ingresos para:{" "}
+                <span className="text-rose-700">{filterDate}</span>
               </p>
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left">
               <thead>
                 <tr className="text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] bg-stone-50/50">
                   <th className="py-4 px-6">ID / Ticket</th>
                   <th className="py-4 px-6">Huésped & Contacto</th>
-                  <th className="py-4 px-4">Documentos</th>
+                  <th className="py-4 px-4 text-center">Noches</th>
                   <th className="py-4 px-4 text-center">Hab</th>
                   <th className="py-4 px-4">Estancia</th>
                   <th className="py-4 px-4 text-right">Total</th>
@@ -334,100 +340,113 @@ export default async function AdminPage(props: any) {
                 </tr>
               </thead>
               <tbody className="text-xs">
-                {allBookings?.slice(0, 15).map((booking) => (
-                  <tr
-                    key={booking.id}
-                    className="border-b border-stone-50 hover:bg-rose-50/20 transition-colors group"
-                  >
-                    {/* 1. ID Y NÚMERO DE RESERVA */}
-                    <td className="py-5 px-6">
-                      <div className="font-mono text-[10px] text-stone-400">
-                        SYS-{booking.id.toString().slice(-4)}
-                      </div>
-                      <div className="font-black text-rose-900 text-[11px]">
-                        RES-{booking.booking_number || "00" + booking.id}
-                      </div>
-                    </td>
+                {allBookings
+                  ?.filter((b) => b.check_in === filterDate) // FILTRO DE SEGURIDAD POR FECHA
+                  .map((booking) => {
+                    const noches = calculateNights(
+                      booking.check_in,
+                      booking.check_out
+                    );
 
-                    {/* 2. NOMBRES, CELULAR Y CORREO */}
-                    <td className="py-5 px-6">
-                      <div className="font-black text-stone-800 uppercase text-[11px] mb-1">
-                        {booking.client_name}
-                      </div>
-                      <div className="flex flex-col gap-1 text-[10px] font-bold text-stone-500">
-                        <span className="flex items-center gap-1.5 text-emerald-700">
-                          <Phone size={10} /> {booking.client_phone || "S/N"}
-                        </span>
-                        <span className="flex items-center gap-1.5 text-blue-600 lowercase font-medium">
-                          <span className="text-stone-300">@</span>{" "}
-                          {booking.client_email || "sin@correo.com"}
-                        </span>
-                      </div>
-                    </td>
+                    return (
+                      <tr
+                        key={booking.id}
+                        className="border-b border-stone-50 hover:bg-rose-50/20 transition-colors"
+                      >
+                        {/* 1. ID FORMATEADO (Mínimo 100) */}
+                        <td className="py-5 px-6">
+                          <div className="font-mono text-[10px] text-stone-400">
+                            SYS-{booking.id}
+                          </div>
+                          <div className="font-black text-rose-900 text-[11px]">
+                            #{formatTicket(booking.id)}
+                          </div>
+                        </td>
 
-                    {/* 3. DOCUMENTOS Y PAÍS */}
-                    <td className="py-5 px-4">
-                      <div className="text-stone-800 font-bold uppercase text-[10px]">
-                        {booking.document_type || "DOC"}:{" "}
-                        {booking.document_number}
-                      </div>
-                      <div className="text-[9px] text-stone-400 font-black uppercase tracking-tighter mt-1 flex items-center gap-1">
-                        <MapPin size={10} /> {booking.client_country || "Perú"}
-                      </div>
-                    </td>
-
-                    {/* 4. HABITACIÓN */}
-                    <td className="py-5 px-4 text-center">
-                      <div className="inline-block bg-stone-900 text-white font-black px-2 py-1 rounded text-[10px]">
-                        {getRoomNumber(booking.room_id)}
-                      </div>
-                    </td>
-
-                    {/* 5. ESTANCIA */}
-                    <td className="py-5 px-4">
-                      <div className="flex flex-col font-bold text-[10px]">
-                        <span className="text-emerald-600">
-                          IN: {booking.check_in}
-                        </span>
-                        <span className="text-rose-600">
-                          OUT: {booking.check_out}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* 6. TOTAL */}
-                    <td className="py-5 px-4 text-right font-black text-stone-900 text-[12px]">
-                      {formatMoney(booking.total_price)}
-                    </td>
-
-                    {/* 7. ESTADO VISUAL */}
-                    <td className="py-5 px-4 text-center">
-                      <div className="flex flex-col items-center gap-1">
-                        {booking.status === "pagado" ||
-                        booking.status === "approved" ? (
-                          <>
-                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[8px] font-black text-emerald-600 uppercase">
-                              Confirmado
+                        {/* 2. HUÉSPED & CONTACTO */}
+                        <td className="py-5 px-6">
+                          <div className="font-black text-stone-800 uppercase text-[11px] mb-1">
+                            {booking.client_name}
+                          </div>
+                          <div className="flex flex-col gap-1 text-[10px] font-bold text-stone-500">
+                            <span className="flex items-center gap-1.5 text-emerald-700">
+                              <Phone size={10} />{" "}
+                              {booking.client_phone || "S/N"}
                             </span>
-                          </>
-                        ) : (
-                          <>
-                            <div className="w-2 h-2 rounded-full bg-amber-400" />
-                            <span className="text-[8px] font-black text-amber-500 uppercase">
-                              Pendiente
+                            <span className="text-blue-600 lowercase font-medium">
+                              {booking.client_email || "sin@correo.com"}
                             </span>
-                          </>
-                        )}
-                      </div>
-                    </td>
+                          </div>
+                        </td>
 
-                    {/* 8. ACCIONES CLARAS */}
-                    <td className="py-5 px-8">
-                      <div className="flex gap-2 justify-center">
-                        {booking.status !== "pagado" &&
-                          booking.status !== "approved" && (
-                            <form action={markAsPaid}>
+                        {/* 3. COLUMNA DE NOCHES */}
+                        <td className="py-5 px-4 text-center">
+                          <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-black text-[10px] border border-blue-100">
+                            {noches} {noches === 1 ? "día" : "días"}
+                          </span>
+                        </td>
+
+                        {/* 4. HABITACIÓN */}
+                        <td className="py-5 px-4 text-center">
+                          <div className="inline-block bg-stone-900 text-white font-black px-2 py-1 rounded text-[10px]">
+                            #{getRoomNumber(booking.room_id)}
+                          </div>
+                        </td>
+
+                        {/* 5. ESTANCIA */}
+                        <td className="py-5 px-4">
+                          <div className="flex flex-col font-bold text-[10px] uppercase">
+                            <span className="text-emerald-600">
+                              IN: {booking.check_in}
+                            </span>
+                            <span className="text-rose-600">
+                              OUT: {booking.check_out}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* 6. TOTAL */}
+                        <td className="py-5 px-4 text-right font-black text-stone-900">
+                          {formatMoney(booking.total_price)}
+                        </td>
+
+                        {/* 7. ESTADO */}
+                        <td className="py-5 px-4 text-center">
+                          <span
+                            className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${
+                              booking.status === "pagado" ||
+                              booking.status === "approved"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-amber-100 text-amber-600"
+                            }`}
+                          >
+                            {booking.status === "pagado" ||
+                            booking.status === "approved"
+                              ? "Pagado"
+                              : "Pendiente"}
+                          </span>
+                        </td>
+
+                        {/* 8. ACCIONES CLARAS */}
+                        <td className="py-5 px-8">
+                          <div className="flex gap-2 justify-center">
+                            {booking.status !== "pagado" &&
+                              booking.status !== "approved" && (
+                                <form action={markAsPaid}>
+                                  <input
+                                    type="hidden"
+                                    name="bookingId"
+                                    value={booking.id}
+                                  />
+                                  <button
+                                    type="submit"
+                                    className="flex items-center gap-1 px-3 py-2 bg-emerald-600 text-white rounded-xl font-bold text-[9px] uppercase hover:bg-emerald-700"
+                                  >
+                                    <DollarSign size={12} /> Cobrar
+                                  </button>
+                                </form>
+                              )}
+                            <form action={deleteBooking}>
                               <input
                                 type="hidden"
                                 name="bookingId"
@@ -435,33 +454,25 @@ export default async function AdminPage(props: any) {
                               />
                               <button
                                 type="submit"
-                                className="group/btn flex items-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-xl font-bold text-[9px] uppercase hover:bg-emerald-700 transition-all shadow-md shadow-emerald-100"
+                                className="flex items-center gap-1 px-3 py-2 bg-white border border-stone-200 text-stone-400 rounded-xl font-bold text-[9px] uppercase hover:text-rose-600"
                               >
-                                <DollarSign size={12} />
-                                Cobrar
+                                <X size={12} /> Anular
                               </button>
                             </form>
-                          )}
-                        <form action={deleteBooking}>
-                          <input
-                            type="hidden"
-                            name="bookingId"
-                            value={booking.id}
-                          />
-                          <button
-                            type="submit"
-                            className="flex items-center gap-2 px-3 py-2 bg-white border border-stone-200 text-stone-400 rounded-xl font-bold text-[9px] uppercase hover:border-rose-200 hover:text-rose-600 transition-all"
-                          >
-                            <X size={12} />
-                            Anular
-                          </button>
-                        </form>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
+            {/* Mensaje de tabla vacía */}
+            {allBookings?.filter((b) => b.check_in === filterDate).length ===
+              0 && (
+              <div className="p-20 text-center text-stone-400 font-medium italic">
+                No hay reservas que inicien el {filterDate}
+              </div>
+            )}
           </div>
         </section>
 
