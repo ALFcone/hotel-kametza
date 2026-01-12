@@ -23,29 +23,28 @@ import {
   CalendarDays,
 } from "lucide-react";
 
-// --- FUNCIÓN AUXILIAR PARA MEJORAR DESCRIPCIONES (MARKETING) ---
-// Esta función detecta el nombre de la habitación y devuelve un texto vendedor
-// ignorando la descripción básica de la base de datos si encuentra coincidencia.
-function getMarketingDescription(name: string, originalDesc: string) {
+// --- FUNCIÓN DE DESCRIPCIONES SENCILLAS ---
+// Detecta el tipo de habitación y pone texto corto y real
+function getSimpleDescription(name: string, originalDesc: string) {
   const n = name.toLowerCase();
 
   if (n.includes("simple") || n.includes("individual")) {
-    return "Tu refugio personal de confort. Disfruta de una cama de 2 plazas premium ideal para el viajero independiente, con baño privado impecable, agua caliente y la privacidad que mereces para un descanso reparador.";
+    return "Ideal para viajero solo. Cama de 2 plazas, baño privado completo, agua caliente 24h, Smart TV y WiFi.";
   }
   if (n.includes("matrimonial") || n.includes("queen") || n.includes("king")) {
-    return "La escapada perfecta en pareja. Relájate en una amplia cama Queen con sábanas de algodón, ambiente cálido con iluminación suave y todos los detalles pensados para una estancia romántica e inolvidable.";
+    return "Ideal para parejas. Cama Queen confortable, ambiente tranquilo, baño privado con agua caliente y Smart TV.";
   }
   if (n.includes("doble") || n.includes("twin")) {
-    return "Comparte sin sacrificar comodidad. Dos camas ergonómicas independientes en un ambiente espacioso, ideal para amigos o colegas que buscan descanso y funcionalidad con WiFi de alta velocidad.";
+    return "Para compartir. Dos camas cómodas, baño privado completo, WiFi rápido y Smart TV con cable.";
   }
   if (n.includes("triple") || n.includes("familiar")) {
-    return "Espacio y calidez para todos. La opción ideal para familias o grupos, con tres camas distribuidas para maximizar el confort, garantizando seguridad y agua caliente las 24 horas.";
+    return "Para familias o grupos. Tres camas, espacio amplio, baño completo y todos los servicios incluidos.";
   }
 
-  // Si no coincide con ninguna, usa la descripción original de la BD pero mejorada si es muy corta
-  return originalDesc.length > 20
+  // Si no coincide, usa la original o un genérico corto
+  return originalDesc.length > 10
     ? originalDesc
-    : "Disfruta de una estancia inolvidable con todas las comodidades modernas, limpieza impecable y la mejor atención de Ayacucho.";
+    : "Habitación confortable con baño privado, agua caliente, WiFi y TV.";
 }
 
 // --- AUTH MODAL ---
@@ -336,8 +335,8 @@ function BookingModal({
     }
   };
 
-  // Usamos la función de marketing para el modal también
-  const marketingDesc = getMarketingDescription(room.name, room.description);
+  // Usamos la función sencilla
+  const simpleDesc = getSimpleDescription(room.name, room.description);
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200">
@@ -356,8 +355,8 @@ function BookingModal({
                 {room.name}
               </h3>
               <p className="text-xs text-stone-600 font-medium line-clamp-4">
-                {/* APLICAMOS LA DESCRIPCIÓN DE MARKETING AQUÍ */}
-                {marketingDesc}
+                {/* Texto sencillo aquí */}
+                {simpleDesc}
               </p>
             </div>
             <div className="bg-white/90 backdrop-blur p-4 rounded-2xl shadow-lg">
@@ -569,8 +568,8 @@ function RoomCard({
 }) {
   const [showModal, setShowModal] = useState(false);
 
-  // USAMOS LA FUNCIÓN PARA OBTENER EL TEXTO DE MARKETING EN VEZ DEL BÁSICO
-  const marketingDesc = getMarketingDescription(room.name, room.description);
+  // USAMOS LA FUNCIÓN PARA OBTENER EL TEXTO SENCILLO
+  const simpleDesc = getSimpleDescription(room.name, room.description);
 
   return (
     <>
@@ -618,9 +617,9 @@ function RoomCard({
             </div>
           </div>
 
-          {/* DESCRIPCIÓN REEMPLAZADA POR LA DE MARKETING */}
+          {/* DESCRIPCIÓN SENCILLA (SIN FLORO) */}
           <p className="text-stone-500 text-sm mb-6 leading-relaxed font-light line-clamp-3">
-            {marketingDesc}
+            {simpleDesc}
           </p>
 
           {/* Servicios Reales (Etiquetas Claras) */}
@@ -634,19 +633,17 @@ function RoomCard({
             <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
               <Clock size={14} className="text-rose-900" />
               <span className="text-[10px] font-bold uppercase">
-                Ducha Caliente 24h
+                Agua Caliente 24h
               </span>
             </div>
             <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
               <Tv size={14} className="text-rose-900" />
-              <span className="text-[10px] font-bold uppercase">
-                Smart TV / Netflix
-              </span>
+              <span className="text-[10px] font-bold uppercase">Smart TV</span>
             </div>
             <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
               <Users size={14} className="text-rose-900" />
               <span className="text-[10px] font-bold uppercase">
-                Baño Privado Impecable
+                Baño Privado
               </span>
             </div>
           </div>
