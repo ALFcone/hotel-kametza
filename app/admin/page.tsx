@@ -1,7 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
-import { updateRoom } from "../actions";
+import { updateRoom } from "../actions"; // Asegúrate de actualizar este archivo luego (ver Paso 2)
 import DownloadButton from "./DownloadButton";
+import Link from "next/link"; // <--- Importante para el botón de ir al inicio
 import {
   Calendar,
   CheckCircle,
@@ -25,6 +26,7 @@ import {
   MapPin,
   Mail,
   FileText,
+  Globe, // <--- Icono para el botón de ir a la web
 } from "lucide-react";
 
 // --- ACCIONES DE SERVIDOR ---
@@ -82,7 +84,7 @@ export default async function AdminPage(props: {
     .select("*")
     .order("created_at", { ascending: false });
 
-  // Filtro por Rango
+  // Filtro
   const filteredBookings = allBookings?.filter((b) => {
     const checkInDate = b.check_in
       ? b.check_in.toString().substring(0, 10)
@@ -159,9 +161,18 @@ export default async function AdminPage(props: {
               <h1 className="text-3xl font-serif font-bold text-rose-950">
                 Panel Kametza
               </h1>
-              <p className="text-stone-400 text-[10px] uppercase font-black tracking-widest">
-                Control de Reservas
-              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-stone-400 text-[10px] uppercase font-black tracking-widest">
+                  Control de Reservas
+                </p>
+                {/* BOTÓN IR AL INICIO */}
+                <Link
+                  href="/"
+                  className="flex items-center gap-1 bg-stone-100 text-stone-500 px-3 py-1 rounded-full text-[9px] font-black uppercase hover:bg-rose-100 hover:text-rose-600 transition-colors"
+                >
+                  <Globe size={10} /> Ver Web Principal
+                </Link>
+              </div>
             </div>
           </div>
           <div className="flex gap-4 items-end">
@@ -337,7 +348,7 @@ export default async function AdminPage(props: {
           </div>
         </section>
 
-        {/* TABLA DE RESERVAS COMPLETA */}
+        {/* TABLA DE RESERVAS */}
         <section className="bg-white rounded-[2.5rem] shadow-xl border border-stone-100 overflow-hidden mb-10">
           <div className="p-8 border-b border-stone-50 flex justify-between items-center bg-white">
             <div>
@@ -377,7 +388,6 @@ export default async function AdminPage(props: {
                       key={booking.id}
                       className="border-b border-stone-50 hover:bg-rose-50/20 transition-colors group"
                     >
-                      {/* ID + TICKET (CORREGIDO) */}
                       <td className="py-5 px-6">
                         <div className="font-mono text-[10px] text-stone-400">
                           SYS-{booking.id}
@@ -386,8 +396,6 @@ export default async function AdminPage(props: {
                           RES-{formatTicket(booking.id)}
                         </div>
                       </td>
-
-                      {/* HUÉSPED */}
                       <td className="py-5 px-6">
                         <div className="font-black text-stone-800 uppercase text-[11px] mb-1">
                           {booking.client_name}
@@ -396,8 +404,6 @@ export default async function AdminPage(props: {
                           <Mail size={10} /> {booking.client_email || "-"}
                         </div>
                       </td>
-
-                      {/* DOCUMENTO */}
                       <td className="py-5 px-4">
                         <div className="flex flex-col gap-1">
                           <span className="text-[10px] font-bold text-stone-600 uppercase flex items-center gap-1">
@@ -409,8 +415,6 @@ export default async function AdminPage(props: {
                           </span>
                         </div>
                       </td>
-
-                      {/* PAÍS Y CELULAR */}
                       <td className="py-5 px-4">
                         <div className="flex flex-col gap-1">
                           <span className="text-[10px] font-bold text-stone-500 flex items-center gap-1 uppercase">
@@ -422,22 +426,16 @@ export default async function AdminPage(props: {
                           </span>
                         </div>
                       </td>
-
-                      {/* NOCHES */}
                       <td className="py-5 px-4 text-center">
                         <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-black text-[10px] border border-blue-100">
                           {noches} {noches === 1 ? "Día" : "Días"}
                         </span>
                       </td>
-
-                      {/* HABITACIÓN */}
                       <td className="py-5 px-4 text-center">
                         <span className="font-black text-stone-800">
                           #{getRoomNumber(booking.room_id)}
                         </span>
                       </td>
-
-                      {/* ESTANCIA */}
                       <td className="py-5 px-4">
                         <div className="flex flex-col font-bold text-[9px] uppercase tracking-tighter">
                           <span className="text-emerald-600">
@@ -448,13 +446,9 @@ export default async function AdminPage(props: {
                           </span>
                         </div>
                       </td>
-
-                      {/* TOTAL */}
                       <td className="py-5 px-4 text-right font-black text-stone-900">
                         {formatMoney(booking.total_price)}
                       </td>
-
-                      {/* ESTADO */}
                       <td className="py-5 px-4 text-center">
                         <span
                           className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${
@@ -470,8 +464,6 @@ export default async function AdminPage(props: {
                             : "Pendiente"}
                         </span>
                       </td>
-
-                      {/* BOTONES */}
                       <td className="py-5 px-8 text-center">
                         <div className="flex gap-2 justify-center">
                           {booking.status !== "pagado" &&
@@ -518,7 +510,7 @@ export default async function AdminPage(props: {
           </div>
         </section>
 
-        {/* INVENTARIO */}
+        {/* INVENTARIO (CON DESCRIPCIÓN) */}
         <section>
           <div className="flex items-center gap-2 mb-6">
             <div className="h-1 w-10 bg-stone-800 rounded-full"></div>
@@ -571,6 +563,18 @@ export default async function AdminPage(props: {
                           className="w-full p-3 bg-stone-50 rounded-xl border border-stone-100 text-[10px]"
                         />
                       </div>
+                    </div>
+                    {/* NUEVO CAMPO DE DESCRIPCIÓN */}
+                    <div>
+                      <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
+                        Descripción
+                      </label>
+                      <textarea
+                        name="description"
+                        defaultValue={room.description}
+                        className="w-full p-3 bg-stone-50 rounded-xl border border-stone-100 text-[10px] h-20 resize-none"
+                        placeholder="Descripción de la habitación..."
+                      ></textarea>
                     </div>
                     <button className="w-full bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-rose-900 transition-all text-[10px] uppercase tracking-widest">
                       Guardar Cambios

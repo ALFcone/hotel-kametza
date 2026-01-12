@@ -14,9 +14,8 @@ const client = new MercadoPagoConfig({
     "TEST-7434598007363249-102513-e453188d9076f03407c57077a988d519-195979069",
 });
 
-// --- FUNCIÓN CORREGIDA PARA NEXT.JS 15 ---
+// --- FUNCIÓN PARA OBTENER USUARIO (Next.js 15) ---
 async function getUser() {
-  // AQUI ESTABA EL ERROR: En Next.js 15 cookies() lleva await
   const cookieStore = await cookies();
 
   const supabaseServer = createServerClient(
@@ -44,11 +43,14 @@ export async function createBooking(formData: FormData) {
   const name = formData.get("name") as string;
   const price = formData.get("price");
   const paymentMethod = formData.get("paymentMethod") as string;
-
   const documentType = formData.get("documentType") as string;
   const documentNumber = formData.get("documentNumber") as string;
 
-  // 1. OBTENER USUARIO (Con la corrección)
+  // --- NUEVO: Capturar Celular y País ---
+  const phone = formData.get("phone") as string;
+  const country = formData.get("country") as string;
+
+  // 1. Obtener usuario
   const user = await getUser();
 
   // 2. Verificar disponibilidad
@@ -62,13 +64,15 @@ export async function createBooking(formData: FormData) {
     return { error: "Fechas ocupadas. Por favor elige otras." };
   }
 
-  // 3. Crear reserva
+  // 3. Crear reserva (GUARDANDO TODOS LOS DATOS)
   const { data: booking, error } = await supabase
     .from("bookings")
     .insert({
       room_id: Number(roomId),
       client_name: name,
       client_email: email,
+      client_phone: phone, // <--- Guardamos celular
+      client_country: country, // <--- Guardamos país
       check_in: checkIn,
       check_out: checkOut,
       total_price: Number(price),
@@ -82,6 +86,7 @@ export async function createBooking(formData: FormData) {
     .single();
 
   if (error || !booking) {
+    console.error("Error creando reserva:", error);
     return { error: "Error interno al guardar la reserva." };
   }
 
@@ -140,7 +145,11 @@ export async function createBooking(formData: FormData) {
 export async function updateRoom(formData: FormData) {
   const roomId = formData.get("roomId");
   const price = formData.get("price");
+
+  // --- NUEVO: Capturamos la descripción ---
   const description = formData.get("description");
+
+  // Manejo de imagen (si se sube una nueva)
   const imageFile = formData.get("image") as File;
   let imageUrlToUpdate = null;
 
@@ -149,6 +158,7 @@ export async function updateRoom(formData: FormData) {
     const { error: uploadError } = await supabase.storage
       .from("room-images")
       .upload(fileName, imageFile, { cacheControl: "3600", upsert: true });
+
     if (!uploadError) {
       const { data } = supabase.storage
         .from("room-images")
@@ -156,12 +166,20 @@ export async function updateRoom(formData: FormData) {
       imageUrlToUpdate = data.publicUrl;
     }
   }
+
+  // Preparamos los datos para actualizar
   const updateData: any = {
     price_per_night: Number(price),
-    description: description,
+    description: description, // <--- Guardamos la descripción
   };
-  if (imageUrlToUpdate) updateData.image_url = imageUrlToUpdate;
+
+  if (imageUrlToUpdate) {
+    updateData.image_url = imageUrlToUpdate;
+  }
+
+  // Ejecutamos la actualización en Supabase
   await supabase.from("rooms").update(updateData).eq("id", roomId);
+
   revalidatePath("/admin");
   revalidatePath("/");
 }
