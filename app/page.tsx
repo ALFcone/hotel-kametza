@@ -20,10 +20,10 @@ import {
   Globe,
   Calendar,
   Search,
-  CalendarDays, // <--- Icono nuevo para estética
+  CalendarDays,
 } from "lucide-react";
 
-// --- AUTH MODAL (SIN CAMBIOS) ---
+// --- AUTH MODAL ---
 function AuthModal({
   isOpen,
   onClose,
@@ -526,7 +526,7 @@ interface Room {
   room_number: string;
 }
 
-// --- ROOM CARD ---
+// --- ROOM CARD MEJORADA ---
 function RoomCard({
   room,
   onRequireAuth,
@@ -542,79 +542,96 @@ function RoomCard({
 
   return (
     <>
-      <div className="group bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-stone-100 flex flex-col hover:shadow-[0_20px_50px_rgba(112,8,36,0.2)] transition-all duration-500 h-full">
-        <div className="relative h-64 w-full overflow-hidden">
+      <div className="group bg-white rounded-[2.5rem] shadow-lg hover:shadow-[0_20px_40px_rgba(112,8,36,0.15)] transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full relative">
+        {/* IMAGEN Y PRECIO */}
+        <div className="relative h-72 w-full overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10 opacity-60"></div>
           <img
             src={room.image_url}
             alt={room.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
           />
-          <div className="absolute top-6 left-6 bg-[#700824] text-white px-4 py-2 rounded-2xl shadow-xl z-20">
-            <p className="text-[10px] uppercase font-bold opacity-80 mb-0.5">
-              Precio Noche
+          {/* Precio Flotante */}
+          <div className="absolute bottom-4 right-4 z-20 bg-white/95 backdrop-blur-sm px-5 py-2 rounded-2xl shadow-lg border border-white/50">
+            <p className="text-[9px] uppercase font-bold text-stone-400 tracking-widest mb-0.5">
+              Por noche
             </p>
-            <p className="text-lg font-black">S/ {room.price_per_night}</p>
+            <p className="text-xl font-black text-[#700824]">
+              S/ {room.price_per_night}
+            </p>
+          </div>
+          {/* Etiqueta Destacada */}
+          <div className="absolute top-4 left-4 z-20">
+            <span className="bg-[#700824] text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] shadow-lg">
+              Exclusivo
+            </span>
           </div>
         </div>
 
+        {/* CONTENIDO */}
         <div className="p-8 flex flex-col flex-grow">
-          <div className="flex items-center gap-2 mb-3">
-            <Star size={12} className="fill-[#700824] text-[#700824]" />
-            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400">
-              Categoría Premium
-            </span>
+          {/* Título */}
+          <div className="flex justify-between items-start mb-3">
+            <h3 className="text-2xl font-serif font-bold text-rose-950 leading-tight group-hover:text-rose-700 transition-colors">
+              {room.name}
+            </h3>
+            <div className="flex gap-0.5 mt-1">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Star
+                  key={i}
+                  size={12}
+                  className="fill-amber-400 text-amber-400"
+                />
+              ))}
+            </div>
           </div>
 
-          <h3 className="text-2xl font-serif font-bold text-rose-950 mb-3">
-            {room.name}
-          </h3>
-
+          {/* Descripción Realista */}
           <p className="text-stone-500 text-sm mb-6 leading-relaxed font-light line-clamp-3">
             {room.description ||
-              "Disfruta de una experiencia inolvidable con todas las comodidades."}
+              "Descansa en un ambiente seguro y confortable. Incluye cama ergonómica, limpieza diaria impecable y atención personalizada las 24 horas."}
           </p>
 
-          <div className="flex gap-4 mb-8 border-t border-stone-100 pt-4">
-            <div className="flex flex-col items-center gap-1">
-              <div className="bg-rose-50 p-2 rounded-full text-rose-800">
-                <Tv size={14} />
-              </div>
-              <span className="text-[8px] font-bold uppercase text-stone-400">
-                TV
+          {/* Servicios Reales (Etiquetas Claras) */}
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
+              <Wifi size={14} className="text-rose-900" />
+              <span className="text-[10px] font-bold uppercase">
+                WiFi Fibra Óptica
               </span>
             </div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="bg-rose-50 p-2 rounded-full text-rose-800">
-                <Wifi size={14} />
-              </div>
-              <span className="text-[8px] font-bold uppercase text-stone-400">
-                WiFi
+            <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
+              <Clock size={14} className="text-rose-900" />
+              <span className="text-[10px] font-bold uppercase">
+                Agua Caliente 24h
               </span>
             </div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="bg-rose-50 p-2 rounded-full text-rose-800">
-                <Clock size={14} />
-              </div>
-              <span className="text-[8px] font-bold uppercase text-stone-400">
-                Agua
+            <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
+              <Tv size={14} className="text-rose-900" />
+              <span className="text-[10px] font-bold uppercase">
+                Smart TV Cable
               </span>
             </div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="bg-rose-50 p-2 rounded-full text-rose-800">
-                <Users size={14} />
-              </div>
-              <span className="text-[8px] font-bold uppercase text-stone-400">
-                Baño
+            <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
+              <Users size={14} className="text-rose-900" />
+              <span className="text-[10px] font-bold uppercase">
+                Baño Privado
               </span>
             </div>
           </div>
 
-          <div className="mt-auto">
+          {/* Botón de Acción */}
+          <div className="mt-auto pt-4 border-t border-stone-100">
             <button
               onClick={() => setShowModal(true)}
-              className="w-full bg-stone-900 text-white font-black py-4 rounded-2xl hover:bg-[#700824] transition-all shadow-lg flex items-center justify-center gap-2 uppercase text-xs tracking-widest"
+              className="w-full bg-stone-900 text-white font-bold py-4 rounded-xl hover:bg-[#700824] transition-all shadow-lg hover:shadow-rose-900/20 flex items-center justify-between px-6 group/btn"
             >
-              Ver Detalles y Reservar <ArrowRight size={14} />
+              <span className="text-xs uppercase tracking-[0.2em]">
+                Ver Disponibilidad
+              </span>
+              <div className="bg-white/10 p-1.5 rounded-full group-hover/btn:bg-white/20 transition">
+                <ArrowRight size={16} />
+              </div>
             </button>
           </div>
         </div>
@@ -850,7 +867,9 @@ export default function Home() {
             >
               Contacto
             </a>
+
             <div className="w-16 h-px bg-stone-200 my-4"></div>
+
             {currentUser ? (
               <div className="flex flex-col items-center gap-4">
                 <a
@@ -880,6 +899,7 @@ export default function Home() {
                 <LogIn size={24} /> Iniciar Sesión
               </button>
             )}
+
             <a
               href="#habitaciones"
               onClick={closeMenu}
