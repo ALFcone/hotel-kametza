@@ -59,35 +59,44 @@ function calculateNights(checkIn: string, checkOut: string) {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 }
 
-// NUEVA UTILIDAD: Formato de Ticket (Ej: 1 -> 00101)
 const formatTicket = (id: number) => {
   return (100 + id).toString().padStart(5, "0");
 };
 
-// Usamos 'any' en props para evitar conflictos de versiones
-export default async function AdminPage(props: any) {
-  const searchParams = props.searchParams;
+// --- COMPONENTE PRINCIPAL ---
+export default async function AdminPage(props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
+  // 1. Corrección CRÍTICA para Next.js 15: Esperar los parámetros
+  const searchParams = await props.searchParams;
+
   const today = new Date().toISOString().split("T")[0];
 
-  // --- LÓGICA DE RANGO DE FECHAS ---
-  const dateFrom = searchParams?.from || today;
-  const dateTo = searchParams?.to || today;
+  // 2. Leemos las fechas (Si no existen, usa hoy)
+  const dateFrom = searchParams.from || today;
+  const dateTo = searchParams.to || today;
 
-  // Para los KPIs de arriba usamos la fecha de inicio como referencia
+  // Referencia para los KPIs superiores (usa la fecha 'Desde')
   const filterDate = dateFrom;
 
+  // 3. Carga de datos
   const { data: rooms } = await supabase.from("rooms").select("*").order("id");
   const { data: allBookings } = await supabase
     .from("bookings")
     .select("*")
     .order("created_at", { ascending: false });
 
-  // FILTRO PRINCIPAL PARA LA TABLA (RANGO)
+  // 4. LÓGICA DE FILTRADO ROBUSTA
+  // Comparamos solo la parte de la fecha YYYY-MM-DD para evitar errores de horas
   const filteredBookings = allBookings?.filter((b) => {
-    return b.check_in >= dateFrom && b.check_in <= dateTo;
+    // Aseguramos que sea string y tomamos los primeros 10 caracteres (la fecha)
+    const checkInDate = b.check_in
+      ? b.check_in.toString().substring(0, 10)
+      : "";
+    return checkInDate >= dateFrom && checkInDate <= dateTo;
   });
 
-  // 1. ESTADÍSTICAS OPERATIVAS (Basadas en filterDate / fecha inicio)
+  // --- KPIs y Lógica Auxiliar ---
   const occupiedCount =
     allBookings?.filter(
       (b) =>
@@ -96,12 +105,13 @@ export default async function AdminPage(props: any) {
         b.check_in <= filterDate &&
         b.check_out > filterDate
     ).length || 0;
+
   const arrivalsCount =
     allBookings?.filter((b) => b.check_in === filterDate).length || 0;
+
   const cleaningList =
     allBookings?.filter((b) => b.check_out === filterDate) || [];
 
-  // 2. CIERRE DE CAJA (Ventas realizadas en la fecha de inicio)
   const salesOnDate =
     allBookings?.filter(
       (b) =>
@@ -151,7 +161,7 @@ export default async function AdminPage(props: any) {
   return (
     <div className="min-h-screen bg-[#F5F5F4] text-stone-800 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* HEADER CON FILTRO DE RANGO (CORREGIDO CON METHOD=GET) */}
+        {/* HEADER CON FILTRO FUNCIONAL */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100">
           <div className="flex items-center gap-4">
             <div className="bg-rose-900 text-white p-3 rounded-2xl shadow-lg shadow-rose-200">
@@ -168,7 +178,7 @@ export default async function AdminPage(props: any) {
           </div>
 
           <div className="flex gap-4 items-end">
-            {/* --- AQUÍ ESTÁ LA CORRECCIÓN: method="get" --- */}
+            {/* IMPORTANTE: method="get" envía los datos a la URL */}
             <form className="flex items-end gap-2" method="get">
               <div className="flex flex-col gap-1">
                 <label className="text-[9px] font-black uppercase text-stone-400 ml-2">
@@ -223,16 +233,15 @@ export default async function AdminPage(props: any) {
           </div>
         )}
 
-        {/* KPIs OPERATIVOS Y FINANCIEROS */}
+        {/* KPIs OPERATIVOS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {/* CIERRE DE CAJA */}
           <div className="bg-stone-900 text-white p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
             <TrendingUp
               className="absolute right-4 top-4 text-white/5"
               size={80}
             />
             <p className="text-stone-400 text-[10px] font-bold uppercase tracking-widest mb-1">
-              Ventas del día: {filterDate}
+              Ventas del día ({filterDate})
             </p>
             <p className="text-4xl font-black">{formatMoney(totalIncome)}</p>
             <div className="flex gap-4 mt-4 border-t border-white/10 pt-4">
@@ -345,7 +354,7 @@ export default async function AdminPage(props: any) {
           </div>
         </section>
 
-        {/* TABLA DE RESERVAS MEJORADA (Con Rango, Ticket ID, Noches) */}
+        {/* TABLA DE RESERVAS (HISTORIAL DE INGRESOS) */}
         <section className="bg-white rounded-[2.5rem] shadow-xl border border-stone-100 overflow-hidden mb-10">
           <div className="p-8 border-b border-stone-50 flex justify-between items-center bg-white">
             <div>
@@ -378,18 +387,14 @@ export default async function AdminPage(props: any) {
                     booking.check_in,
                     booking.check_out
                   );
-
                   return (
                     <tr
                       key={booking.id}
                       className="border-b border-stone-50 hover:bg-rose-50/20 transition-colors group"
                     >
-                      {/* ID FORMATEADO */}
                       <td className="py-5 px-6 font-mono font-black text-rose-900 text-[11px]">
                         #{formatTicket(booking.id)}
                       </td>
-
-                      {/* CONTACTO COMPLETO */}
                       <td className="py-5 px-6">
                         <div className="font-black text-stone-800 uppercase text-[11px] mb-1">
                           {booking.client_name}
@@ -403,20 +408,16 @@ export default async function AdminPage(props: any) {
                           </span>
                         </div>
                       </td>
-
-                      {/* NOCHES */}
                       <td className="py-5 px-4 text-center">
                         <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-black text-[10px] border border-blue-100">
                           {noches} {noches === 1 ? "Día" : "Días"}
                         </span>
                       </td>
-
                       <td className="py-5 px-4 text-center">
                         <span className="font-black text-stone-800">
                           #{getRoomNumber(booking.room_id)}
                         </span>
                       </td>
-
                       <td className="py-5 px-4">
                         <div className="flex flex-col font-bold text-[9px] uppercase tracking-tighter">
                           <span className="text-emerald-600">
@@ -427,11 +428,9 @@ export default async function AdminPage(props: any) {
                           </span>
                         </div>
                       </td>
-
                       <td className="py-5 px-4 text-right font-black text-stone-900">
                         {formatMoney(booking.total_price)}
                       </td>
-
                       <td className="py-5 px-4 text-center">
                         <span
                           className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${
@@ -447,7 +446,6 @@ export default async function AdminPage(props: any) {
                             : "Pendiente"}
                         </span>
                       </td>
-
                       <td className="py-5 px-8 text-center">
                         <div className="flex gap-2 justify-center">
                           {booking.status !== "pagado" &&
@@ -488,13 +486,14 @@ export default async function AdminPage(props: any) {
             </table>
             {filteredBookings?.length === 0 && (
               <div className="p-12 text-center text-stone-400 italic text-sm">
-                No se encontraron reservas en este rango de fechas.
+                No se encontraron reservas que ingresen entre el {dateFrom} y el{" "}
+                {dateTo}.
               </div>
             )}
           </div>
         </section>
 
-        {/* GESTIÓN DE HABITACIONES (INVENTARIO) */}
+        {/* INVENTARIO */}
         <section>
           <div className="flex items-center gap-2 mb-6">
             <div className="h-1 w-10 bg-stone-800 rounded-full"></div>
