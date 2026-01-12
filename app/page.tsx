@@ -24,15 +24,14 @@ import {
 } from "lucide-react";
 
 // --- FUNCIÓN DE DESCRIPCIONES SENCILLAS ---
-// Detecta el tipo de habitación y pone texto corto y real
 function getSimpleDescription(name: string, originalDesc: string) {
   const n = name.toLowerCase();
 
   if (n.includes("simple") || n.includes("individual")) {
-    return "Ideal para viajero solo. Cama amplia, baño privado completo, agua caliente 24h, Smart TV y WiFi.";
+    return "Ideal para viajero solo. Cama de 2 plazas, baño privado completo, agua caliente 24h, Smart TV y WiFi.";
   }
   if (n.includes("matrimonial") || n.includes("queen") || n.includes("king")) {
-    return "Especial para parejas. Cama de 2 plazas confortables, ambiente tranquilo, baño privado con agua caliente y Smart TV.";
+    return "Ideal para parejas. Cama Queen confortable, ambiente tranquilo, baño privado con agua caliente y Smart TV.";
   }
   if (n.includes("doble") || n.includes("twin")) {
     return "Para compartir. Dos camas cómodas, baño privado completo, WiFi rápido y Smart TV con cable.";
@@ -41,7 +40,6 @@ function getSimpleDescription(name: string, originalDesc: string) {
     return "Para familias o grupos. Tres camas, espacio amplio, baño completo y todos los servicios incluidos.";
   }
 
-  // Si no coincide, usa la original o un genérico corto
   return originalDesc.length > 10
     ? originalDesc
     : "Habitación confortable con baño privado, agua caliente, WiFi y TV.";
@@ -335,13 +333,11 @@ function BookingModal({
     }
   };
 
-  // Usamos la función sencilla
   const simpleDesc = getSimpleDescription(room.name, room.description);
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200">
       <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
-        {/* Lado Izquierdo */}
         <div className="hidden md:block w-1/3 bg-stone-100 p-8 relative overflow-hidden">
           <div className="absolute inset-0 bg-rose-900/10 mix-blend-multiply"></div>
           <img
@@ -355,7 +351,6 @@ function BookingModal({
                 {room.name}
               </h3>
               <p className="text-xs text-stone-600 font-medium line-clamp-4">
-                {/* Texto sencillo aquí */}
                 {simpleDesc}
               </p>
             </div>
@@ -373,7 +368,6 @@ function BookingModal({
           </div>
         </div>
 
-        {/* Lado Derecho */}
         <div className="flex-1 p-8 md:p-10 overflow-y-auto relative">
           <button
             onClick={onClose}
@@ -567,14 +561,11 @@ function RoomCard({
   globalCheckOut: string;
 }) {
   const [showModal, setShowModal] = useState(false);
-
-  // USAMOS LA FUNCIÓN PARA OBTENER EL TEXTO SENCILLO
   const simpleDesc = getSimpleDescription(room.name, room.description);
 
   return (
     <>
       <div className="group bg-white rounded-[2.5rem] shadow-lg hover:shadow-[0_20px_40px_rgba(112,8,36,0.15)] transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full relative">
-        {/* IMAGEN Y PRECIO */}
         <div className="relative h-72 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10 opacity-60"></div>
           <img
@@ -582,7 +573,6 @@ function RoomCard({
             alt={room.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
           />
-          {/* Precio Flotante */}
           <div className="absolute bottom-4 right-4 z-20 bg-white/95 backdrop-blur-sm px-5 py-2 rounded-2xl shadow-lg border border-white/50">
             <p className="text-[9px] uppercase font-bold text-stone-400 tracking-widest mb-0.5">
               Por noche
@@ -591,7 +581,6 @@ function RoomCard({
               S/ {room.price_per_night}
             </p>
           </div>
-          {/* Etiqueta Destacada */}
           <div className="absolute top-4 left-4 z-20">
             <span className="bg-[#700824] text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] shadow-lg">
               Exclusivo
@@ -599,9 +588,7 @@ function RoomCard({
           </div>
         </div>
 
-        {/* CONTENIDO */}
         <div className="p-8 flex flex-col flex-grow">
-          {/* Título */}
           <div className="flex justify-between items-start mb-3">
             <h3 className="text-2xl font-serif font-bold text-rose-950 leading-tight group-hover:text-rose-700 transition-colors">
               {room.name}
@@ -617,12 +604,10 @@ function RoomCard({
             </div>
           </div>
 
-          {/* DESCRIPCIÓN SENCILLA (SIN FLORO) */}
           <p className="text-stone-500 text-sm mb-6 leading-relaxed font-light line-clamp-3">
             {simpleDesc}
           </p>
 
-          {/* Servicios Reales (Etiquetas Claras) */}
           <div className="grid grid-cols-2 gap-3 mb-8">
             <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
               <Wifi size={14} className="text-rose-900" />
@@ -648,7 +633,6 @@ function RoomCard({
             </div>
           </div>
 
-          {/* Botón de Acción */}
           <div className="mt-auto pt-4 border-t border-stone-100">
             <button
               onClick={() => setShowModal(true)}
@@ -683,7 +667,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // --- ESTADOS DE FECHAS (BUSCADOR) ---
   const [globalCheckIn, setGlobalCheckIn] = useState("");
   const [globalCheckOut, setGlobalCheckOut] = useState("");
   const today = new Date().toISOString().split("T")[0];
@@ -853,7 +836,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* --- MENÚ MÓVIL --- */}
         <div
           className={`fixed inset-0 bg-white z-[105] flex flex-col justify-center items-center transition-all duration-300 ${
             isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
@@ -958,9 +940,7 @@ export default function Home() {
             contemporáneo.{" "}
           </p>
 
-          {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
           <div className="bg-white p-2 rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-stone-100 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-100">
-            {/* CAMPO LLEGADA */}
             <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group">
               <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-rose-900 transition">
                 Check-in
@@ -981,7 +961,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* CAMPO SALIDA */}
             <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group">
               <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-rose-900 transition">
                 Check-out
@@ -1001,7 +980,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* BOTÓN BUSCAR */}
             <div className="p-2 w-full md:w-auto">
               <a
                 href="#habitaciones"
@@ -1020,23 +998,39 @@ export default function Home() {
         </div>
       </section>
 
+      {/* --- SECCIÓN SERVICIOS ACTUALIZADA --- */}
       <section id="servicios" className="py-20 relative z-10 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
+              icon: "🚗",
+              title: "Cochera Privada",
+              desc: "Estacionamiento seguro para tu vehículo.",
+            },
+            {
               icon: "☕",
-              title: "Desayuno Local",
-              desc: "Pan chapla, quesos y café.",
+              title: "Desayunos",
+              desc: "Disfruta de desayunos regionales.",
             },
             {
-              icon: "📡",
-              title: "Wi-Fi Veloz",
-              desc: "Conexión de alta velocidad.",
+              icon: "🛎️",
+              title: "Room Service",
+              desc: "Atención a la habitación para tu comodidad.",
             },
             {
-              icon: "🚕",
+              icon: "🧺",
+              title: "Lavandería",
+              desc: "Servicio de lavado y secado disponible.",
+            },
+            {
+              icon: "✈️",
               title: "Traslados",
-              desc: "Coordinación de tours y taxis.",
+              desc: "Recojo del aeropuerto previa coordinación.",
+            },
+            {
+              icon: "🗺️",
+              title: "Tours Garantizados",
+              desc: "Agencias aliadas seguras (previa coordinación).",
             },
           ].map((item, idx) => (
             <div
