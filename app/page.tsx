@@ -16,9 +16,10 @@ import {
   LogIn,
   LogOut,
   User,
-  Phone, // <--- Icono para celular
-  Globe, // <--- Icono para país
-  Calendar, // <--- Icono para fechas
+  Phone,
+  Globe,
+  Calendar,
+  Search, // <--- Nuevo icono para el botón de buscar
 } from "lucide-react";
 
 // --- AUTH MODAL (SIN CAMBIOS) ---
@@ -197,27 +198,40 @@ function AuthModal({
   );
 }
 
-// --- BOOKING MODAL (NUEVO COMPONENTE CON EL FORMULARIO DETALLADO) ---
+// --- BOOKING MODAL ---
 function BookingModal({
   isOpen,
   onClose,
   room,
   onRequireAuth,
+  defaultCheckIn, // <--- Recibe fecha seleccionada
+  defaultCheckOut, // <--- Recibe fecha seleccionada
 }: {
   isOpen: boolean;
   onClose: () => void;
   room: any;
   onRequireAuth: (callback: () => void) => void;
+  defaultCheckIn: string;
+  defaultCheckOut: string;
 }) {
   const router = useRouter();
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
+
+  // Inicializamos con las fechas que vienen del buscador
+  const [checkIn, setCheckIn] = useState(defaultCheckIn || "");
+  const [checkOut, setCheckOut] = useState(defaultCheckOut || "");
+
   const [totalPrice, setTotalPrice] = useState(room.price_per_night);
   const [nights, setNights] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [docType, setDocType] = useState("DNI");
 
   const today = new Date().toISOString().split("T")[0];
+
+  // Actualizamos si cambian los props (cuando el usuario filtra afuera)
+  useEffect(() => {
+    if (defaultCheckIn) setCheckIn(defaultCheckIn);
+    if (defaultCheckOut) setCheckOut(defaultCheckOut);
+  }, [defaultCheckIn, defaultCheckOut]);
 
   useEffect(() => {
     if (checkIn && checkOut) {
@@ -291,7 +305,6 @@ function BookingModal({
     } = await supabase.auth.getUser();
 
     if (!user) {
-      // Pasamos una función anónima que recibirá el callback después
       onRequireAuth(() => executeBooking(formData));
       setIsSubmitting(false);
     } else {
@@ -302,7 +315,7 @@ function BookingModal({
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200">
       <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
-        {/* Lado Izquierdo: Resumen (Visible en Desktop) */}
+        {/* Lado Izquierdo */}
         <div className="hidden md:block w-1/3 bg-stone-100 p-8 relative overflow-hidden">
           <div className="absolute inset-0 bg-rose-900/10 mix-blend-multiply"></div>
           <img
@@ -333,7 +346,7 @@ function BookingModal({
           </div>
         </div>
 
-        {/* Lado Derecho: Formulario Completo */}
+        {/* Lado Derecho */}
         <div className="flex-1 p-8 md:p-10 overflow-y-auto relative">
           <button
             onClick={onClose}
@@ -351,7 +364,7 @@ function BookingModal({
             <input type="hidden" name="roomId" value={room.firstAvailableId} />
             <input type="hidden" name="price" value={totalPrice} />
 
-            {/* FECHAS */}
+            {/* FECHAS (PRECARGADAS) */}
             <div className="grid grid-cols-2 gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-100">
               <div>
                 <label className="text-[10px] font-bold text-stone-400 uppercase ml-1">
@@ -362,6 +375,7 @@ function BookingModal({
                   name="checkIn"
                   required
                   min={today}
+                  value={checkIn} // Vinculado al estado
                   onChange={(e) => setCheckIn(e.target.value)}
                   className="w-full bg-transparent text-sm font-bold text-stone-800 outline-none mt-1"
                 />
@@ -375,6 +389,7 @@ function BookingModal({
                   name="checkOut"
                   required
                   min={checkIn || today}
+                  value={checkOut} // Vinculado al estado
                   onChange={(e) => setCheckOut(e.target.value)}
                   className="w-full bg-transparent text-sm font-bold text-stone-800 outline-none mt-1"
                 />
@@ -406,7 +421,6 @@ function BookingModal({
               </div>
             </div>
 
-            {/* DATOS PERSONALES */}
             <input
               type="text"
               name="name"
@@ -422,7 +436,6 @@ function BookingModal({
               className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
             />
 
-            {/* NUEVOS CAMPOS: PAÍS Y CELULAR */}
             <div className="grid grid-cols-2 gap-3">
               <div className="relative">
                 <Globe
@@ -460,7 +473,6 @@ function BookingModal({
               </div>
             </div>
 
-            {/* PAGO */}
             <div className="relative">
               <select
                 name="paymentMethod"
@@ -483,7 +495,6 @@ function BookingModal({
               </div>
             </div>
 
-            {/* RESUMEN MOVIL */}
             <div className="md:hidden flex justify-between items-center text-xs font-bold text-stone-500 border-t pt-2">
               <span>Total ({nights} noches):</span>
               <span className="text-lg text-[#700824]">S/ {totalPrice}</span>
@@ -518,13 +529,17 @@ interface Room {
   room_number: string;
 }
 
-// --- ROOM CARD (SIMPLIFICADA) ---
+// --- ROOM CARD (RECIBE FECHAS GLOBALES) ---
 function RoomCard({
   room,
   onRequireAuth,
+  globalCheckIn,
+  globalCheckOut,
 }: {
   room: any;
   onRequireAuth: (callback: () => void) => void;
+  globalCheckIn: string;
+  globalCheckOut: string;
 }) {
   const [showModal, setShowModal] = useState(false);
 
@@ -557,13 +572,11 @@ function RoomCard({
             {room.name}
           </h3>
 
-          {/* DESCRIPCIÓN VISIBLE AHORA */}
           <p className="text-stone-500 text-sm mb-6 leading-relaxed font-light line-clamp-3">
             {room.description ||
               "Disfruta de una experiencia inolvidable con todas las comodidades."}
           </p>
 
-          {/* ICONOS */}
           <div className="flex gap-4 mb-8 border-t border-stone-100 pt-4">
             <div className="flex flex-col items-center gap-1">
               <div className="bg-rose-50 p-2 rounded-full text-rose-800">
@@ -610,24 +623,29 @@ function RoomCard({
         </div>
       </div>
 
-      {/* MODAL DE RESERVA DETALLADA */}
       <BookingModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         room={room}
         onRequireAuth={onRequireAuth}
+        defaultCheckIn={globalCheckIn} // <--- Pasa las fechas
+        defaultCheckOut={globalCheckOut} // <--- Pasa las fechas
       />
     </>
   );
 }
 
-// --- HOME (SIN CAMBIOS ESTRUCTURALES) ---
+// --- HOME ---
 export default function Home() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // --- ESTADOS DE AUTENTICACIÓN ---
+  // --- ESTADOS DE FECHAS (BUSCADOR) ---
+  const [globalCheckIn, setGlobalCheckIn] = useState("");
+  const [globalCheckOut, setGlobalCheckOut] = useState("");
+  const today = new Date().toISOString().split("T")[0];
+
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [pendingBookingAction, setPendingBookingAction] = useState<
@@ -835,9 +853,7 @@ export default function Home() {
             >
               Contacto
             </a>
-
             <div className="w-16 h-px bg-stone-200 my-4"></div>
-
             {currentUser ? (
               <div className="flex flex-col items-center gap-4">
                 <a
@@ -867,7 +883,6 @@ export default function Home() {
                 <LogIn size={24} /> Iniciar Sesión
               </button>
             )}
-
             <a
               href="#habitaciones"
               onClick={closeMenu}
@@ -879,7 +894,6 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* --- SECCIONES WEB --- */}
       <section
         id="inicio"
         className="relative pt-48 pb-24 lg:pt-56 lg:pb-32 overflow-hidden z-10 px-4 text-center"
@@ -898,24 +912,51 @@ export default function Home() {
             Un refugio donde la historia colonial se encuentra con el confort
             contemporáneo.{" "}
           </p>
-          <div className="flex flex-col md:flex-row justify-center gap-4">
+
+          {/* --- BUSCADOR DE FECHAS (NUEVO) --- */}
+          <div className="bg-white p-4 rounded-[2rem] shadow-xl max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-4 border border-stone-100 mb-8">
+            <div className="flex items-center gap-4 w-full md:w-auto flex-grow px-2">
+              <div className="flex flex-col items-start w-full">
+                <label className="text-[10px] font-bold text-stone-400 uppercase ml-2 mb-1">
+                  Llegada
+                </label>
+                <div className="flex items-center bg-stone-50 rounded-xl px-4 py-3 w-full border border-stone-200">
+                  <Calendar size={18} className="text-rose-700 mr-2" />
+                  <input
+                    type="date"
+                    min={today}
+                    value={globalCheckIn}
+                    onChange={(e) => setGlobalCheckIn(e.target.value)}
+                    className="bg-transparent outline-none text-sm font-bold w-full text-stone-700"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col items-start w-full">
+                <label className="text-[10px] font-bold text-stone-400 uppercase ml-2 mb-1">
+                  Salida
+                </label>
+                <div className="flex items-center bg-stone-50 rounded-xl px-4 py-3 w-full border border-stone-200">
+                  <Calendar size={18} className="text-rose-700 mr-2" />
+                  <input
+                    type="date"
+                    min={globalCheckIn || today}
+                    value={globalCheckOut}
+                    onChange={(e) => setGlobalCheckOut(e.target.value)}
+                    className="bg-transparent outline-none text-sm font-bold w-full text-stone-700"
+                  />
+                </div>
+              </div>
+            </div>
             <a
               href="#habitaciones"
-              className="px-8 py-4 bg-rose-900 text-white rounded-xl font-bold hover:bg-rose-800 shadow-xl transition"
+              className="bg-[#700824] text-white p-4 rounded-xl shadow-lg hover:bg-black transition-all w-full md:w-auto flex justify-center"
             >
-              {" "}
-              Ver Habitaciones{" "}
-            </a>
-            <a
-              href="#contacto"
-              className="px-8 py-4 bg-white text-stone-800 border border-stone-200 rounded-xl font-bold hover:bg-stone-50 transition shadow-sm"
-            >
-              {" "}
-              Contáctanos{" "}
+              <Search size={24} />
             </a>
           </div>
         </div>
       </section>
+
       <section id="servicios" className="py-20 relative z-10 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
@@ -951,6 +992,7 @@ export default function Home() {
           ))}
         </div>
       </section>
+
       <section id="habitaciones" className="py-20 relative z-10 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -969,11 +1011,14 @@ export default function Home() {
                 key={room.name}
                 room={room}
                 onRequireAuth={triggerAuthFlow}
+                globalCheckIn={globalCheckIn} // <--- Pasa datos
+                globalCheckOut={globalCheckOut} // <--- Pasa datos
               />
             ))}
           </div>
         </div>
       </section>
+
       <section id="ubicacion" className="py-20 bg-white relative z-10 px-4">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div>
@@ -1018,6 +1063,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
       <section
         id="contacto"
         className="py-24 bg-[#700824]/90 relative overflow-hidden z-10 px-4"
@@ -1107,6 +1153,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
       <footer className="bg-stone-900 text-stone-400 py-12 text-sm relative z-10 px-4 text-center md:text-left">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
