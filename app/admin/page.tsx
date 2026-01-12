@@ -24,6 +24,7 @@ import {
   Phone,
   MapPin,
   Mail,
+  FileText, // <--- Agregado para el documento
 } from "lucide-react";
 
 // --- ACCIONES DE SERVIDOR ---
@@ -67,36 +68,32 @@ const formatTicket = (id: number) => {
 export default async function AdminPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  // 1. Corrección CRÍTICA para Next.js 15: Esperar los parámetros
+  // 1. Esperamos los parámetros (Corrección Next.js 15)
   const searchParams = await props.searchParams;
 
   const today = new Date().toISOString().split("T")[0];
-
-  // 2. Leemos las fechas (Si no existen, usa hoy)
   const dateFrom = searchParams.from || today;
   const dateTo = searchParams.to || today;
 
-  // Referencia para los KPIs superiores (usa la fecha 'Desde')
+  // Fecha referencia para KPIs
   const filterDate = dateFrom;
 
-  // 3. Carga de datos
+  // 2. Carga de datos
   const { data: rooms } = await supabase.from("rooms").select("*").order("id");
   const { data: allBookings } = await supabase
     .from("bookings")
     .select("*")
     .order("created_at", { ascending: false });
 
-  // 4. LÓGICA DE FILTRADO ROBUSTA
-  // Comparamos solo la parte de la fecha YYYY-MM-DD para evitar errores de horas
+  // 3. Filtro por Rango de Fechas
   const filteredBookings = allBookings?.filter((b) => {
-    // Aseguramos que sea string y tomamos los primeros 10 caracteres (la fecha)
     const checkInDate = b.check_in
       ? b.check_in.toString().substring(0, 10)
       : "";
     return checkInDate >= dateFrom && checkInDate <= dateTo;
   });
 
-  // --- KPIs y Lógica Auxiliar ---
+  // --- LÓGICA DE KPIs ---
   const occupiedCount =
     allBookings?.filter(
       (b) =>
@@ -131,8 +128,6 @@ export default async function AdminPage(props: {
     .filter((b) => b.payment_method === "online")
     .reduce((acc, b) => acc + (b.total_price || 0), 0);
 
-  const getRoomName = (id: number) =>
-    rooms?.find((r) => r.id === id)?.name || "Habitación";
   const getRoomNumber = (id: number) => {
     const r = rooms?.find((r) => r.id === id);
     return r?.room_number || r?.id || "#";
@@ -161,7 +156,7 @@ export default async function AdminPage(props: {
   return (
     <div className="min-h-screen bg-[#F5F5F4] text-stone-800 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* HEADER CON FILTRO FUNCIONAL */}
+        {/* HEADER CON FILTRO QUE FUNCIONA (method="get") */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100">
           <div className="flex items-center gap-4">
             <div className="bg-rose-900 text-white p-3 rounded-2xl shadow-lg shadow-rose-200">
@@ -178,7 +173,6 @@ export default async function AdminPage(props: {
           </div>
 
           <div className="flex gap-4 items-end">
-            {/* IMPORTANTE: method="get" envía los datos a la URL */}
             <form className="flex items-end gap-2" method="get">
               <div className="flex flex-col gap-1">
                 <label className="text-[9px] font-black uppercase text-stone-400 ml-2">
@@ -213,7 +207,7 @@ export default async function AdminPage(props: {
           </div>
         </div>
 
-        {/* INDICADOR DE LIMPIEZA DINÁMICO */}
+        {/* INDICADOR DE LIMPIEZA */}
         {cleaningList.length > 0 && (
           <div className="mb-6 bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center gap-3">
@@ -233,7 +227,7 @@ export default async function AdminPage(props: {
           </div>
         )}
 
-        {/* KPIs OPERATIVOS */}
+        {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-stone-900 text-white p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
             <TrendingUp
@@ -263,7 +257,6 @@ export default async function AdminPage(props: {
               </div>
             </div>
           </div>
-
           <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100 flex items-center gap-4">
             <div className="p-4 bg-purple-50 text-purple-600 rounded-2xl">
               <LogIn size={30} />
@@ -275,7 +268,6 @@ export default async function AdminPage(props: {
               <p className="text-3xl font-black">{arrivalsCount}</p>
             </div>
           </div>
-
           <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100 flex items-center gap-4">
             <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl">
               <BedDouble size={30} />
@@ -302,7 +294,6 @@ export default async function AdminPage(props: {
               const info = getRoomStatus(room.id);
               const isOccupied = info.status === "occupied";
               const isCheckout = info.status === "checkout";
-
               return (
                 <div
                   key={room.id}
@@ -354,7 +345,7 @@ export default async function AdminPage(props: {
           </div>
         </section>
 
-        {/* TABLA DE RESERVAS (HISTORIAL DE INGRESOS) */}
+        {/* TABLA DE RESERVAS (TODAS LAS COLUMNAS RESTAURADAS) */}
         <section className="bg-white rounded-[2.5rem] shadow-xl border border-stone-100 overflow-hidden mb-10">
           <div className="p-8 border-b border-stone-50 flex justify-between items-center bg-white">
             <div>
@@ -371,8 +362,10 @@ export default async function AdminPage(props: {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] bg-stone-50/50">
-                  <th className="py-4 px-6">Ticket ID</th>
-                  <th className="py-4 px-6">Huésped & Contacto</th>
+                  <th className="py-4 px-6">Ticket</th>
+                  <th className="py-4 px-6">Huésped</th>
+                  <th className="py-4 px-4">Documento</th>
+                  <th className="py-4 px-4">Origen/Cel</th>
                   <th className="py-4 px-4 text-center">Noches</th>
                   <th className="py-4 px-4 text-center">Hab</th>
                   <th className="py-4 px-4">Estancia</th>
@@ -392,32 +385,62 @@ export default async function AdminPage(props: {
                       key={booking.id}
                       className="border-b border-stone-50 hover:bg-rose-50/20 transition-colors group"
                     >
+                      {/* ID / TICKET */}
                       <td className="py-5 px-6 font-mono font-black text-rose-900 text-[11px]">
                         #{formatTicket(booking.id)}
                       </td>
+
+                      {/* HUÉSPED */}
                       <td className="py-5 px-6">
                         <div className="font-black text-stone-800 uppercase text-[11px] mb-1">
                           {booking.client_name}
                         </div>
-                        <div className="flex flex-col gap-1 text-[10px] font-bold text-stone-500">
-                          <span className="flex items-center gap-1.5 text-emerald-700">
-                            <Phone size={10} /> {booking.client_phone || "S/N"}
+                        <div className="flex items-center gap-1 text-[10px] text-blue-500 lowercase">
+                          <Mail size={10} /> {booking.client_email || "-"}
+                        </div>
+                      </td>
+
+                      {/* DOCUMENTO (RESTAURADO) */}
+                      <td className="py-5 px-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-bold text-stone-600 uppercase flex items-center gap-1">
+                            <FileText size={10} />{" "}
+                            {booking.document_type || "DOC"}
                           </span>
-                          <span className="flex items-center gap-1.5 text-blue-600 lowercase font-medium">
-                            <Mail size={10} /> {booking.client_email || "S/E"}
+                          <span className="text-[11px] font-black text-stone-800">
+                            {booking.document_number || "---"}
                           </span>
                         </div>
                       </td>
+
+                      {/* PAÍS Y CELULAR (RESTAURADO) */}
+                      <td className="py-5 px-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-bold text-stone-500 flex items-center gap-1 uppercase">
+                            <MapPin size={10} />{" "}
+                            {booking.client_country || "Perú"}
+                          </span>
+                          <span className="text-[10px] font-black text-emerald-700 flex items-center gap-1">
+                            <Phone size={10} /> {booking.client_phone || "S/N"}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* NOCHES */}
                       <td className="py-5 px-4 text-center">
                         <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-black text-[10px] border border-blue-100">
                           {noches} {noches === 1 ? "Día" : "Días"}
                         </span>
                       </td>
+
+                      {/* HABITACIÓN */}
                       <td className="py-5 px-4 text-center">
                         <span className="font-black text-stone-800">
                           #{getRoomNumber(booking.room_id)}
                         </span>
                       </td>
+
+                      {/* ESTANCIA */}
                       <td className="py-5 px-4">
                         <div className="flex flex-col font-bold text-[9px] uppercase tracking-tighter">
                           <span className="text-emerald-600">
@@ -428,9 +451,13 @@ export default async function AdminPage(props: {
                           </span>
                         </div>
                       </td>
+
+                      {/* TOTAL */}
                       <td className="py-5 px-4 text-right font-black text-stone-900">
                         {formatMoney(booking.total_price)}
                       </td>
+
+                      {/* ESTADO */}
                       <td className="py-5 px-4 text-center">
                         <span
                           className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${
@@ -446,6 +473,8 @@ export default async function AdminPage(props: {
                             : "Pendiente"}
                         </span>
                       </td>
+
+                      {/* BOTONES */}
                       <td className="py-5 px-8 text-center">
                         <div className="flex gap-2 justify-center">
                           {booking.status !== "pagado" &&
@@ -460,7 +489,7 @@ export default async function AdminPage(props: {
                                   type="submit"
                                   className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white rounded-xl font-bold text-[9px] uppercase hover:bg-emerald-700"
                                 >
-                                  <DollarSign size={12} /> Cobrar
+                                  <DollarSign size={12} />
                                 </button>
                               </form>
                             )}
@@ -474,7 +503,7 @@ export default async function AdminPage(props: {
                               type="submit"
                               className="flex items-center gap-1 px-3 py-1.5 bg-white border border-stone-200 text-stone-400 rounded-xl font-bold text-[9px] uppercase hover:border-rose-200 hover:text-rose-600"
                             >
-                              <X size={12} /> Anular
+                              <X size={12} />
                             </button>
                           </form>
                         </div>
@@ -486,8 +515,7 @@ export default async function AdminPage(props: {
             </table>
             {filteredBookings?.length === 0 && (
               <div className="p-12 text-center text-stone-400 italic text-sm">
-                No se encontraron reservas que ingresen entre el {dateFrom} y el{" "}
-                {dateTo}.
+                No se encontraron reservas en este rango de fechas.
               </div>
             )}
           </div>
