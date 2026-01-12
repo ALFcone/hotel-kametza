@@ -21,6 +21,12 @@ import {
   Calendar,
   Search,
   CalendarDays,
+  Car, // Para cochera
+  Coffee, // Para desayuno
+  Bell, // Para room service
+  Shirt, // Para lavandería
+  Plane, // Para traslados
+  Map, // Para tours
 } from "lucide-react";
 
 // --- FUNCIÓN DE DESCRIPCIONES SENCILLAS ---
@@ -999,58 +1005,142 @@ export default function Home() {
       </section>
 
       {/* --- SECCIÓN SERVICIOS ACTUALIZADA --- */}
-      <section id="servicios" className="py-20 relative z-10 px-4">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              icon: "🚗",
-              title: "Cochera Privada",
-              desc: "Estacionamiento seguro para tu vehículo.",
-            },
-            {
-              icon: "☕",
-              title: "Desayunos",
-              desc: "Disfruta de desayunos regionales.",
-            },
-            {
-              icon: "🛎️",
-              title: "Room Service",
-              desc: "Atención a la habitación para tu comodidad.",
-            },
-            {
-              icon: "🧺",
-              title: "Lavandería",
-              desc: "Servicio de lavado y secado disponible.",
-            },
-            {
-              icon: "✈️",
-              title: "Traslados",
-              desc: "Recojo del aeropuerto previa coordinación.",
-            },
-            {
-              icon: "🗺️",
-              title: "Tours Garantizados",
-              desc: "Agencias aliadas seguras (previa coordinación).",
-            },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="p-8 rounded-3xl bg-white border border-stone-100 shadow-xl shadow-stone-200/50 hover:-translate-y-1 transition duration-300"
-            >
-              <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-2xl mb-6 text-rose-700">
-                {" "}
-                {item.icon}{" "}
+      {/* --- SECCIÓN SERVICIOS: ESTILO BENTO GRID --- */}
+      <section id="servicios" className="py-24 bg-stone-50 relative z-10 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-rose-700 font-bold tracking-widest text-xs uppercase bg-rose-50 px-4 py-2 rounded-full border border-rose-100">
+              Experiencia Kametza
+            </span>
+            <h2 className="text-4xl md:text-5xl font-serif font-medium text-rose-950 mt-4">
+              Mucho más que <br /> solo descansar
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[250px]">
+            {/* 1. COCHERA (Tarjeta Grande con Foto) */}
+            <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500 cursor-default">
+              <img
+                src="https://images.unsplash.com/photo-1506521781263-d8422e82f27a?q=80&w=2070&auto=format&fit=crop"
+                alt="Cochera"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 p-8">
+                <div className="flex items-center gap-3 mb-2 text-rose-400">
+                  <Car size={24} />
+                  <span className="text-xs font-bold uppercase tracking-wider">
+                    Gratuito
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-1">
+                  Cochera Privada
+                </h3>
+                <p className="text-stone-300 text-sm font-light">
+                  Estacionamiento seguro 24/7 dentro de nuestras instalaciones.
+                </p>
               </div>
-              <h3 className="text-xl font-serif font-bold mb-3 text-rose-950">
-                {" "}
-                {item.title}{" "}
-              </h3>
-              <p className="text-stone-500 text-sm leading-relaxed">
-                {" "}
-                {item.desc}{" "}
-              </p>
             </div>
-          ))}
+
+            {/* 2. DESAYUNOS (Tarjeta Vertical) */}
+            <div className="group relative lg:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500 bg-[#700824]">
+              <img
+                src="https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=2070&auto=format&fit=crop"
+                alt="Desayuno"
+                className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition duration-700 group-hover:scale-110"
+              />
+              <div className="relative h-full flex flex-col justify-end p-8 z-10">
+                <div className="bg-white/10 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center mb-4 text-white">
+                  <Coffee size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Desayuno Regional
+                </h3>
+                <p className="text-rose-100 text-sm leading-relaxed">
+                  Empieza el día con el aroma del café ayacuchano y nuestro
+                  famoso pan chapla recién horneado.
+                </p>
+              </div>
+            </div>
+
+            {/* 3. ROOM SERVICE (Tarjeta Simple Elegante) */}
+            <div className="group bg-white rounded-[2rem] p-8 flex flex-col justify-between shadow-sm border border-stone-100 hover:border-rose-200 transition duration-300">
+              <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-700 group-hover:scale-110 transition">
+                <Bell size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-stone-800 mb-1">
+                  Room Service
+                </h3>
+                <p className="text-stone-500 text-xs">
+                  Atención a la habitación para tu máxima comodidad y
+                  privacidad.
+                </p>
+              </div>
+            </div>
+
+            {/* 4. LAVANDERÍA (Tarjeta Simple Elegante) */}
+            <div className="group bg-white rounded-[2rem] p-8 flex flex-col justify-between shadow-sm border border-stone-100 hover:border-rose-200 transition duration-300">
+              <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-700 group-hover:scale-110 transition">
+                <Shirt size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-stone-800 mb-1">
+                  Lavandería
+                </h3>
+                <p className="text-stone-500 text-xs">
+                  Servicio de lavado y secado rápido para que viajes ligero.
+                </p>
+              </div>
+            </div>
+
+            {/* 5. TRASLADOS (Tarjeta con Foto) */}
+            <div className="group relative rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500">
+              <img
+                src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop"
+                alt="Traslados"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition"></div>
+              <div className="absolute bottom-0 left-0 p-6 w-full">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Traslados</h3>
+                    <p className="text-stone-200 text-xs">Aeropuerto - Hotel</p>
+                  </div>
+                  <Plane size={24} className="text-white opacity-80" />
+                </div>
+              </div>
+            </div>
+
+            {/* 6. TOURS (Tarjeta Grande final) */}
+            <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500 cursor-pointer">
+              <img
+                src="https://images.unsplash.com/photo-1526392060635-9d6019884377?q=80&w=2070&auto=format&fit=crop"
+                alt="Tours"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#700824]/90 to-transparent"></div>
+              <div className="absolute inset-0 p-8 flex flex-col justify-center max-w-xs">
+                <div className="flex items-center gap-2 text-amber-400 mb-3">
+                  <Map size={20} />
+                  <span className="text-[10px] font-black uppercase tracking-widest">
+                    Empresas Garantizadas
+                  </span>
+                </div>
+                <h3 className="text-3xl font-serif font-medium text-white mb-2">
+                  Descubre Ayacucho
+                </h3>
+                <p className="text-stone-200 text-sm mb-6">
+                  Coordinamos tus tours a las aguas turquesas, iglesias y
+                  miradores con agencias de total confianza.
+                </p>
+                <span className="inline-flex items-center gap-2 text-white font-bold text-sm group-hover:gap-4 transition-all">
+                  Coordinar Tour <ArrowRight size={16} />
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
