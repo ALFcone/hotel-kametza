@@ -19,7 +19,8 @@ import {
   Phone,
   Globe,
   Calendar,
-  Search, // <--- Nuevo icono para el botón de buscar
+  Search,
+  CalendarDays, // <--- Icono nuevo para estética
 } from "lucide-react";
 
 // --- AUTH MODAL (SIN CAMBIOS) ---
@@ -204,8 +205,8 @@ function BookingModal({
   onClose,
   room,
   onRequireAuth,
-  defaultCheckIn, // <--- Recibe fecha seleccionada
-  defaultCheckOut, // <--- Recibe fecha seleccionada
+  defaultCheckIn,
+  defaultCheckOut,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -216,7 +217,6 @@ function BookingModal({
 }) {
   const router = useRouter();
 
-  // Inicializamos con las fechas que vienen del buscador
   const [checkIn, setCheckIn] = useState(defaultCheckIn || "");
   const [checkOut, setCheckOut] = useState(defaultCheckOut || "");
 
@@ -227,7 +227,6 @@ function BookingModal({
 
   const today = new Date().toISOString().split("T")[0];
 
-  // Actualizamos si cambian los props (cuando el usuario filtra afuera)
   useEffect(() => {
     if (defaultCheckIn) setCheckIn(defaultCheckIn);
     if (defaultCheckOut) setCheckOut(defaultCheckOut);
@@ -364,7 +363,6 @@ function BookingModal({
             <input type="hidden" name="roomId" value={room.firstAvailableId} />
             <input type="hidden" name="price" value={totalPrice} />
 
-            {/* FECHAS (PRECARGADAS) */}
             <div className="grid grid-cols-2 gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-100">
               <div>
                 <label className="text-[10px] font-bold text-stone-400 uppercase ml-1">
@@ -375,7 +373,7 @@ function BookingModal({
                   name="checkIn"
                   required
                   min={today}
-                  value={checkIn} // Vinculado al estado
+                  value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
                   className="w-full bg-transparent text-sm font-bold text-stone-800 outline-none mt-1"
                 />
@@ -389,14 +387,13 @@ function BookingModal({
                   name="checkOut"
                   required
                   min={checkIn || today}
-                  value={checkOut} // Vinculado al estado
+                  value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
                   className="w-full bg-transparent text-sm font-bold text-stone-800 outline-none mt-1"
                 />
               </div>
             </div>
 
-            {/* DOCUMENTOS */}
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-1">
                 <select
@@ -529,7 +526,7 @@ interface Room {
   room_number: string;
 }
 
-// --- ROOM CARD (RECIBE FECHAS GLOBALES) ---
+// --- ROOM CARD ---
 function RoomCard({
   room,
   onRequireAuth,
@@ -628,8 +625,8 @@ function RoomCard({
         onClose={() => setShowModal(false)}
         room={room}
         onRequireAuth={onRequireAuth}
-        defaultCheckIn={globalCheckIn} // <--- Pasa las fechas
-        defaultCheckOut={globalCheckOut} // <--- Pasa las fechas
+        defaultCheckIn={globalCheckIn}
+        defaultCheckOut={globalCheckOut}
       />
     </>
   );
@@ -913,46 +910,64 @@ export default function Home() {
             contemporáneo.{" "}
           </p>
 
-          {/* --- BUSCADOR DE FECHAS (NUEVO) --- */}
-          <div className="bg-white p-4 rounded-[2rem] shadow-xl max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-4 border border-stone-100 mb-8">
-            <div className="flex items-center gap-4 w-full md:w-auto flex-grow px-2">
-              <div className="flex flex-col items-start w-full">
-                <label className="text-[10px] font-bold text-stone-400 uppercase ml-2 mb-1">
-                  Llegada
-                </label>
-                <div className="flex items-center bg-stone-50 rounded-xl px-4 py-3 w-full border border-stone-200">
-                  <Calendar size={18} className="text-rose-700 mr-2" />
-                  <input
-                    type="date"
-                    min={today}
-                    value={globalCheckIn}
-                    onChange={(e) => setGlobalCheckIn(e.target.value)}
-                    className="bg-transparent outline-none text-sm font-bold w-full text-stone-700"
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col items-start w-full">
-                <label className="text-[10px] font-bold text-stone-400 uppercase ml-2 mb-1">
-                  Salida
-                </label>
-                <div className="flex items-center bg-stone-50 rounded-xl px-4 py-3 w-full border border-stone-200">
-                  <Calendar size={18} className="text-rose-700 mr-2" />
-                  <input
-                    type="date"
-                    min={globalCheckIn || today}
-                    value={globalCheckOut}
-                    onChange={(e) => setGlobalCheckOut(e.target.value)}
-                    className="bg-transparent outline-none text-sm font-bold w-full text-stone-700"
-                  />
-                </div>
+          {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
+          <div className="bg-white p-2 rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-stone-100 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-100">
+            {/* CAMPO LLEGADA */}
+            <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group">
+              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-rose-900 transition">
+                Check-in
+              </label>
+              <div className="flex items-center w-full">
+                <CalendarDays
+                  size={18}
+                  className="text-stone-300 mr-3 group-hover:text-rose-700 transition"
+                />
+                <input
+                  type="date"
+                  min={today}
+                  value={globalCheckIn}
+                  onChange={(e) => setGlobalCheckIn(e.target.value)}
+                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer placeholder-stone-300"
+                  placeholder="Agrega fechas"
+                />
               </div>
             </div>
-            <a
-              href="#habitaciones"
-              className="bg-[#700824] text-white p-4 rounded-xl shadow-lg hover:bg-black transition-all w-full md:w-auto flex justify-center"
-            >
-              <Search size={24} />
-            </a>
+
+            {/* CAMPO SALIDA */}
+            <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group">
+              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-rose-900 transition">
+                Check-out
+              </label>
+              <div className="flex items-center w-full">
+                <CalendarDays
+                  size={18}
+                  className="text-stone-300 mr-3 group-hover:text-rose-700 transition"
+                />
+                <input
+                  type="date"
+                  min={globalCheckIn || today}
+                  value={globalCheckOut}
+                  onChange={(e) => setGlobalCheckOut(e.target.value)}
+                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* BOTÓN BUSCAR */}
+            <div className="p-2 w-full md:w-auto">
+              <a
+                href="#habitaciones"
+                className="bg-[#700824] text-white px-8 py-4 rounded-full shadow-lg hover:bg-black transition-all w-full flex items-center justify-center gap-2 group"
+              >
+                <Search
+                  size={20}
+                  className="group-hover:scale-110 transition"
+                />
+                <span className="font-bold text-xs uppercase tracking-widest">
+                  Buscar Disponibilidad
+                </span>
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -1011,8 +1026,8 @@ export default function Home() {
                 key={room.name}
                 room={room}
                 onRequireAuth={triggerAuthFlow}
-                globalCheckIn={globalCheckIn} // <--- Pasa datos
-                globalCheckOut={globalCheckOut} // <--- Pasa datos
+                globalCheckIn={globalCheckIn}
+                globalCheckOut={globalCheckOut}
               />
             ))}
           </div>
