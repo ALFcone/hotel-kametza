@@ -23,6 +23,31 @@ import {
   CalendarDays,
 } from "lucide-react";
 
+// --- FUNCIÓN AUXILIAR PARA MEJORAR DESCRIPCIONES (MARKETING) ---
+// Esta función detecta el nombre de la habitación y devuelve un texto vendedor
+// ignorando la descripción básica de la base de datos si encuentra coincidencia.
+function getMarketingDescription(name: string, originalDesc: string) {
+  const n = name.toLowerCase();
+
+  if (n.includes("simple") || n.includes("individual")) {
+    return "Tu refugio personal de confort. Disfruta de una cama de 2 plazas premium ideal para el viajero independiente, con baño privado impecable, agua caliente y la privacidad que mereces para un descanso reparador.";
+  }
+  if (n.includes("matrimonial") || n.includes("queen") || n.includes("king")) {
+    return "La escapada perfecta en pareja. Relájate en una amplia cama Queen con sábanas de algodón, ambiente cálido con iluminación suave y todos los detalles pensados para una estancia romántica e inolvidable.";
+  }
+  if (n.includes("doble") || n.includes("twin")) {
+    return "Comparte sin sacrificar comodidad. Dos camas ergonómicas independientes en un ambiente espacioso, ideal para amigos o colegas que buscan descanso y funcionalidad con WiFi de alta velocidad.";
+  }
+  if (n.includes("triple") || n.includes("familiar")) {
+    return "Espacio y calidez para todos. La opción ideal para familias o grupos, con tres camas distribuidas para maximizar el confort, garantizando seguridad y agua caliente las 24 horas.";
+  }
+
+  // Si no coincide con ninguna, usa la descripción original de la BD pero mejorada si es muy corta
+  return originalDesc.length > 20
+    ? originalDesc
+    : "Disfruta de una estancia inolvidable con todas las comodidades modernas, limpieza impecable y la mejor atención de Ayacucho.";
+}
+
 // --- AUTH MODAL ---
 function AuthModal({
   isOpen,
@@ -311,6 +336,9 @@ function BookingModal({
     }
   };
 
+  // Usamos la función de marketing para el modal también
+  const marketingDesc = getMarketingDescription(room.name, room.description);
+
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200">
       <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
@@ -328,9 +356,8 @@ function BookingModal({
                 {room.name}
               </h3>
               <p className="text-xs text-stone-600 font-medium line-clamp-4">
-                {/* AQUI TAMBIEN SE MEJORA EL TEXTO POR SI NO HAY DATA */}
-                {room.description ||
-                  "Relájate en un espacio diseñado para tu máximo bienestar. Disfruta de camas premium con sábanas de algodón, iluminación cálida y una atmósfera de paz absoluta."}
+                {/* APLICAMOS LA DESCRIPCIÓN DE MARKETING AQUÍ */}
+                {marketingDesc}
               </p>
             </div>
             <div className="bg-white/90 backdrop-blur p-4 rounded-2xl shadow-lg">
@@ -542,6 +569,9 @@ function RoomCard({
 }) {
   const [showModal, setShowModal] = useState(false);
 
+  // USAMOS LA FUNCIÓN PARA OBTENER EL TEXTO DE MARKETING EN VEZ DEL BÁSICO
+  const marketingDesc = getMarketingDescription(room.name, room.description);
+
   return (
     <>
       <div className="group bg-white rounded-[2.5rem] shadow-lg hover:shadow-[0_20px_40px_rgba(112,8,36,0.15)] transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full relative">
@@ -588,13 +618,12 @@ function RoomCard({
             </div>
           </div>
 
-          {/* MEJORA 1: Descripción por defecto más atractiva */}
+          {/* DESCRIPCIÓN REEMPLAZADA POR LA DE MARKETING */}
           <p className="text-stone-500 text-sm mb-6 leading-relaxed font-light line-clamp-3">
-            {room.description ||
-              "Relájate en un espacio diseñado para tu máximo bienestar. Disfruta de camas premium con sábanas de algodón, iluminación cálida y una atmósfera de paz absoluta. El equilibrio ideal entre la elegancia moderna y la hospitalidad ayacuchana."}
+            {marketingDesc}
           </p>
 
-          {/* MEJORA 2: Textos de los íconos (amenities) más llamativos */}
+          {/* Servicios Reales (Etiquetas Claras) */}
           <div className="grid grid-cols-2 gap-3 mb-8">
             <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
               <Wifi size={14} className="text-rose-900" />
