@@ -1005,7 +1005,6 @@ export default function Home() {
       </section>
 
       {/* --- SECCIÓN SERVICIOS ACTUALIZADA --- */}
-      {/* --- SECCIÓN SERVICIOS: ESTILO BENTO GRID --- */}
       <section id="servicios" className="py-24 bg-stone-50 relative z-10 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -1021,7 +1020,7 @@ export default function Home() {
             {/* 1. COCHERA (Tarjeta Grande con Foto) */}
             <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500 cursor-default">
               <img
-                src="https://images.unsplash.com/photo-1506521781263-d8422e82f27a?q=80&w=2070&auto=format&fit=crop"
+                src=""
                 alt="Cochera"
                 className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
               />
@@ -1045,7 +1044,7 @@ export default function Home() {
             {/* 2. DESAYUNOS (Tarjeta Vertical) */}
             <div className="group relative lg:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500 bg-[#700824]">
               <img
-                src="https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=2070&auto=format&fit=crop"
+                src=""
                 alt="Desayuno"
                 className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition duration-700 group-hover:scale-110"
               />
@@ -1097,7 +1096,7 @@ export default function Home() {
             {/* 5. TRASLADOS (Tarjeta con Foto) */}
             <div className="group relative rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500">
               <img
-                src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop"
+                src=""
                 alt="Traslados"
                 className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
               />
@@ -1116,7 +1115,7 @@ export default function Home() {
             {/* 6. TOURS (Tarjeta Grande final) */}
             <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition duration-500 cursor-pointer">
               <img
-                src="https://images.unsplash.com/photo-1526392060635-9d6019884377?q=80&w=2070&auto=format&fit=crop"
+                src=""
                 alt="Tours"
                 className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
               />
