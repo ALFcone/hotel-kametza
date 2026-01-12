@@ -328,7 +328,9 @@ function BookingModal({
                 {room.name}
               </h3>
               <p className="text-xs text-stone-600 font-medium line-clamp-4">
-                {room.description}
+                {/* AQUI TAMBIEN SE MEJORA EL TEXTO POR SI NO HAY DATA */}
+                {room.description ||
+                  "Relájate en un espacio diseñado para tu máximo bienestar. Disfruta de camas premium con sábanas de algodón, iluminación cálida y una atmósfera de paz absoluta."}
               </p>
             </div>
             <div className="bg-white/90 backdrop-blur p-4 rounded-2xl shadow-lg">
@@ -586,13 +588,13 @@ function RoomCard({
             </div>
           </div>
 
-          {/* Descripción Realista */}
+          {/* MEJORA 1: Descripción por defecto más atractiva */}
           <p className="text-stone-500 text-sm mb-6 leading-relaxed font-light line-clamp-3">
             {room.description ||
-              "Descansa en un ambiente seguro y confortable. Incluye cama ergonómica, limpieza diaria impecable y atención personalizada las 24 horas."}
+              "Relájate en un espacio diseñado para tu máximo bienestar. Disfruta de camas premium con sábanas de algodón, iluminación cálida y una atmósfera de paz absoluta. El equilibrio ideal entre la elegancia moderna y la hospitalidad ayacuchana."}
           </p>
 
-          {/* Servicios Reales (Etiquetas Claras) */}
+          {/* MEJORA 2: Textos de los íconos (amenities) más llamativos */}
           <div className="grid grid-cols-2 gap-3 mb-8">
             <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
               <Wifi size={14} className="text-rose-900" />
@@ -603,19 +605,19 @@ function RoomCard({
             <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
               <Clock size={14} className="text-rose-900" />
               <span className="text-[10px] font-bold uppercase">
-                Agua Caliente 24h
+                Ducha Caliente 24h
               </span>
             </div>
             <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
               <Tv size={14} className="text-rose-900" />
               <span className="text-[10px] font-bold uppercase">
-                Smart TV Cable
+                Smart TV / Netflix
               </span>
             </div>
             <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
               <Users size={14} className="text-rose-900" />
               <span className="text-[10px] font-bold uppercase">
-                Baño Privado
+                Baño Privado Impecable
               </span>
             </div>
           </div>
@@ -1000,7 +1002,11 @@ export default function Home() {
               title: "Desayuno Local",
               desc: "Pan chapla, quesos y café.",
             },
-            { icon: "📡", title: "Wi-Fi Veloz", desc: "Fibra óptica ideal." },
+            {
+              icon: "📡",
+              title: "Wi-Fi Veloz",
+              desc: "Conexión de alta velocidad.",
+            },
             {
               icon: "🚕",
               title: "Traslados",
