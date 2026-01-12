@@ -24,7 +24,7 @@ import {
   Phone,
   MapPin,
   Mail,
-  FileText, // <--- Agregado para el documento
+  FileText,
 } from "lucide-react";
 
 // --- ACCIONES DE SERVIDOR ---
@@ -68,24 +68,21 @@ const formatTicket = (id: number) => {
 export default async function AdminPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  // 1. Esperamos los parámetros (Corrección Next.js 15)
   const searchParams = await props.searchParams;
 
   const today = new Date().toISOString().split("T")[0];
   const dateFrom = searchParams.from || today;
   const dateTo = searchParams.to || today;
 
-  // Fecha referencia para KPIs
   const filterDate = dateFrom;
 
-  // 2. Carga de datos
   const { data: rooms } = await supabase.from("rooms").select("*").order("id");
   const { data: allBookings } = await supabase
     .from("bookings")
     .select("*")
     .order("created_at", { ascending: false });
 
-  // 3. Filtro por Rango de Fechas
+  // Filtro por Rango
   const filteredBookings = allBookings?.filter((b) => {
     const checkInDate = b.check_in
       ? b.check_in.toString().substring(0, 10)
@@ -93,7 +90,7 @@ export default async function AdminPage(props: {
     return checkInDate >= dateFrom && checkInDate <= dateTo;
   });
 
-  // --- LÓGICA DE KPIs ---
+  // KPIs
   const occupiedCount =
     allBookings?.filter(
       (b) =>
@@ -102,13 +99,10 @@ export default async function AdminPage(props: {
         b.check_in <= filterDate &&
         b.check_out > filterDate
     ).length || 0;
-
   const arrivalsCount =
     allBookings?.filter((b) => b.check_in === filterDate).length || 0;
-
   const cleaningList =
     allBookings?.filter((b) => b.check_out === filterDate) || [];
-
   const salesOnDate =
     allBookings?.filter(
       (b) =>
@@ -116,7 +110,6 @@ export default async function AdminPage(props: {
         b.created_at.startsWith(filterDate) &&
         (b.status === "pagado" || b.status === "approved")
     ) || [];
-
   const totalIncome = salesOnDate.reduce(
     (acc, b) => acc + (b.total_price || 0),
     0
@@ -128,10 +121,10 @@ export default async function AdminPage(props: {
     .filter((b) => b.payment_method === "online")
     .reduce((acc, b) => acc + (b.total_price || 0), 0);
 
-  const getRoomNumber = (id: number) => {
-    const r = rooms?.find((r) => r.id === id);
-    return r?.room_number || r?.id || "#";
-  };
+  const getRoomNumber = (id: number) =>
+    rooms?.find((r) => r.id === id)?.room_number ||
+    rooms?.find((r) => r.id === id)?.id ||
+    "#";
 
   const getRoomStatus = (roomId: number) => {
     const leaving = allBookings?.find(
@@ -156,7 +149,7 @@ export default async function AdminPage(props: {
   return (
     <div className="min-h-screen bg-[#F5F5F4] text-stone-800 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* HEADER CON FILTRO QUE FUNCIONA (method="get") */}
+        {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100">
           <div className="flex items-center gap-4">
             <div className="bg-rose-900 text-white p-3 rounded-2xl shadow-lg shadow-rose-200">
@@ -171,7 +164,6 @@ export default async function AdminPage(props: {
               </p>
             </div>
           </div>
-
           <div className="flex gap-4 items-end">
             <form className="flex items-end gap-2" method="get">
               <div className="flex flex-col gap-1">
@@ -207,7 +199,7 @@ export default async function AdminPage(props: {
           </div>
         </div>
 
-        {/* INDICADOR DE LIMPIEZA */}
+        {/* INDICADOR LIMPIEZA */}
         {cleaningList.length > 0 && (
           <div className="mb-6 bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center gap-3">
@@ -281,7 +273,7 @@ export default async function AdminPage(props: {
           </div>
         </div>
 
-        {/* MAPA DE HABITACIONES */}
+        {/* MAPA HABITACIONES */}
         <section className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <div className="h-1 w-10 bg-rose-600 rounded-full"></div>
@@ -345,7 +337,7 @@ export default async function AdminPage(props: {
           </div>
         </section>
 
-        {/* TABLA DE RESERVAS (TODAS LAS COLUMNAS RESTAURADAS) */}
+        {/* TABLA DE RESERVAS COMPLETA */}
         <section className="bg-white rounded-[2.5rem] shadow-xl border border-stone-100 overflow-hidden mb-10">
           <div className="p-8 border-b border-stone-50 flex justify-between items-center bg-white">
             <div>
@@ -362,8 +354,8 @@ export default async function AdminPage(props: {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] bg-stone-50/50">
-                  <th className="py-4 px-6">Ticket</th>
-                  <th className="py-4 px-6">Huésped</th>
+                  <th className="py-4 px-6">ID / Ticket</th>
+                  <th className="py-4 px-6">Huésped & Contacto</th>
                   <th className="py-4 px-4">Documento</th>
                   <th className="py-4 px-4">Origen/Cel</th>
                   <th className="py-4 px-4 text-center">Noches</th>
@@ -385,9 +377,14 @@ export default async function AdminPage(props: {
                       key={booking.id}
                       className="border-b border-stone-50 hover:bg-rose-50/20 transition-colors group"
                     >
-                      {/* ID / TICKET */}
-                      <td className="py-5 px-6 font-mono font-black text-rose-900 text-[11px]">
-                        #{formatTicket(booking.id)}
+                      {/* ID + TICKET (CORREGIDO) */}
+                      <td className="py-5 px-6">
+                        <div className="font-mono text-[10px] text-stone-400">
+                          SYS-{booking.id}
+                        </div>
+                        <div className="font-black text-rose-900 text-[11px]">
+                          RES-{formatTicket(booking.id)}
+                        </div>
                       </td>
 
                       {/* HUÉSPED */}
@@ -400,7 +397,7 @@ export default async function AdminPage(props: {
                         </div>
                       </td>
 
-                      {/* DOCUMENTO (RESTAURADO) */}
+                      {/* DOCUMENTO */}
                       <td className="py-5 px-4">
                         <div className="flex flex-col gap-1">
                           <span className="text-[10px] font-bold text-stone-600 uppercase flex items-center gap-1">
@@ -413,7 +410,7 @@ export default async function AdminPage(props: {
                         </div>
                       </td>
 
-                      {/* PAÍS Y CELULAR (RESTAURADO) */}
+                      {/* PAÍS Y CELULAR */}
                       <td className="py-5 px-4">
                         <div className="flex flex-col gap-1">
                           <span className="text-[10px] font-bold text-stone-500 flex items-center gap-1 uppercase">
@@ -515,7 +512,7 @@ export default async function AdminPage(props: {
             </table>
             {filteredBookings?.length === 0 && (
               <div className="p-12 text-center text-stone-400 italic text-sm">
-                No se encontraron reservas en este rango de fechas.
+                No se encontraron reservas.
               </div>
             )}
           </div>
