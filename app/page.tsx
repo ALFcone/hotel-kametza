@@ -932,20 +932,19 @@ export default function Home() {
         className="relative pt-48 pb-24 lg:pt-56 lg:pb-32 overflow-hidden z-10 px-4 text-center"
       >
         <div className="max-w-7xl mx-auto relative">
-          {/* ETIQUETA ESTILO RETABLO AYACUCHANO (SIN IMAGEN, SOLO CÓDIGO) */}
-          {/* 1. Contenedor exterior: Crea el borde colorido usando un fondo degradado y padding */}
-          <span className="inline-block p-[4px] rounded-full bg-[conic-gradient(at_top,_#D92525,_#FFD700,_#FF1493,_#00A86B,_#1E90FF,_#D92525)] mb-8 shadow-[0_4px_15px_rgba(217,37,37,0.3)] hover:shadow-[0_6px_20px_rgba(217,37,37,0.5)] transition-all hover:scale-105 cursor-default">
-            {/* 2. Contenedor interior: El fondo blanco que hace que el texto resalte */}
-            <span className="block px-8 py-2.5 rounded-full bg-white relative overflow-hidden">
-              {/* (Opcional) Un toque de "brillo" decorativo en el fondo */}
-              <span className="absolute inset-0 bg-gradient-to-tr from-yellow-100/50 to-transparent opacity-50"></span>
+          {/* ETIQUETA ELEGANTE Y PROFESIONAL (Minimalista) */}
+          <div className="flex items-center justify-center gap-4 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+            {/* Línea decorativa izquierda */}
+            <div className="h-[1px] w-8 md:w-16 bg-stone-400"></div>
 
-              {/* 3. El Texto: Colorido con degradado y estilo audaz */}
-              <span className="relative z-10 text-sm md:text-base font-black tracking-[0.25em] uppercase bg-gradient-to-r from-[#D92525] via-[#FF1493] via-[#FFD700] to-[#00A86B] bg-clip-text text-transparent drop-shadow-sm">
-                Ayacucho, Perú
-              </span>
+            {/* Texto Principal */}
+            <span className="text-lg md:text-xl font-serif font-medium text-stone-800 tracking-[0.35em] uppercase">
+              Ayacucho, Perú
             </span>
-          </span>
+
+            {/* Línea decorativa derecha */}
+            <div className="h-[1px] w-8 md:w-16 bg-stone-400"></div>
+          </div>
           <h1 className="text-5xl md:text-7xl font-serif font-medium mb-6 text-rose-950 tracking-tight leading-tight">
             {" "}
             Descubre la magia <br /> de los Andes{" "}
