@@ -21,9 +21,9 @@ import {
   Coins,
   LayoutDashboard,
   Filter,
-  Phone, // <--- Agregado
-  MapPin, // <--- Agregado
-  Mail, // <--- Agregado
+  Phone,
+  MapPin,
+  Mail,
 } from "lucide-react";
 
 // --- ACCIONES DE SERVIDOR ---
@@ -72,7 +72,8 @@ export default async function AdminPage(props: any) {
   // --- LÓGICA DE RANGO DE FECHAS ---
   const dateFrom = searchParams?.from || today;
   const dateTo = searchParams?.to || today;
-  // Usamos dateFrom como referencia para los KPIs de "un solo día" para mantener estructura
+
+  // Para los KPIs de arriba usamos la fecha de inicio como referencia
   const filterDate = dateFrom;
 
   const { data: rooms } = await supabase.from("rooms").select("*").order("id");
@@ -86,7 +87,7 @@ export default async function AdminPage(props: any) {
     return b.check_in >= dateFrom && b.check_in <= dateTo;
   });
 
-  // 1. ESTADÍSTICAS OPERATIVAS (Mantenemos lógica original basada en filterDate)
+  // 1. ESTADÍSTICAS OPERATIVAS (Basadas en filterDate / fecha inicio)
   const occupiedCount =
     allBookings?.filter(
       (b) =>
@@ -100,7 +101,7 @@ export default async function AdminPage(props: any) {
   const cleaningList =
     allBookings?.filter((b) => b.check_out === filterDate) || [];
 
-  // 2. CIERRE DE CAJA (Ventas realizadas en la fecha del filtro)
+  // 2. CIERRE DE CAJA (Ventas realizadas en la fecha de inicio)
   const salesOnDate =
     allBookings?.filter(
       (b) =>
@@ -150,7 +151,7 @@ export default async function AdminPage(props: any) {
   return (
     <div className="min-h-screen bg-[#F5F5F4] text-stone-800 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* HEADER CON NUEVO FILTRO DE RANGO */}
+        {/* HEADER CON FILTRO DE RANGO (CORREGIDO CON METHOD=GET) */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100">
           <div className="flex items-center gap-4">
             <div className="bg-rose-900 text-white p-3 rounded-2xl shadow-lg shadow-rose-200">
@@ -167,8 +168,8 @@ export default async function AdminPage(props: any) {
           </div>
 
           <div className="flex gap-4 items-end">
-            {/* Formulario de Rango */}
-            <form className="flex items-end gap-2">
+            {/* --- AQUÍ ESTÁ LA CORRECCIÓN: method="get" --- */}
+            <form className="flex items-end gap-2" method="get">
               <div className="flex flex-col gap-1">
                 <label className="text-[9px] font-black uppercase text-stone-400 ml-2">
                   Desde
@@ -231,7 +232,7 @@ export default async function AdminPage(props: any) {
               size={80}
             />
             <p className="text-stone-400 text-[10px] font-bold uppercase tracking-widest mb-1">
-              Ventas: {filterDate}
+              Ventas del día: {filterDate}
             </p>
             <p className="text-4xl font-black">{formatMoney(totalIncome)}</p>
             <div className="flex gap-4 mt-4 border-t border-white/10 pt-4">
@@ -260,7 +261,7 @@ export default async function AdminPage(props: any) {
             </div>
             <div>
               <p className="text-stone-400 text-[10px] font-black uppercase tracking-widest">
-                Llegadas Hoy
+                Llegadas ({filterDate})
               </p>
               <p className="text-3xl font-black">{arrivalsCount}</p>
             </div>
@@ -493,7 +494,7 @@ export default async function AdminPage(props: any) {
           </div>
         </section>
 
-        {/* GESTIÓN DE HABITACIONES (INVENTARIO) - MANTENIDO */}
+        {/* GESTIÓN DE HABITACIONES (INVENTARIO) */}
         <section>
           <div className="flex items-center gap-2 mb-6">
             <div className="h-1 w-10 bg-stone-800 rounded-full"></div>
