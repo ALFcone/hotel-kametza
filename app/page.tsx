@@ -16,7 +16,6 @@ import {
   LogIn,
   LogOut,
   User,
-  Phone,
   Globe,
   Calendar,
   Search,
@@ -27,6 +26,11 @@ import {
   Shirt, // Para lavandería
   Plane, // Para traslados
   Map, // Para tours
+  Home as HomeIcon, // Alias para el icono de casa
+  Bed, // Para Habitaciones
+  Sparkles, // Para Servicios
+  MapPin, // Para Ubicación
+  Phone, // Para Contacto
 } from "lucide-react";
 
 // --- FUNCIÓN DE DESCRIPCIONES SENCILLAS ---
@@ -772,25 +776,33 @@ export default function Home() {
                 />
               </a>
             </div>
-            <div className="hidden md:flex space-x-8 text-sm font-medium text-stone-600 items-center">
-              <a href="#inicio" className="hover:text-rose-800 transition">
-                Inicio
-              </a>
-              <a
-                href="#habitaciones"
-                className="hover:text-rose-800 transition"
-              >
-                Habitaciones
-              </a>
-              <a href="#servicios" className="hover:text-rose-800 transition">
-                Servicios
-              </a>
-              <a href="#ubicacion" className="hover:text-rose-800 transition">
-                Ubicación
-              </a>
-              <a href="#contacto" className="hover:text-rose-800 transition">
-                Contacto
-              </a>
+            {/* --- MENÚ DE NAVEGACIÓN PROFESIONAL (DESKTOP) --- */}
+            <div className="hidden md:flex items-center gap-1">
+              {[
+                { name: "Inicio", href: "#inicio", icon: HomeIcon },
+                { name: "Habitaciones", href: "#habitaciones", icon: Bed },
+                { name: "Servicios", href: "#servicios", icon: Sparkles },
+                { name: "Ubicación", href: "#ubicacion", icon: MapPin },
+                { name: "Contacto", href: "#contacto", icon: Phone },
+              ].map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-500 hover:text-rose-900 transition-colors duration-300"
+                >
+                  {/* Icono: Sube ligeramente y cambia de color al pasar el mouse */}
+                  <item.icon
+                    size={14}
+                    className="text-stone-400 group-hover:text-rose-700 group-hover:-translate-y-0.5 transition-all duration-300"
+                  />
+
+                  {/* Texto del enlace */}
+                  {item.name}
+
+                  {/* Línea decorativa inferior (Animación elegante) */}
+                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-rose-900/50 -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
+                </a>
+              ))}
             </div>
             <div className="hidden md:flex items-center gap-4">
               {currentUser ? (
