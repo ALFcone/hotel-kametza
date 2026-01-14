@@ -776,7 +776,7 @@ export default function Home() {
                 />
               </a>
             </div>
-            {/* --- MENÚ DE NAVEGACIÓN PROFESIONAL (DESKTOP) --- */}
+            {/* --- MENÚ DE NAVEGACIÓN (ICONOS CON COLOR DE MARCA) --- */}
             <div className="hidden md:flex items-center gap-1">
               {[
                 { name: "Inicio", href: "#inicio", icon: HomeIcon },
@@ -788,19 +788,18 @@ export default function Home() {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-500 hover:text-rose-900 transition-colors duration-300"
+                  className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-600 hover:text-[#700824] transition-colors duration-300"
                 >
-                  {/* Icono: Sube ligeramente y cambia de color al pasar el mouse */}
+                  {/* ICONO: Ahora tiene el color de la marca (#700824) siempre visible */}
                   <item.icon
-                    size={14}
-                    className="text-stone-400 group-hover:text-rose-700 group-hover:-translate-y-0.5 transition-all duration-300"
+                    size={16}
+                    className="text-[#700824] group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 drop-shadow-sm"
                   />
 
-                  {/* Texto del enlace */}
                   {item.name}
 
-                  {/* Línea decorativa inferior (Animación elegante) */}
-                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-rose-900/50 -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
+                  {/* Línea decorativa */}
+                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-[#700824] -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
                 </a>
               ))}
             </div>
@@ -831,16 +830,22 @@ export default function Home() {
                   </button>
                 </div>
               ) : (
+                /* BOTÓN ACCEDER MEJORADO */
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="text-xs font-bold text-stone-500 hover:text-stone-900 flex items-center gap-1"
+                  className="group flex items-center gap-2 bg-stone-50 border border-stone-200 hover:border-[#700824]/30 hover:bg-rose-50 text-stone-600 hover:text-[#700824] px-5 py-2.5 rounded-full transition-all duration-300 text-[11px] font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
                 >
-                  <LogIn size={14} /> Acceder
+                  <div className="bg-white p-1 rounded-full group-hover:scale-110 transition-transform">
+                    <LogIn size={14} className="text-[#700824]" />
+                  </div>
+                  Acceder
                 </button>
               )}
+
+              {/* BOTÓN RESERVAR (Se mantiene igual, para referencia) */}
               <a
                 href="#habitaciones"
-                className="bg-rose-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-rose-800 transition shadow-lg"
+                className="bg-[#700824] text-white px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-rose-900/40 transform hover:-translate-y-0.5"
               >
                 Reservar
               </a>
