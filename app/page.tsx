@@ -395,6 +395,9 @@ function BookingModal({
           </h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {/* --- SOLUCIÓN DEFINITIVA: ENVIAR ID DE USUARIO EXPLÍCITAMENTE --- */}
+            <input type="hidden" name="userId" value={currentUser?.id || ""} />
+
             <input type="hidden" name="roomId" value={room.firstAvailableId} />
             <input type="hidden" name="price" value={totalPrice} />
 

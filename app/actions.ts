@@ -46,14 +46,24 @@ export async function createBooking(formData: FormData) {
   const documentType = formData.get("documentType") as string;
   const documentNumber = formData.get("documentNumber") as string;
 
-  // --- NUEVO: Capturar Celular y País ---
+  // --- Capturar Celular y País ---
   const phone = formData.get("phone") as string;
   const country = formData.get("country") as string;
 
-  // 1. Obtener usuario
+  // --- CORRECCIÓN: Capturar el ID que viene del formulario ---
+  const userIdFromForm = formData.get("userId") as string;
+
+  // 1. Intentar obtener usuario desde el servidor (Cookie)
   const user = await getUser();
 
-  // 2. Verificar disponibilidad
+  // 2. Lógica de Respaldo: Si falla la cookie, usamos el del formulario
+  const finalUserId = user
+    ? user.id
+    : userIdFromForm && userIdFromForm !== "undefined" && userIdFromForm !== ""
+    ? userIdFromForm
+    : null;
+
+  // 3. Verificar disponibilidad
   const { data: isAvailable } = await supabase.rpc("check_availability", {
     room_id_input: Number(roomId),
     check_in_input: checkIn,
@@ -64,15 +74,15 @@ export async function createBooking(formData: FormData) {
     return { error: "Fechas ocupadas. Por favor elige otras." };
   }
 
-  // 3. Crear reserva (GUARDANDO TODOS LOS DATOS)
+  // 4. Crear reserva (USANDO finalUserId)
   const { data: booking, error } = await supabase
     .from("bookings")
     .insert({
       room_id: Number(roomId),
       client_name: name,
       client_email: email,
-      client_phone: phone, // <--- Guardamos celular
-      client_country: country, // <--- Guardamos país
+      client_phone: phone,
+      client_country: country,
       check_in: checkIn,
       check_out: checkOut,
       total_price: Number(price),
@@ -80,7 +90,7 @@ export async function createBooking(formData: FormData) {
       status: "pendiente",
       document_type: documentType,
       document_number: documentNumber,
-      user_id: user ? user.id : null,
+      user_id: finalUserId, // <--- AQUÍ ESTÁ LA CORRECCIÓN
     })
     .select()
     .single();
@@ -90,7 +100,7 @@ export async function createBooking(formData: FormData) {
     return { error: "Error interno al guardar la reserva." };
   }
 
-  // 4. MERCADO PAGO
+  // 5. MERCADO PAGO
   if (paymentMethod === "online") {
     try {
       const preference = new Preference(client);
@@ -134,7 +144,7 @@ export async function createBooking(formData: FormData) {
     }
   }
 
-  // 5. MÉTODOS MANUALES
+  // 6. MÉTODOS MANUALES
   return {
     success: true,
     url: `/exito?method=${paymentMethod}&amount=${price}&id=${booking.id}`,
@@ -145,11 +155,9 @@ export async function createBooking(formData: FormData) {
 export async function updateRoom(formData: FormData) {
   const roomId = formData.get("roomId");
   const price = formData.get("price");
-
-  // --- NUEVO: Capturamos la descripción ---
   const description = formData.get("description");
 
-  // Manejo de imagen (si se sube una nueva)
+  // Manejo de imagen
   const imageFile = formData.get("image") as File;
   let imageUrlToUpdate = null;
 
@@ -167,17 +175,17 @@ export async function updateRoom(formData: FormData) {
     }
   }
 
-  // Preparamos los datos para actualizar
+  // Preparamos los datos
   const updateData: any = {
     price_per_night: Number(price),
-    description: description, // <--- Guardamos la descripción
+    description: description,
   };
 
   if (imageUrlToUpdate) {
     updateData.image_url = imageUrlToUpdate;
   }
 
-  // Ejecutamos la actualización en Supabase
+  // Actualizar
   await supabase.from("rooms").update(updateData).eq("id", roomId);
 
   revalidatePath("/admin");
