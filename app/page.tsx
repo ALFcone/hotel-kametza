@@ -20,17 +20,17 @@ import {
   Calendar,
   Search,
   CalendarDays,
-  Car, // Para cochera
-  Coffee, // Para desayuno
-  Bell, // Para room service
-  Shirt, // Para lavandería
-  Plane, // Para traslados
-  Map, // Para tours
-  Home as HomeIcon, // Alias para el icono de casa
-  Bed, // Para Habitaciones
-  Sparkles, // Para Servicios
-  MapPin, // Para Ubicación
-  Phone, // Para Contacto
+  Car,
+  Coffee,
+  Bell,
+  Shirt,
+  Plane,
+  Map,
+  Home as HomeIcon,
+  Bed,
+  Sparkles,
+  MapPin,
+  Phone,
 } from "lucide-react";
 
 // --- FUNCIÓN DE DESCRIPCIONES SENCILLAS ---
@@ -739,10 +739,13 @@ export default function Home() {
   });
   const groupedRooms = Object.values(roomTypes);
 
+  // Lógica para obtener solo el primer nombre (Más elegante)
+  const rawName =
+    currentUser?.user_metadata?.full_name || currentUser?.email || "Invitado";
+  const firstName = rawName.split(" ")[0]; // Toma solo la primera palabra
+  // Capitalizar (Primera mayúscula, resto minúscula)
   const userName =
-    currentUser?.user_metadata?.full_name ||
-    currentUser?.email?.split("@")[0] ||
-    "Cliente";
+    firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
 
   if (loading)
     return (
@@ -752,18 +755,27 @@ export default function Home() {
     );
 
   return (
-    <div className="min-h-screen font-sans text-stone-800 bg-[#FDFBF7] selection:bg-rose-200 selection:text-rose-900">
+    <div className="min-h-screen font-sans text-stone-800 selection:bg-rose-200 selection:text-rose-900 relative">
+      {/* --- FONDO DE RETABLO AYACUCHANO (PROFESIONAL CON EFECTO VIDRIO) --- */}
+      <div className="fixed inset-0 z-0">
+        {/* IMAGEN DE FONDO (Reemplaza src con tu foto real) */}
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/8/86/Retablo_ayacuchano.jpg"
+          alt="Fondo Textura Retablo"
+          className="w-full h-full object-cover object-center scale-105"
+        />
+        {/* EL FILTRO DE LUJO (Marfil al 90% para que sea profesional y legible) */}
+        <div className="absolute inset-0 bg-[#FFFDF5]/90 backdrop-blur-[2px]"></div>
+        {/* Decoración sutil de fondo */}
+        <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#FFFDF5] to-transparent"></div>
+      </div>
+
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         onSuccess={handleLoginSuccess}
       />
 
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(#d6d3d1_1px,transparent_1px)] [background-size:20px_20px] opacity-30"></div>
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-200/30 rounded-full blur-[100px] mix-blend-multiply animate-pulse-slow"></div>
-        <div className="absolute top-[40%] right-0 w-[600px] h-[600px] bg-rose-200/20 rounded-full blur-[120px] mix-blend-multiply"></div>
-      </div>
       <nav className="fixed top-0 w-full bg-white z-[100] shadow-2xl border-b border-stone-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24 md:h-32">
@@ -776,7 +788,8 @@ export default function Home() {
                 />
               </a>
             </div>
-            {/* --- MENÚ DE NAVEGACIÓN (ICONOS CON COLOR DE MARCA) --- */}
+
+            {/* --- MENÚ DE NAVEGACIÓN PROFESIONAL (ICONOS CON COLOR DE MARCA) --- */}
             <div className="hidden md:flex items-center gap-1">
               {[
                 { name: "Inicio", href: "#inicio", icon: HomeIcon },
@@ -790,47 +803,49 @@ export default function Home() {
                   href={item.href}
                   className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-600 hover:text-[#700824] transition-colors duration-300"
                 >
-                  {/* ICONO: Ahora tiene el color de la marca (#700824) siempre visible */}
                   <item.icon
                     size={16}
                     className="text-[#700824] group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 drop-shadow-sm"
                   />
-
                   {item.name}
-
-                  {/* Línea decorativa */}
                   <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-[#700824] -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
                 </a>
               ))}
             </div>
+
             <div className="hidden md:flex items-center gap-4">
               {currentUser ? (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   {currentUser.user_metadata?.role === "admin" && (
                     <a
                       href="/admin"
-                      className="text-[10px] font-black bg-black text-white px-3 py-1 rounded-lg hover:bg-rose-900 transition"
+                      className="text-[10px] font-black bg-stone-900 text-white px-3 py-1.5 rounded-lg hover:bg-rose-900 transition tracking-widest uppercase"
                     >
-                      PANEL
+                      Panel
                     </a>
                   )}
+                  {/* BOTÓN DE USUARIO MINIMALISTA */}
                   <a
                     href="/dashboard"
-                    className="text-xs font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-full hover:bg-rose-100 transition"
+                    className="group flex items-center gap-2 text-stone-600 hover:text-[#700824] transition-colors duration-300"
                   >
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>{" "}
-                    Hola, {userName}
+                    <div className="p-1.5 rounded-full border border-stone-200 group-hover:border-[#700824] transition-colors">
+                      <User size={16} strokeWidth={1.5} />
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-widest">
+                      {userName}
+                    </span>
                   </a>
                   <button
                     onClick={handleLogout}
                     title="Cerrar Sesión"
-                    className="p-1.5 rounded-full bg-stone-100 text-stone-400 hover:bg-rose-100 hover:text-rose-600 transition"
+                    className="text-stone-300 hover:text-rose-600 transition-colors"
                   >
-                    <LogOut size={16} />
+                    <LogOut size={18} strokeWidth={1.5} />
                   </button>
                 </div>
               ) : (
-                /* BOTÓN ACCEDER MEJORADO */
+                /* BOTÓN ACCEDER ESTILO CÁPSULA */
                 <button
                   onClick={() => setShowAuthModal(true)}
                   className="group flex items-center gap-2 bg-stone-50 border border-stone-200 hover:border-[#700824]/30 hover:bg-rose-50 text-stone-600 hover:text-[#700824] px-5 py-2.5 rounded-full transition-all duration-300 text-[11px] font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
@@ -841,8 +856,6 @@ export default function Home() {
                   Acceder
                 </button>
               )}
-
-              {/* BOTÓN RESERVAR (Se mantiene igual, para referencia) */}
               <a
                 href="#habitaciones"
                 className="bg-[#700824] text-white px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-rose-900/40 transform hover:-translate-y-0.5"
@@ -859,6 +872,7 @@ export default function Home() {
           </div>
         </div>
 
+        {/* --- MENÚ MÓVIL --- */}
         <div
           className={`fixed inset-0 bg-white z-[105] flex flex-col justify-center items-center transition-all duration-300 ${
             isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
@@ -904,21 +918,32 @@ export default function Home() {
             <div className="w-16 h-px bg-stone-200 my-4"></div>
 
             {currentUser ? (
-              <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center gap-6 animate-in slide-in-from-bottom-4 duration-500">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="p-3 rounded-full border-2 border-[#700824]/20 bg-rose-50 text-[#700824]">
+                    <User size={24} strokeWidth={1.5} />
+                  </div>
+                  <span className="text-sm font-bold uppercase tracking-widest text-stone-800">
+                    {userName}
+                  </span>
+                </div>
+
                 <a
                   href="/dashboard"
-                  className="text-sm font-bold text-rose-900 flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-full hover:bg-rose-100 transition"
+                  onClick={closeMenu}
+                  className="text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-[#700824] transition-colors"
                 >
-                  <User size={16} /> Hola, {userName}
+                  Ir al Panel
                 </a>
+
                 <button
                   onClick={() => {
                     handleLogout();
                     closeMenu();
                   }}
-                  className="text-stone-400 hover:text-rose-600 flex items-center gap-2 font-bold text-sm"
+                  className="flex items-center gap-2 text-stone-400 hover:text-red-600 transition-colors text-xs font-bold uppercase tracking-widest mt-2"
                 >
-                  <LogOut size={18} /> Cerrar Sesión
+                  <LogOut size={16} /> Cerrar Sesión
                 </button>
               </div>
             ) : (
@@ -951,15 +976,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto relative">
           {/* ETIQUETA ELEGANTE Y PROFESIONAL (Minimalista) */}
           <div className="flex items-center justify-center gap-4 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-            {/* Línea decorativa izquierda */}
             <div className="h-[1px] w-8 md:w-16 bg-stone-400"></div>
-
-            {/* Texto Principal */}
             <span className="text-lg md:text-xl font-serif font-medium text-stone-800 tracking-[0.35em] uppercase">
               Ayacucho, Perú
             </span>
-
-            {/* Línea decorativa derecha */}
             <div className="h-[1px] w-8 md:w-16 bg-stone-400"></div>
           </div>
           <h1 className="text-5xl md:text-7xl font-serif font-medium mb-6 text-rose-950 tracking-tight leading-tight">
@@ -972,6 +992,7 @@ export default function Home() {
             contemporáneo.{" "}
           </p>
 
+          {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
           <div className="bg-white p-2 rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-stone-100 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-100">
             <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group">
               <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-rose-900 transition">
@@ -1030,8 +1051,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- SECCIÓN SERVICIOS ACTUALIZADA --- */}
-
+      {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
       <section id="servicios" className="py-24 relative z-10 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -1044,7 +1064,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[250px]">
-            {/* 1. COCHERA (Tarjeta Grande Horizontal) */}
+            {/* 1. COCHERA */}
             <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-default">
               <img
                 src=""
@@ -1069,7 +1089,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 2. DESAYUNOS (Tarjeta Alta Vertical) */}
+            {/* 2. DESAYUNOS */}
             <div className="group relative lg:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 bg-[#700824]">
               <img
                 src=""
@@ -1091,7 +1111,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 3. ROOM SERVICE (Tarjeta Pequeña Blanca) */}
+            {/* 3. ROOM SERVICE */}
             <div className="group bg-white rounded-[2rem] p-8 flex flex-col justify-between shadow-sm border border-stone-100 hover:border-rose-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
               <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-700 group-hover:scale-110 transition duration-300">
                 <Bell size={24} />
@@ -1107,7 +1127,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 4. LAVANDERÍA (Tarjeta Pequeña Blanca) */}
+            {/* 4. LAVANDERÍA */}
             <div className="group bg-white rounded-[2rem] p-8 flex flex-col justify-between shadow-sm border border-stone-100 hover:border-blue-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
               <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-700 group-hover:scale-110 transition duration-300">
                 <Shirt size={24} />
@@ -1123,7 +1143,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 5. TRASLADOS (Tarjeta Pequeña con Foto) */}
+            {/* 5. TRASLADOS */}
             <div className="group relative rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
               <img
                 src=""
@@ -1146,7 +1166,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 6. TOURS (Tarjeta Grande Final) */}
+            {/* 6. TOURS */}
             <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-pointer">
               <img
                 src=""
