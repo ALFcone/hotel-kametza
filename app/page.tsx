@@ -31,6 +31,7 @@ import {
   Sparkles,
   MapPin,
   Phone,
+  Lock, // Importamos el candado para el input de email
 } from "lucide-react";
 
 // --- FUNCIÓN DE DESCRIPCIONES SENCILLAS ---
@@ -239,6 +240,7 @@ function BookingModal({
   onRequireAuth,
   defaultCheckIn,
   defaultCheckOut,
+  currentUser, // Recibimos el usuario actual
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -246,6 +248,7 @@ function BookingModal({
   onRequireAuth: (callback: () => void) => void;
   defaultCheckIn: string;
   defaultCheckOut: string;
+  currentUser: any; // Tipo para el usuario
 }) {
   const router = useRouter();
 
@@ -455,15 +458,37 @@ function BookingModal({
               name="name"
               placeholder="Nombre completo"
               required
+              // MEJORA: Autocompletar nombre si está disponible
+              defaultValue={currentUser?.user_metadata?.full_name || ""}
               className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
             />
-            <input
-              type="email"
-              name="email"
-              placeholder="Correo electrónico"
-              required
-              className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
-            />
+
+            {/* MEJORA: INPUT DE CORREO AUTOMÁTICO Y BLOQUEADO */}
+            <div className="relative">
+              <input
+                type="email"
+                name="email"
+                placeholder="Correo electrónico"
+                required
+                // Si hay usuario, poner su email y bloquear el campo
+                defaultValue={currentUser?.email || ""}
+                readOnly={!!currentUser}
+                className={`w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 ${
+                  currentUser
+                    ? "text-stone-500 cursor-not-allowed bg-stone-100"
+                    : ""
+                }`}
+              />
+              {/* Si está logueado, mostrar candado para indicar seguridad */}
+              {currentUser && (
+                <div
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400"
+                  title="Sesión iniciada"
+                >
+                  <Lock size={14} />
+                </div>
+              )}
+            </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="relative">
@@ -564,11 +589,13 @@ function RoomCard({
   onRequireAuth,
   globalCheckIn,
   globalCheckOut,
+  currentUser, // Recibimos el usuario
 }: {
   room: any;
   onRequireAuth: (callback: () => void) => void;
   globalCheckIn: string;
   globalCheckOut: string;
+  currentUser: any; // Tipo
 }) {
   const [showModal, setShowModal] = useState(false);
   const simpleDesc = getSimpleDescription(room.name, room.description);
@@ -666,6 +693,7 @@ function RoomCard({
         onRequireAuth={onRequireAuth}
         defaultCheckIn={globalCheckIn}
         defaultCheckOut={globalCheckOut}
+        currentUser={currentUser} // Pasamos el usuario al modal
       />
     </>
   );
@@ -1217,6 +1245,7 @@ export default function Home() {
                 onRequireAuth={triggerAuthFlow}
                 globalCheckIn={globalCheckIn}
                 globalCheckOut={globalCheckOut}
+                currentUser={currentUser} // Pasamos el usuario al RoomCard
               />
             ))}
           </div>
