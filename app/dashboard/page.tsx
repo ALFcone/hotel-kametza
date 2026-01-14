@@ -178,7 +178,8 @@ export default function Dashboard() {
                   </div>
 
                   <p className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-4">
-                    TICKET: RES-{booking.id.toString().padStart(5, "0")}
+                    {/* Sumamos 100 al ID para que coincida con el Admin (34 + 100 = 134) */}
+                    TICKET: RES-{(booking.id + 100).toString().padStart(5, "0")}
                   </p>
 
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8">
