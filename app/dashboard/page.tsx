@@ -178,7 +178,7 @@ export default function Dashboard() {
                   </div>
 
                   <p className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-4">
-                    Código: #{booking.id.toString().padStart(6, "0")}
+                    TICKET: RES-{booking.id.toString().padStart(5, "0")}
                   </p>
 
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8">
