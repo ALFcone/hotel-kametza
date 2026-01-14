@@ -26,6 +26,17 @@ function PaymentContent() {
   const isApproved = method === "online" && status === "approved";
   const isFailure = method === "online" && status === "failure";
 
+  // --- LÓGICA DE FORMATO DE ID (Igualar al Admin/Dashboard) ---
+  // Si el ID es 34, le sumamos 100 -> 134. Formato: RES-00134
+  const displayId = id
+    ? `RES-{(Number(id) + 100).toString().padStart(5, "0")}`
+    : "PENDIENTE";
+
+  // Versión renderizable (el string anterior tenía llaves extra de JSX)
+  const formattedId = id
+    ? `RES-${(Number(id) + 100).toString().padStart(5, "0")}`
+    : "---";
+
   return (
     <div className="min-h-screen font-sans text-stone-800 relative flex items-center justify-center p-4">
       {/* --- 1. FONDO DE LUJO (RETABLO AYACUCHANO) --- */}
@@ -82,14 +93,14 @@ function PaymentContent() {
 
         {/* CUERPO DEL TICKET */}
         <div className="p-8">
-          {/* CÓDIGO DE RESERVA */}
+          {/* CÓDIGO DE RESERVA CORREGIDO */}
           <div className="flex justify-between items-center pb-6 border-b border-dashed border-stone-200 mb-6">
             <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
               Código de Reserva
             </span>
             <div className="flex items-center gap-2 bg-stone-50 px-4 py-2 rounded-lg border border-stone-100">
               <span className="font-mono font-black text-xl text-stone-700 tracking-widest">
-                #{id?.toString().padStart(6, "0")}
+                {formattedId}
               </span>
               <Copy
                 size={14}
@@ -182,7 +193,7 @@ function PaymentContent() {
             {/* Botón WhatsApp (Solo si no es automático o recepción) */}
             {!isApproved && !isFailure && method !== "recepcion" && (
               <a
-                href={`https://wa.me/51966556622?text=Hola,%20adjunto%20constancia%20para%20reserva%20%23${id}%20(Monto:%20S/${amount}).`}
+                href={`https://wa.me/51966556622?text=Hola,%20adjunto%20constancia%20para%20reserva%20${formattedId}%20(Monto:%20S/${amount}).`}
                 target="_blank"
                 className="w-full bg-[#25D366] text-white font-bold py-4 rounded-xl hover:bg-[#1da851] transition shadow-lg hover:shadow-green-900/20 flex items-center justify-center gap-2 group"
               >
