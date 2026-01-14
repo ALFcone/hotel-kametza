@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { cancelBooking } from "../actions"; // Importamos la acción de cancelar
 import {
   CalendarDays,
-  MapPin,
   CreditCard,
   Clock,
   ArrowRight,
@@ -14,6 +14,8 @@ import {
   BedDouble,
   User,
   Home,
+  XCircle, // Icono para botón cancelar
+  Ban, // Icono para estado cancelado (encima de la foto)
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -21,6 +23,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [bookings, setBookings] = useState<any[]>([]);
+  const [cancellingId, setCancellingId] = useState<number | null>(null);
 
   useEffect(() => {
     const getData = async () => {
@@ -31,12 +34,12 @@ export default function Dashboard() {
       } = await supabase.auth.getUser();
 
       if (error || !user) {
-        router.push("/"); // Si no hay usuario, mandar al inicio
+        router.push("/");
         return;
       }
       setUser(user);
 
-      // 2. Obtener Reservas del Usuario (con datos de la habitación)
+      // 2. Obtener Reservas
       const { data: bookingsData } = await supabase
         .from("bookings")
         .select("*, rooms(*)")
@@ -55,7 +58,32 @@ export default function Dashboard() {
     router.push("/");
   };
 
-  // Función para obtener el nombre corto (Igual que en el Home)
+  // --- LÓGICA DE CANCELACIÓN ---
+  const handleCancel = async (bookingId: number) => {
+    const confirm = window.confirm(
+      "¿Estás seguro que deseas cancelar esta reserva? Esta acción liberará la habitación."
+    );
+    if (!confirm) return;
+
+    setCancellingId(bookingId); // Activar "cargando..."
+    const res = await cancelBooking(bookingId); // Llamar al servidor
+
+    if (res?.success) {
+      // Actualizar visualmente la lista sin recargar
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === bookingId ? { ...b, status: "cancelled" } : b
+        )
+      );
+      alert(
+        "Reserva cancelada correctamente. Puedes realizar una nueva reserva cuando gustes."
+      );
+    } else {
+      alert("Hubo un error al cancelar. Inténtalo de nuevo.");
+    }
+    setCancellingId(null);
+  };
+
   const getDisplayName = () => {
     if (!user) return "Viajero";
     const rawName = user.user_metadata?.full_name || user.email || "Viajero";
@@ -63,15 +91,16 @@ export default function Dashboard() {
     return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
   };
 
-  // Función para el estilo del estado
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
         return "bg-emerald-100 text-emerald-800 border-emerald-200";
       case "pending":
         return "bg-amber-50 text-amber-700 border-amber-200";
+      case "pendiente":
+        return "bg-amber-50 text-amber-700 border-amber-200";
       case "cancelled":
-        return "bg-stone-100 text-stone-500 border-stone-200";
+        return "bg-rose-50 text-rose-800 border-rose-100";
       default:
         return "bg-stone-100 text-stone-600";
     }
@@ -82,6 +111,8 @@ export default function Dashboard() {
       case "confirmed":
         return "Confirmada";
       case "pending":
+        return "Pendiente de Pago";
+      case "pendiente":
         return "Pendiente de Pago";
       case "cancelled":
         return "Cancelada";
@@ -100,7 +131,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen font-sans text-stone-800 relative bg-[#FDFBF7]">
-      {/* --- 1. FONDO DE LUJO (Igual al Home para consistencia) --- */}
+      {/* FONDO */}
       <div className="fixed inset-0 z-0">
         <img
           src="https://upload.wikimedia.org/wikipedia/commons/8/86/Retablo_ayacuchano.jpg"
@@ -110,9 +141,8 @@ export default function Dashboard() {
         <div className="absolute inset-0 bg-[#FFFDF5]/90 backdrop-blur-[1px]"></div>
       </div>
 
-      {/* --- CONTENIDO PRINCIPAL --- */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-12 md:py-20">
-        {/* ENCABEZADO DEL DASHBOARD */}
+        {/* ENCABEZADO */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
           <div>
             <span className="text-[#700824] font-bold tracking-widest text-xs uppercase bg-rose-50 px-3 py-1 rounded-full border border-rose-100 mb-4 inline-block">
@@ -122,7 +152,7 @@ export default function Dashboard() {
               Hola, {getDisplayName()}
             </h1>
             <p className="text-stone-500 mt-2 font-light">
-              Bienvenido a tu espacio personal en Hotel Kametza.
+              Gestiona tus reservas de manera sencilla.
             </p>
           </div>
 
@@ -142,27 +172,37 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* LISTA DE RESERVAS */}
+        {/* LISTA */}
         {bookings.length > 0 ? (
           <div className="grid gap-6">
             {bookings.map((booking) => (
               <div
                 key={booking.id}
-                className="group bg-white rounded-[2rem] p-6 md:p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-stone-100 flex flex-col md:flex-row gap-8 items-center relative overflow-hidden"
+                className={`group bg-white rounded-[2rem] p-6 md:p-8 shadow-xl border border-stone-100 flex flex-col md:flex-row gap-8 items-center relative overflow-hidden transition-all duration-500 ${
+                  booking.status === "cancelled"
+                    ? "opacity-75 grayscale-[0.5]"
+                    : "hover:shadow-2xl"
+                }`}
               >
-                {/* Decoración de fondo en la tarjeta */}
+                {/* Decoración Fondo Tarjeta */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-stone-50 rounded-bl-[100px] -z-0 group-hover:bg-rose-50 transition-colors duration-500"></div>
 
-                {/* IMAGEN DE LA HABITACIÓN */}
+                {/* IMAGEN */}
                 <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden shadow-md relative z-10 flex-shrink-0">
                   <img
                     src={booking.rooms?.image_url}
                     alt={booking.rooms?.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    className="w-full h-full object-cover"
                   />
+                  {/* Overlay Cancelado */}
+                  {booking.status === "cancelled" && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <Ban className="text-white opacity-80" size={32} />
+                    </div>
+                  )}
                 </div>
 
-                {/* DETALLES */}
+                {/* INFO */}
                 <div className="flex-1 w-full relative z-10">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-serif font-bold text-[#700824]">
@@ -177,8 +217,8 @@ export default function Dashboard() {
                     </span>
                   </div>
 
+                  {/* ID CORREGIDO (+100) */}
                   <p className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-4">
-                    {/* Sumamos 100 al ID para que coincida con el Admin (34 + 100 = 134) */}
                     TICKET: RES-{(booking.id + 100).toString().padStart(5, "0")}
                   </p>
 
@@ -225,12 +265,31 @@ export default function Dashboard() {
                       </div>
                     </div>
                   </div>
+
+                  {/* SOLO BOTÓN CANCELAR (Y solo si no está cancelada ya) */}
+                  {booking.status !== "cancelled" && (
+                    <div className="mt-6 border-t border-stone-100 pt-4 flex justify-end">
+                      <button
+                        onClick={() => handleCancel(booking.id)}
+                        disabled={cancellingId === booking.id}
+                        className="flex items-center gap-2 text-rose-700 hover:text-white border border-rose-200 hover:bg-rose-700 hover:border-rose-700 px-4 py-2 rounded-lg transition-all duration-300 text-xs font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {cancellingId === booking.id ? (
+                          "Cancelando..."
+                        ) : (
+                          <>
+                            <XCircle size={16} /> Cancelar Reserva
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          /* ESTADO VACÍO (Sin Reservas) */
+          /* EMPTY STATE */
           <div className="bg-white rounded-[2.5rem] p-12 text-center shadow-xl border border-stone-100">
             <div className="bg-stone-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 text-stone-300">
               <BedDouble size={48} />

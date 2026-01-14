@@ -191,3 +191,45 @@ export async function updateRoom(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/");
 }
+//  CANCELAR RESERVA (CLIENTE)
+// ------------------------------------------------------------------
+export async function cancelBooking(bookingId: number) {
+  // Necesitamos instanciar el cliente aquí para verificar la sesión del usuario
+  const cookieStore = await cookies();
+
+  const supabaseServer = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
+
+  // 1. Validar Usuario
+  const {
+    data: { user },
+  } = await supabaseServer.auth.getUser();
+
+  if (!user) {
+    return { error: "No autorizado" };
+  }
+
+  // 2. Cancelar (Solo si la reserva pertenece al usuario)
+  const { error } = await supabaseServer
+    .from("bookings")
+    .update({ status: "cancelled" })
+    .eq("id", bookingId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Error al cancelar:", error);
+    return { error: "No se pudo cancelar la reserva" };
+  }
+
+  revalidatePath("/dashboard");
+  return { success: true };
+}
