@@ -532,6 +532,8 @@ export default async function AdminPage(props: {
                                   month: "short",
                                   hour: "2-digit",
                                   minute: "2-digit",
+                                  hour12: true,
+                                  timeZone: "America/Lima", // <--- ESTO FUERZA LA HORA DE PERÚ
                                 })}
                               </span>
                             )}
