@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
-import { updateRoom } from "../actions"; // Asegúrate de actualizar este archivo luego (ver Paso 2)
+import { updateRoom } from "../actions";
 import DownloadButton from "./DownloadButton";
-import Link from "next/link"; // <--- Importante para el botón de ir al inicio
+import Link from "next/link";
 import {
   Calendar,
   CheckCircle,
@@ -26,10 +26,15 @@ import {
   MapPin,
   Mail,
   FileText,
-  Globe, // <--- Icono para el botón de ir a la web
+  Globe,
+  XCircle, // Agregado para el icono de cancelado
 } from "lucide-react";
 
-// --- ACCIONES DE SERVIDOR ---
+// ==============================================================================
+// 1. ACCIONES DE SERVIDOR (SERVER ACTIONS)
+// ==============================================================================
+// Estas funciones se ejecutan en el servidor cuando pulsas los botones de la tabla.
+
 async function markAsPaid(formData: FormData) {
   "use server";
   const bookingId = formData.get("bookingId");
@@ -45,11 +50,18 @@ async function deleteBooking(formData: FormData) {
   "use server";
   const bookingId = formData.get("bookingId");
   if (!bookingId) return;
+
+  // OJO: En lugar de borrar, podrías cambiar estado a 'cancelled' si prefieres historial.
+  // Pero si quieres borrar físico, esto está bien.
   await supabase.from("bookings").delete().eq("id", bookingId);
   revalidatePath("/admin");
 }
 
-// --- UTILIDADES ---
+// ==============================================================================
+// 2. UTILIDADES Y FORMATO
+// ==============================================================================
+// Pequeñas funciones para que los números y fechas se vean bonitos.
+
 const formatMoney = (amount: number) =>
   new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(
     amount
@@ -63,28 +75,33 @@ function calculateNights(checkIn: string, checkOut: string) {
 }
 
 const formatTicket = (id: number) => {
+  // Fórmula para que coincida con el Dashboard del cliente (ID + 100)
   return (100 + id).toString().padStart(5, "0");
 };
 
-// --- COMPONENTE PRINCIPAL ---
+// ==============================================================================
+// 3. COMPONENTE PRINCIPAL (PÁGINA DE ADMIN)
+// ==============================================================================
+
 export default async function AdminPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const searchParams = await props.searchParams;
 
+  // A. OBTENCIÓN DE FECHAS Y PARÁMETROS
   const today = new Date().toISOString().split("T")[0];
   const dateFrom = searchParams.from || today;
   const dateTo = searchParams.to || today;
+  const filterDate = dateFrom; // Fecha base para KPIs
 
-  const filterDate = dateFrom;
-
+  // B. CONSULTAS A BASE DE DATOS (DATA FETCHING)
   const { data: rooms } = await supabase.from("rooms").select("*").order("id");
   const { data: allBookings } = await supabase
     .from("bookings")
     .select("*")
     .order("created_at", { ascending: false });
 
-  // Filtro
+  // C. LÓGICA DE FILTRADO
   const filteredBookings = allBookings?.filter((b) => {
     const checkInDate = b.check_in
       ? b.check_in.toString().substring(0, 10)
@@ -92,19 +109,31 @@ export default async function AdminPage(props: {
     return checkInDate >= dateFrom && checkInDate <= dateTo;
   });
 
-  // KPIs
+  // D. CÁLCULO DE KPIS (INDICADORES DE RENDIMIENTO)
+  // Nota: Agregamos filtros para ignorar las canceladas en la ocupación.
+
   const occupiedCount =
     allBookings?.filter(
       (b) =>
         b.check_in &&
         b.check_out &&
         b.check_in <= filterDate &&
-        b.check_out > filterDate
+        b.check_out > filterDate &&
+        b.status !== "cancelled" &&
+        b.status !== "cancelada" // <--- CORRECCIÓN: Ignorar canceladas
     ).length || 0;
+
   const arrivalsCount =
-    allBookings?.filter((b) => b.check_in === filterDate).length || 0;
+    allBookings?.filter(
+      (b) => b.check_in === filterDate && b.status !== "cancelled"
+    ).length || 0;
+
   const cleaningList =
-    allBookings?.filter((b) => b.check_out === filterDate) || [];
+    allBookings?.filter(
+      (b) => b.check_out === filterDate && b.status !== "cancelled"
+    ) || [];
+
+  // Ingresos del día (Solo pagadas o aprobadas)
   const salesOnDate =
     allBookings?.filter(
       (b) =>
@@ -112,33 +141,46 @@ export default async function AdminPage(props: {
         b.created_at.startsWith(filterDate) &&
         (b.status === "pagado" || b.status === "approved")
     ) || [];
+
   const totalIncome = salesOnDate.reduce(
     (acc, b) => acc + (b.total_price || 0),
     0
   );
+
   const cashIncome = salesOnDate
     .filter((b) => b.payment_method === "recepcion")
     .reduce((acc, b) => acc + (b.total_price || 0), 0);
+
   const digitalIncome = salesOnDate
     .filter((b) => b.payment_method === "online")
     .reduce((acc, b) => acc + (b.total_price || 0), 0);
 
+  // E. HELPERS PARA ESTADO DE HABITACIONES
   const getRoomNumber = (id: number) =>
     rooms?.find((r) => r.id === id)?.room_number ||
     rooms?.find((r) => r.id === id)?.id ||
     "#";
 
   const getRoomStatus = (roomId: number) => {
+    // Buscar si alguien sale hoy (y no canceló)
     const leaving = allBookings?.find(
-      (b) => b.room_id === roomId && b.check_out === filterDate
+      (b) =>
+        b.room_id === roomId &&
+        b.check_out === filterDate &&
+        b.status !== "cancelled"
     );
     if (leaving) return { status: "checkout", guest: leaving.client_name };
+
+    // Buscar si está ocupada hoy (y no canceló)
     const occupied = allBookings?.find(
       (b) =>
         b.room_id === roomId &&
         b.check_in <= filterDate &&
-        b.check_out > filterDate
+        b.check_out > filterDate &&
+        b.status !== "cancelled" &&
+        b.status !== "cancelada" // <--- IMPORTANTE: No marcar ocupada si se canceló
     );
+
     if (occupied)
       return {
         status: "occupied",
@@ -148,10 +190,14 @@ export default async function AdminPage(props: {
     return { status: "free", guest: null };
   };
 
+  // ==============================================================================
+  // 4. RENDERIZADO DE LA INTERFAZ (UI)
+  // ==============================================================================
+
   return (
     <div className="min-h-screen bg-[#F5F5F4] text-stone-800 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* HEADER */}
+        {/* --- SECCIÓN: ENCABEZADO Y FILTROS --- */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100">
           <div className="flex items-center gap-4">
             <div className="bg-rose-900 text-white p-3 rounded-2xl shadow-lg shadow-rose-200">
@@ -165,7 +211,6 @@ export default async function AdminPage(props: {
                 <p className="text-stone-400 text-[10px] uppercase font-black tracking-widest">
                   Control de Reservas
                 </p>
-                {/* BOTÓN IR AL INICIO */}
                 <Link
                   href="/"
                   className="flex items-center gap-1 bg-stone-100 text-stone-500 px-3 py-1 rounded-full text-[9px] font-black uppercase hover:bg-rose-100 hover:text-rose-600 transition-colors"
@@ -210,7 +255,7 @@ export default async function AdminPage(props: {
           </div>
         </div>
 
-        {/* INDICADOR LIMPIEZA */}
+        {/* --- SECCIÓN: ALERTAS DE LIMPIEZA --- */}
         {cleaningList.length > 0 && (
           <div className="mb-6 bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center gap-3">
@@ -230,7 +275,7 @@ export default async function AdminPage(props: {
           </div>
         )}
 
-        {/* KPIs */}
+        {/* --- SECCIÓN: TARJETAS DE INDICADORES (KPIs) --- */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-stone-900 text-white p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
             <TrendingUp
@@ -284,7 +329,7 @@ export default async function AdminPage(props: {
           </div>
         </div>
 
-        {/* MAPA HABITACIONES */}
+        {/* --- SECCIÓN: MAPA DE ESTADO DE HABITACIONES --- */}
         <section className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <div className="h-1 w-10 bg-rose-600 rounded-full"></div>
@@ -348,7 +393,7 @@ export default async function AdminPage(props: {
           </div>
         </section>
 
-        {/* TABLA DE RESERVAS */}
+        {/* --- SECCIÓN: TABLA DE HISTORIAL DE RESERVAS --- */}
         <section className="bg-white rounded-[2.5rem] shadow-xl border border-stone-100 overflow-hidden mb-10">
           <div className="p-8 border-b border-stone-50 flex justify-between items-center bg-white">
             <div>
@@ -383,16 +428,31 @@ export default async function AdminPage(props: {
                     booking.check_in,
                     booking.check_out
                   );
+                  // Detectar si está cancelada
+                  const isCancelled =
+                    booking.status === "cancelled" ||
+                    booking.status === "cancelada";
+
                   return (
                     <tr
                       key={booking.id}
-                      className="border-b border-stone-50 hover:bg-rose-50/20 transition-colors group"
+                      className={`border-b border-stone-50 transition-colors group ${
+                        isCancelled
+                          ? "bg-stone-50 opacity-60"
+                          : "hover:bg-rose-50/20"
+                      }`}
                     >
                       <td className="py-5 px-6">
                         <div className="font-mono text-[10px] text-stone-400">
                           SYS-{booking.id}
                         </div>
-                        <div className="font-black text-rose-900 text-[11px]">
+                        <div
+                          className={`font-black text-[11px] ${
+                            isCancelled
+                              ? "text-stone-500 line-through"
+                              : "text-rose-900"
+                          }`}
+                        >
                           RES-{formatTicket(booking.id)}
                         </div>
                       </td>
@@ -447,27 +507,41 @@ export default async function AdminPage(props: {
                         </div>
                       </td>
                       <td className="py-5 px-4 text-right font-black text-stone-900">
-                        {formatMoney(booking.total_price)}
+                        {/* Si está cancelada, tachamos el precio */}
+                        <span
+                          className={
+                            isCancelled ? "line-through text-stone-400" : ""
+                          }
+                        >
+                          {formatMoney(booking.total_price)}
+                        </span>
                       </td>
                       <td className="py-5 px-4 text-center">
-                        <span
-                          className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${
-                            booking.status === "pagado" ||
+                        {isCancelled ? (
+                          <span className="flex items-center justify-center gap-1 bg-rose-100 text-rose-700 px-2 py-1 rounded-full text-[9px] font-black uppercase border border-rose-200">
+                            <XCircle size={10} /> Cancelada
+                          </span>
+                        ) : (
+                          <span
+                            className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${
+                              booking.status === "pagado" ||
+                              booking.status === "approved"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-amber-100 text-amber-600"
+                            }`}
+                          >
+                            {booking.status === "pagado" ||
                             booking.status === "approved"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-amber-100 text-amber-600"
-                          }`}
-                        >
-                          {booking.status === "pagado" ||
-                          booking.status === "approved"
-                            ? "Pagado"
-                            : "Pendiente"}
-                        </span>
+                              ? "Pagado"
+                              : "Pendiente"}
+                          </span>
+                        )}
                       </td>
                       <td className="py-5 px-8 text-center">
                         <div className="flex gap-2 justify-center">
                           {booking.status !== "pagado" &&
-                            booking.status !== "approved" && (
+                            booking.status !== "approved" &&
+                            !isCancelled && (
                               <form action={markAsPaid}>
                                 <input
                                   type="hidden"
@@ -491,6 +565,7 @@ export default async function AdminPage(props: {
                             <button
                               type="submit"
                               className="flex items-center gap-1 px-3 py-1.5 bg-white border border-stone-200 text-stone-400 rounded-xl font-bold text-[9px] uppercase hover:border-rose-200 hover:text-rose-600"
+                              title="Borrar del historial"
                             >
                               <X size={12} />
                             </button>
@@ -510,7 +585,7 @@ export default async function AdminPage(props: {
           </div>
         </section>
 
-        {/* INVENTARIO (CON DESCRIPCIÓN) */}
+        {/* --- SECCIÓN: INVENTARIO Y EDICIÓN DE HABITACIONES --- */}
         <section>
           <div className="flex items-center gap-2 mb-6">
             <div className="h-1 w-10 bg-stone-800 rounded-full"></div>
@@ -538,6 +613,7 @@ export default async function AdminPage(props: {
                   <h3 className="font-black text-lg text-stone-800 mb-4 uppercase">
                     {room.name}
                   </h3>
+                  {/* Formulario de Edición (Server Action) */}
                   <form action={updateRoom} className="space-y-4">
                     <input type="hidden" name="roomId" value={room.id} />
                     <div className="grid grid-cols-2 gap-3">
@@ -564,7 +640,6 @@ export default async function AdminPage(props: {
                         />
                       </div>
                     </div>
-                    {/* NUEVO CAMPO DE DESCRIPCIÓN */}
                     <div>
                       <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
                         Descripción
