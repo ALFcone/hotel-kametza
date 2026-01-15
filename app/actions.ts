@@ -192,11 +192,24 @@ export async function updateRoom(formData: FormData) {
   revalidatePath("/");
 }
 //  CANCELAR RESERVA (CLIENTE)
-// --- REEMPLAZA LA FUNCIÓN cancelBooking EN app/actions.ts ---
+// --- REEMPLAZA ESTO AL FINAL DE app/actions.ts ---
 
 export async function cancelBooking(bookingId: number) {
-  const cookieStore = await cookies();
+  // 1. Usamos la MISMA función auxiliar que usa createBooking
+  // (Esto garantiza que si puedes reservar, también puedes cancelar)
+  const user = await getUser();
 
+  if (!user) {
+    console.log("Error: Usuario no autenticado en cancelBooking");
+    return {
+      error:
+        "Tu sesión ha expirado. Por favor cierra sesión y vuelve a ingresar.",
+    };
+  }
+
+  // Necesitamos instanciar el cliente solo para hacer el update
+  // (Reutilizamos la lógica de conexión para no fallar)
+  const cookieStore = await cookies();
   const supabaseServer = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -209,40 +222,28 @@ export async function cancelBooking(bookingId: number) {
     }
   );
 
-  // 1. Validar Usuario
-  const {
-    data: { user },
-  } = await supabaseServer.auth.getUser();
-
-  if (!user) {
-    console.log("Error: Usuario no autenticado en cancelBooking");
-    return { error: "Tu sesión ha expirado. Recarga la página." };
-  }
-
   console.log("Intentando cancelar reserva:", bookingId, "Usuario:", user.id);
 
-  // 2. Cancelar
+  // 2. Ejecutar la cancelación
   const { data, error } = await supabaseServer
     .from("bookings")
     .update({ status: "cancelled" })
     .eq("id", bookingId)
-    .eq("user_id", user.id) // Seguridad: solo el dueño
+    .eq("user_id", user.id) // Doble seguridad
     .select();
 
   if (error) {
-    console.error("❌ ERROR SUPABASE:", error.message); // MIRA ESTO EN TU TERMINAL
+    console.error("❌ ERROR SUPABASE:", error.message);
     return { error: `Error de BD: ${error.message}` };
   }
 
-  // Si no hay error pero no devolvió datos, significa que no encontró la reserva (RLS o ID incorrecto)
+  // Validación extra: si no devolvió datos, es porque no encontró la reserva o no es tuya
   if (!data || data.length === 0) {
-    console.error("❌ ERROR: No se encontró la reserva o no tienes permiso.");
     return {
-      error: "No se encontró la reserva o no tienes permiso para cancelarla.",
+      error: "No se encontró la reserva o no tienes permisos para modificarla.",
     };
   }
 
-  console.log("✅ Reserva cancelada con éxito");
   revalidatePath("/dashboard");
   return { success: true };
 }
