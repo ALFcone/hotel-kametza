@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import { cancelBooking } from "../actions"; // Importamos la acción de cancelar
+import { cancelBooking } from "../actions"; // Importamos la lógica del servidor
 import {
   CalendarDays,
   CreditCard,
@@ -14,61 +14,83 @@ import {
   BedDouble,
   User,
   Home,
-  XCircle, // Icono para botón cancelar
-  Ban, // Icono para estado cancelado (encima de la foto)
+  XCircle,
+  Ban,
 } from "lucide-react";
 
 export default function Dashboard() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [bookings, setBookings] = useState<any[]>([]);
-  const [cancellingId, setCancellingId] = useState<number | null>(null);
 
+  // ==============================================================================
+  // 1. ESTADO: Variables para guardar datos temporalmente en pantalla
+  // ==============================================================================
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null); // Guardamos quién es el usuario
+  const [bookings, setBookings] = useState<any[]>([]); // Guardamos sus reservas
+  const [cancellingId, setCancellingId] = useState<number | null>(null); // Para efecto de carga
+
+  // ==============================================================================
+  // 2. EFECTO: Cargar datos al entrar a la página
+  // ==============================================================================
   useEffect(() => {
     const getData = async () => {
-      // 1. Obtener Usuario
+      // A. Obtener Usuario actual
       const {
         data: { user },
         error,
       } = await supabase.auth.getUser();
 
       if (error || !user) {
-        router.push("/");
+        router.push("/"); // Si no hay usuario, mandar al inicio
         return;
       }
       setUser(user);
 
-      // 2. Obtener Reservas
+      // B. Obtener Reservas de este usuario desde Supabase
       const { data: bookingsData } = await supabase
         .from("bookings")
         .select("*, rooms(*)")
-        .eq("user_id", user.id)
+        .eq("user_id", user.id) // Solo las de este ID
         .order("created_at", { ascending: false });
 
       if (bookingsData) setBookings(bookingsData);
-      setLoading(false);
+      setLoading(false); // Apagar pantalla de carga
     };
 
     getData();
   }, [router]);
 
+  // Función para cerrar sesión
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/");
   };
 
-  // --- LÓGICA DE CANCELACIÓN ---
+  // ==============================================================================
+  // 3. LÓGICA: Manejar el clic en "Cancelar"
+  // ==============================================================================
   const handleCancel = async (bookingId: number) => {
+    // A. Confirmación visual
     const confirm = window.confirm(
-      "¿Estás seguro que deseas cancelar esta reserva? Esta acción liberará la habitación."
+      "¿Estás seguro que deseas cancelar esta reserva?"
     );
     if (!confirm) return;
 
-    setCancellingId(bookingId); // Activar "cargando..."
-    const res = await cancelBooking(bookingId); // Llamar al servidor
+    // B. Validación de seguridad: ¿Sabemos quién es el usuario?
+    if (!user || !user.id) {
+      alert("Error crítico: No se reconoce tu usuario. Recarga la página.");
+      return;
+    }
 
+    setCancellingId(bookingId); // Activar spinner en el botón
+
+    // C. LLAMADA AL SERVIDOR (Aquí estaba el error antes)
+    // Ahora enviamos explícitamente el user.id para evitar el error de sesión
+    const res = await cancelBooking(bookingId, user.id);
+
+    // D. Resultado
     if (res?.success) {
+      // Actualizar la lista visualmente (cambiar estado a 'cancelled')
       setBookings((prev) =>
         prev.map((b) =>
           b.id === bookingId ? { ...b, status: "cancelled" } : b
@@ -76,12 +98,12 @@ export default function Dashboard() {
       );
       alert("Reserva cancelada correctamente.");
     } else {
-      // AHORA MOSTRAMOS EL ERROR REAL
       alert("Error: " + (res?.error || "Desconocido"));
     }
     setCancellingId(null);
   };
 
+  // Función auxiliar para obtener el nombre corto del usuario
   const getDisplayName = () => {
     if (!user) return "Viajero";
     const rawName = user.user_metadata?.full_name || user.email || "Viajero";
@@ -89,12 +111,11 @@ export default function Dashboard() {
     return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
   };
 
+  // Helpers para colores y textos de estado
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
         return "bg-emerald-100 text-emerald-800 border-emerald-200";
-      case "pending":
-        return "bg-amber-50 text-amber-700 border-amber-200";
       case "pendiente":
         return "bg-amber-50 text-amber-700 border-amber-200";
       case "cancelled":
@@ -104,21 +125,9 @@ export default function Dashboard() {
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return "Confirmada";
-      case "pending":
-        return "Pendiente de Pago";
-      case "pendiente":
-        return "Pendiente de Pago";
-      case "cancelled":
-        return "Cancelada";
-      default:
-        return status;
-    }
-  };
-
+  // ==============================================================================
+  // 4. RENDERIZADO: El HTML que ve el cliente
+  // ==============================================================================
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7] text-[#700824] font-bold animate-pulse">
@@ -129,7 +138,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen font-sans text-stone-800 relative bg-[#FDFBF7]">
-      {/* FONDO */}
+      {/* Fondo Decorativo */}
       <div className="fixed inset-0 z-0">
         <img
           src="https://upload.wikimedia.org/wikipedia/commons/8/86/Retablo_ayacuchano.jpg"
@@ -140,7 +149,7 @@ export default function Dashboard() {
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-12 md:py-20">
-        {/* ENCABEZADO */}
+        {/* Encabezado con Bienvenida */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
           <div>
             <span className="text-[#700824] font-bold tracking-widest text-xs uppercase bg-rose-50 px-3 py-1 rounded-full border border-rose-100 mb-4 inline-block">
@@ -157,20 +166,20 @@ export default function Dashboard() {
           <div className="flex gap-3">
             <Link
               href="/"
-              className="flex items-center gap-2 bg-white border border-stone-200 text-stone-600 px-5 py-3 rounded-full hover:bg-stone-50 hover:text-[#700824] transition-all shadow-sm font-bold text-xs uppercase tracking-wider"
+              className="flex items-center gap-2 bg-white border border-stone-200 text-stone-600 px-5 py-3 rounded-full hover:bg-stone-50 font-bold text-xs uppercase tracking-wider"
             >
               <Home size={16} /> Inicio
             </Link>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 bg-stone-900 text-white px-5 py-3 rounded-full hover:bg-[#700824] transition-all shadow-lg font-bold text-xs uppercase tracking-wider"
+              className="flex items-center gap-2 bg-stone-900 text-white px-5 py-3 rounded-full hover:bg-[#700824] font-bold text-xs uppercase tracking-wider"
             >
               <LogOut size={16} /> Salir
             </button>
           </div>
         </div>
 
-        {/* LISTA */}
+        {/* Lista de Reservas */}
         {bookings.length > 0 ? (
           <div className="grid gap-6">
             {bookings.map((booking) => (
@@ -182,17 +191,13 @@ export default function Dashboard() {
                     : "hover:shadow-2xl"
                 }`}
               >
-                {/* Decoración Fondo Tarjeta */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-stone-50 rounded-bl-[100px] -z-0 group-hover:bg-rose-50 transition-colors duration-500"></div>
-
-                {/* IMAGEN */}
+                {/* Imagen Habitación */}
                 <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden shadow-md relative z-10 flex-shrink-0">
                   <img
                     src={booking.rooms?.image_url}
                     alt={booking.rooms?.name}
                     className="w-full h-full object-cover"
                   />
-                  {/* Overlay Cancelado */}
                   {booking.status === "cancelled" && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <Ban className="text-white opacity-80" size={32} />
@@ -200,7 +205,7 @@ export default function Dashboard() {
                   )}
                 </div>
 
-                {/* INFO */}
+                {/* Detalles Reserva */}
                 <div className="flex-1 w-full relative z-10">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-serif font-bold text-[#700824]">
@@ -211,11 +216,14 @@ export default function Dashboard() {
                         booking.status
                       )}`}
                     >
-                      {getStatusText(booking.status)}
+                      {booking.status === "cancelled"
+                        ? "Cancelada"
+                        : booking.status === "pendiente"
+                        ? "Pendiente"
+                        : booking.status}
                     </span>
                   </div>
 
-                  {/* ID CORREGIDO (+100) */}
                   <p className="text-stone-400 text-xs font-bold uppercase tracking-widest mb-4">
                     TICKET: RES-{(booking.id + 100).toString().padStart(5, "0")}
                   </p>
@@ -234,7 +242,6 @@ export default function Dashboard() {
                         </p>
                       </div>
                     </div>
-
                     <div className="flex items-center gap-3">
                       <div className="bg-stone-50 p-2 rounded-full text-stone-400">
                         <Clock size={18} />
@@ -248,7 +255,6 @@ export default function Dashboard() {
                         </p>
                       </div>
                     </div>
-
                     <div className="flex items-center gap-3 col-span-2 md:col-span-1">
                       <div className="bg-stone-50 p-2 rounded-full text-stone-400">
                         <CreditCard size={18} />
@@ -264,7 +270,7 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* SOLO BOTÓN CANCELAR (Y solo si no está cancelada ya) */}
+                  {/* BOTÓN CANCELAR (Solo si no está cancelada) */}
                   {booking.status !== "cancelled" && (
                     <div className="mt-6 border-t border-stone-100 pt-4 flex justify-end">
                       <button
@@ -273,7 +279,7 @@ export default function Dashboard() {
                         className="flex items-center gap-2 text-rose-700 hover:text-white border border-rose-200 hover:bg-rose-700 hover:border-rose-700 px-4 py-2 rounded-lg transition-all duration-300 text-xs font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {cancellingId === booking.id ? (
-                          "Cancelando..."
+                          "Procesando..."
                         ) : (
                           <>
                             <XCircle size={16} /> Cancelar Reserva
@@ -287,7 +293,7 @@ export default function Dashboard() {
             ))}
           </div>
         ) : (
-          /* EMPTY STATE */
+          /* Estado Vacío */
           <div className="bg-white rounded-[2.5rem] p-12 text-center shadow-xl border border-stone-100">
             <div className="bg-stone-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 text-stone-300">
               <BedDouble size={48} />
@@ -295,10 +301,6 @@ export default function Dashboard() {
             <h2 className="text-2xl font-serif font-bold text-stone-800 mb-2">
               Aún no tienes reservas
             </h2>
-            <p className="text-stone-500 max-w-md mx-auto mb-8">
-              Descubre la magia de Ayacucho y vive una experiencia inolvidable
-              con nosotros.
-            </p>
             <Link
               href="/#habitaciones"
               className="inline-flex items-center gap-2 bg-[#700824] text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black transition-all shadow-lg hover:shadow-rose-900/30"

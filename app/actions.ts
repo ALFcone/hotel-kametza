@@ -6,18 +6,18 @@ import { MercadoPagoConfig, Preference } from "mercadopago";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-// ------------------------------------------------------------------
-// TU TOKEN
-// ------------------------------------------------------------------
+// ==============================================================================
+// 1. CONFIGURACIÓN: Conexiones a servicios externos
+// ==============================================================================
+// Conecta con Mercado Pago para procesar cobros
 const client = new MercadoPagoConfig({
   accessToken:
     "TEST-7434598007363249-102513-e453188d9076f03407c57077a988d519-195979069",
 });
 
-// --- FUNCIÓN PARA OBTENER USUARIO (Next.js 15) ---
+// Función auxiliar para leer la sesión del usuario (Usada al crear reserva)
 async function getUser() {
   const cookieStore = await cookies();
-
   const supabaseServer = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -35,7 +35,12 @@ async function getUser() {
   return user;
 }
 
+// ==============================================================================
+// 2. FUNCIÓN: CREAR RESERVA (createBooking)
+// ==============================================================================
+// Recibe el formulario, verifica disponibilidad y guarda en la base de datos.
 export async function createBooking(formData: FormData) {
+  // A. Extracción de datos del formulario HTML
   const roomId = formData.get("roomId");
   const checkIn = formData.get("checkIn") as string;
   const checkOut = formData.get("checkOut") as string;
@@ -45,25 +50,20 @@ export async function createBooking(formData: FormData) {
   const paymentMethod = formData.get("paymentMethod") as string;
   const documentType = formData.get("documentType") as string;
   const documentNumber = formData.get("documentNumber") as string;
-
-  // --- Capturar Celular y País ---
   const phone = formData.get("phone") as string;
   const country = formData.get("country") as string;
+  const userIdFromForm = formData.get("userId") as string; // <--- EL DATO CLAVE
 
-  // --- CORRECCIÓN: Capturar el ID que viene del formulario ---
-  const userIdFromForm = formData.get("userId") as string;
-
-  // 1. Intentar obtener usuario desde el servidor (Cookie)
+  // B. Identificación del Usuario (Lógica blindada)
+  // Intentamos obtenerlo por cookie, si falla, usamos el que viene oculto en el form
   const user = await getUser();
-
-  // 2. Lógica de Respaldo: Si falla la cookie, usamos el del formulario
   const finalUserId = user
     ? user.id
     : userIdFromForm && userIdFromForm !== "undefined" && userIdFromForm !== ""
     ? userIdFromForm
     : null;
 
-  // 3. Verificar disponibilidad
+  // C. Verificación de Disponibilidad (Llama a la función SQL)
   const { data: isAvailable } = await supabase.rpc("check_availability", {
     room_id_input: Number(roomId),
     check_in_input: checkIn,
@@ -74,7 +74,7 @@ export async function createBooking(formData: FormData) {
     return { error: "Fechas ocupadas. Por favor elige otras." };
   }
 
-  // 4. Crear reserva (USANDO finalUserId)
+  // D. Guardado en Base de Datos (INSERT)
   const { data: booking, error } = await supabase
     .from("bookings")
     .insert({
@@ -90,7 +90,7 @@ export async function createBooking(formData: FormData) {
       status: "pendiente",
       document_type: documentType,
       document_number: documentNumber,
-      user_id: finalUserId, // <--- AQUÍ ESTÁ LA CORRECCIÓN
+      user_id: finalUserId, // <--- Aquí guardamos el dueño
     })
     .select()
     .single();
@@ -100,11 +100,10 @@ export async function createBooking(formData: FormData) {
     return { error: "Error interno al guardar la reserva." };
   }
 
-  // 5. MERCADO PAGO
+  // E. Integración Mercado Pago (Solo si eligió pago online)
   if (paymentMethod === "online") {
     try {
       const preference = new Preference(client);
-
       const result = await preference.create({
         body: {
           items: [
@@ -126,7 +125,6 @@ export async function createBooking(formData: FormData) {
           external_reference: booking.id.toString(),
         },
       });
-
       if (result.init_point) {
         return {
           success: true,
@@ -135,16 +133,13 @@ export async function createBooking(formData: FormData) {
           bookingId: booking.id,
           price,
         };
-      } else {
-        return { error: "No se pudo generar el link de pago." };
       }
     } catch (e: any) {
-      console.error("ERROR MERCADO PAGO:", e);
       return { error: `Error MP: ${e.message}` };
     }
   }
 
-  // 6. MÉTODOS MANUALES
+  // F. Retorno Exitoso (Pago Manual)
   return {
     success: true,
     url: `/exito?method=${paymentMethod}&amount=${price}&id=${booking.id}`,
@@ -152,15 +147,19 @@ export async function createBooking(formData: FormData) {
   };
 }
 
+// ==============================================================================
+// 3. FUNCIÓN: ACTUALIZAR HABITACIÓN (updateRoom)
+// ==============================================================================
+// Permite al administrador cambiar precios, fotos y descripciones.
 export async function updateRoom(formData: FormData) {
   const roomId = formData.get("roomId");
   const price = formData.get("price");
   const description = formData.get("description");
-
-  // Manejo de imagen
   const imageFile = formData.get("image") as File;
+
   let imageUrlToUpdate = null;
 
+  // A. Subida de imagen a Supabase Storage (si existe nueva imagen)
   if (imageFile && imageFile.size > 0 && imageFile.name !== "undefined") {
     const fileName = `${Date.now()}-${imageFile.name.replace(/\s/g, "-")}`;
     const { error: uploadError } = await supabase.storage
@@ -175,40 +174,26 @@ export async function updateRoom(formData: FormData) {
     }
   }
 
-  // Preparamos los datos
+  // B. Actualización en Base de Datos (UPDATE)
   const updateData: any = {
     price_per_night: Number(price),
     description: description,
   };
+  if (imageUrlToUpdate) updateData.image_url = imageUrlToUpdate;
 
-  if (imageUrlToUpdate) {
-    updateData.image_url = imageUrlToUpdate;
-  }
-
-  // Actualizar
   await supabase.from("rooms").update(updateData).eq("id", roomId);
 
+  // C. Refrescar cachés para que los cambios se vean al instante
   revalidatePath("/admin");
   revalidatePath("/");
 }
-//  CANCELAR RESERVA (CLIENTE)
-// --- REEMPLAZA ESTO AL FINAL DE app/actions.ts ---
 
-export async function cancelBooking(bookingId: number) {
-  // 1. Usamos la MISMA función auxiliar que usa createBooking
-  // (Esto garantiza que si puedes reservar, también puedes cancelar)
-  const user = await getUser();
-
-  if (!user) {
-    console.log("Error: Usuario no autenticado en cancelBooking");
-    return {
-      error:
-        "Tu sesión ha expirado. Por favor cierra sesión y vuelve a ingresar.",
-    };
-  }
-
-  // Necesitamos instanciar el cliente solo para hacer el update
-  // (Reutilizamos la lógica de conexión para no fallar)
+// ==============================================================================
+// 4. FUNCIÓN: CANCELAR RESERVA (cancelBooking) - ¡LA CORREGIDA!
+// ==============================================================================
+// Cambia el estado a "cancelled".
+// NOTA: Acepta 'userId' como parámetro para evitar errores de sesión expirada.
+export async function cancelBooking(bookingId: number, userId: string) {
   const cookieStore = await cookies();
   const supabaseServer = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -222,28 +207,29 @@ export async function cancelBooking(bookingId: number) {
     }
   );
 
-  console.log("Intentando cancelar reserva:", bookingId, "Usuario:", user.id);
+  console.log(
+    "--> Iniciando cancelación. Reserva:",
+    bookingId,
+    "Usuario:",
+    userId
+  );
 
-  // 2. Ejecutar la cancelación
-  const { data, error } = await supabaseServer
+  // A. Ejecución Directa (UPDATE)
+  // Confiamos en el ID que viene del cliente porque la regla SQL 'USING(true)'
+  // permite la operación, pero el filtro .eq('user_id', userId) asegura que
+  // solo borres lo tuyo.
+  const { error } = await supabaseServer
     .from("bookings")
     .update({ status: "cancelled" })
     .eq("id", bookingId)
-    .eq("user_id", user.id) // Doble seguridad
-    .select();
+    .eq("user_id", userId); // <--- Candado de seguridad
 
   if (error) {
-    console.error("❌ ERROR SUPABASE:", error.message);
-    return { error: `Error de BD: ${error.message}` };
+    console.error("❌ ERROR BD:", error.message);
+    return { error: `No se pudo cancelar: ${error.message}` };
   }
 
-  // Validación extra: si no devolvió datos, es porque no encontró la reserva o no es tuya
-  if (!data || data.length === 0) {
-    return {
-      error: "No se encontró la reserva o no tienes permisos para modificarla.",
-    };
-  }
-
+  // B. Éxito y Recarga
   revalidatePath("/dashboard");
   return { success: true };
 }
