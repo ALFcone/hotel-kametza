@@ -69,17 +69,15 @@ export default function Dashboard() {
     const res = await cancelBooking(bookingId); // Llamar al servidor
 
     if (res?.success) {
-      // Actualizar visualmente la lista sin recargar
       setBookings((prev) =>
         prev.map((b) =>
           b.id === bookingId ? { ...b, status: "cancelled" } : b
         )
       );
-      alert(
-        "Reserva cancelada correctamente. Puedes realizar una nueva reserva cuando gustes."
-      );
+      alert("Reserva cancelada correctamente.");
     } else {
-      alert("Hubo un error al cancelar. Inténtalo de nuevo.");
+      // AHORA MOSTRAMOS EL ERROR REAL
+      alert("Error: " + (res?.error || "Desconocido"));
     }
     setCancellingId(null);
   };

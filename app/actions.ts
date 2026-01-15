@@ -192,9 +192,9 @@ export async function updateRoom(formData: FormData) {
   revalidatePath("/");
 }
 //  CANCELAR RESERVA (CLIENTE)
-// ------------------------------------------------------------------
+// --- REEMPLAZA LA FUNCIÓN cancelBooking EN app/actions.ts ---
+
 export async function cancelBooking(bookingId: number) {
-  // Necesitamos instanciar el cliente aquí para verificar la sesión del usuario
   const cookieStore = await cookies();
 
   const supabaseServer = createServerClient(
@@ -215,21 +215,34 @@ export async function cancelBooking(bookingId: number) {
   } = await supabaseServer.auth.getUser();
 
   if (!user) {
-    return { error: "No autorizado" };
+    console.log("Error: Usuario no autenticado en cancelBooking");
+    return { error: "Tu sesión ha expirado. Recarga la página." };
   }
 
-  // 2. Cancelar (Solo si la reserva pertenece al usuario)
-  const { error } = await supabaseServer
+  console.log("Intentando cancelar reserva:", bookingId, "Usuario:", user.id);
+
+  // 2. Cancelar
+  const { data, error } = await supabaseServer
     .from("bookings")
     .update({ status: "cancelled" })
     .eq("id", bookingId)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id) // Seguridad: solo el dueño
+    .select();
 
   if (error) {
-    console.error("Error al cancelar:", error);
-    return { error: "No se pudo cancelar la reserva" };
+    console.error("❌ ERROR SUPABASE:", error.message); // MIRA ESTO EN TU TERMINAL
+    return { error: `Error de BD: ${error.message}` };
   }
 
+  // Si no hay error pero no devolvió datos, significa que no encontró la reserva (RLS o ID incorrecto)
+  if (!data || data.length === 0) {
+    console.error("❌ ERROR: No se encontró la reserva o no tienes permiso.");
+    return {
+      error: "No se encontró la reserva o no tienes permiso para cancelarla.",
+    };
+  }
+
+  console.log("✅ Reserva cancelada con éxito");
   revalidatePath("/dashboard");
   return { success: true };
 }
