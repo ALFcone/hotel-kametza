@@ -518,9 +518,24 @@ export default async function AdminPage(props: {
                       </td>
                       <td className="py-5 px-4 text-center">
                         {isCancelled ? (
-                          <span className="flex items-center justify-center gap-1 bg-rose-100 text-rose-700 px-2 py-1 rounded-full text-[9px] font-black uppercase border border-rose-200">
-                            <XCircle size={10} /> Cancelada
-                          </span>
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="flex items-center justify-center gap-1 bg-rose-100 text-rose-700 px-2 py-1 rounded-full text-[9px] font-black uppercase border border-rose-200">
+                              <XCircle size={10} /> Cancelada
+                            </span>
+                            {/* AQUÍ MOSTRAMOS LA HORA SI EXISTE */}
+                            {booking.cancelled_at && (
+                              <span className="text-[9px] font-medium text-stone-400">
+                                {new Date(
+                                  booking.cancelled_at
+                                ).toLocaleDateString("es-PE", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            )}
+                          </div>
                         ) : (
                           <span
                             className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${

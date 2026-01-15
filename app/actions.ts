@@ -189,10 +189,10 @@ export async function updateRoom(formData: FormData) {
 }
 
 // ==============================================================================
-// 4. FUNCIÓN: CANCELAR RESERVA (cancelBooking) - ¡LA CORREGIDA!
+// 4. FUNCIÓN: CANCELAR RESERVA (cancelBooking)
 // ==============================================================================
 // Cambia el estado a "cancelled".
-// NOTA: Acepta 'userId' como parámetro para evitar errores de sesión expirada.
+
 export async function cancelBooking(bookingId: number, userId: string) {
   const cookieStore = await cookies();
   const supabaseServer = createServerClient(
@@ -215,21 +215,22 @@ export async function cancelBooking(bookingId: number, userId: string) {
   );
 
   // A. Ejecución Directa (UPDATE)
-  // Confiamos en el ID que viene del cliente porque la regla SQL 'USING(true)'
-  // permite la operación, pero el filtro .eq('user_id', userId) asegura que
-  // solo borres lo tuyo.
+  // Ahora guardamos TAMBIÉN la fecha actual en 'cancelled_at'
   const { error } = await supabaseServer
     .from("bookings")
-    .update({ status: "cancelled" })
+    .update({
+      status: "cancelled",
+      cancelled_at: new Date().toISOString(), // <--- ¡AQUÍ GUARDAMOS LA HORA EXACTA!
+    })
     .eq("id", bookingId)
-    .eq("user_id", userId); // <--- Candado de seguridad
+    .eq("user_id", userId);
 
   if (error) {
     console.error("❌ ERROR BD:", error.message);
     return { error: `No se pudo cancelar: ${error.message}` };
   }
 
-  // B. Éxito y Recarga
   revalidatePath("/dashboard");
+  revalidatePath("/admin"); // Actualizamos también el admin para que salga la fecha
   return { success: true };
 }
