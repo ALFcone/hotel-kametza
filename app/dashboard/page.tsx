@@ -198,6 +198,11 @@ export default function Dashboard() {
                     alt={booking.rooms?.name}
                     className="w-full h-full object-cover"
                   />
+                  ) : (
+                    <div className="w-full h-full bg-stone-200 flex items-center justify-center">
+                      <BedDouble className="text-stone-400" />
+                    </div>
+                  )
                   {booking.status === "cancelled" && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                       <Ban className="text-white opacity-80" size={32} />
