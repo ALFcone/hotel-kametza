@@ -1081,8 +1081,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
+            {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
       <section id="servicios" className="py-24 relative z-10 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -1094,19 +1093,20 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[250px]">
-            {/* 1. COCHERA */}
-            <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-default">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[220px]">
+            
+            {/* 1. COCHERA (2x2) */}
+            <div className="group relative md:col-span-2 md:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-default">
               <img
-                src=""
+                src="/COCHERA PRIVADA.jpg"
                 alt="Cochera"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-105 bg-stone-200"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 p-8">
+              <div className="absolute bottom-0 left-0 p-8 z-10">
                 <div className="flex items-center gap-3 mb-2 text-rose-400">
                   <Car size={24} />
-                  <span className="text-xs font-bold uppercase tracking-wider bg-white/10 px-2 py-1 rounded-md backdrop-blur-sm">
+                  <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-2 py-1 rounded-md backdrop-blur-sm text-white border border-white/20">
                     Gratuito
                   </span>
                 </div>
@@ -1114,116 +1114,127 @@ export default function Home() {
                   Cochera Privada
                 </h3>
                 <p className="text-stone-300 text-sm font-light max-w-sm">
-                  Estacionamiento seguro 24/7 dentro de nuestras instalaciones
-                  para tu total tranquilidad.
+                  Estacionamiento seguro 24/7 dentro de nuestras instalaciones para tu total tranquilidad.
                 </p>
               </div>
             </div>
 
-            {/* 2. DESAYUNOS */}
-            <div className="group relative lg:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 bg-[#700824]">
+            {/* 2. DESAYUNOS (1x2) - Filtro rojo eliminado */}
+            <div className="group relative md:col-span-1 md:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
               <img
-                src=""
+                src="/DESAYUNO AYACUCHANO.jpg"
                 alt="Desayuno"
-                className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay transition duration-700 group-hover:scale-110 bg-rose-900"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
               />
-              <div className="relative h-full flex flex-col justify-end p-8 z-10">
-                <div className="bg-white/10 backdrop-blur-md w-14 h-14 rounded-full flex items-center justify-center mb-6 text-white border border-white/20">
-                  <Coffee size={28} />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+              <div className="relative h-full flex flex-col justify-end p-6 z-10">
+                <div className="bg-white/20 backdrop-blur-md w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg border border-white/30">
+                  <Coffee size={24} />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3">
+                <h3 className="text-2xl font-bold text-white mb-2 leading-tight">
                   Desayuno Regional
                 </h3>
-                <p className="text-rose-100 text-sm leading-relaxed">
-                  Empieza el día con el aroma del café ayacuchano y nuestro
-                  famoso pan chapla recién horneado, quesos frescos y jugos
-                  naturales.
+                <p className="text-stone-200 text-xs font-light leading-relaxed">
+                  Empieza el día con el aroma del café ayacuchano y nuestro famoso pan chapla recién horneado, quesos frescos y jugos naturales.
                 </p>
               </div>
             </div>
 
-            {/* 3. ROOM SERVICE */}
-            <div className="group bg-white rounded-[2rem] p-8 flex flex-col justify-between shadow-sm border border-stone-100 hover:border-rose-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-              <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-700 group-hover:scale-110 transition duration-300">
-                <Bell size={24} />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-stone-800 mb-2">
-                  Room Service
-                </h3>
-                <p className="text-stone-500 text-xs leading-relaxed">
-                  Atención directa a tu habitación para tu máxima comodidad y
-                  privacidad cuando lo desees.
-                </p>
-              </div>
-            </div>
-
-            {/* 4. LAVANDERÍA */}
-            <div className="group bg-white rounded-[2rem] p-8 flex flex-col justify-between shadow-sm border border-stone-100 hover:border-blue-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-              <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-700 group-hover:scale-110 transition duration-300">
-                <Shirt size={24} />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-stone-800 mb-2">
-                  Lavandería
-                </h3>
-                <p className="text-stone-500 text-xs leading-relaxed">
-                  Servicio de lavado y secado rápido y cuidadoso para que viajes
-                  ligero y sin preocupaciones.
-                </p>
-              </div>
-            </div>
-
-            {/* 5. TRASLADOS */}
-            <div className="group relative rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
+            {/* 3. ROOM SERVICE (1x1) */}
+            <div className="group relative md:col-span-1 md:row-span-1 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-default">
               <img
-                src=""
-                alt="Traslados"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110 bg-stone-300"
+                src="/ROOM SERVICE.jpg"
+                alt="Room Service"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition duration-500"></div>
-              <div className="absolute bottom-0 left-0 p-6 w-full z-10">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold text-white leading-tight">
-                      Traslados
-                    </h3>
-                    <p className="text-stone-200 text-[10px] uppercase tracking-wider mt-1">
-                      Aeropuerto - Hotel
-                    </p>
-                  </div>
-                  <Plane size={24} className="text-white opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+              <div className="relative h-full flex flex-col justify-end p-6 z-10">
+                <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white mb-3 border border-white/30">
+                  <Bell size={20} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-1">
+                    Room Service
+                  </h3>
+                  <p className="text-stone-200 text-xs leading-relaxed font-light">
+                    Atención directa a tu habitación para tu máxima comodidad y privacidad cuando lo desees.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* 6. TOURS */}
-            <div className="group relative lg:col-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-pointer">
+            {/* 4. LAVANDERÍA (1x1) */}
+            <div className="group relative md:col-span-1 md:row-span-1 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-default">
               <img
-                src=""
-                alt="Tours Ayacucho"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-105 bg-stone-400"
+                src="/LAVANDERIA.jpg"
+                alt="Lavandería"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#700824]/95 via-[#700824]/60 to-transparent"></div>
-              <div className="absolute inset-0 p-8 flex flex-col justify-center max-w-sm">
-                <div className="flex items-center gap-2 text-amber-400 mb-3">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+              <div className="relative h-full flex flex-col justify-end p-6 z-10">
+                <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white mb-3 border border-white/30">
+                  <Shirt size={20} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-1">
+                    Lavandería
+                  </h3>
+                  <p className="text-stone-200 text-xs leading-relaxed font-light">
+                    Servicio de lavado y secado rápido y cuidadoso para que viajes ligero y sin preocupaciones.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. TRASLADOS (1x2 - Columna Vertical Izquierda Base) */}
+            <div className="group relative md:col-span-1 md:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
+              <img
+                src="/TRASLADO AEROPUERTO.jpg"
+                alt="Traslados"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 p-6 w-full z-10">
+                <div className="bg-white/20 backdrop-blur-md w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-white border border-white/30">
+                  <Plane size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-white leading-tight">
+                  Traslados
+                </h3>
+                <p className="text-stone-200 text-[10px] uppercase tracking-wider mt-2 font-bold">
+                  Aeropuerto - Hotel
+                </p>
+              </div>
+            </div>
+
+            {/* 6. TOURS (3x2 - Gran Bloque Horizontal Derecho) */}
+            <div className="group relative md:col-span-3 md:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-pointer min-h-[440px]">
+              <img
+                src="/DESCUBRE AYACUCHOO.jpg"
+                alt="Tours Ayacucho"
+                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent"></div>
+              
+              <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-center max-w-2xl z-10 text-left">
+                <div className="flex items-center gap-2.5 text-amber-400 mb-3">
                   <Map size={20} />
-                  <span className="text-[10px] font-black uppercase tracking-widest bg-black/20 px-2 py-1 rounded">
-                    Garantía y Seguridad
+                  <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded border border-white/10 text-white">
+                    Experiencias Garantizadas y Seguras
                   </span>
                 </div>
-                <h3 className="text-3xl font-serif font-medium text-white mb-2 leading-tight">
-                  Descubre Ayacucho
+                <h3 className="text-3xl md:text-5xl font-serif font-medium text-white mb-3 leading-tight tracking-tight">
+                  Descubre Ayacucho <br /> con los Expertos
                 </h3>
-                <p className="text-stone-200 text-sm mb-6 font-light">
-                  Coordinamos tus tours a las aguas turquesas, iglesias y
-                  miradores con agencias aliadas de total confianza.
+                <p className="text-stone-300 text-sm md:text-base mb-8 font-light max-w-lg leading-relaxed">
+                  Te conectamos con los mejores tours certificados para explorar las piscinas de Millpu, iglesias coloniales, miradores y la rica historia andina. Experiencias auténticas y totalmente seguras.
                 </p>
-                <span className="inline-flex items-center gap-2 text-white font-bold text-sm group-hover:gap-4 transition-all bg-white/20 w-fit px-4 py-2 rounded-full backdrop-blur-sm border border-white/30 hover:bg-white/30">
-                  Coordinar Tour <ArrowRight size={16} />
+                <span className="inline-flex items-center gap-3 text-white font-bold text-sm w-fit group-hover:text-amber-400 transition-colors bg-white/10 px-6 py-3 rounded-full border border-white/20 backdrop-blur-sm hover:bg-white/20">
+                  Coordinar Tour <ArrowRight size={16} className="group-hover:translate-x-1.5 transition-transform" />
                 </span>
               </div>
             </div>
+
           </div>
         </div>
       </section>
