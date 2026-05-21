@@ -192,23 +192,24 @@ export default function Dashboard() {
                 }`}
               >
                 {/* Imagen Habitación */}
-                <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden shadow-md relative z-10 flex-shrink-0">
-                  <img
-                    src={booking.rooms?.image_url}
-                    alt={booking.rooms?.name}
-                    className="w-full h-full object-cover"
-                  />
-                  ) : (
-                    <div className="w-full h-full bg-stone-200 flex items-center justify-center">
-                      <BedDouble className="text-stone-400" />
-                    </div>
-                  )
-                  {booking.status === "cancelled" && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <Ban className="text-white opacity-80" size={32} />
-                    </div>
-                  )}
-                </div>
+                  <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden shadow-md relative z-10 flex-shrink-0">
+                    {booking.rooms?.image_url ? (
+                      <img
+                        src={booking.rooms.image_url}
+                        alt={booking.rooms?.name || "Habitación"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-stone-200 flex items-center justify-center">
+                        <BedDouble className="text-stone-400" />
+                      </div>
+                    )}
+                    {booking.status === "cancelled" && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <Ban className="text-white opacity-80" size={32} />
+                      </div>
+                    )}
+                  </div>
 
                 {/* Detalles Reserva */}
                 <div className="flex-1 w-full relative z-10">
