@@ -110,9 +110,9 @@ function AuthModal({
     } catch (err: any) {
       setError(
         "Error: " +
-          (err.message === "Invalid login credentials"
-            ? "Contraseña incorrecta"
-            : err.message)
+        (err.message === "Invalid login credentials"
+          ? "Contraseña incorrecta"
+          : err.message)
       );
     } finally {
       setLoading(false);
@@ -213,8 +213,8 @@ function AuthModal({
             {loading
               ? "Cargando..."
               : isLogin
-              ? "Ingresar y Reservar"
-              : "Crear Cuenta"}
+                ? "Ingresar y Reservar"
+                : "Crear Cuenta"}
           </button>
         </form>
 
@@ -476,11 +476,10 @@ function BookingModal({
                 // Si hay usuario, poner su email y bloquear el campo
                 defaultValue={currentUser?.email || ""}
                 readOnly={!!currentUser}
-                className={`w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 ${
-                  currentUser
-                    ? "text-stone-500 cursor-not-allowed bg-stone-100"
-                    : ""
-                }`}
+                className={`w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 ${currentUser
+                  ? "text-stone-500 cursor-not-allowed bg-stone-100"
+                  : ""
+                  }`}
               />
               {/* Si está logueado, mostrar candado para indicar seguridad */}
               {currentUser && (
@@ -905,9 +904,8 @@ export default function Home() {
 
         {/* --- MENÚ MÓVIL --- */}
         <div
-          className={`fixed inset-0 bg-white z-[105] flex flex-col justify-center items-center transition-all duration-300 ${
-            isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
-          } md:hidden`}
+          className={`fixed inset-0 bg-white z-[105] flex flex-col justify-center items-center transition-all duration-300 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+            } md:hidden`}
         >
           <div className="flex flex-col space-y-8 text-center items-center">
             <a
@@ -1015,7 +1013,7 @@ export default function Home() {
           </div>
           <h1 className="text-5xl md:text-7xl font-serif font-medium mb-6 text-rose-950 tracking-tight leading-tight">
             {" "}
-            Descubre la magia <br /> de los Andes{" "}
+            Descubre Ayacucho <br /> La Magia de los Andes{" "}
           </h1>
           <p className="text-lg md:text-xl text-stone-600 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
             {" "}
@@ -1081,7 +1079,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-            {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
+      {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
       <section id="servicios" className="py-24 relative z-10 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -1094,7 +1092,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[220px]">
-            
+
             {/* 1. COCHERA (2x2) */}
             <div className="group relative md:col-span-2 md:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-default">
               <img
@@ -1215,7 +1213,7 @@ export default function Home() {
                 className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent"></div>
-              
+
               <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-center max-w-2xl z-10 text-left">
                 <div className="flex items-center gap-2.5 text-amber-400 mb-3">
                   <Map size={20} />
