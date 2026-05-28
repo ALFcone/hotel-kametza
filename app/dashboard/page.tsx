@@ -41,12 +41,17 @@ export default function Dashboard() {
       } = await supabase.auth.getUser();
 
       if (error || !user) {
-        router.push("/"); // Si no hay usuario, mandar al inicio
+        router.push("/login"); // Si no hay usuario, mandar al login
         return;
       }
       setUser(user);
 
-      // B. Obtener Reservas de este usuario desde Supabase
+      if (user.email === "alfesco86@gmail.com") {
+        router.push("/admin"); // Si es admin, mandarlo al portal de admin
+        return;
+      }
+
+      // C. Obtener Reservas de este usuario desde Supabase
       const { data: bookingsData } = await supabase
         .from("bookings")
         .select("*, rooms(*)")
@@ -84,9 +89,9 @@ export default function Dashboard() {
 
     setCancellingId(bookingId); // Activar spinner en el botón
 
-    // C. LLAMADA AL SERVIDOR (Aquí estaba el error antes)
-    // Ahora enviamos explícitamente el user.id para evitar el error de sesión
-    const res = await cancelBooking(bookingId, user.id);
+    // C. LLAMADA AL SERVIDOR
+    // Obtenemos la sesión en el servidor para mayor seguridad
+    const res = await cancelBooking(bookingId);
 
     // D. Resultado
     if (res?.success) {
@@ -185,31 +190,30 @@ export default function Dashboard() {
             {bookings.map((booking) => (
               <div
                 key={booking.id}
-                className={`group bg-white rounded-[2rem] p-6 md:p-8 shadow-xl border border-stone-100 flex flex-col md:flex-row gap-8 items-center relative overflow-hidden transition-all duration-500 ${
-                  booking.status === "cancelled"
+                className={`group bg-white rounded-[2rem] p-6 md:p-8 shadow-xl border border-stone-100 flex flex-col md:flex-row gap-8 items-center relative overflow-hidden transition-all duration-500 ${booking.status === "cancelled"
                     ? "opacity-75 grayscale-[0.5]"
                     : "hover:shadow-2xl"
-                }`}
+                  }`}
               >
                 {/* Imagen Habitación */}
-                  <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden shadow-md relative z-10 flex-shrink-0">
-                    {booking.rooms?.image_url ? (
-                      <img
-                        src={booking.rooms.image_url}
-                        alt={booking.rooms?.name || "Habitación"}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-stone-200 flex items-center justify-center">
-                        <BedDouble className="text-stone-400" />
-                      </div>
-                    )}
-                    {booking.status === "cancelled" && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <Ban className="text-white opacity-80" size={32} />
-                      </div>
-                    )}
-                  </div>
+                <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden shadow-md relative z-10 flex-shrink-0">
+                  {booking.rooms?.image_url ? (
+                    <img
+                      src={booking.rooms.image_url}
+                      alt={booking.rooms?.name || "Habitación"}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-stone-200 flex items-center justify-center">
+                      <BedDouble className="text-stone-400" />
+                    </div>
+                  )}
+                  {booking.status === "cancelled" && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <Ban className="text-white opacity-80" size={32} />
+                    </div>
+                  )}
+                </div>
 
                 {/* Detalles Reserva */}
                 <div className="flex-1 w-full relative z-10">
@@ -225,8 +229,8 @@ export default function Dashboard() {
                       {booking.status === "cancelled"
                         ? "Cancelada"
                         : booking.status === "pendiente"
-                        ? "Pendiente"
-                        : booking.status}
+                          ? "Pendiente"
+                          : booking.status}
                     </span>
                   </div>
 
