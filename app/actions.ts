@@ -1,25 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
-import { createServerClient } from "@supabase/ssr";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseServer } from "@/lib/supabase-server";
 
-// ==============================================================================
-// 1. HELPER: Obtener cliente con sesión
-// ==============================================================================
-async function getSupabaseServer() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) { return cookieStore.get(name)?.value; },
-      },
-    }
-  );
-}
 
 // ==============================================================================
 // 2. FUNCIÓN: CREAR RESERVA (Directa a tabla 'reserva')
@@ -35,7 +18,7 @@ export async function createBooking(formData: FormData) {
   const paymentMethod = formData.get("paymentMethod") as string;
 
   // Verificación de disponibilidad
-  const { data: isAvailable } = await supabase.rpc("check_availability", {
+  const { data: isAvailable } = await supabaseServer.rpc("check_availability", {
     room_id_input: idHabitacion,
     check_in_input: formData.get("checkIn") as string,
     check_out_input: formData.get("checkOut") as string,
@@ -45,15 +28,21 @@ export async function createBooking(formData: FormData) {
 
   // Inserción en Base de Datos - ESQUEMA REAL
   const { data: booking, error } = await supabaseServer
-    .from("reserva") 
+    .from("bookings") 
     .insert({
-      id_usuario: user.id, 
-      id_habitacion: idHabitacion,
-      fecha_ingreso: formData.get("checkIn"),
-      fecha_salida: formData.get("checkOut"),
-      total: total,
-      metodo_pago: paymentMethod, 
-      estado: "pendiente",
+      user_id: user.id, 
+      room_id: idHabitacion,
+      check_in: formData.get("checkIn"),
+      check_out: formData.get("checkOut"),
+      total_price: total,
+      payment_method: paymentMethod, 
+      status: "pendiente",
+      client_name: formData.get("name"),
+      client_email: formData.get("email"),
+      client_country: formData.get("country"),
+      client_phone: formData.get("phone"),
+      document_type: formData.get("documentType"),
+      document_number: formData.get("documentNumber"),
     })
     .select()
     .single();
@@ -77,13 +66,13 @@ export async function cancelBooking(bookingId: number) {
   if (!user) return { error: "No autorizado." };
 
   const { error } = await supabaseServer
-    .from("reserva") 
+    .from("bookings") 
     .update({ 
-      estado: "cancelled", 
-      fecha_cancelacion: new Date().toISOString() 
+      status: "cancelled", 
+      cancelled_at: new Date().toISOString() 
     })
     .eq("id", bookingId)
-    .eq("id_usuario", user.id); 
+    .eq("user_id", user.id); 
 
   if (error) return { error: "No se pudo cancelar." };
 
@@ -92,16 +81,27 @@ export async function cancelBooking(bookingId: number) {
   return { success: true };
 }
 
-// ==============================================================================
-// 4. FUNCIÓN: ACTUALIZAR HABITACIÓN
-// ==============================================================================
 export async function updateRoom(formData: FormData) {
-  const idHabitacion = formData.get("roomId");
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+
+  if (!user || user.email !== "alfesco86@gmail.com") {
+    console.error("No autorizado: Permisos insuficientes");
+    return;
+  }
+
+  const idHabitacion = Number(formData.get("roomId"));
   
-  await supabase.from("habitaciones").update({ 
-    precio: Number(formData.get("price")),
-    descripcion: formData.get("description"),
+  const { error } = await supabaseServer.from("rooms").update({ 
+    price_per_night: Number(formData.get("price")),
+    description: formData.get("description"),
+    image_url: formData.get("image"),
   }).eq("id", idHabitacion);
+
+  if (error) {
+    console.error("No se pudo actualizar la habitación:", error.message);
+    return;
+  }
 
   revalidatePath("/admin");
   revalidatePath("/");

@@ -286,6 +286,19 @@ function BookingModal({
   if (!isOpen) return null;
 
   const executeBooking = async (formData: FormData) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Debes iniciar sesión para reservar.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Asegurar que el ID del usuario recién autenticado esté en el FormData
+    formData.set("userId", user.id);
+
     const method = formData.get("paymentMethod");
     let newTab: Window | null = null;
     if (method === "online") {
@@ -305,7 +318,7 @@ function BookingModal({
         if (method === "online" && newTab) {
           newTab.location.href = response.url;
           router.push(
-            `/exito?method=online&status=pending&id=${response.bookingId}&amount=${response.price}`
+            `/exito?method=online&status=pending&id=${response.bookingId}&amount=${totalPrice}`
           );
         } else {
           router.push(response.url);
@@ -689,6 +702,7 @@ function RoomCard({
       </div>
 
       <BookingModal
+        key={currentUser?.id || "anonymous"}
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         room={room}
@@ -777,6 +791,8 @@ export default function Home() {
   const userName =
     firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
 
+  const isAdmin = currentUser?.email === "alfesco86@gmail.com";
+
   if (loading)
     return (
       <div className="h-screen flex items-center justify-center bg-white text-[#700824] font-bold animate-pulse">
@@ -846,7 +862,7 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-4">
               {currentUser ? (
                 <div className="flex items-center gap-4">
-                  {currentUser.user_metadata?.role === "admin" && (
+                  {isAdmin && (
                     <a
                       href="/admin"
                       className="text-[10px] font-black bg-stone-900 text-white px-3 py-1.5 rounded-lg hover:bg-rose-900 transition tracking-widest uppercase"
@@ -856,7 +872,7 @@ export default function Home() {
                   )}
                   {/* BOTÓN DE USUARIO MINIMALISTA */}
                   <a
-                    href="/dashboard"
+                    href={isAdmin ? "/admin" : "/dashboard"}
                     className="group flex items-center gap-2 text-stone-600 hover:text-[#700824] transition-colors duration-300"
                   >
                     <div className="p-1.5 rounded-full border border-stone-200 group-hover:border-[#700824] transition-colors">
@@ -958,7 +974,7 @@ export default function Home() {
                 </div>
 
                 <a
-                  href="/dashboard"
+                  href={isAdmin ? "/admin" : "/dashboard"}
                   onClick={closeMenu}
                   className="text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-[#700824] transition-colors"
                 >
@@ -1408,11 +1424,6 @@ export default function Home() {
             </p>
           </div>
           <div className="flex gap-6">
-            {" "}
-            <a href="/admin" className="hover:text-white transition">
-              {" "}
-              Admin Login{" "}
-            </a>{" "}
           </div>
         </div>
       </footer>

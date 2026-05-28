@@ -1,4 +1,5 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabaseServer } from "@/lib/supabase-server";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { updateRoom } from "../actions";
 import DownloadButton from "./DownloadButton";
@@ -39,7 +40,12 @@ async function markAsPaid(formData: FormData) {
   "use server";
   const bookingId = formData.get("bookingId");
   if (!bookingId) return;
-  await supabase
+
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+  if (!user || user.email !== "alfesco86@gmail.com") return;
+
+  await supabaseServer
     .from("bookings")
     .update({ status: "pagado" })
     .eq("id", bookingId);
@@ -51,9 +57,13 @@ async function deleteBooking(formData: FormData) {
   const bookingId = formData.get("bookingId");
   if (!bookingId) return;
 
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+  if (!user || user.email !== "alfesco86@gmail.com") return;
+
   // OJO: En lugar de borrar, podrías cambiar estado a 'cancelled' si prefieres historial.
   // Pero si quieres borrar físico, esto está bien.
-  await supabase.from("bookings").delete().eq("id", bookingId);
+  await supabaseServer.from("bookings").delete().eq("id", bookingId);
   revalidatePath("/admin");
 }
 
@@ -86,6 +96,18 @@ const formatTicket = (id: number) => {
 export default async function AdminPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
+  // VALIDACIÓN DE AUTENTICACIÓN Y ROL DE ADMIN
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user }, error: authError } = await supabaseServer.auth.getUser();
+
+  if (!user || authError) {
+    redirect("/login");
+  }
+
+  if (user.email !== "alfesco86@gmail.com") {
+    redirect("/dashboard");
+  }
+
   const searchParams = await props.searchParams;
 
   // A. OBTENCIÓN DE FECHAS Y PARÁMETROS
@@ -95,8 +117,8 @@ export default async function AdminPage(props: {
   const filterDate = dateFrom; // Fecha base para KPIs
 
   // B. CONSULTAS A BASE DE DATOS (DATA FETCHING)
-  const { data: rooms } = await supabase.from("rooms").select("*").order("id");
-  const { data: allBookings } = await supabase
+  const { data: rooms } = await supabaseServer.from("rooms").select("*").order("id");
+  const { data: allBookings } = await supabaseServer
     .from("bookings")
     .select("*")
     .order("created_at", { ascending: false });
