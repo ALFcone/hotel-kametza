@@ -1025,18 +1025,23 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
           {/* ETIQUETA ELEGANTE Y PROFESIONAL */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <div className="h-[1px] w-8 md:w-16 bg-white/50"></div>
-            <span className="text-lg md:text-xl font-serif font-medium text-white tracking-[0.35em] uppercase drop-shadow-md">
-              Ayacucho, Perú
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="h-[1px] w-12 md:w-24 bg-white/40"></div>
+            <span className="text-xs md:text-sm font-medium text-white tracking-[0.5em] uppercase drop-shadow-md">
+              Bienvenidos a
             </span>
-            <div className="h-[1px] w-8 md:w-16 bg-white/50"></div>
+            <div className="h-[1px] w-12 md:w-24 bg-white/40"></div>
           </div>
-          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 text-white tracking-tight leading-tight drop-shadow-2xl">
-            Descubre Ayacucho <br /> La Magia de los Andes
+          
+          <h1 className="text-6xl md:text-8xl lg:text-[8rem] font-serif font-black mb-2 text-white tracking-widest leading-none drop-shadow-2xl uppercase">
+            Kametza
           </h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-12 font-light leading-relaxed drop-shadow-lg">
-            Un refugio donde la historia colonial se encuentra con el confort contemporáneo, diseñado para una experiencia inolvidable.
+          <h2 className="text-3xl md:text-5xl font-serif italic text-white/90 mb-10 drop-shadow-xl font-light tracking-wide">
+            Hotel & Suites
+          </h2>
+          
+          <p className="text-lg md:text-xl text-white/95 max-w-2xl mx-auto mb-12 font-light leading-relaxed drop-shadow-lg bg-black/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10">
+            Un refugio donde la historia colonial de Ayacucho se encuentra con el confort contemporáneo para brindarte una experiencia inolvidable.
           </p>
 
           {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
