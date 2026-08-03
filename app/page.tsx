@@ -1350,6 +1350,75 @@ export default function Home() {
         </div>
       </section>
 
+      {/* --- SECCIÓN DESAYUNO --- */}
+      <section id="desayuno" className="scroll-reveal py-24 relative w-full bg-white overflow-hidden border-b border-stone-100">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 xl:px-12 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            
+            <div className="order-2 lg:order-1 relative">
+              <div className="aspect-[4/5] md:aspect-square lg:aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl relative group">
+                <img 
+                  src="/DESAYUNO%20AYACUCHANO.jpg" 
+                  alt="Desayuno Ayacuchano en Hotel Kametza" 
+                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/20 to-transparent"></div>
+                <div className="absolute bottom-8 left-8 right-8 text-white">
+                  <p className="font-serif italic text-xl md:text-2xl drop-shadow-md leading-relaxed">"Un despertar con el verdadero sabor de nuestra tierra"</p>
+                </div>
+              </div>
+              {/* Decoración detrás de la imagen */}
+              <div className="absolute -z-10 -bottom-6 -left-6 w-full h-full border-2 border-[#e3004f]/20 rounded-[2.5rem]"></div>
+            </div>
+
+            <div className="order-1 lg:order-2">
+              <div className="flex items-center gap-4 mb-4">
+                <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+                  Experiencia Gastronómica
+                </span>
+                <div className="h-[1px] w-12 md:w-20 bg-rose-200"></div>
+              </div>
+              
+              <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6 leading-tight">
+                El Auténtico Desayuno <br className="hidden md:block"/> Ayacuchano
+              </h2>
+              
+              <p className="text-stone-500 text-sm md:text-base leading-relaxed mb-8">
+                Cada mañana, preparamos un desayuno pensado para que inicies el día lleno de energía. Disfruta de la fusión perfecta entre la frescura de los ingredientes locales y el sabor tradicional que nos caracteriza.
+              </p>
+
+              <div className="space-y-4 mb-10">
+                <div className="flex items-start gap-4 bg-stone-50 p-4 md:p-6 rounded-2xl border border-stone-100 transition-colors hover:border-rose-200">
+                  <div className="w-10 h-10 rounded-full bg-white shadow-sm text-rose-600 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Coffee size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-stone-800 mb-1">Bebidas Calientes</h4>
+                    <p className="text-stone-500 text-sm leading-relaxed">Café pasado de la región, variedad de infusiones naturales, mates tradicionales y leche fresca.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4 bg-stone-50 p-4 md:p-6 rounded-2xl border border-stone-100 transition-colors hover:border-amber-200">
+                  <div className="w-10 h-10 rounded-full bg-white shadow-sm text-amber-500 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Check size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-stone-800 mb-1">Acompañamientos de la Región</h4>
+                    <p className="text-stone-500 text-sm leading-relaxed">Delicioso pan chapla recién horneado, queso andino fresco, tamalitos, aceitunas y frutas de la estación.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="inline-flex items-center gap-3 bg-white border border-stone-200 rounded-full py-3 px-6 text-stone-600 text-sm font-bold shadow-sm hover:shadow-md transition-shadow">
+                <Clock size={16} className="text-rose-600" />
+                Disponible todos los días de 7:00 AM a 9:30 AM
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       <section id="resenas" className="scroll-reveal py-24 bg-stone-100 relative w-full overflow-hidden">
         {/* Decoraciones de fondo */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-rose-100 rounded-full blur-3xl opacity-40 -translate-y-1/2 translate-x-1/3"></div>
