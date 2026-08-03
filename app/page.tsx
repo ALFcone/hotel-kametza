@@ -1638,101 +1638,101 @@ export default function Home() {
 
       <section
         id="contacto"
-        className="min-h-screen flex flex-col justify-center py-24 relative overflow-hidden z-10 w-full bg-[url('/bg_contacto.png')] bg-cover bg-center bg-fixed"
+        className="min-h-screen flex flex-col justify-center py-24 relative overflow-hidden z-10 w-full bg-[url('/bg_contacto.png')] bg-cover bg-center bg-fixed border-t border-stone-800"
       >
-        <div className="absolute inset-0 bg-stone-50/70 backdrop-blur-md"></div>
+        <div className="absolute inset-0 bg-stone-950/85 backdrop-blur-md"></div>
         <div className="w-full px-4 md:px-8 xl:px-12 text-center relative z-10 max-w-none">
           <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
-            <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+            <div className="h-[1px] w-12 md:w-20 bg-amber-700/50"></div>
+            <span className="text-amber-400 font-serif italic text-lg md:text-2xl font-medium tracking-wide">
               Atención 24/7
             </span>
-            <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
+            <div className="h-[1px] w-12 md:w-20 bg-amber-700/50"></div>
           </div>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-stone-900">
+          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-stone-50">
             {" "}
             ¿Deseas una atención directa?{" "}
           </h2>
-          <div className="grid md:grid-cols-3 gap-8 text-center max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 text-center max-w-6xl mx-auto mt-12">
             <a
               href="https://wa.me/51966556622"
               target="_blank"
-              className="p-10 bg-white border border-stone-100 rounded-[2.5rem] hover:border-rose-200 hover:shadow-rose-900/10 transition duration-500 group shadow-xl flex flex-col items-center justify-center hover:-translate-y-2"
+              className="p-10 bg-stone-900/80 backdrop-blur-sm border border-stone-800 rounded-[2.5rem] hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(251,191,36,0.1)] transition duration-500 group flex flex-col items-center justify-center hover:-translate-y-2"
             >
-              <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 transition duration-500">
+              <div className="w-16 h-16 bg-stone-800 rounded-2xl flex items-center justify-center text-amber-400 mb-6 group-hover:scale-110 transition duration-500">
                 <MessageSquare size={32} />
               </div>
-              <h3 className="font-black text-2xl mb-2 text-stone-900 font-serif">WhatsApp</h3>
-              <p className="text-rose-600 font-bold tracking-widest">966 556 622</p>
+              <h3 className="font-black text-2xl mb-2 text-stone-100 font-serif">WhatsApp</h3>
+              <p className="text-amber-400 font-bold tracking-widest">966 556 622</p>
             </a>
             <a
               href="tel:+51920042099"
-              className="p-10 bg-white border border-stone-100 rounded-[2.5rem] hover:border-rose-200 hover:shadow-rose-900/10 transition duration-500 group shadow-xl flex flex-col items-center justify-center hover:-translate-y-2"
+              className="p-10 bg-stone-900/80 backdrop-blur-sm border border-stone-800 rounded-[2.5rem] hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(251,191,36,0.1)] transition duration-500 group flex flex-col items-center justify-center hover:-translate-y-2"
             >
-              <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 transition duration-500">
+              <div className="w-16 h-16 bg-stone-800 rounded-2xl flex items-center justify-center text-amber-400 mb-6 group-hover:scale-110 transition duration-500">
                 <Phone size={32} />
               </div>
-              <h3 className="font-black text-2xl mb-2 text-stone-900 font-serif">Recepción</h3>
-              <p className="text-rose-600 font-bold tracking-widest">920 042 099</p>
+              <h3 className="font-black text-2xl mb-2 text-stone-100 font-serif">Recepción</h3>
+              <p className="text-amber-400 font-bold tracking-widest">920 042 099</p>
             </a>
             <a
               href="mailto:kametzahotelayacucho@gmail.com"
-              className="p-10 bg-white border border-stone-100 rounded-[2.5rem] hover:border-rose-200 hover:shadow-rose-900/10 transition duration-500 group shadow-xl flex flex-col items-center justify-center hover:-translate-y-2"
+              className="p-10 bg-stone-900/80 backdrop-blur-sm border border-stone-800 rounded-[2.5rem] hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(251,191,36,0.1)] transition duration-500 group flex flex-col items-center justify-center hover:-translate-y-2"
             >
-              <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 transition duration-500">
+              <div className="w-16 h-16 bg-stone-800 rounded-2xl flex items-center justify-center text-amber-400 mb-6 group-hover:scale-110 transition duration-500">
                 <Mail size={32} />
               </div>
-              <h3 className="font-black text-2xl mb-2 text-stone-900 font-serif">Correo</h3>
-              <p className="text-rose-600 font-bold text-sm">kametzahotelayacucho@gmail.com</p>
+              <h3 className="font-black text-2xl mb-2 text-stone-100 font-serif">Correo</h3>
+              <p className="text-amber-400 font-bold text-sm">kametzahotelayacucho@gmail.com</p>
             </a>
           </div>
         </div>
       </section>
 
       {/* --- FOOTER PREMIUM --- */}
-      <footer className="bg-stone-50 border-t border-stone-200 pt-24 pb-12 text-sm relative z-10 w-full overflow-hidden">
+      <footer className="bg-stone-950 border-t border-stone-900 pt-24 pb-12 text-sm relative z-10 w-full overflow-hidden">
         {/* Elemento decorativo del footer */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-rose-100/50 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-stone-200/50 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-900/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-stone-800/30 rounded-full blur-[100px] pointer-events-none"></div>
 
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 xl:px-12 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-12 xl:gap-8 mb-20">
             
             {/* Brand Column */}
             <div className="xl:col-span-1">
-              <img src="/logoo.png" alt="Hotel Kametza" className="h-24 mb-6" />
-              <p className="text-stone-600 text-sm leading-relaxed mb-8 max-w-sm">
+              <img src="/logoo.png" alt="Hotel Kametza" className="h-24 mb-6 brightness-0 invert" />
+              <p className="text-stone-400 text-sm leading-relaxed mb-8 max-w-sm">
                 Un refugio exclusivo donde la historia colonial se encuentra con el confort contemporáneo en el corazón de Ayacucho.
               </p>
               <div className="flex gap-4">
-                <a href="https://www.facebook.com/share/1KhmvycDcR/" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:bg-[#1877F2] hover:border-[#1877F2] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
-                  <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" className="w-4 h-4 group-hover:brightness-0 group-hover:invert transition-all" alt="Facebook" />
+                <a href="https://www.facebook.com/share/1KhmvycDcR/" target="_blank" className="w-10 h-10 bg-stone-900 shadow-sm border border-stone-800 hover:bg-[#1877F2] hover:border-[#1877F2] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                  <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" className="w-4 h-4 brightness-0 invert transition-all" alt="Facebook" />
                 </a>
-                <a href="https://www.instagram.com/kametzahotelayacucho/" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:bg-[#E4405F] hover:border-[#E4405F] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
-                  <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" className="w-4 h-4 group-hover:brightness-0 group-hover:invert transition-all" alt="Instagram" />
+                <a href="https://www.instagram.com/kametzahotelayacucho/" target="_blank" className="w-10 h-10 bg-stone-900 shadow-sm border border-stone-800 hover:bg-[#E4405F] hover:border-[#E4405F] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                  <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" className="w-4 h-4 brightness-0 invert transition-all" alt="Instagram" />
                 </a>
-                <a href="https://tiktok.com/@HotelKametza" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:bg-black hover:border-black group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
-                  <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" className="w-4 h-4 group-hover:brightness-0 group-hover:invert transition-all" alt="TikTok" />
+                <a href="https://tiktok.com/@HotelKametza" target="_blank" className="w-10 h-10 bg-stone-900 shadow-sm border border-stone-800 hover:bg-black hover:border-black group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                  <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" className="w-4 h-4 brightness-0 invert transition-all" alt="TikTok" />
                 </a>
               </div>
             </div>
 
             {/* Links Column */}
             <div>
-              <h4 className="text-rose-950 font-bold tracking-widest text-xs uppercase mb-6">Descubre</h4>
+              <h4 className="text-amber-500 font-bold tracking-widest text-xs uppercase mb-6">Descubre</h4>
               <ul className="space-y-4">
-                <li><a href="#inicio" className="text-stone-500 font-medium hover:text-rose-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-rose-400" /> Inicio</a></li>
-                <li><a href="#habitaciones" className="text-stone-500 font-medium hover:text-rose-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-rose-400" /> Habitaciones</a></li>
-                <li><a href="#servicios" className="text-stone-500 font-medium hover:text-rose-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-rose-400" /> Experiencia Kametza</a></li>
-                <li><a href="#ubicacion" className="text-stone-500 font-medium hover:text-rose-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-rose-400" /> Ubicación</a></li>
+                <li><a href="#inicio" className="text-stone-400 font-medium hover:text-amber-400 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-amber-600" /> Inicio</a></li>
+                <li><a href="#habitaciones" className="text-stone-400 font-medium hover:text-amber-400 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-amber-600" /> Habitaciones</a></li>
+                <li><a href="#servicios" className="text-stone-400 font-medium hover:text-amber-400 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-amber-600" /> Experiencia Kametza</a></li>
+                <li><a href="#ubicacion" className="text-stone-400 font-medium hover:text-amber-400 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-amber-600" /> Ubicación</a></li>
               </ul>
             </div>
 
             {/* Dirección Column */}
             <div>
-              <h4 className="text-rose-950 font-bold tracking-widest text-xs uppercase mb-6">Ubicación</h4>
-              <div className="flex items-start gap-3 text-stone-600 mb-4 font-medium">
-                <MapPin size={18} className="text-rose-600 flex-shrink-0 mt-1" />
+              <h4 className="text-amber-500 font-bold tracking-widest text-xs uppercase mb-6">Ubicación</h4>
+              <div className="flex items-start gap-3 text-stone-400 mb-4 font-medium">
+                <MapPin size={18} className="text-amber-600 flex-shrink-0 mt-1" />
                 <p className="leading-relaxed">
                   Jirón Las Américas #154<br />
                   Ref. Óvalo Magdalena<br />
@@ -1743,8 +1743,8 @@ export default function Home() {
 
             {/* Pagos Column */}
             <div>
-              <h4 className="text-rose-950 font-bold tracking-widest text-xs uppercase mb-6">Medios de Pago</h4>
-              <p className="text-stone-600 font-medium text-sm mb-4">
+              <h4 className="text-amber-500 font-bold tracking-widest text-xs uppercase mb-6">Medios de Pago</h4>
+              <p className="text-stone-400 font-medium text-sm mb-4">
                 Aceptamos todas las tarjetas de crédito, débito y transferencias.
               </p>
               <div className="flex gap-2 mb-6">
@@ -1764,12 +1764,12 @@ export default function Home() {
           </div>
 
           {/* Bottom Footer */}
-          <div className="border-t border-stone-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+          <div className="border-t border-stone-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
             <div>
-              <p className="font-bold text-stone-600 text-xs">© 2025 Hotel Kametza. Todos los derechos reservados.</p>
-              <p className="text-[10px] text-stone-400 mt-1">RUC: 10452685951</p>
+              <p className="font-bold text-stone-500 text-xs">© 2025 Hotel Kametza. Todos los derechos reservados.</p>
+              <p className="text-[10px] text-stone-600 mt-1">RUC: 10452685951</p>
             </div>
-            <div className="text-[10px] text-rose-600 bg-rose-50 px-3 py-1.5 rounded-full border border-rose-100 uppercase tracking-widest font-black">
+            <div className="text-[10px] text-amber-500 bg-amber-950/30 px-3 py-1.5 rounded-full border border-amber-900/50 uppercase tracking-widest font-black">
               Experiencia Premium en Ayacucho
             </div>
           </div>
