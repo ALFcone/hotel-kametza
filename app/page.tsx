@@ -1127,11 +1127,12 @@ export default function Home() {
       <section id="servicios" className="scroll-reveal min-h-screen flex flex-col justify-center py-24 relative z-10 w-full bg-stone-50">
         <div className="w-full px-4 md:px-12 lg:px-20 xl:px-32">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-950 border border-rose-800 shadow-[0_4px_20px_rgba(227,0,79,0.2)] mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#e3004f] animate-pulse shadow-[0_0_8px_#e3004f]"></span>
-              <span className="text-rose-50 font-black text-[10px] uppercase tracking-[0.2em]">
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
+              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                 Experiencia Kametza
               </span>
+              <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
             </div>
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-stone-900 mt-6 mb-4">
               Mucho más que solo descansar
@@ -1342,11 +1343,12 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 md:px-8 xl:px-12 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-950 border border-rose-800 shadow-[0_4px_20px_rgba(227,0,79,0.2)] mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#e3004f] animate-pulse shadow-[0_0_8px_#e3004f]"></span>
-              <span className="text-rose-50 font-black text-[10px] uppercase tracking-[0.2em]">
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
+              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                 Testimonios Reales
               </span>
+              <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
             </div>
             <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6">
               Lo que dicen nuestros huéspedes en Google
@@ -1426,9 +1428,9 @@ export default function Home() {
             {/* Elemento decorativo */}
             <div className="absolute -top-10 -left-10 w-32 h-32 bg-rose-200 rounded-full blur-3xl opacity-30"></div>
             
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-950 border border-rose-800 shadow-[0_4px_20px_rgba(227,0,79,0.2)] relative z-10 mb-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#e3004f] animate-pulse shadow-[0_0_8px_#e3004f]"></span>
-              <span className="text-rose-50 font-black text-[10px] uppercase tracking-[0.2em]">
+            <div className="flex items-center gap-4 mb-4 relative z-10">
+              <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
+              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                 Ubicación Estratégica
               </span>
             </div>
@@ -1506,11 +1508,12 @@ export default function Home() {
       >
         <div className="absolute inset-0 bg-stone-50/70 backdrop-blur-md"></div>
         <div className="w-full px-4 md:px-8 xl:px-12 text-center relative z-10 max-w-none">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-950 border border-rose-800 shadow-[0_4px_20px_rgba(227,0,79,0.2)] mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#e3004f] animate-pulse shadow-[0_0_8px_#e3004f]"></span>
-            <span className="text-rose-50 font-black text-[10px] uppercase tracking-[0.2em]">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
+            <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
               Atención 24/7
             </span>
+            <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
           </div>
           <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-stone-900">
             {" "}
