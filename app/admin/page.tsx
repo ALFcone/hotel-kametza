@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { updateRoom } from "../actions";
 import DownloadButton from "./DownloadButton";
 import Link from "next/link";
+import WalkInForm from "./WalkInForm";
 import {
   Calendar,
   CheckCircle,
@@ -28,13 +29,16 @@ import {
   Mail,
   FileText,
   Globe,
-  XCircle, // Agregado para el icono de cancelado
+  XCircle,
+  Sparkles,
+  CalendarCheck,
+  Users,
+  Building,
 } from "lucide-react";
 
 // ==============================================================================
 // 1. ACCIONES DE SERVIDOR (SERVER ACTIONS)
 // ==============================================================================
-// Estas funciones se ejecutan en el servidor cuando pulsas los botones de la tabla.
 
 async function markAsPaid(formData: FormData) {
   "use server";
@@ -61,8 +65,6 @@ async function deleteBooking(formData: FormData) {
   const { data: { user } } = await supabaseServer.auth.getUser();
   if (!user || user.email !== "alfesco86@gmail.com") return;
 
-  // OJO: En lugar de borrar, podrías cambiar estado a 'cancelled' si prefieres historial.
-  // Pero si quieres borrar físico, esto está bien.
   await supabaseServer.from("bookings").delete().eq("id", bookingId);
   revalidatePath("/admin");
 }
@@ -70,7 +72,6 @@ async function deleteBooking(formData: FormData) {
 // ==============================================================================
 // 2. UTILIDADES Y FORMATO
 // ==============================================================================
-// Pequeñas funciones para que los números y fechas se vean bonitos.
 
 const formatMoney = (amount: number) =>
   new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(
@@ -85,9 +86,17 @@ function calculateNights(checkIn: string, checkOut: string) {
 }
 
 const formatTicket = (id: number) => {
-  // Fórmula para que coincida con el Dashboard del cliente (ID + 100)
   return (100 + id).toString().padStart(5, "0");
 };
+
+function formatDateShort(dateStr: string): string {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("es-PE", {
+    day: "2-digit",
+    month: "short",
+  });
+}
 
 // ==============================================================================
 // 3. COMPONENTE PRINCIPAL (PÁGINA DE ADMIN)
@@ -96,7 +105,7 @@ const formatTicket = (id: number) => {
 export default async function AdminPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  // VALIDACIÓN DE AUTENTICACIÓN Y ROL DE ADMIN
+  // VALIDACIÓN
   const supabaseServer = await getSupabaseServer();
   const { data: { user }, error: authError } = await supabaseServer.auth.getUser();
 
@@ -109,31 +118,37 @@ export default async function AdminPage(props: {
   }
 
   const searchParams = await props.searchParams;
+  const activeTab = searchParams.tab || "resumen";
 
-  // A. OBTENCIÓN DE FECHAS Y PARÁMETROS
+  // A. FECHAS Y PARÁMETROS
   const today = new Date().toISOString().split("T")[0];
   const dateFrom = searchParams.from || today;
   const dateTo = searchParams.to || today;
-  const filterDate = dateFrom; // Fecha base para KPIs
+  const filterDate = dateFrom;
+  const rangeLabel = dateFrom === dateTo ? dateFrom : `${dateFrom} al ${dateTo}`;
 
-  // B. CONSULTAS A BASE DE DATOS (DATA FETCHING)
+  const todayFormatted = new Date().toLocaleDateString("es-PE", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  // B. CONSULTAS
   const { data: rooms } = await supabaseServer.from("rooms").select("*").order("id");
   const { data: allBookings } = await supabaseServer
     .from("bookings")
     .select("*")
     .order("created_at", { ascending: false });
 
-  // C. LÓGICA DE FILTRADO
+  // C. FILTRADO (Reservas creadas o que inician en el rango de fechas)
   const filteredBookings = allBookings?.filter((b) => {
-    const checkInDate = b.check_in
-      ? b.check_in.toString().substring(0, 10)
-      : "";
+    const checkInDate = b.check_in ? b.check_in.toString().substring(0, 10) : "";
     return checkInDate >= dateFrom && checkInDate <= dateTo;
   });
 
-  // D. CÁLCULO DE KPIS (INDICADORES DE RENDIMIENTO)
-  // Nota: Agregamos filtros para ignorar las canceladas en la ocupación.
-
+  // D. KPIs
+  // Ocupación: Foto diaria específica para la fecha inicial (filterDate)
   const occupiedCount =
     allBookings?.filter(
       (b) =>
@@ -142,49 +157,99 @@ export default async function AdminPage(props: {
         b.check_in <= filterDate &&
         b.check_out > filterDate &&
         b.status !== "cancelled" &&
-        b.status !== "cancelada" // <--- CORRECCIÓN: Ignorar canceladas
+        b.status !== "cancelada"
     ).length || 0;
 
+  // Llegadas acumuladas dentro de todo el rango de fechas
   const arrivalsCount =
     allBookings?.filter(
-      (b) => b.check_in === filterDate && b.status !== "cancelled"
+      (b) =>
+        b.check_in &&
+        b.check_in >= dateFrom &&
+        b.check_in <= dateTo &&
+        b.status !== "cancelled" &&
+        b.status !== "cancelada"
     ).length || 0;
 
+  // Salidas (para limpieza) acumuladas dentro de todo el rango de fechas
   const cleaningList =
     allBookings?.filter(
-      (b) => b.check_out === filterDate && b.status !== "cancelled"
-    ) || [];
-
-  // Ingresos del día (Solo pagadas o aprobadas)
-  const salesOnDate =
-    allBookings?.filter(
       (b) =>
-        b.created_at &&
-        b.created_at.startsWith(filterDate) &&
-        (b.status === "pagado" || b.status === "approved")
+        b.check_out &&
+        b.check_out >= dateFrom &&
+        b.check_out <= dateTo &&
+        b.status !== "cancelled" &&
+        b.status !== "cancelada"
     ) || [];
 
-  const totalIncome = salesOnDate.reduce(
+  // Ventas creadas dentro del rango de fechas (Solo se consideran si el pago está CONFIRMADO: 'pagado' o 'approved')
+  const salesInRange =
+    allBookings?.filter((b) => {
+      if (!b.created_at) return false;
+      const createdAtDate = b.created_at.substring(0, 10);
+      return (
+        createdAtDate >= dateFrom &&
+        createdAtDate <= dateTo &&
+        (b.status === "pagado" || b.status === "approved")
+      );
+    }) || [];
+
+  const totalIncome = salesInRange.reduce(
     (acc, b) => acc + (b.total_price || 0),
     0
   );
 
-  const cashIncome = salesOnDate
-    .filter((b) => b.payment_method === "recepcion")
+  const cashIncome = salesInRange
+    .filter((b) => b.payment_method === "recepcion" || b.payment_method === "efectivo")
     .reduce((acc, b) => acc + (b.total_price || 0), 0);
 
-  const digitalIncome = salesOnDate
-    .filter((b) => b.payment_method === "online")
+  const digitalIncome = salesInRange
+    .filter((b) => b.payment_method === "online" || b.payment_method === "yape" || b.payment_method === "tarjeta")
     .reduce((acc, b) => acc + (b.total_price || 0), 0);
 
-  // E. HELPERS PARA ESTADO DE HABITACIONES
+  const totalRooms = rooms?.length || 0;
+  const freeRooms = totalRooms - occupiedCount;
+
+  // F. CÁLCULO DE TENDENCIA DE VENTAS (ÚLTIMOS 7 DÍAS)
+  const last7Days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    return d.toISOString().split("T")[0];
+  });
+
+  const salesTrend = last7Days.map((dateStr) => {
+    const daySales = allBookings?.filter(
+      (b) =>
+        b.created_at &&
+        b.created_at.startsWith(dateStr) &&
+        (b.status === "pagado" || b.status === "approved")
+    ) || [];
+    const total = daySales.reduce((acc, b) => acc + (b.total_price || 0), 0);
+    
+    const dayName = new Date(dateStr + "T00:00:00").toLocaleDateString("es-PE", {
+      weekday: "short",
+    });
+    return { date: dateStr, dayName: dayName.charAt(0).toUpperCase() + dayName.slice(1), total };
+  });
+
+  const maxSales = Math.max(...salesTrend.map((s) => s.total), 100);
+
+  const points = salesTrend.map((s, i) => {
+    const x = Math.round(40 + i * (520 / 6));
+    const y = Math.round(160 - (s.total / maxSales) * 140);
+    return { x, y, ...s };
+  });
+
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`).join(" ");
+  const areaPath = `${linePath} L${points[points.length - 1].x},160 L${points[0].x},160 Z`;
+
+  // E. HELPERS
   const getRoomNumber = (id: number) =>
     rooms?.find((r) => r.id === id)?.room_number ||
     rooms?.find((r) => r.id === id)?.id ||
     "#";
 
   const getRoomStatus = (roomId: number) => {
-    // Buscar si alguien sale hoy (y no canceló)
     const leaving = allBookings?.find(
       (b) =>
         b.room_id === roomId &&
@@ -193,14 +258,13 @@ export default async function AdminPage(props: {
     );
     if (leaving) return { status: "checkout", guest: leaving.client_name };
 
-    // Buscar si está ocupada hoy (y no canceló)
     const occupied = allBookings?.find(
       (b) =>
         b.room_id === roomId &&
         b.check_in <= filterDate &&
         b.check_out > filterDate &&
         b.status !== "cancelled" &&
-        b.status !== "cancelada" // <--- IMPORTANTE: No marcar ocupada si se canceló
+        b.status !== "cancelada"
     );
 
     if (occupied)
@@ -213,493 +277,672 @@ export default async function AdminPage(props: {
   };
 
   // ==============================================================================
-  // 4. RENDERIZADO DE LA INTERFAZ (UI)
+  // 4. RENDERIZADO
   // ==============================================================================
 
   return (
-    <div className="min-h-screen bg-[#F5F5F4] text-stone-800 p-4 md:p-8 font-sans">
-      <div className="max-w-7xl mx-auto">
-        {/* --- SECCIÓN: ENCABEZADO Y FILTROS --- */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100">
-          <div className="flex items-center gap-4">
-            <div className="bg-rose-900 text-white p-3 rounded-2xl shadow-lg shadow-rose-200">
-              <LayoutDashboard size={32} />
+    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans flex">
+      {/* --- SIDEBAR --- */}
+      <aside className="hidden lg:flex flex-col w-72 bg-[#8a0030] text-white p-6 border-r border-[#4a001a] shrink-0 sticky top-0 h-screen justify-between z-50">
+        <div className="space-y-8">
+          {/* Logo & Hotel Brand */}
+          <div className="flex items-center gap-3 pb-6 border-b border-white/10">
+            <div className="bg-white/10 text-rose-300 p-2.5 rounded-2xl border border-white/10 shadow-lg">
+              <Building size={24} />
             </div>
             <div>
-              <h1 className="text-3xl font-serif font-bold text-rose-950">
-                Panel Kametza
+              <h2 className="font-serif font-bold text-lg text-white leading-tight">Kametza</h2>
+              <span className="text-[10px] text-rose-300/70 uppercase tracking-widest font-black">Panel Admin</span>
+            </div>
+          </div>
+
+          {/* Menú de Navegación */}
+          <nav className="flex flex-col gap-1.5">
+            <Link
+              href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === "resumen"
+                  ? "bg-white text-[#e3004f] shadow-md"
+                  : "text-rose-100/80 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <TrendingUp size={16} /> Resumen y Ventas
+            </Link>
+            <Link
+              href={`/admin?tab=estado&from=${dateFrom}&to=${dateTo}`}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === "estado"
+                  ? "bg-white text-[#e3004f] shadow-md"
+                  : "text-rose-100/80 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <LayoutDashboard size={16} /> Estado de Habitaciones
+            </Link>
+            <Link
+              href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === "historial"
+                  ? "bg-white text-[#e3004f] shadow-md"
+                  : "text-rose-100/80 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <FileText size={16} /> Historial de Reservas
+            </Link>
+            <Link
+              href={`/admin?tab=inventario&from=${dateFrom}&to=${dateTo}`}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === "inventario"
+                  ? "bg-white text-[#e3004f] shadow-md"
+                  : "text-rose-100/80 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <BedDouble size={16} /> Inventario
+            </Link>
+            <Link
+              href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === "registrar"
+                  ? "bg-white text-[#e3004f] shadow-md"
+                  : "text-rose-100/80 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <CalendarCheck size={16} /> Registrar Reserva
+            </Link>
+          </nav>
+        </div>
+
+        {/* Footer Sidebar */}
+        <div className="space-y-4 pt-6 border-t border-white/10">
+          <Link href="/" className="flex items-center justify-center gap-2 bg-white/10 text-white/90 py-3 rounded-xl text-xs font-bold uppercase hover:bg-white/20 transition-all border border-white/10 w-full">
+            <Globe size={14} /> Volver a la Web
+          </Link>
+          <div className="text-[9px] text-rose-300/40 text-center uppercase tracking-widest">
+            Hecho con ❤️ en Ayacucho
+          </div>
+        </div>
+      </aside>
+      {/* --- CONTENIDO PRINCIPAL --- */}
+      <main className="flex-1 p-6 md:p-12 overflow-y-auto w-full relative">
+        <div className="w-full">
+          {/* TOP BAR / FILTROS */}
+          <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-10 gap-6 border-b border-stone-200/60 pb-8">
+            <div>
+              <span className="text-[#e3004f] text-xs font-black uppercase tracking-widest bg-rose-50 px-3.5 py-1.5 rounded-full border border-rose-100">
+                Administración
+              </span>
+              <h1 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 mt-3">
+                Panel de Control
               </h1>
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-stone-400 text-[10px] uppercase font-black tracking-widest">
-                  Control de Reservas
-                </p>
-                <Link
-                  href="/"
-                  className="flex items-center gap-1 bg-stone-100 text-stone-500 px-3 py-1 rounded-full text-[9px] font-black uppercase hover:bg-rose-100 hover:text-rose-600 transition-colors"
-                >
-                  <Globe size={10} /> Ver Web Principal
-                </Link>
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-4 items-end">
-            <form className="flex items-end gap-2" method="get">
-              <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-black uppercase text-stone-400 ml-2">
-                  Desde
-                </label>
-                <input
-                  type="date"
-                  name="from"
-                  defaultValue={dateFrom}
-                  className="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-rose-900 outline-none"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-black uppercase text-stone-400 ml-2">
-                  Hasta
-                </label>
-                <input
-                  type="date"
-                  name="to"
-                  defaultValue={dateTo}
-                  className="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-rose-900 outline-none"
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-rose-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest h-[34px]"
-              >
-                Filtrar
-              </button>
-            </form>
-            {allBookings && <DownloadButton data={allBookings} />}
-          </div>
-        </div>
-
-        {/* --- SECCIÓN: ALERTAS DE LIMPIEZA --- */}
-        {cleaningList.length > 0 && (
-          <div className="mb-6 bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-amber-500 text-white p-2 rounded-lg">
-                <Brush size={18} />
-              </div>
-              <div>
-                <p className="text-amber-900 font-bold text-sm">
-                  Salidas para Limpieza: {cleaningList.length}
-                </p>
-                <p className="text-amber-700 text-[10px] uppercase font-medium">
-                  Habitaciones:{" "}
-                  {cleaningList.map((b) => getRoomNumber(b.room_id)).join(", ")}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* --- SECCIÓN: TARJETAS DE INDICADORES (KPIs) --- */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-stone-900 text-white p-6 rounded-[2rem] shadow-xl relative overflow-hidden">
-            <TrendingUp
-              className="absolute right-4 top-4 text-white/5"
-              size={80}
-            />
-            <p className="text-stone-400 text-[10px] font-bold uppercase tracking-widest mb-1">
-              Ventas del día ({filterDate})
-            </p>
-            <p className="text-4xl font-black">{formatMoney(totalIncome)}</p>
-            <div className="flex gap-4 mt-4 border-t border-white/10 pt-4">
-              <div>
-                <p className="text-[9px] text-stone-500 uppercase font-bold">
-                  Efectivo
-                </p>
-                <p className="font-bold text-emerald-400">
-                  {formatMoney(cashIncome)}
-                </p>
-              </div>
-              <div>
-                <p className="text-[9px] text-stone-500 uppercase font-bold">
-                  Digital
-                </p>
-                <p className="font-bold text-sky-400">
-                  {formatMoney(digitalIncome)}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100 flex items-center gap-4">
-            <div className="p-4 bg-purple-50 text-purple-600 rounded-2xl">
-              <LogIn size={30} />
-            </div>
-            <div>
-              <p className="text-stone-400 text-[10px] font-black uppercase tracking-widest">
-                Llegadas ({filterDate})
-              </p>
-              <p className="text-3xl font-black">{arrivalsCount}</p>
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-100 flex items-center gap-4">
-            <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl">
-              <BedDouble size={30} />
-            </div>
-            <div>
-              <p className="text-stone-400 text-[10px] font-black uppercase tracking-widest">
-                En Casa
-              </p>
-              <p className="text-3xl font-black">{occupiedCount}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* --- SECCIÓN: MAPA DE ESTADO DE HABITACIONES --- */}
-        <section className="mb-10">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="h-1 w-10 bg-rose-600 rounded-full"></div>
-            <h2 className="text-lg font-bold text-stone-700 uppercase tracking-tight">
-              Estado Actual
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {rooms?.map((room) => {
-              const info = getRoomStatus(room.id);
-              const isOccupied = info.status === "occupied";
-              const isCheckout = info.status === "checkout";
-              return (
-                <div
-                  key={room.id}
-                  className={`p-4 rounded-3xl border transition-all duration-300 flex flex-col justify-between h-32 relative overflow-hidden ${
-                    isOccupied
-                      ? "bg-rose-950 text-white border-rose-950 shadow-lg"
-                      : isCheckout
-                      ? "bg-amber-100 text-amber-900 border-amber-200 border-dashed"
-                      : "bg-white border-stone-100 text-stone-600"
-                  }`}
-                >
-                  <span className="absolute -bottom-2 -right-2 text-7xl font-black tracking-tighter opacity-10 select-none">
-                    {room.room_number || room.id}
-                  </span>
-                  <div className="z-10">
-                    <p className="font-black text-[10px] uppercase tracking-widest truncate">
-                      {room.name}
-                    </p>
-                    {info.guest && (
-                      <p className="text-[10px] mt-1 font-medium italic opacity-80 truncate">
-                        {info.guest}
-                      </p>
-                    )}
-                  </div>
-                  <div className="z-10">
-                    <span
-                      className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${
-                        info.status === "free"
-                          ? "bg-stone-100 text-stone-400"
-                          : isCheckout
-                          ? "bg-amber-500 text-white"
-                          : info.paid
-                          ? "bg-emerald-500 text-white"
-                          : "bg-rose-500 text-white"
-                      }`}
-                    >
-                      {info.status === "free"
-                        ? "Libre"
-                        : isCheckout
-                        ? "Salida"
-                        : info.paid
-                        ? "Pagado"
-                        : "Pendiente"}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* --- SECCIÓN: TABLA DE HISTORIAL DE RESERVAS --- */}
-        <section className="bg-white rounded-[2.5rem] shadow-xl border border-stone-100 overflow-hidden mb-10">
-          <div className="p-8 border-b border-stone-50 flex justify-between items-center bg-white">
-            <div>
-              <h2 className="font-bold text-xl text-stone-800">
-                Historial de Ingresos
-              </h2>
-              <p className="text-stone-400 text-[10px] uppercase font-bold tracking-widest mt-1">
-                Del <span className="text-rose-700">{dateFrom}</span> al{" "}
-                <span className="text-rose-700">{dateTo}</span>
+              <p className="text-stone-500 text-xs mt-1 font-medium capitalize">
+                {todayFormatted}
               </p>
             </div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="text-[9px] font-black text-stone-400 uppercase tracking-[0.2em] bg-stone-50/50">
-                  <th className="py-4 px-6">ID / Ticket</th>
-                  <th className="py-4 px-6">Huésped & Contacto</th>
-                  <th className="py-4 px-4">Documento</th>
-                  <th className="py-4 px-4">Origen/Cel</th>
-                  <th className="py-4 px-4 text-center">Noches</th>
-                  <th className="py-4 px-4 text-center">Hab</th>
-                  <th className="py-4 px-4">Estancia</th>
-                  <th className="py-4 px-4 text-right">Total</th>
-                  <th className="py-4 px-4 text-center">Estado</th>
-                  <th className="py-4 px-8 text-center">Gestión</th>
-                </tr>
-              </thead>
-              <tbody className="text-xs">
-                {filteredBookings?.map((booking) => {
-                  const noches = calculateNights(
-                    booking.check_in,
-                    booking.check_out
-                  );
-                  // Detectar si está cancelada
-                  const isCancelled =
-                    booking.status === "cancelled" ||
-                    booking.status === "cancelada";
 
-                  return (
-                    <tr
-                      key={booking.id}
-                      className={`border-b border-stone-50 transition-colors group ${
-                        isCancelled
-                          ? "bg-stone-50 opacity-60"
-                          : "hover:bg-rose-50/20"
-                      }`}
-                    >
-                      <td className="py-5 px-6">
-                        <div className="font-mono text-[10px] text-stone-400">
-                          SYS-{booking.id}
-                        </div>
-                        <div
-                          className={`font-black text-[11px] ${
-                            isCancelled
-                              ? "text-stone-500 line-through"
-                              : "text-rose-900"
-                          }`}
-                        >
-                          RES-{formatTicket(booking.id)}
-                        </div>
-                      </td>
-                      <td className="py-5 px-6">
-                        <div className="font-black text-stone-800 uppercase text-[11px] mb-1">
-                          {booking.client_name}
-                        </div>
-                        <div className="flex items-center gap-1 text-[10px] text-blue-500 lowercase">
-                          <Mail size={10} /> {booking.client_email || "-"}
-                        </div>
-                      </td>
-                      <td className="py-5 px-4">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] font-bold text-stone-600 uppercase flex items-center gap-1">
-                            <FileText size={10} />{" "}
-                            {booking.document_type || "DOC"}
-                          </span>
-                          <span className="text-[11px] font-black text-stone-800">
-                            {booking.document_number || "---"}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-5 px-4">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] font-bold text-stone-500 flex items-center gap-1 uppercase">
-                            <MapPin size={10} />{" "}
-                            {booking.client_country || "Perú"}
-                          </span>
-                          <span className="text-[10px] font-black text-emerald-700 flex items-center gap-1">
-                            <Phone size={10} /> {booking.client_phone || "S/N"}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-5 px-4 text-center">
-                        <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-black text-[10px] border border-blue-100">
-                          {noches} {noches === 1 ? "Día" : "Días"}
-                        </span>
-                      </td>
-                      <td className="py-5 px-4 text-center">
-                        <span className="font-black text-stone-800">
-                          #{getRoomNumber(booking.room_id)}
-                        </span>
-                      </td>
-                      <td className="py-5 px-4">
-                        <div className="flex flex-col font-bold text-[9px] uppercase tracking-tighter">
-                          <span className="text-emerald-600">
-                            IN: {booking.check_in}
-                          </span>
-                          <span className="text-rose-600">
-                            OUT: {booking.check_out}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-5 px-4 text-right font-black text-stone-900">
-                        {/* Si está cancelada, tachamos el precio */}
-                        <span
-                          className={
-                            isCancelled ? "line-through text-stone-400" : ""
-                          }
-                        >
-                          {formatMoney(booking.total_price)}
-                        </span>
-                      </td>
-                      <td className="py-5 px-4 text-center">
-                        {isCancelled ? (
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="flex items-center justify-center gap-1 bg-rose-100 text-rose-700 px-2 py-1 rounded-full text-[9px] font-black uppercase border border-rose-200">
-                              <XCircle size={10} /> Cancelada
-                            </span>
-                            {/* AQUÍ MOSTRAMOS LA HORA SI EXISTE */}
-                            {booking.cancelled_at && (
-                              <span className="text-[9px] font-medium text-stone-400">
-                                {new Date(
-                                  booking.cancelled_at
-                                ).toLocaleDateString("es-PE", {
-                                  day: "2-digit",
-                                  month: "short",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hour12: true,
-                                  timeZone: "America/Lima", // <--- ESTO FUERZA LA HORA DE PERÚ
-                                })}
-                              </span>
-                            )}
-                          </div>
-                        ) : (
-                          <span
-                            className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${
-                              booking.status === "pagado" ||
-                              booking.status === "approved"
-                                ? "bg-emerald-100 text-emerald-700"
-                                : "bg-amber-100 text-amber-600"
-                            }`}
-                          >
-                            {booking.status === "pagado" ||
-                            booking.status === "approved"
-                              ? "Pagado"
-                              : "Pendiente"}
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-5 px-8 text-center">
-                        <div className="flex gap-2 justify-center">
-                          {booking.status !== "pagado" &&
-                            booking.status !== "approved" &&
-                            !isCancelled && (
-                              <form action={markAsPaid}>
-                                <input
-                                  type="hidden"
-                                  name="bookingId"
-                                  value={booking.id}
-                                />
-                                <button
-                                  type="submit"
-                                  className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white rounded-xl font-bold text-[9px] uppercase hover:bg-emerald-700"
-                                >
-                                  <DollarSign size={12} />
-                                </button>
-                              </form>
-                            )}
-                          <form action={deleteBooking}>
-                            <input
-                              type="hidden"
-                              name="bookingId"
-                              value={booking.id}
-                            />
-                            <button
-                              type="submit"
-                              className="flex items-center gap-1 px-3 py-1.5 bg-white border border-stone-200 text-stone-400 rounded-xl font-bold text-[9px] uppercase hover:border-rose-200 hover:text-rose-600"
-                              title="Borrar del historial"
-                            >
-                              <X size={12} />
-                            </button>
-                          </form>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            {filteredBookings?.length === 0 && (
-              <div className="p-12 text-center text-stone-400 italic text-sm">
-                No se encontraron reservas.
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* --- SECCIÓN: INVENTARIO Y EDICIÓN DE HABITACIONES --- */}
-        <section>
-          <div className="flex items-center gap-2 mb-6">
-            <div className="h-1 w-10 bg-stone-800 rounded-full"></div>
-            <h2 className="text-lg font-bold text-stone-700 uppercase tracking-tight">
-              Inventario
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rooms?.map((room) => (
-              <div
-                key={room.id}
-                className="bg-white rounded-[2.5rem] shadow-lg border border-stone-100 overflow-hidden group"
-              >
-                <div className="h-40 overflow-hidden relative">
-                  <img
-                    src={room.image_url}
-                    alt={room.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+            {/* Filtros de Fecha */}
+            <div className="flex items-end gap-3 flex-wrap w-full xl:w-auto">
+              <form className="flex items-end gap-2 bg-white p-3 rounded-2xl border border-stone-200/60 shadow-sm flex-wrap w-full sm:w-auto" method="get">
+                {/* Mantener la pestaña activa al filtrar */}
+                <input type="hidden" name="tab" value={activeTab} />
+                <div className="flex flex-col gap-1">
+                  <span className="text-[8px] font-black uppercase text-stone-400 ml-2">Desde</span>
+                  <input
+                    type="date"
+                    name="from"
+                    defaultValue={dateFrom}
+                    className="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-700 outline-none"
                   />
-                  <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-xl text-[10px] font-black">
-                    #{room.room_number || room.id}
-                  </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="font-black text-lg text-stone-800 mb-4 uppercase">
-                    {room.name}
-                  </h3>
-                  {/* Formulario de Edición (Server Action) */}
-                  <form action={updateRoom} className="space-y-4">
-                    <input type="hidden" name="roomId" value={room.id} />
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
-                          Precio
-                        </label>
-                        <input
-                          name="price"
-                          defaultValue={room.price_per_night}
-                          type="number"
-                          className="w-full p-3 bg-stone-50 rounded-xl border border-stone-100 font-bold"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
-                          Imagen URL
-                        </label>
-                        <input
-                          name="image"
-                          type="text"
-                          defaultValue={room.image_url}
-                          className="w-full p-3 bg-stone-50 rounded-xl border border-stone-100 text-[10px]"
-                        />
-                      </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[8px] font-black uppercase text-stone-400 ml-2">Hasta</span>
+                  <input
+                    type="date"
+                    name="to"
+                    defaultValue={dateTo}
+                    className="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-700 outline-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="bg-[#e3004f] hover:bg-black text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider h-[38px] transition shadow-md"
+                >
+                  Filtrar
+                </button>
+              </form>
+              <div className="flex gap-2">
+                {allBookings && <DownloadButton data={allBookings} />}
+              </div>
+            </div>
+          </div>
+
+          {/* --- TAB: RESUMEN GENERAL --- */}
+          {activeTab === "resumen" && (
+            <div className="space-y-10 animate-fade-in-up">
+              {/* --- ALERTAS DE LIMPIEZA --- */}
+              {cleaningList.length > 0 && (
+                <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-200 p-5 rounded-3xl flex items-center justify-between shadow-sm backdrop-blur-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-gradient-to-br from-amber-500 to-orange-500 text-white p-3 rounded-2xl shadow-lg">
+                      <Brush size={20} />
                     </div>
                     <div>
-                      <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
-                        Descripción
-                      </label>
-                      <textarea
-                        name="description"
-                        defaultValue={room.description}
-                        className="w-full p-3 bg-stone-50 rounded-xl border border-stone-100 text-[10px] h-20 resize-none"
-                        placeholder="Descripción de la habitación..."
-                      ></textarea>
+                      <p className="text-amber-950 font-bold text-base">
+                        Salidas para Limpieza hoy: {cleaningList.length} habitaciones
+                      </p>
+                      <p className="text-amber-700 text-xs font-bold uppercase tracking-wider mt-0.5">
+                        Habitaciones a desinfectar:{" "}
+                        {cleaningList.map((b) => getRoomNumber(b.room_id)).join(", ")}
+                      </p>
                     </div>
-                    <button className="w-full bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-rose-900 transition-all text-[10px] uppercase tracking-widest">
-                      Guardar Cambios
-                    </button>
-                  </form>
+                  </div>
+                </div>
+              )}
+
+              <div id="resumen" className="scroll-mt-24 mb-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="h-1.5 w-8 bg-[#e3004f] rounded-full" />
+                  <h2 className="text-xl font-bold text-stone-900 tracking-tight">Resumen General</h2>
+                </div>
+                
+                {/* Cards KPIs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  {/* Card Ventas */}
+                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all duration-300">
+                    <div className="relative z-10">
+                      <div className="bg-emerald-50 text-emerald-700 p-3 rounded-2xl w-fit mb-4 border border-emerald-100">
+                        <Wallet size={20} />
+                      </div>
+                      <span className="text-stone-400 text-[10px] font-bold uppercase tracking-wider">Ventas ({rangeLabel})</span>
+                      <p className="text-3xl font-bold text-stone-900 mt-2">{formatMoney(totalIncome)}</p>
+                      <div className="flex gap-6 mt-6 border-t border-stone-100 pt-4">
+                        <div>
+                          <p className="text-[9px] text-stone-400 uppercase font-black">Efectivo</p>
+                          <p className="font-bold text-stone-800 text-sm mt-0.5">{formatMoney(cashIncome)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] text-stone-400 uppercase font-black">Digital</p>
+                          <p className="font-bold text-[#e3004f] text-sm mt-0.5">{formatMoney(digitalIncome)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Llegadas */}
+                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all duration-300">
+                    <div>
+                      <div className="bg-indigo-50 text-indigo-700 p-3 rounded-2xl w-fit mb-4 border border-indigo-100">
+                        <CalendarCheck size={20} />
+                      </div>
+                      <span className="text-stone-400 text-[10px] font-bold uppercase tracking-wider">Llegadas ({rangeLabel})</span>
+                      <p className="text-3xl font-bold text-stone-900 mt-2">{arrivalsCount}</p>
+                      <p className="text-stone-500 text-[10px] font-medium mt-1 uppercase tracking-wider">Huéspedes Registrados</p>
+                    </div>
+                  </div>
+
+                  {/* Card Ocupación */}
+                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all duration-300">
+                    <div>
+                      <div className="bg-rose-50 text-rose-700 p-3 rounded-2xl w-fit mb-4 border border-rose-100">
+                        <Building size={20} />
+                      </div>
+                      <span className="text-stone-400 text-[10px] font-bold uppercase tracking-wider">Ocupadas ({filterDate})</span>
+                      <p className="text-3xl font-bold text-stone-900 mt-2">{occupiedCount}</p>
+                      <p className="text-stone-500 text-[10px] font-medium mt-1 uppercase tracking-wider">
+                        {freeRooms} libres de {totalRooms}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Card Salidas */}
+                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all duration-300">
+                    <div>
+                      <div className="bg-amber-50 text-amber-700 p-3 rounded-2xl w-fit mb-4 border border-amber-100">
+                        <Brush size={20} />
+                      </div>
+                      <span className="text-stone-400 text-[10px] font-bold uppercase tracking-wider">Salidas ({rangeLabel})</span>
+                      <p className="text-3xl font-bold text-stone-900 mt-2">{cleaningList.length}</p>
+                      <p className="text-stone-500 text-[10px] font-medium mt-1 uppercase tracking-wider">Para Limpieza / Salida</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gráficos Visuales */}
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                  {/* 1. Gráfico de Líneas de Ventas */}
+                  <div className="xl:col-span-2 bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm">
+                    <div className="flex justify-between items-center mb-6">
+                      <div>
+                        <h3 className="font-bold text-base text-stone-900">Tendencia de Ventas</h3>
+                        <p className="text-stone-400 text-[10px] uppercase font-bold tracking-wider mt-0.5">Últimos 7 días de ingresos (S/)</p>
+                      </div>
+                    </div>
+                    <div className="w-full overflow-hidden">
+                      <svg viewBox="0 0 600 200" className="w-full h-auto max-h-56" preserveAspectRatio="xMidYMid meet">
+                        <defs>
+                          <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#e3004f" stopOpacity="0.15"/>
+                            <stop offset="100%" stopColor="#e3004f" stopOpacity="0.0"/>
+                          </linearGradient>
+                        </defs>
+                        {/* Grid Lines */}
+                        <line x1="40" y1="20" x2="560" y2="20" stroke="#F1F5F9" strokeWidth="2" strokeDasharray="4" />
+                        <line x1="40" y1="90" x2="560" y2="90" stroke="#F1F5F9" strokeWidth="2" strokeDasharray="4" />
+                        <line x1="40" y1="160" x2="560" y2="160" stroke="#E2E8F0" strokeWidth="1" />
+
+                        {/* Area Fill */}
+                        <path d={areaPath} fill="url(#salesGrad)" />
+
+                        {/* Line */}
+                        <path d={linePath} fill="none" stroke="#e3004f" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+                        {/* Points */}
+                        {points.map((p, i) => (
+                          <g key={i}>
+                            <circle cx={p.x} cy={p.y} r="5" fill="#FFFFFF" stroke="#e3004f" strokeWidth="3" />
+                            <text x={p.x} y={p.y - 12} textAnchor="middle" className="text-[10px] font-bold fill-stone-800">
+                              S/ {Math.round(p.total)}
+                            </text>
+                            <text x={p.x} y="180" textAnchor="middle" className="text-[9px] font-black uppercase tracking-wider fill-stone-400">
+                              {p.dayName}
+                            </text>
+                          </g>
+                        ))}
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* 2. Ocupación y Distribución */}
+                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-bold text-base text-stone-900 mb-6">Ocupación y Métodos</h3>
+                      
+                      {/* Doughnut de Ocupación */}
+                      <div className="flex items-center gap-6 mb-8 border-b border-stone-100 pb-6">
+                        <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
+                          <svg className="w-full h-full transform -rotate-90">
+                            {/* Background Circle */}
+                            <circle cx="48" cy="48" r="38" stroke="#F5F5F4" strokeWidth="8" fill="transparent" />
+                            {/* Progress Circle */}
+                            <circle
+                              cx="48"
+                              cy="48"
+                              r="38"
+                              stroke="#e3004f"
+                              strokeWidth="8"
+                              fill="transparent"
+                              strokeDasharray={2 * Math.PI * 38}
+                              strokeDashoffset={2 * Math.PI * 38 - (2 * Math.PI * 38 * (occupiedCount / (totalRooms || 1)))}
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className="text-lg font-black text-stone-900">
+                              {Math.round((occupiedCount / (totalRooms || 1)) * 100)}%
+                            </span>
+                            <span className="text-[8px] font-bold text-stone-400 uppercase tracking-widest">Ocupado</span>
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-xs text-stone-850">Distribución Física</h4>
+                          <p className="text-stone-400 text-[10px] mt-1 font-medium">
+                            {occupiedCount} habitaciones ocupadas de {totalRooms} totales.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Proporción de Métodos de Pago */}
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
+                            <span className="text-stone-500">🏨 Efectivo / Recepción</span>
+                            <span className="text-stone-900">{formatMoney(cashIncome)}</span>
+                          </div>
+                          <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
+                            <div
+                              className="bg-stone-850 h-full rounded-full"
+                              style={{ width: `${totalIncome > 0 ? (cashIncome / totalIncome) * 100 : 0}%` }}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
+                            <span className="text-stone-500">💳 Digital / Online</span>
+                            <span className="text-[#e3004f]">{formatMoney(digitalIncome)}</span>
+                          </div>
+                          <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
+                            <div
+                              className="bg-[#e3004f] h-full rounded-full"
+                              style={{ width: `${totalIncome > 0 ? (digitalIncome / totalIncome) * 100 : 0}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* --- TAB: ESTADO ACTUAL HABITACIONES --- */}
+          {activeTab === "estado" && (
+            <div id="estado-actual" className="scroll-mt-24 mb-12 animate-fade-in-up">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-1.5 w-8 bg-[#e3004f] rounded-full" />
+                <h2 className="text-xl font-bold text-stone-900 tracking-tight">Estado de Habitaciones</h2>
+                <div className="flex items-center gap-4 ml-auto text-[9px] font-bold uppercase tracking-wider">
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-white border border-stone-300" /> Libre</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#e3004f]" /> Ocupada</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-400" /> Salida</span>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
-      </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
+                {rooms?.map((room) => {
+                  const info = getRoomStatus(room.id);
+                  const isOccupied = info.status === "occupied";
+                  const isCheckout = info.status === "checkout";
+                  return (
+                    <div
+                      key={room.id}
+                      className={`p-6 rounded-[2rem] border transition-all duration-300 flex flex-col justify-between h-40 relative overflow-hidden group hover:-translate-y-1 hover:shadow-xl ${
+                        isOccupied
+                          ? "bg-gradient-to-br from-rose-950 to-[#e3004f] text-white border-rose-950 shadow-lg shadow-rose-900/10"
+                          : isCheckout
+                          ? "bg-gradient-to-br from-amber-50 to-orange-50 text-amber-900 border-amber-200 border-dashed"
+                          : "bg-white border-stone-200/60 text-stone-600 hover:border-rose-900/30"
+                      }`}
+                    >
+                      <span className="absolute -bottom-3 -right-3 text-8xl font-black tracking-tighter opacity-[0.05] select-none group-hover:opacity-[0.1] transition-opacity">
+                        {room.room_number || room.id}
+                      </span>
+                      <div className="z-10">
+                        <p className="font-bold text-xs uppercase tracking-wider truncate">
+                          {room.name}
+                        </p>
+                        {info.guest && (
+                          <p className="text-[10px] mt-2 font-semibold italic opacity-85 truncate max-w-[90%]">
+                            {info.guest}
+                          </p>
+                        )}
+                      </div>
+                      <div className="z-10 mt-4">
+                        <span
+                          className={`text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${
+                            info.status === "free"
+                              ? "bg-stone-100 text-stone-500"
+                              : isCheckout
+                              ? "bg-amber-400 text-stone-900 shadow-sm"
+                              : info.paid
+                              ? "bg-emerald-500 text-white shadow-sm"
+                              : "bg-rose-500 text-white shadow-sm"
+                          }`}
+                        >
+                          {info.status === "free"
+                            ? "Libre"
+                            : isCheckout
+                            ? "Salida"
+                            : info.paid
+                            ? "Pagado"
+                            : "Pendiente"}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* --- TAB: HISTORIAL DE RESERVAS (TABLA) --- */}
+          {activeTab === "historial" && (
+            <div id="historial" className="scroll-mt-24 mb-12 animate-fade-in-up">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-1.5 w-8 bg-[#e3004f] rounded-full" />
+                <h2 className="text-xl font-bold text-stone-900 tracking-tight">Historial de Reservas</h2>
+              </div>
+
+              <div className="bg-white rounded-[2.5rem] shadow-sm border border-stone-200/60 overflow-hidden">
+                <div className="p-8 border-b border-stone-100 flex justify-between items-center bg-gradient-to-r from-white to-stone-50/30">
+                  <div>
+                    <h3 className="font-bold text-lg text-stone-900">Historial Completo</h3>
+                    <p className="text-stone-400 text-[10px] uppercase font-bold tracking-widest mt-1">
+                      Mostrando reservas de <span className="text-[#e3004f]">{dateFrom}</span> a <span className="text-[#e3004f]">{dateTo}</span>
+                      {filteredBookings && (
+                        <span className="ml-2 bg-stone-100 px-2 py-0.5 rounded-full text-stone-500 text-[9px]">
+                          {filteredBookings.length} registros
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full text-left border-collapse min-w-[1000px]">
+                    <thead>
+                      <tr className="text-[10px] font-black text-stone-400 uppercase tracking-widest bg-stone-50 border-b border-stone-100">
+                        <th className="py-5 px-6">Reserva / Ticket</th>
+                        <th className="py-5 px-6">Huésped</th>
+                        <th className="py-5 px-4">Documento</th>
+                        <th className="py-5 px-4">Contacto</th>
+                        <th className="py-5 px-4 text-center">Noches</th>
+                        <th className="py-5 px-4 text-center">Hab.</th>
+                        <th className="py-5 px-4">Estancia</th>
+                        <th className="py-5 px-4 text-right">Total</th>
+                        <th className="py-5 px-4 text-center">Estado</th>
+                        <th className="py-5 px-8 text-center">Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-xs">
+                      {filteredBookings?.map((booking) => {
+                        const noches = calculateNights(booking.check_in, booking.check_out);
+                        const isCancelled = booking.status === "cancelled" || booking.status === "cancelada";
+
+                        return (
+                          <tr
+                            key={booking.id}
+                            className={`border-b border-stone-100 transition-all duration-200 ${
+                              isCancelled ? "bg-stone-50/50 opacity-60" : "hover:bg-rose-50/20"
+                            }`}
+                          >
+                            <td className="py-5 px-6">
+                              <div className="font-mono text-[9px] text-stone-400">SYS-{booking.id}</div>
+                              <div className={`font-black text-xs ${isCancelled ? "text-stone-500 line-through" : "text-[#e3004f]"}`}>
+                                RES-{formatTicket(booking.id)}
+                              </div>
+                            </td>
+                            <td className="py-5 px-6 font-bold text-stone-900 uppercase">
+                              {booking.client_name}
+                            </td>
+                            <td className="py-5 px-4">
+                              <div className="flex flex-col">
+                                <span className="text-[9px] font-bold text-stone-400 uppercase">{booking.document_type || "DOC"}</span>
+                                <span className="font-bold text-stone-850 mt-0.5">{booking.document_number}</span>
+                              </div>
+                            </td>
+                            <td className="py-5 px-4">
+                              <div className="flex flex-col gap-0.5 text-[10px]">
+                                <span className="text-stone-500 flex items-center gap-1"><Mail size={10} /> {booking.client_email || "—"}</span>
+                                <span className="text-emerald-700 font-bold flex items-center gap-1"><Phone size={10} /> {booking.client_phone || "—"}</span>
+                              </div>
+                            </td>
+                            <td className="py-5 px-4 text-center">
+                              <span className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-bold text-[10px] border border-indigo-100">
+                                {noches} {noches === 1 ? "noche" : "noches"}
+                              </span>
+                            </td>
+                            <td className="py-5 px-4 text-center font-bold text-stone-900">
+                              <span className="bg-stone-100 px-2.5 py-1 rounded-md text-[10px]">
+                                #{getRoomNumber(booking.room_id)}
+                              </span>
+                            </td>
+                            <td className="py-5 px-4">
+                              <div className="flex flex-col font-bold text-[9px] uppercase tracking-wider gap-0.5">
+                                <span className="text-emerald-600 flex items-center gap-1">
+                                  <span className="w-1 h-1 rounded-full bg-emerald-500" />
+                                  {formatDateShort(booking.check_in)}
+                                </span>
+                                <span className="text-rose-600 flex items-center gap-1">
+                                  <span className="w-1 h-1 rounded-full bg-rose-500" />
+                                  {formatDateShort(booking.check_out)}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-5 px-4 text-right font-bold text-stone-900">
+                              {formatMoney(booking.total_price)}
+                            </td>
+                            <td className="py-5 px-4 text-center">
+                              {isCancelled ? (
+                                <span className="inline-flex items-center gap-1 bg-rose-550/10 text-rose-700 px-2.5 py-1 rounded-full text-[9px] font-black uppercase border border-rose-200">
+                                  <XCircle size={10} /> Cancelada
+                                </span>
+                              ) : (
+                                <span
+                                  className={`text-[8px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-full ${
+                                    booking.status === "pagado" || booking.status === "approved"
+                                      ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                      : "bg-amber-100 text-amber-600 border border-amber-200"
+                                  }`}
+                                >
+                                  {booking.status === "pagado" || booking.status === "approved" ? "Pagado" : "Pendiente"}
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-5 px-8 text-center">
+                              <div className="flex gap-2 justify-center">
+                                {booking.status !== "pagado" && booking.status !== "approved" && !isCancelled && (
+                                  <form action={markAsPaid}>
+                                    <input type="hidden" name="bookingId" value={booking.id} />
+                                    <button
+                                      type="submit"
+                                      className="flex items-center justify-center w-8 h-8 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition shadow-sm hover:shadow-lg"
+                                      title="Marcar como pagado"
+                                    >
+                                      <DollarSign size={14} />
+                                    </button>
+                                  </form>
+                                )}
+                                <form action={deleteBooking}>
+                                  <input type="hidden" name="bookingId" value={booking.id} />
+                                  <button
+                                    type="submit"
+                                    className="flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-xl hover:border-rose-200 hover:text-rose-600 hover:bg-rose-50 transition"
+                                    title="Borrar"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                </form>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  {filteredBookings?.length === 0 && (
+                    <div className="p-12 text-center text-stone-400 italic text-sm">
+                      No se encontraron reservas en este rango de fechas.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* --- TAB: INVENTARIO DE HABITACIONES --- */}
+          {activeTab === "inventario" && (
+            <div id="inventario" className="scroll-mt-24 mb-12 animate-fade-in-up">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-1.5 w-8 bg-[#e3004f] rounded-full" />
+                <h2 className="text-xl font-bold text-stone-900 tracking-tight">Gestión de Inventario</h2>
+                <span className="text-[10px] bg-stone-100 text-stone-500 px-3 py-1 rounded-full font-bold">
+                  {rooms?.length} habitaciones
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {rooms?.map((room) => (
+                  <div
+                    key={room.id}
+                    className="bg-white rounded-[2.5rem] shadow-sm border border-stone-200/60 overflow-hidden group hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                  >
+                    <div className="h-48 overflow-hidden relative">
+                      <img
+                        src={room.image_url}
+                        alt={room.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+                      />
+                      <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl text-[10px] font-black shadow-sm">
+                        #{room.room_number || room.id}
+                      </div>
+                    </div>
+                    
+                    <div className="p-8">
+                      <h3 className="font-bold text-lg text-stone-900 mb-6 uppercase tracking-tight">
+                        {room.name}
+                      </h3>
+                      
+                      <form action={updateRoom} className="space-y-5">
+                        <input type="hidden" name="roomId" value={room.id} />
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
+                              Precio por Noche
+                            </label>
+                            <input
+                              name="price"
+                              defaultValue={room.price_per_night}
+                              type="number"
+                              className="w-full p-3.5 bg-stone-50 rounded-xl border border-stone-250 font-bold focus:ring-2 focus:ring-[#e3004f]/10 focus:border-[#e3004f] outline-none transition text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
+                              Cambiar Imagen
+                            </label>
+                            <input type="hidden" name="oldImage" value={room.image_url || ""} />
+                            <input
+                              name="image"
+                              type="file"
+                              accept="image/*"
+                              className="w-full bg-stone-50 rounded-xl border border-stone-250 text-[10px] file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-[9px] file:font-bold file:bg-stone-200 file:text-stone-700 hover:file:bg-stone-300 outline-none transition"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
+                            Descripción
+                          </label>
+                          <textarea
+                            name="description"
+                            defaultValue={room.description}
+                            className="w-full p-3.5 bg-stone-50 rounded-xl border border-stone-250 text-xs h-24 resize-none focus:ring-2 focus:ring-[#e3004f]/10 focus:border-[#e3004f] outline-none transition"
+                            placeholder="Descripción de la habitación..."
+                          />
+                        </div>
+                        
+                        <button className="btn-shimmer w-full bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-[#e3004f] transition-all text-[10px] uppercase tracking-widest shadow-md">
+                          Guardar Cambios
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* --- TAB: REGISTRAR RESERVA (WALK-IN CLIENT SIDE FORM) --- */}
+          {activeTab === "registrar" && rooms && (
+            <div className="animate-fade-in-up">
+              <WalkInForm rooms={rooms} />
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

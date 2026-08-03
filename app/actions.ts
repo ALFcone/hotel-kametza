@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { getSupabaseServer } from "@/lib/supabase-server";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 
 
 // ==============================================================================
@@ -91,12 +93,51 @@ export async function updateRoom(formData: FormData) {
   }
 
   const idHabitacion = Number(formData.get("roomId"));
-  
-  const { error } = await supabaseServer.from("rooms").update({ 
-    price_per_night: Number(formData.get("price")),
-    description: formData.get("description"),
-    image_url: formData.get("image"),
-  }).eq("id", idHabitacion);
+  const price = Number(formData.get("price"));
+  const description = formData.get("description") as string;
+  const imageFile = formData.get("image") as File;
+  const oldImage = formData.get("oldImage") as string;
+
+  let imageUrl = oldImage;
+
+  console.log("DEBUG updateRoom:", {
+    idHabitacion,
+    price,
+    description,
+    imageFileType: typeof imageFile,
+    imageFileExists: !!imageFile,
+    imageFileName: imageFile ? (imageFile as any).name : null,
+    imageFileSize: imageFile ? (imageFile as any).size : null,
+    oldImage
+  });
+
+  const isUpload = imageFile && typeof imageFile === "object" && "arrayBuffer" in imageFile && (imageFile as any).size > 0;
+
+  if (isUpload) {
+    const arrayBuffer = await (imageFile as any).arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const filename = `${Date.now()}-${(imageFile as any).name.replace(/\s+/g, '_')}`;
+    const uploadDir = path.join(process.cwd(), "public", "rooms");
+    
+    try {
+      await mkdir(uploadDir, { recursive: true });
+      await writeFile(path.join(uploadDir, filename), buffer);
+      imageUrl = `/rooms/${filename}`;
+      console.log("DEBUG: Imagen guardada exitosamente en:", imageUrl);
+    } catch (err) {
+      console.error("Error guardando imagen:", err);
+    }
+  } else {
+    console.log("DEBUG: No se detectó un archivo File válido o el tamaño es 0.");
+  }
+
+  const { data: updateData, error } = await supabaseServer.from("rooms").update({ 
+    price_per_night: price,
+    description: description,
+    image_url: imageUrl,
+  }).eq("id", idHabitacion).select();
+
+  console.log("DEBUG: Supabase update response:", { updateData, error });
 
   if (error) {
     console.error("No se pudo actualizar la habitación:", error.message);
@@ -105,4 +146,56 @@ export async function updateRoom(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/");
+}
+
+export async function adminCreateBooking(formData: FormData) {
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+
+  if (!user || user.email !== "alfesco86@gmail.com") {
+    return { error: "No autorizado." };
+  }
+
+  const idHabitacion = Number(formData.get("roomId"));
+  const price = Number(formData.get("price"));
+  const checkIn = formData.get("checkIn") as string;
+  const checkOut = formData.get("checkOut") as string;
+  const paymentMethod = formData.get("paymentMethod") as string;
+
+  // Verificación de disponibilidad
+  const { data: isAvailable } = await supabaseServer.rpc("check_availability", {
+    room_id_input: idHabitacion,
+    check_in_input: checkIn,
+    check_out_input: checkOut,
+  });
+
+  if (!isAvailable) {
+    return { error: "Habitación no disponible en esas fechas." };
+  }
+
+  const { error } = await supabaseServer
+    .from("bookings")
+    .insert({
+      user_id: user.id,
+      room_id: idHabitacion,
+      check_in: checkIn,
+      check_out: checkOut,
+      total_price: price,
+      payment_method: paymentMethod,
+      status: "pagado",
+      client_name: formData.get("name"),
+      client_email: formData.get("email") || null,
+      client_country: formData.get("country") || "Perú",
+      client_phone: formData.get("phone"),
+      document_type: formData.get("documentType"),
+      document_number: formData.get("documentNumber"),
+    });
+
+  if (error) {
+    console.error("Error al registrar reserva por admin:", error.message);
+    return { error: `Error en base de datos: ${error.message}` };
+  }
+
+  revalidatePath("/admin");
+  return { success: true };
 }

@@ -14,17 +14,17 @@ export async function getSupabaseServer() {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
-        set(name: string, value: string, options: any) {
+        set(name: string, value: string, options: Parameters<typeof cookieStore.set>[2]) {
           try {
             cookieStore.set({ name, value, ...options });
-          } catch (error) {
+          } catch {
             // Se ignora si se llama desde Server Components
           }
         },
-        remove(name: string, options: any) {
+        remove(name: string, options: Parameters<typeof cookieStore.set>[2]) {
           try {
             cookieStore.set({ name, value: "", ...options });
-          } catch (error) {
+          } catch {
             // Se ignora si se llama desde Server Components
           }
         },

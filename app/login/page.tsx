@@ -11,6 +11,8 @@ import {
   ArrowRight,
   Sparkles,
   ChevronLeft,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 export default function LoginPage() {
@@ -22,6 +24,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // 1. Verificar si el usuario ya tiene sesión activa al cargar
   useEffect(() => {
@@ -69,7 +73,6 @@ export default function LoginPage() {
 
     try {
       if (isLogin) {
-        // Iniciar Sesión
         const { data, error: loginError } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -84,7 +87,6 @@ export default function LoginPage() {
           }
         }
       } else {
-        // Registrarse
         const { data, error: signupError } = await supabase.auth.signUp({
           email,
           password,
@@ -113,39 +115,64 @@ export default function LoginPage() {
     }
   };
 
+  // Toggle entre Login y Registro con animación
+  const toggleMode = () => {
+    setIsTransitioning(true);
+    setError("");
+    setTimeout(() => {
+      setIsLogin(!isLogin);
+      setIsTransitioning(false);
+    }, 200);
+  };
+
+  // Skeleton loader premium
   if (checkingSession) {
     return (
-      <div className="h-screen flex items-center justify-center bg-[#FDFBF7] text-[#700824] font-bold animate-pulse">
-        Verificando sesión...
+      <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+        <div className="w-full max-w-md p-10">
+          {/* Skeleton card */}
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              <div className="w-14 h-14 rounded-2xl animate-shimmer" />
+            </div>
+            <div className="h-8 w-48 mx-auto rounded-full animate-shimmer" />
+            <div className="h-4 w-64 mx-auto rounded-full animate-shimmer" />
+            <div className="h-12 w-full rounded-xl animate-shimmer" />
+            <div className="h-px w-full animate-shimmer" />
+            <div className="h-12 w-full rounded-xl animate-shimmer" />
+            <div className="h-12 w-full rounded-xl animate-shimmer" />
+            <div className="h-14 w-full rounded-xl animate-shimmer" />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen font-sans text-stone-800 relative flex items-center justify-center p-4">
-      {/* Fondo de Retablo Ayacuchano con Filtro Profesional */}
+      {/* Fondo de Retablo Ayacuchano */}
       <div className="fixed inset-0 z-0">
         <img
           src="https://upload.wikimedia.org/wikipedia/commons/8/86/Retablo_ayacuchano.jpg"
           alt="Fondo Retablo Ayacuchano"
           className="w-full h-full object-cover object-center scale-105"
         />
-        <div className="absolute inset-0 bg-[#FFFDF5]/92 backdrop-blur-[3px]"></div>
+        <div className="absolute inset-0 bg-[#FFFDF5]/92 backdrop-blur-[3px]" />
       </div>
 
-      <div className="relative z-10 w-full max-w-md bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 md:p-10 shadow-2xl border border-stone-100/50">
+      <div className="animate-scale-in relative z-10 w-full max-w-md bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 md:p-10 shadow-2xl border border-stone-100/50">
         {/* Botón de Regresar */}
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-stone-500 hover:text-[#700824] transition mb-6 group"
+          className="animate-fade-in-up inline-flex items-center gap-1.5 text-xs font-bold text-stone-500 hover:text-[#e3004f] transition mb-6 group"
         >
           <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Volver al Inicio
         </Link>
 
-        {/* Encabezado */}
-        <div className="text-center mb-8">
-          <div className="inline-flex p-3 bg-rose-50 rounded-2xl mb-3 text-rose-900">
+        {/* Encabezado con transición */}
+        <div className={`text-center mb-8 transition-all duration-200 ${isTransitioning ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}>
+          <div className="inline-flex p-3 bg-gradient-to-br from-rose-50 to-rose-100 rounded-2xl mb-3 text-rose-900 shadow-inner">
             <Sparkles size={24} className="animate-pulse" />
           </div>
           <h1 className="text-3xl font-serif font-bold text-rose-950">
@@ -162,7 +189,8 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="flex items-center justify-center gap-3 w-full bg-white border border-stone-200 text-stone-700 font-bold py-3.5 rounded-xl hover:bg-stone-50 transition text-sm mb-6 shadow-sm disabled:opacity-50"
+          className="animate-fade-in-up flex items-center justify-center gap-3 w-full bg-white border border-stone-200 text-stone-700 font-bold py-3.5 rounded-xl hover:bg-stone-50 hover:border-stone-300 hover:shadow-md transition-all text-sm mb-6 shadow-sm disabled:opacity-50"
+          style={{ animationDelay: "100ms" }}
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -186,24 +214,27 @@ export default function LoginPage() {
         </button>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="h-px bg-stone-200/60 flex-1"></div>
+          <div className="h-px bg-stone-200/60 flex-1" />
           <span className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
             O con correo
           </span>
-          <div className="h-px bg-stone-200/60 flex-1"></div>
+          <div className="h-px bg-stone-200/60 flex-1" />
         </div>
 
         {/* Mensaje de Error */}
         {error && (
-          <div className="bg-rose-50 text-rose-800 text-xs p-4 rounded-2xl mb-4 border border-rose-100 font-medium">
+          <div className="animate-fade-in-up bg-rose-50 text-rose-800 text-xs p-4 rounded-2xl mb-4 border border-rose-100 font-medium">
             {error}
           </div>
         )}
 
-        {/* Formulario */}
-        <form onSubmit={handleAuth} className="flex flex-col gap-4">
+        {/* Formulario con transición */}
+        <form
+          onSubmit={handleAuth}
+          className={`flex flex-col gap-4 transition-all duration-200 ${isTransitioning ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}
+        >
           {!isLogin && (
-            <div className="relative">
+            <div className="relative animate-fade-in-up">
               <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
               <input
                 type="text"
@@ -211,12 +242,12 @@ export default function LoginPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
-                className="w-full p-3.5 pl-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-[#700824]/10 focus:border-[#700824] transition text-sm"
+                className="w-full p-3.5 pl-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-[#e3004f]/10 focus:border-[#e3004f] transition text-sm"
               />
             </div>
           )}
 
-          <div className="relative">
+          <div className="relative animate-fade-in-up" style={{ animationDelay: "150ms" }}>
             <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
             <input
               type="email"
@@ -224,25 +255,34 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-3.5 pl-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-[#700824]/10 focus:border-[#700824] transition text-sm"
+              className="w-full p-3.5 pl-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-[#e3004f]/10 focus:border-[#e3004f] transition text-sm"
             />
           </div>
 
-          <div className="relative">
+          <div className="relative animate-fade-in-up" style={{ animationDelay: "200ms" }}>
             <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-3.5 pl-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-[#700824]/10 focus:border-[#700824] transition text-sm"
+              className="w-full p-3.5 pl-11 pr-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-[#e3004f]/10 focus:border-[#e3004f] transition text-sm"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 password-toggle"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
           </div>
 
           <button
             disabled={loading}
-            className="w-full bg-[#700824] hover:bg-black text-white font-bold py-4 rounded-xl transition shadow-lg hover:shadow-rose-950/10 disabled:opacity-50 text-xs tracking-wider uppercase flex items-center justify-center gap-2 mt-2 cursor-pointer"
+            className="animate-fade-in-up btn-shimmer w-full bg-[#e3004f] hover:bg-black text-white font-bold py-4 rounded-xl transition shadow-lg hover:shadow-rose-950/20 disabled:opacity-50 text-xs tracking-wider uppercase flex items-center justify-center gap-2 mt-2 cursor-pointer"
+            style={{ animationDelay: "250ms" }}
           >
             {loading ? (
               "Procesando..."
@@ -255,14 +295,11 @@ export default function LoginPage() {
         </form>
 
         {/* Enlace para cambiar entre Login y Registro */}
-        <div className="mt-8 text-center text-xs text-stone-500">
+        <div className="mt-8 text-center text-xs text-stone-500 animate-fade-in-up" style={{ animationDelay: "300ms" }}>
           {isLogin ? "¿No tienes cuenta? " : "¿Ya tienes cuenta? "}
           <button
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setError("");
-            }}
-            className="font-bold text-[#700824] hover:underline"
+            onClick={toggleMode}
+            className="font-bold text-[#e3004f] hover:underline"
           >
             {isLogin ? "Regístrate aquí" : "Inicia sesión aquí"}
           </button>

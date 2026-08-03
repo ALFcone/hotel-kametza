@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { createBooking } from "./actions";
@@ -30,7 +30,10 @@ import {
   Bed,
   Sparkles,
   MapPin,
+  Check,
   Phone,
+  MessageSquare,
+  Mail,
   Lock, // Importamos el candado para el input de email
 } from "lucide-react";
 
@@ -300,34 +303,17 @@ function BookingModal({
     formData.set("userId", user.id);
 
     const method = formData.get("paymentMethod");
-    let newTab: Window | null = null;
-    if (method === "online") {
-      newTab = window.open("", "_blank");
-      if (newTab)
-        newTab.document.write(
-          "<div style='height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;'><h2>Cargando pasarela segura...</h2></div>"
-        );
-    }
 
     try {
       const response = await createBooking(formData);
       if (response?.error) {
         alert(response.error);
-        if (newTab) newTab.close();
       } else if (response?.success && response.url) {
-        if (method === "online" && newTab) {
-          newTab.location.href = response.url;
-          router.push(
-            `/exito?method=online&status=pending&id=${response.bookingId}&amount=${totalPrice}`
-          );
-        } else {
-          router.push(response.url);
-        }
+        router.push(response.url);
       }
     } catch (err) {
       console.error(err);
       alert("Error inesperado.");
-      if (newTab) newTab.close();
     }
     setIsSubmitting(false);
   };
@@ -384,7 +370,7 @@ function BookingModal({
               <p className="text-[10px] uppercase font-bold text-stone-500 mb-1">
                 Total a Pagar
               </p>
-              <p className="text-3xl font-black text-[#700824]">
+              <p className="text-3xl font-black text-[#e3004f]">
                 S/ {totalPrice}
               </p>
               <p className="text-[10px] text-stone-400 font-bold mt-1">
@@ -552,8 +538,8 @@ function BookingModal({
                 <option value="" disabled>
                   Seleccione método de pago
                 </option>
-                <option value="online">
-                  💳 Pago Online (Tarjetas, Yape, Plin)
+                <option value="yape">
+                  📱 Yape / Plin (Pago inmediato con QR)
                 </option>
                 <option value="recepcion">
                   🏨 Pagar en Recepción (Efectivo)
@@ -566,13 +552,13 @@ function BookingModal({
 
             <div className="md:hidden flex justify-between items-center text-xs font-bold text-stone-500 border-t pt-2">
               <span>Total ({nights} noches):</span>
-              <span className="text-lg text-[#700824]">S/ {totalPrice}</span>
+              <span className="text-lg text-[#e3004f]">S/ {totalPrice}</span>
             </div>
 
             <button
               disabled={isSubmitting}
               type="submit"
-              className="w-full bg-[#700824] text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50 mt-2"
+              className="w-full bg-[#e3004f] text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50 mt-2"
             >
               {isSubmitting ? (
                 "Procesando..."
@@ -618,7 +604,7 @@ function RoomCard({
   return (
     <>
       <div className="group bg-white rounded-[2.5rem] shadow-lg hover:shadow-[0_20px_40px_rgba(112,8,36,0.15)] transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full relative">
-        <div className="relative h-72 w-full overflow-hidden">
+        <div className="relative h-72 md:h-96 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10 opacity-60"></div>
           <img
             src={room.image_url}
@@ -629,12 +615,12 @@ function RoomCard({
             <p className="text-[9px] uppercase font-bold text-stone-400 tracking-widest mb-0.5">
               Por noche
             </p>
-            <p className="text-xl font-black text-[#700824]">
+            <p className="text-xl font-black text-[#e3004f]">
               S/ {room.price_per_night}
             </p>
           </div>
           <div className="absolute top-4 left-4 z-20">
-            <span className="bg-[#700824] text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] shadow-lg">
+            <span className="bg-[#e3004f] text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] shadow-lg">
               Exclusivo
             </span>
           </div>
@@ -688,7 +674,7 @@ function RoomCard({
           <div className="mt-auto pt-4 border-t border-stone-100">
             <button
               onClick={() => setShowModal(true)}
-              className="w-full bg-stone-900 text-white font-bold py-4 rounded-xl hover:bg-[#700824] transition-all shadow-lg hover:shadow-rose-900/20 flex items-center justify-between px-6 group/btn"
+              className="w-full bg-stone-900 text-white font-bold py-4 rounded-xl hover:bg-[#e3004f] transition-all shadow-lg hover:shadow-rose-900/20 flex items-center justify-between px-6 group/btn"
             >
               <span className="text-xs uppercase tracking-[0.2em]">
                 Ver Disponibilidad
@@ -748,6 +734,23 @@ export default function Home() {
     fetchData();
   }, []);
 
+  // Scroll reveal effect
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+    );
+
+    document.querySelectorAll(".scroll-reveal").forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [loading]);
+
   const handleLoginSuccess = () => {
     setShowAuthModal(false);
     supabase.auth.getUser().then(({ data }) => {
@@ -795,42 +798,28 @@ export default function Home() {
 
   if (loading)
     return (
-      <div className="h-screen flex items-center justify-center bg-white text-[#700824] font-bold animate-pulse">
+      <div className="h-screen flex items-center justify-center bg-white text-[#e3004f] font-bold animate-pulse">
         Cargando Hotel Kametza...
       </div>
     );
 
   return (
-    <div className="min-h-screen font-sans text-stone-800 selection:bg-rose-200 selection:text-rose-900 relative">
-      {/* --- FONDO DE RETABLO AYACUCHANO (PROFESIONAL CON EFECTO VIDRIO) --- */}
-      <div className="fixed inset-0 z-0">
-        {/* IMAGEN DE FONDO (Reemplaza src con tu foto real) */}
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/8/86/Retablo_ayacuchano.jpg"
-          alt="Fondo Textura Retablo"
-          className="w-full h-full object-cover object-center scale-105"
-        />
-        {/* EL FILTRO DE LUJO (Marfil al 90% para que sea profesional y legible) */}
-        <div className="absolute inset-0 bg-[#FFFDF5]/90 backdrop-blur-[2px]"></div>
-        {/* Decoración sutil de fondo */}
-        <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#FFFDF5] to-transparent"></div>
-      </div>
-
+    <div className="min-h-screen font-sans text-stone-800 selection:bg-rose-200 selection:text-rose-900 relative bg-[#FDFBF7]">
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         onSuccess={handleLoginSuccess}
       />
 
-      <nav className="fixed top-0 w-full bg-white z-[100] shadow-2xl border-b border-stone-100">
+      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-lg z-[100] shadow-xl border-b border-stone-100/50 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24 md:h-32">
             <div className="flex-shrink-0 z-[110]">
               <a href="#inicio" onClick={closeMenu}>
                 <img
-                  src="/logo.jpg"
+                  src="/logoo.png"
                   alt="Hotel Kametza"
-                  className="h-20 md:h-28 w-auto object-contain"
+                  className="h-24 md:h-32 w-auto object-contain scale-125 md:scale-[1.4] origin-left brightness-[1.2] drop-shadow-sm"
                 />
               </a>
             </div>
@@ -847,14 +836,14 @@ export default function Home() {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-600 hover:text-[#700824] transition-colors duration-300"
+                  className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-600 hover:text-[#e3004f] transition-colors duration-300"
                 >
                   <item.icon
                     size={16}
-                    className="text-[#700824] group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 drop-shadow-sm"
+                    className="text-[#e3004f] group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 drop-shadow-sm"
                   />
                   {item.name}
-                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-[#700824] -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
+                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-[#e3004f] -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
                 </a>
               ))}
             </div>
@@ -873,9 +862,9 @@ export default function Home() {
                   {/* BOTÓN DE USUARIO MINIMALISTA */}
                   <a
                     href={isAdmin ? "/admin" : "/dashboard"}
-                    className="group flex items-center gap-2 text-stone-600 hover:text-[#700824] transition-colors duration-300"
+                    className="group flex items-center gap-2 text-stone-600 hover:text-[#e3004f] transition-colors duration-300"
                   >
-                    <div className="p-1.5 rounded-full border border-stone-200 group-hover:border-[#700824] transition-colors">
+                    <div className="p-1.5 rounded-full border border-stone-200 group-hover:border-[#e3004f] transition-colors">
                       <User size={16} strokeWidth={1.5} />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-widest">
@@ -894,17 +883,17 @@ export default function Home() {
                 /* BOTÓN ACCEDER ESTILO CÁPSULA */
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="group flex items-center gap-2 bg-stone-50 border border-stone-200 hover:border-[#700824]/30 hover:bg-rose-50 text-stone-600 hover:text-[#700824] px-5 py-2.5 rounded-full transition-all duration-300 text-[11px] font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
+                  className="group flex items-center gap-2 bg-stone-50 border border-stone-200 hover:border-[#e3004f]/30 hover:bg-rose-50 text-stone-600 hover:text-[#e3004f] px-5 py-2.5 rounded-full transition-all duration-300 text-[11px] font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
                 >
                   <div className="bg-white p-1 rounded-full group-hover:scale-110 transition-transform">
-                    <LogIn size={14} className="text-[#700824]" />
+                    <LogIn size={14} className="text-[#e3004f]" />
                   </div>
                   Acceder
                 </button>
               )}
               <a
                 href="#habitaciones"
-                className="bg-[#700824] text-white px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-rose-900/40 transform hover:-translate-y-0.5"
+                className="btn-shimmer bg-[#e3004f] text-white px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-rose-900/40 transform hover:-translate-y-0.5"
               >
                 Reservar
               </a>
@@ -965,7 +954,7 @@ export default function Home() {
             {currentUser ? (
               <div className="flex flex-col items-center gap-6 animate-in slide-in-from-bottom-4 duration-500">
                 <div className="flex flex-col items-center gap-2">
-                  <div className="p-3 rounded-full border-2 border-[#700824]/20 bg-rose-50 text-[#700824]">
+                  <div className="p-3 rounded-full border-2 border-[#e3004f]/20 bg-rose-50 text-[#e3004f]">
                     <User size={24} strokeWidth={1.5} />
                   </div>
                   <span className="text-sm font-bold uppercase tracking-widest text-stone-800">
@@ -976,7 +965,7 @@ export default function Home() {
                 <a
                   href={isAdmin ? "/admin" : "/dashboard"}
                   onClick={closeMenu}
-                  className="text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-[#700824] transition-colors"
+                  className="text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-[#e3004f] transition-colors"
                 >
                   Ir al Panel
                 </a>
@@ -1016,29 +1005,35 @@ export default function Home() {
 
       <section
         id="inicio"
-        className="relative pt-48 pb-24 lg:pt-56 lg:pb-32 overflow-hidden z-10 px-4 text-center"
+        className="relative pt-48 pb-32 lg:pt-56 lg:pb-40 overflow-hidden z-10 px-4 text-center min-h-[90vh] flex flex-col justify-center"
       >
-        <div className="max-w-7xl mx-auto relative">
-          {/* ETIQUETA ELEGANTE Y PROFESIONAL (Minimalista) */}
-          <div className="flex items-center justify-center gap-4 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-            <div className="h-[1px] w-8 md:w-16 bg-stone-400"></div>
-            <span className="text-lg md:text-xl font-serif font-medium text-stone-800 tracking-[0.35em] uppercase">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/hero.png"
+            alt="Hotel Kametza Exterior"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/70 via-stone-900/40 to-[#FDFBF7]" />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
+          {/* ETIQUETA ELEGANTE Y PROFESIONAL */}
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <div className="h-[1px] w-8 md:w-16 bg-white/50"></div>
+            <span className="text-lg md:text-xl font-serif font-medium text-white tracking-[0.35em] uppercase drop-shadow-md">
               Ayacucho, Perú
             </span>
-            <div className="h-[1px] w-8 md:w-16 bg-stone-400"></div>
+            <div className="h-[1px] w-8 md:w-16 bg-white/50"></div>
           </div>
-          <h1 className="text-5xl md:text-7xl font-serif font-medium mb-6 text-rose-950 tracking-tight leading-tight">
-            {" "}
-            Descubre Ayacucho <br /> La Magia de los Andes{" "}
+          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 text-white tracking-tight leading-tight drop-shadow-2xl">
+            Descubre Ayacucho <br /> La Magia de los Andes
           </h1>
-          <p className="text-lg md:text-xl text-stone-600 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-            {" "}
-            Un refugio donde la historia colonial se encuentra con el confort
-            contemporáneo.{" "}
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-12 font-light leading-relaxed drop-shadow-lg">
+            Un refugio donde la historia colonial se encuentra con el confort contemporáneo, diseñado para una experiencia inolvidable.
           </p>
 
           {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
-          <div className="bg-white p-2 rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-stone-100 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-100">
+          <div className="bg-white/95 backdrop-blur-lg p-2 rounded-[2rem] md:rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-white/40 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-200">
             <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group">
               <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-rose-900 transition">
                 Check-in
@@ -1081,7 +1076,7 @@ export default function Home() {
             <div className="p-2 w-full md:w-auto">
               <a
                 href="#habitaciones"
-                className="bg-[#700824] text-white px-8 py-4 rounded-full shadow-lg hover:bg-black transition-all w-full flex items-center justify-center gap-2 group"
+                className="btn-shimmer bg-[#e3004f] text-white px-8 py-4 rounded-full shadow-lg hover:bg-black transition-all w-full flex items-center justify-center gap-2 group"
               >
                 <Search
                   size={20}
@@ -1096,224 +1091,306 @@ export default function Home() {
         </div>
       </section>
       {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
-      <section id="servicios" className="py-24 relative z-10 px-4">
-        <div className="max-w-7xl mx-auto">
+      <section id="habitaciones" className="scroll-reveal min-h-screen flex flex-col justify-center py-24 relative z-10 w-full">
+        <div className="w-full px-4 md:px-8 xl:px-12">
           <div className="text-center mb-16">
-            <span className="text-rose-700 font-bold tracking-widest text-xs uppercase bg-rose-50 px-4 py-2 rounded-full border border-rose-100 shadow-sm">
-              Experiencia Kametza
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif font-medium text-rose-950 mt-4">
-              Mucho más que <br /> solo descansar
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-rose-950">
+              Nuestras Habitaciones
             </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[220px]">
-
-            {/* 1. COCHERA (2x2) */}
-            <div className="group relative md:col-span-2 md:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-default">
-              <img
-                src="/COCHERA PRIVADA.jpg"
-                alt="Cochera"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 p-8 z-10">
-                <div className="flex items-center gap-3 mb-2 text-rose-400">
-                  <Car size={24} />
-                  <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-2 py-1 rounded-md backdrop-blur-sm text-white border border-white/20">
-                    Gratuito
-                  </span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-1">
-                  Cochera Privada
-                </h3>
-                <p className="text-stone-300 text-sm font-light max-w-sm">
-                  Estacionamiento seguro 24/7 dentro de nuestras instalaciones para tu total tranquilidad.
-                </p>
-              </div>
-            </div>
-
-            {/* 2. DESAYUNOS (1x2) - Filtro rojo eliminado */}
-            <div className="group relative md:col-span-1 md:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
-              <img
-                src="/DESAYUNO AYACUCHANO.jpg"
-                alt="Desayuno"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-              <div className="relative h-full flex flex-col justify-end p-6 z-10">
-                <div className="bg-white/20 backdrop-blur-md w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-white shadow-lg border border-white/30">
-                  <Coffee size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2 leading-tight">
-                  Desayuno Regional
-                </h3>
-                <p className="text-stone-200 text-xs font-light leading-relaxed">
-                  Empieza el día con el aroma del café ayacuchano y nuestro famoso pan chapla recién horneado, quesos frescos y jugos naturales.
-                </p>
-              </div>
-            </div>
-
-            {/* 3. ROOM SERVICE (1x1) */}
-            <div className="group relative md:col-span-1 md:row-span-1 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-default">
-              <img
-                src="/ROOM SERVICE.jpg"
-                alt="Room Service"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-              <div className="relative h-full flex flex-col justify-end p-6 z-10">
-                <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white mb-3 border border-white/30">
-                  <Bell size={20} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-1">
-                    Room Service
-                  </h3>
-                  <p className="text-stone-200 text-xs leading-relaxed font-light">
-                    Atención directa a tu habitación para tu máxima comodidad y privacidad cuando lo desees.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* 4. LAVANDERÍA (1x1) */}
-            <div className="group relative md:col-span-1 md:row-span-1 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-default">
-              <img
-                src="/LAVANDERIA.jpg"
-                alt="Lavandería"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-              <div className="relative h-full flex flex-col justify-end p-6 z-10">
-                <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white mb-3 border border-white/30">
-                  <Shirt size={20} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-1">
-                    Lavandería
-                  </h3>
-                  <p className="text-stone-200 text-xs leading-relaxed font-light">
-                    Servicio de lavado y secado rápido y cuidadoso para que viajes ligero y sin preocupaciones.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* 5. TRASLADOS (1x2 - Columna Vertical Izquierda Base) */}
-            <div className="group relative md:col-span-1 md:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500">
-              <img
-                src="/TRASLADO AEROPUERTO.jpg"
-                alt="Traslados"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 p-6 w-full z-10">
-                <div className="bg-white/20 backdrop-blur-md w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-white border border-white/30">
-                  <Plane size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-white leading-tight">
-                  Traslados
-                </h3>
-                <p className="text-stone-200 text-[10px] uppercase tracking-wider mt-2 font-bold">
-                  Aeropuerto - Hotel
-                </p>
-              </div>
-            </div>
-
-            {/* 6. TOURS (3x2 - Gran Bloque Horizontal Derecho) */}
-            <div className="group relative md:col-span-3 md:row-span-2 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 cursor-pointer min-h-[440px]">
-              <img
-                src="/DESCUBRE AYACUCHOO.jpg"
-                alt="Tours Ayacucho"
-                className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent"></div>
-
-              <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-center max-w-2xl z-10 text-left">
-                <div className="flex items-center gap-2.5 text-amber-400 mb-3">
-                  <Map size={20} />
-                  <span className="text-[10px] md:text-[11px] font-black uppercase tracking-widest bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded border border-white/10 text-white">
-                    Experiencias Garantizadas y Seguras
-                  </span>
-                </div>
-                <h3 className="text-3xl md:text-5xl font-serif font-medium text-white mb-3 leading-tight tracking-tight">
-                  Descubre Ayacucho <br /> con los Expertos
-                </h3>
-                <p className="text-stone-300 text-sm md:text-base mb-8 font-light max-w-lg leading-relaxed">
-                  Te conectamos con los mejores tours certificados para explorar las piscinas de Millpu, iglesias coloniales, miradores y la rica historia andina. Experiencias auténticas y totalmente seguras.
-                </p>
-                <span className="inline-flex items-center gap-3 text-white font-bold text-sm w-fit group-hover:text-amber-400 transition-colors bg-white/10 px-6 py-3 rounded-full border border-white/20 backdrop-blur-sm hover:bg-white/20">
-                  Coordinar Tour <ArrowRight size={16} className="group-hover:translate-x-1.5 transition-transform" />
-                </span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <section id="habitaciones" className="py-20 relative z-10 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-rose-950">
-              {" "}
-              Nuestras Habitaciones{" "}
-            </h2>
-            <p className="text-stone-500 mt-2">
-              {" "}
-              Espacios diseñados para tu máximo descanso{" "}
+            <p className="text-stone-500 mt-4 text-lg">
+              Espacios diseñados para tu máximo descanso
             </p>
           </div>
-          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-2 max-w-5xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-8 w-full">
             {groupedRooms.map((room: any) => (
-              <RoomCard
-                key={room.name}
-                room={room}
-                onRequireAuth={triggerAuthFlow}
-                globalCheckIn={globalCheckIn}
-                globalCheckOut={globalCheckOut}
-                currentUser={currentUser} // Pasamos el usuario al RoomCard
-              />
+              <div key={room.name} className="w-full sm:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[calc(25%-1.5rem)] max-w-[420px]">
+                <RoomCard
+                  room={room}
+                  onRequireAuth={triggerAuthFlow}
+                  globalCheckIn={globalCheckIn}
+                  globalCheckOut={globalCheckOut}
+                  currentUser={currentUser} // Pasamos el usuario al RoomCard
+                />
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="ubicacion" className="py-20 bg-white relative z-10 px-4">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <span className="text-rose-700 font-bold tracking-wider text-sm uppercase">
-              {" "}
-              Ubicación Estratégica{" "}
+      <section id="servicios" className="scroll-reveal min-h-screen flex flex-col justify-center py-24 relative z-10 w-full bg-stone-50">
+        <div className="w-full px-4 md:px-12 lg:px-20 xl:px-32">
+          <div className="text-center mb-20">
+            <span className="text-rose-600 font-bold tracking-widest text-xs uppercase bg-rose-50 px-4 py-2 rounded-full border border-rose-100 shadow-sm">
+              Experiencia Kametza
             </span>
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-rose-950 mt-2 mb-6">
-              {" "}
-              Tranquilidad y Fácil Acceso{" "}
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-stone-900 mt-6 mb-4">
+              Mucho más que solo descansar
             </h2>
-            <div className="mb-8 bg-[#FDFBF7] p-6 rounded-2xl border border-stone-100">
-              <p className="text-sm text-stone-400 uppercase font-bold mb-1">
-                {" "}
-                Dirección Exacta{" "}
-              </p>
-              <p className="text-xl font-bold text-stone-800">
-                {" "}
-                Jirón Las Américas #154{" "}
-              </p>
-              <p className="text-rose-700 font-medium mt-1">
-                {" "}
-                Ref. Óvalo Magdalena, Ayacucho{" "}
-              </p>
-            </div>
-            <p className="text-stone-600 mb-6 leading-relaxed">
-              {" "}
-              Ubicados en una zona apacible cerca al Óvalo Magdalena, ideal para
-              descansar lejos del bullicio pero conectados con toda la ciudad.{" "}
+            <p className="text-stone-500 max-w-2xl mx-auto text-lg">
+              Descubre todos los servicios exclusivos pensados para hacer de tu estadía una experiencia inolvidable.
             </p>
           </div>
-          <div className="h-96 w-full bg-stone-200 rounded-3xl overflow-hidden shadow-2xl shadow-stone-300 border-4 border-white">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* 1. COCHERA */}
+            <a
+              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20deseo%20confirmar%20el%20uso%20de%20la%20cochera%20privada."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
+            >
+              <div className="relative h-60 w-full overflow-hidden">
+                <img
+                  src="/COCHERA PRIVADA.jpg"
+                  alt="Cochera"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-stone-800 shadow-sm">
+                  Gratuito
+                </div>
+              </div>
+              <div className="p-8 flex-1 flex flex-col relative">
+                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
+                  <Car size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
+                  Cochera Privada
+                </h3>
+                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
+                  Estacionamiento seguro 24/7 dentro de nuestras instalaciones para tu total tranquilidad y comodidad.
+                </p>
+                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
+                  Reservar <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                </div>
+              </div>
+            </a>
+
+            {/* 2. DESAYUNOS */}
+            <a
+              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20quisiera%20saber%20m%C3%A1s%20sobre%20el%20desayuno%20regional."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
+            >
+              <div className="relative h-60 w-full overflow-hidden">
+                <img
+                  src="/DESAYUNO AYACUCHANO.jpg"
+                  alt="Desayuno"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+              <div className="p-8 flex-1 flex flex-col relative">
+                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
+                  <Coffee size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
+                  Desayuno Regional
+                </h3>
+                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
+                  Empieza el día con café ayacuchano, pan chapla recién horneado, quesos frescos y deliciosos jugos naturales.
+                </p>
+                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
+                  Saber Más <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                </div>
+              </div>
+            </a>
+
+            {/* 3. ROOM SERVICE */}
+            <a
+              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20necesito%20solicitar%20Room%20Service."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
+            >
+              <div className="relative h-60 w-full overflow-hidden">
+                <img
+                  src="/ROOM SERVICE.jpg"
+                  alt="Room Service"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+              <div className="p-8 flex-1 flex flex-col relative">
+                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
+                  <Bell size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
+                  Room Service
+                </h3>
+                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
+                  Atención directa a tu habitación para tu máxima comodidad y privacidad, en el momento que lo desees.
+                </p>
+                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
+                  Solicitar <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                </div>
+              </div>
+            </a>
+
+            {/* 4. LAVANDERÍA */}
+            <a
+              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20deseo%20solicitar%20el%20servicio%20de%20lavander%C3%ADa."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
+            >
+              <div className="relative h-60 w-full overflow-hidden">
+                <img
+                  src="/LAVANDERIA.jpg"
+                  alt="Lavandería"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+              <div className="p-8 flex-1 flex flex-col relative">
+                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
+                  <Shirt size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
+                  Lavandería
+                </h3>
+                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
+                  Servicio de lavado y secado rápido y cuidadoso para que viajes ligero y sin preocupaciones.
+                </p>
+                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
+                  Solicitar <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                </div>
+              </div>
+            </a>
+
+            {/* 5. TRASLADOS */}
+            <a
+              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20quisiera%20solicitar%20un%20traslado%20desde/hacia%20el%20aeropuerto."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
+            >
+              <div className="relative h-60 w-full overflow-hidden">
+                <img
+                  src="/TRASLADO AEROPUERTO.jpg"
+                  alt="Traslados"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-stone-800 shadow-sm">
+                  Aeropuerto
+                </div>
+              </div>
+              <div className="p-8 flex-1 flex flex-col relative">
+                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
+                  <Plane size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
+                  Traslados Seguros
+                </h3>
+                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
+                  Movilidad garantizada desde y hacia el aeropuerto para un viaje sin contratiempos.
+                </p>
+                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
+                  Coordinar <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                </div>
+              </div>
+            </a>
+
+            {/* 6. TOURS */}
+            <a
+              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20me%20gustar%C3%ADa%20informaci%C3%B3n%20para%20coordinar%20un%20Tour%20por%20Ayacucho."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
+            >
+              <div className="relative h-60 w-full overflow-hidden">
+                <img
+                  src="/DESCUBRE AYACUCHOO.jpg"
+                  alt="Tours Ayacucho"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute top-4 left-4 bg-amber-400/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-amber-950 shadow-sm">
+                  Recomendado
+                </div>
+              </div>
+              <div className="p-8 flex-1 flex flex-col relative">
+                <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm border border-amber-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
+                  <Map size={24} />
+                </div>
+                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
+                  Tours Ayacucho
+                </h3>
+                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
+                  Te conectamos con operadores certificados para descubrir las maravillas coloniales y naturales de la ciudad.
+                </p>
+                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
+                  Explorar <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+                </div>
+              </div>
+            </a>
+            
+          </div>
+        </div>
+      </section>
+
+      <section id="ubicacion" className="scroll-reveal min-h-screen flex items-center py-24 relative z-10 w-full bg-stone-50">
+        <div className="w-full px-4 md:px-8 xl:px-12 grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="relative">
+            {/* Elemento decorativo */}
+            <div className="absolute -top-10 -left-10 w-32 h-32 bg-rose-200 rounded-full blur-3xl opacity-30"></div>
+            
+            <span className="text-rose-600 font-bold tracking-wider text-[11px] uppercase bg-rose-50 px-3 py-1.5 rounded-full border border-rose-100 inline-block relative z-10 shadow-sm">
+              Ubicación Estratégica
+            </span>
+            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mt-4 mb-6 relative z-10 leading-tight">
+              Tranquilidad y Fácil Acceso en la ciudad
+            </h2>
+            
+            <div className="mb-8 bg-white p-6 rounded-2xl border border-stone-100 shadow-xl shadow-stone-200/50 relative z-10">
+              <div className="flex items-center gap-4">
+                <div className="bg-rose-50 text-rose-600 p-3 rounded-xl border border-rose-100">
+                  <MapPin size={28} />
+                </div>
+                <div>
+                  <p className="text-[10px] text-stone-400 uppercase font-bold tracking-widest mb-0.5">
+                    Dirección Exacta
+                  </p>
+                  <p className="text-xl font-bold text-stone-800 font-serif">
+                    Jirón Las Américas #154
+                  </p>
+                  <p className="text-rose-600 font-medium text-sm">
+                    Ref. Óvalo Magdalena, Ayacucho
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-stone-500 mb-8 leading-relaxed text-lg relative z-10">
+              Descubre lo mejor de Ayacucho desde un punto privilegiado. Te ofrecemos la <strong>tranquilidad absoluta</strong> que necesitas para un verdadero descanso, manteniéndote a tan solo unos minutos del centro histórico, zonas comerciales y principales rutas turísticas.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+                  <Check size={14} className="stroke-[3]" />
+                </div>
+                <span className="text-stone-700 font-medium text-sm">Zona segura y silenciosa</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+                  <Check size={14} className="stroke-[3]" />
+                </div>
+                <span className="text-stone-700 font-medium text-sm">Fácil acceso de movilidad</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+                  <Check size={14} className="stroke-[3]" />
+                </div>
+                <span className="text-stone-700 font-medium text-sm">A un paso del Óvalo Magdalena</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+                  <Check size={14} className="stroke-[3]" />
+                </div>
+                <span className="text-stone-700 font-medium text-sm">A 5 minutos de la Plaza</span>
+              </div>
+            </div>
+          </div>
+          <div className="h-[500px] w-full bg-stone-200 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-stone-300 border-4 border-white">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.995393240292!2d-74.2235946851765!3d-13.16222699072975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91127d8e8e7e7e7f%3A0x7e7e7e7e7e7e7e7e!2sJir%C3%B3n%20Las%20Am%C3%A9ricas%20154%2C%20Ayacucho%2005001!5e0!3m2!1ses-419!2spe!4v1620000000000!5m2!1ses-419!2spe"
+              src="https://maps.google.com/maps?width=100%25&height=100%25&hl=es&q=KAMETZA%20HOTEL%2C%20Jr%2C%20%C3%93valo%20de%20La%20Magdalena%2C%20Las%20Americas%20154%2C%20Ayacucho%2005001%2C%20Per%C3%BA&t=&z=17&ie=UTF8&iwloc=B&output=embed"
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -1327,103 +1404,137 @@ export default function Home() {
 
       <section
         id="contacto"
-        className="py-24 bg-[#700824]/90 relative overflow-hidden z-10 px-4"
+        className="min-h-screen flex flex-col justify-center py-24 relative overflow-hidden z-10 w-full bg-[url('/bg_contacto.png')] bg-cover bg-center bg-fixed"
       >
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-        <div className="max-w-6xl mx-auto text-center relative z-10">
-          <span className="inline-block py-1 px-4 rounded-full bg-white/10 border border-white/20 text-white text-[10px] font-black tracking-[0.3em] uppercase mb-6 shadow-sm">
+        <div className="absolute inset-0 bg-stone-50/70 backdrop-blur-md"></div>
+        <div className="w-full px-4 md:px-8 xl:px-12 text-center relative z-10 max-w-none">
+          <span className="inline-block py-1 px-4 rounded-full bg-rose-50 border border-rose-100 text-rose-600 text-[10px] font-black tracking-[0.3em] uppercase mb-6 shadow-sm">
             {" "}
             Atención 24/7{" "}
           </span>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-white drop-shadow-lg">
+          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-stone-900">
             {" "}
             ¿Deseas una atención directa?{" "}
           </h2>
-          <div className="grid md:grid-cols-3 gap-8 text-center mb-16">
+          <div className="grid md:grid-cols-3 gap-8 text-center max-w-6xl mx-auto">
             <a
               href="https://wa.me/51966556622"
               target="_blank"
-              className="p-8 bg-white/10 backdrop-blur-md border border-white/10 rounded-[2.5rem] hover:bg-white/20 transition duration-300 group shadow-2xl"
+              className="p-10 bg-white border border-stone-100 rounded-[2.5rem] hover:border-rose-200 hover:shadow-rose-900/10 transition duration-500 group shadow-xl flex flex-col items-center justify-center hover:-translate-y-2"
             >
-              <div className="text-4xl mb-4 group-hover:scale-110 transition">
-                💬
+              <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 transition duration-500">
+                <MessageSquare size={32} />
               </div>
-              <h3 className="font-black text-xl mb-2 text-white">WhatsApp</h3>
-              <p className="text-rose-200 font-black text-2xl">966 556 622</p>
+              <h3 className="font-black text-2xl mb-2 text-stone-900 font-serif">WhatsApp</h3>
+              <p className="text-rose-600 font-bold tracking-widest">966 556 622</p>
             </a>
             <a
               href="tel:+51920042099"
-              className="p-8 bg-white/10 backdrop-blur-md border border-white/10 rounded-[2.5rem] hover:bg-white/20 transition duration-300 group shadow-2xl"
+              className="p-10 bg-white border border-stone-100 rounded-[2.5rem] hover:border-rose-200 hover:shadow-rose-900/10 transition duration-500 group shadow-xl flex flex-col items-center justify-center hover:-translate-y-2"
             >
-              <div className="text-4xl mb-4 group-hover:scale-110 transition">
-                📞
+              <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 transition duration-500">
+                <Phone size={32} />
               </div>
-              <h3 className="font-black text-xl mb-2 text-white">Llamar</h3>
-              <p className="text-rose-200 font-black text-2xl">920 042 099</p>
+              <h3 className="font-black text-2xl mb-2 text-stone-900 font-serif">Recepción</h3>
+              <p className="text-rose-600 font-bold tracking-widest">920 042 099</p>
             </a>
             <a
               href="mailto:kametzahotelayacucho@gmail.com"
-              className="p-8 bg-white/10 backdrop-blur-md border border-white/10 rounded-[2.5rem] hover:bg-white/20 transition duration-300 group shadow-2xl"
+              className="p-10 bg-white border border-stone-100 rounded-[2.5rem] hover:border-rose-200 hover:shadow-rose-900/10 transition duration-500 group shadow-xl flex flex-col items-center justify-center hover:-translate-y-2"
             >
-              <div className="text-4xl mb-4 group-hover:scale-110 transition">
-                ✉️
+              <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 transition duration-500">
+                <Mail size={32} />
               </div>
-              <h3 className="font-black text-xl mb-2 text-white">Correo</h3>
-              <p className="text-rose-200 font-black text-sm">
-                kametzahotelayacucho@gmail.com
-              </p>
-            </a>
-          </div>
-          <div className="flex flex-wrap justify-center gap-4 pt-10 border-t border-white/20">
-            <a
-              href="https://www.facebook.com/share/1KhmvycDcR/"
-              target="_blank"
-              className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/20 hover:bg-[#1877F2] transition font-black text-white text-sm"
-            >
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/124/124010.png"
-                className="w-5 h-5"
-                alt="Facebook"
-              />{" "}
-              FACEBOOK
-            </a>
-            <a
-              href="https://www.instagram.com/kametzahotelayacucho/"
-              target="_blank"
-              className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/20 hover:bg-[#E4405F] transition font-black text-white text-sm"
-            >
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/174/174855.png"
-                className="w-5 h-5"
-                alt="Instagram"
-              />{" "}
-              INSTAGRAM
-            </a>
-            <a
-              href="https://tiktok.com/@HotelKametza"
-              target="_blank"
-              className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/20 hover:bg-black transition font-black text-white text-sm"
-            >
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png"
-                className="w-5 h-5 brightness-0 invert"
-                alt="TikTok"
-              />{" "}
-              TIKTOK
+              <h3 className="font-black text-2xl mb-2 text-stone-900 font-serif">Correo</h3>
+              <p className="text-rose-600 font-bold text-sm">kametzahotelayacucho@gmail.com</p>
             </a>
           </div>
         </div>
       </section>
 
-      <footer className="bg-stone-900 text-stone-400 py-12 text-sm relative z-10 px-4 text-center md:text-left">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div>
-            <p className="font-bold text-white mb-1">© 2025 Hotel Kametza.</p>
-            <p className="text-xs text-stone-500">
-              RUC: 10452685951 • Ayacucho, Perú.
-            </p>
+      {/* --- FOOTER PREMIUM --- */}
+      <footer className="bg-stone-50 border-t border-stone-200 pt-24 pb-12 text-sm relative z-10 w-full overflow-hidden">
+        {/* Elemento decorativo del footer */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-rose-100/50 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-stone-200/50 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div className="max-w-[1400px] mx-auto px-4 md:px-8 xl:px-12 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-12 xl:gap-8 mb-20">
+            
+            {/* Brand Column */}
+            <div className="xl:col-span-1">
+              <img src="/logoo.png" alt="Hotel Kametza" className="h-24 mb-6" />
+              <p className="text-stone-600 text-sm leading-relaxed mb-8 max-w-sm">
+                Un refugio exclusivo donde la historia colonial se encuentra con el confort contemporáneo en el corazón de Ayacucho.
+              </p>
+              <div className="flex gap-4">
+                <a href="https://www.facebook.com/share/1KhmvycDcR/" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:bg-[#1877F2] hover:border-[#1877F2] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                  <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" className="w-4 h-4 group-hover:brightness-0 group-hover:invert transition-all" alt="Facebook" />
+                </a>
+                <a href="https://www.instagram.com/kametzahotelayacucho/" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:bg-[#E4405F] hover:border-[#E4405F] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                  <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" className="w-4 h-4 group-hover:brightness-0 group-hover:invert transition-all" alt="Instagram" />
+                </a>
+                <a href="https://tiktok.com/@HotelKametza" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:bg-black hover:border-black group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                  <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" className="w-4 h-4 group-hover:brightness-0 group-hover:invert transition-all" alt="TikTok" />
+                </a>
+              </div>
+            </div>
+
+            {/* Links Column */}
+            <div>
+              <h4 className="text-rose-950 font-bold tracking-widest text-xs uppercase mb-6">Descubre</h4>
+              <ul className="space-y-4">
+                <li><a href="#inicio" className="text-stone-500 font-medium hover:text-rose-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-rose-400" /> Inicio</a></li>
+                <li><a href="#habitaciones" className="text-stone-500 font-medium hover:text-rose-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-rose-400" /> Habitaciones</a></li>
+                <li><a href="#servicios" className="text-stone-500 font-medium hover:text-rose-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-rose-400" /> Experiencia Kametza</a></li>
+                <li><a href="#ubicacion" className="text-stone-500 font-medium hover:text-rose-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-rose-400" /> Ubicación</a></li>
+              </ul>
+            </div>
+
+            {/* Dirección Column */}
+            <div>
+              <h4 className="text-rose-950 font-bold tracking-widest text-xs uppercase mb-6">Ubicación</h4>
+              <div className="flex items-start gap-3 text-stone-600 mb-4 font-medium">
+                <MapPin size={18} className="text-rose-600 flex-shrink-0 mt-1" />
+                <p className="leading-relaxed">
+                  Jirón Las Américas #154<br />
+                  Ref. Óvalo Magdalena<br />
+                  Ayacucho, Perú
+                </p>
+              </div>
+            </div>
+
+            {/* Pagos Column */}
+            <div>
+              <h4 className="text-rose-950 font-bold tracking-widest text-xs uppercase mb-6">Medios de Pago</h4>
+              <p className="text-stone-600 font-medium text-sm mb-4">
+                Aceptamos todas las tarjetas de crédito, débito y transferencias.
+              </p>
+              <div className="flex gap-2 mb-6">
+                <div className="bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm flex items-center justify-center h-10 w-14">
+                  <span className="font-black text-[#1A1F71] text-[10px] italic">VISA</span>
+                </div>
+                <div className="bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm flex items-center justify-center h-10 w-14 relative overflow-hidden">
+                  <div className="w-4 h-4 rounded-full bg-[#EB001B] absolute left-2 opacity-80 mix-blend-multiply"></div>
+                  <div className="w-4 h-4 rounded-full bg-[#F79E1B] absolute right-2 opacity-80 mix-blend-multiply"></div>
+                </div>
+                <div className="bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm flex items-center justify-center h-10 w-14">
+                  <span className="font-black text-[#2671B9] text-[10px] italic">AMEX</span>
+                </div>
+              </div>
+            </div>
+
           </div>
-          <div className="flex gap-6">
+
+          {/* Bottom Footer */}
+          <div className="border-t border-stone-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+            <div>
+              <p className="font-bold text-stone-600 text-xs">© 2025 Hotel Kametza. Todos los derechos reservados.</p>
+              <p className="text-[10px] text-stone-400 mt-1">RUC: 10452685951</p>
+            </div>
+            <div className="text-[10px] text-rose-600 bg-rose-50 px-3 py-1.5 rounded-full border border-rose-100 uppercase tracking-widest font-black">
+              Experiencia Premium en Ayacucho
+            </div>
           </div>
         </div>
       </footer>
