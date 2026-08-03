@@ -362,7 +362,7 @@ export default async function AdminPage(props: {
         </div>
       </aside>
       {/* --- CONTENIDO PRINCIPAL --- */}
-      <main className="flex-1 p-6 md:p-12 overflow-y-auto w-full relative">
+      <main className="flex-1 p-6 md:p-12 pb-24 lg:pb-12 overflow-y-auto w-full relative">
         <div className="w-full">
           {/* TOP BAR / FILTROS */}
           <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-10 gap-6 border-b border-stone-200/60 pb-8">
@@ -947,6 +947,30 @@ export default async function AdminPage(props: {
           )}
         </div>
       </main>
+
+      {/* --- MOBILE BOTTOM NAV --- */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-stone-950 text-white border-t border-stone-800 flex justify-between items-center px-6 py-4 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)]">
+        <Link href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "resumen" ? "text-amber-500" : "text-stone-400"}`}>
+          <TrendingUp size={20} />
+          <span className="text-[8px] font-black uppercase">Resumen</span>
+        </Link>
+        <Link href={`/admin?tab=estado&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "estado" ? "text-amber-500" : "text-stone-400"}`}>
+          <LayoutDashboard size={20} />
+          <span className="text-[8px] font-black uppercase">Estado</span>
+        </Link>
+        <Link href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "historial" ? "text-amber-500" : "text-stone-400"}`}>
+          <FileText size={20} />
+          <span className="text-[8px] font-black uppercase">Historial</span>
+        </Link>
+        <Link href={`/admin?tab=inventario&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "inventario" ? "text-amber-500" : "text-stone-400"}`}>
+          <BedDouble size={20} />
+          <span className="text-[8px] font-black uppercase">Cuartos</span>
+        </Link>
+        <Link href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "registrar" ? "text-amber-500" : "text-stone-400"}`}>
+          <CalendarCheck size={20} />
+          <span className="text-[8px] font-black uppercase">Registro</span>
+        </Link>
+      </nav>
     </div>
   );
 }
