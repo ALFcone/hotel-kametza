@@ -1551,7 +1551,7 @@ export default function Home() {
               },
               {
                 q: "¿Se admiten mascotas en las habitaciones?",
-                a: "Nos encantan los animales, pero con el fin de garantizar el máximo descanso, mantener los más altos estándares de limpieza y evitar posibles alergias de otros huéspedes, por el momento no estamos admitiendo mascotas en las instalaciones."
+                a: "Nos encantan los animales. La admisión de mascotas está permitida, pero debe realizarse siempre previa coordinación con la administración al momento de hacer su reserva, para poder brindarle las mejores facilidades y asegurar la comodidad de todos."
               },
               {
                 q: "¿Qué incluye el servicio de desayuno y en qué horario se sirve?",
