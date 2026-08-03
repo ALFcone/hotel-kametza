@@ -60,6 +60,97 @@ function getSimpleDescription(name: string, originalDesc: string) {
     : "Habitación confortable con baño privado, agua caliente, WiFi y TV.";
 }
 
+// --- DATA DE SERVICIOS PARA DESPLIEGUE DINÁMICO ---
+const servicesData = [
+  {
+    id: 'cochera',
+    title: 'Cochera Privada',
+    shortDesc: 'Estacionamiento seguro 24/7 dentro de nuestras instalaciones.',
+    longDesc: 'Ofrecemos servicio de cochera privada, techada y segura de manera totalmente gratuita para todos nuestros huéspedes. Tu vehículo estará protegido las 24 horas del día sin necesidad de salir de las instalaciones.',
+    tag: 'Gratuito',
+    icon: Car,
+    image: '/COCHERA PRIVADA.jpg',
+    features: [
+      { title: 'Seguridad 24/7', desc: 'Vigilancia constante y acceso restringido.' },
+      { title: 'Comodidad', desc: 'Acceso directo desde el estacionamiento a tu habitación.' }
+    ],
+    schedule: 'Disponible 24 Horas',
+    waMsg: 'Hola Hotel Kametza, deseo confirmar el uso de la cochera privada.'
+  },
+  {
+    id: 'desayuno',
+    title: 'Desayuno Regional',
+    shortDesc: 'Empieza el día con café ayacuchano, pan chapla y quesos frescos.',
+    longDesc: 'Cada mañana, preparamos un desayuno pensado para que inicies el día lleno de energía. Disfruta de la fusión perfecta entre la frescura de los ingredientes locales y el sabor tradicional que nos caracteriza.',
+    icon: Coffee,
+    image: '/DESAYUNO%20AYACUCHANO.jpg',
+    features: [
+      { title: 'Bebidas Calientes', desc: 'Café pasado de la región, infusiones naturales y mates tradicionales.' },
+      { title: 'Acompañamientos', desc: 'Pan chapla recién horneado, queso andino fresco, aceitunas y mermeladas.' }
+    ],
+    schedule: 'Todos los días de 7:00 AM a 9:30 AM',
+    waMsg: 'Hola Hotel Kametza, quisiera saber más sobre el desayuno regional.'
+  },
+  {
+    id: 'room-service',
+    title: 'Room Service',
+    shortDesc: 'Atención directa a tu habitación para tu máxima comodidad.',
+    longDesc: 'Disfruta de nuestros deliciosos platillos y bebidas desde la comodidad y privacidad de tu habitación. Nuestro equipo está listo para atenderte de forma rápida y eficiente.',
+    icon: Bell,
+    image: '/ROOM%20SERVICE.jpg',
+    features: [
+      { title: 'Menú a la Carta', desc: 'Variedad de opciones en comidas y bebidas.' },
+      { title: 'Atención Rápida', desc: 'Servicio directo a tu puerta para que no tengas que salir.' }
+    ],
+    schedule: 'Consultar horarios en recepción',
+    waMsg: 'Hola Hotel Kametza, necesito solicitar Room Service.'
+  },
+  {
+    id: 'lavanderia',
+    title: 'Lavandería',
+    shortDesc: 'Servicio de lavado y secado rápido para que viajes ligero.',
+    longDesc: 'No te preocupes por el lavado de tu ropa durante tu viaje. Ofrecemos un servicio de lavandería express cuidadoso con tus prendas, entregándolas limpias, secas y planchadas.',
+    icon: Shirt,
+    image: '/LAVANDERIA.jpg',
+    features: [
+      { title: 'Lavado y Secado', desc: 'Tratamiento especial según el tipo de tela.' },
+      { title: 'Planchado', desc: 'Tus prendas listas para usar en tus reuniones o paseos.' }
+    ],
+    schedule: 'Recepción de 8:00 AM a 8:00 PM',
+    waMsg: 'Hola Hotel Kametza, deseo solicitar el servicio de lavandería.'
+  },
+  {
+    id: 'traslados',
+    title: 'Traslados Seguros',
+    shortDesc: 'Movilidad garantizada desde y hacia el aeropuerto.',
+    longDesc: 'Evita contratiempos a tu llegada o salida. Coordinamos tu traslado desde el aeropuerto hasta el hotel con conductores de total confianza, garantizando un viaje seguro y puntual.',
+    tag: 'Aeropuerto',
+    icon: Plane,
+    image: '/TRASLADO%20AEROPUERTO.jpg',
+    features: [
+      { title: 'Conductores Verificados', desc: 'Personal de confianza y vehículos seguros.' },
+      { title: 'Puntualidad', desc: 'Coordinamos tu recojo según tu itinerario de vuelo.' }
+    ],
+    schedule: 'Previa coordinación',
+    waMsg: 'Hola Hotel Kametza, quisiera solicitar un traslado desde/hacia el aeropuerto.'
+  },
+  {
+    id: 'tours',
+    title: 'Tours Ayacucho',
+    shortDesc: 'Descubre las maravillas coloniales y naturales de la ciudad.',
+    longDesc: 'Ayacucho tiene mucho por descubrir. Te conectamos con los mejores operadores turísticos certificados de la región para que explores las iglesias, museos, pampas y maravillas naturales con total seguridad.',
+    tag: 'Recomendado',
+    icon: Map,
+    image: '/DESCUBRE%20AYACUCHOO.jpg',
+    features: [
+      { title: 'Operadores Certificados', desc: 'Agencias seguras y con experiencia.' },
+      { title: 'Variedad de Rutas', desc: 'Tours históricos, gastronómicos y de aventura.' }
+    ],
+    schedule: 'Salidas diarias',
+    waMsg: 'Hola Hotel Kametza, me gustaría información para coordinar un Tour por Ayacucho.'
+  }
+];
+
 // --- AUTH MODAL ---
 function AuthModal({
   isOpen,
@@ -720,6 +811,7 @@ export default function Home() {
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [activeServiceId, setActiveServiceId] = useState<string | null>(null);
   const [pendingBookingAction, setPendingBookingAction] = useState<
     (() => void) | null
   >(null);
@@ -1156,265 +1248,136 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* 1. COCHERA */}
-            <a
-              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20deseo%20confirmar%20el%20uso%20de%20la%20cochera%20privada."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
-            >
-              <div className="relative h-60 w-full overflow-hidden">
-                <img
-                  src="/COCHERA PRIVADA.jpg"
-                  alt="Cochera"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-stone-800 shadow-sm">
-                  Gratuito
-                </div>
-              </div>
-              <div className="p-8 flex-1 flex flex-col relative">
-                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
-                  <Car size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
-                  Cochera Privada
-                </h3>
-                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
-                  Estacionamiento seguro 24/7 dentro de nuestras instalaciones para tu total tranquilidad y comodidad.
-                </p>
-                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
-                  Reservar <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-                </div>
-              </div>
-            </a>
-
-            {/* 2. DESAYUNOS */}
-            <a
-              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20quisiera%20saber%20m%C3%A1s%20sobre%20el%20desayuno%20regional."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
-            >
-              <div className="relative h-60 w-full overflow-hidden">
-                <img
-                  src="/DESAYUNO AYACUCHANO.jpg"
-                  alt="Desayuno"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-              </div>
-              <div className="p-8 flex-1 flex flex-col relative">
-                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
-                  <Coffee size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
-                  Desayuno Regional
-                </h3>
-                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
-                  Empieza el día con café ayacuchano, pan chapla recién horneado, quesos frescos y deliciosos jugos naturales.
-                </p>
-                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
-                  Saber Más <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-                </div>
-              </div>
-            </a>
-
-            {/* 3. ROOM SERVICE */}
-            <a
-              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20necesito%20solicitar%20Room%20Service."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
-            >
-              <div className="relative h-60 w-full overflow-hidden">
-                <img
-                  src="/ROOM SERVICE.jpg"
-                  alt="Room Service"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-              </div>
-              <div className="p-8 flex-1 flex flex-col relative">
-                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
-                  <Bell size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
-                  Room Service
-                </h3>
-                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
-                  Atención directa a tu habitación para tu máxima comodidad y privacidad, en el momento que lo desees.
-                </p>
-                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
-                  Solicitar <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-                </div>
-              </div>
-            </a>
-
-            {/* 4. LAVANDERÍA */}
-            <a
-              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20deseo%20solicitar%20el%20servicio%20de%20lavander%C3%ADa."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
-            >
-              <div className="relative h-60 w-full overflow-hidden">
-                <img
-                  src="/LAVANDERIA.jpg"
-                  alt="Lavandería"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-              </div>
-              <div className="p-8 flex-1 flex flex-col relative">
-                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
-                  <Shirt size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
-                  Lavandería
-                </h3>
-                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
-                  Servicio de lavado y secado rápido y cuidadoso para que viajes ligero y sin preocupaciones.
-                </p>
-                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
-                  Solicitar <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-                </div>
-              </div>
-            </a>
-
-            {/* 5. TRASLADOS */}
-            <a
-              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20quisiera%20solicitar%20un%20traslado%20desde/hacia%20el%20aeropuerto."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
-            >
-              <div className="relative h-60 w-full overflow-hidden">
-                <img
-                  src="/TRASLADO AEROPUERTO.jpg"
-                  alt="Traslados"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-stone-800 shadow-sm">
-                  Aeropuerto
-                </div>
-              </div>
-              <div className="p-8 flex-1 flex flex-col relative">
-                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
-                  <Plane size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
-                  Traslados Seguros
-                </h3>
-                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
-                  Movilidad garantizada desde y hacia el aeropuerto para un viaje sin contratiempos.
-                </p>
-                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
-                  Coordinar <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-                </div>
-              </div>
-            </a>
-
-            {/* 6. TOURS */}
-            <a
-              href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20me%20gustar%C3%ADa%20informaci%C3%B3n%20para%20coordinar%20un%20Tour%20por%20Ayacucho."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group bg-white rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-rose-900/10 border border-stone-100 hover:border-rose-100 hover:-translate-y-2 transition-all duration-500 flex flex-col block"
-            >
-              <div className="relative h-60 w-full overflow-hidden">
-                <img
-                  src="/DESCUBRE AYACUCHOO.jpg"
-                  alt="Tours Ayacucho"
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute top-4 left-4 bg-amber-400/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase text-amber-950 shadow-sm">
-                  Recomendado
-                </div>
-              </div>
-              <div className="p-8 flex-1 flex flex-col relative">
-                <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm border border-amber-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
-                  <Map size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
-                  Tours Ayacucho
-                </h3>
-                <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
-                  Te conectamos con operadores certificados para descubrir las maravillas coloniales y naturales de la ciudad.
-                </p>
-                <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest group-hover:text-rose-700 transition-colors">
-                  Explorar <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
-                </div>
-              </div>
-            </a>
-            
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {servicesData.map((service) => {
+              const Icon = service.icon;
+              const isActive = activeServiceId === service.id;
+              return (
+                <button
+                  key={service.id}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (isActive) {
+                      setActiveServiceId(null);
+                    } else {
+                      setActiveServiceId(service.id);
+                      setTimeout(() => {
+                        document.getElementById('service-detail')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                    }
+                  }}
+                  className={`group bg-white rounded-[2rem] overflow-hidden transition-all duration-500 flex flex-col text-left border ${
+                    isActive ? 'border-rose-300 ring-4 ring-rose-50 scale-[1.02] shadow-2xl shadow-rose-900/10' : 'border-stone-100 hover:border-rose-100 hover:-translate-y-2 shadow-lg hover:shadow-2xl hover:shadow-rose-900/10'
+                  }`}
+                >
+                  <div className="relative h-60 w-full overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    {service.tag && (
+                      <div className={`absolute top-4 left-4 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase shadow-sm ${
+                        service.tag === 'Recomendado' ? 'bg-amber-400/90 text-amber-950' : 'bg-white/90 text-stone-800'
+                      }`}>
+                        {service.tag}
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-8 flex-1 flex flex-col relative">
+                    <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
+                      <Icon size={24} />
+                    </div>
+                    <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
+                      {service.title}
+                    </h3>
+                    <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
+                      {service.shortDesc}
+                    </p>
+                    <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-colors">
+                      {isActive ? 'Cerrar Detalles' : 'Ver Detalles'} <ArrowRight size={14} className={`transition-transform ${isActive ? 'rotate-90 text-rose-700' : 'group-hover:translate-x-2'}`} />
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
-        </div>
-      </section>
 
-      {/* --- SECCIÓN DESAYUNO --- */}
-      <section id="desayuno" className="scroll-reveal py-24 relative w-full bg-white overflow-hidden border-b border-stone-100">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 xl:px-12 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            
-            <div className="order-2 lg:order-1 relative">
-              <div className="aspect-[4/5] md:aspect-square lg:aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl relative group">
-                <img 
-                  src="/DESAYUNO%20AYACUCHANO.jpg" 
-                  alt="Desayuno Ayacuchano en Hotel Kametza" 
-                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-1000"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/20 to-transparent"></div>
-                <div className="absolute bottom-8 left-8 right-8 text-white">
-                  <p className="font-serif italic text-xl md:text-2xl drop-shadow-md leading-relaxed">"Un despertar con el verdadero sabor de nuestra tierra"</p>
-                </div>
-              </div>
-              {/* Decoración detrás de la imagen */}
-              <div className="absolute -z-10 -bottom-6 -left-6 w-full h-full border-2 border-[#e3004f]/20 rounded-[2.5rem]"></div>
-            </div>
-
-            <div className="order-1 lg:order-2">
-              <div className="flex items-center gap-4 mb-4">
-                <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
-                  Experiencia Gastronómica
-                </span>
-                <div className="h-[1px] w-12 md:w-20 bg-rose-200"></div>
-              </div>
+          {/* DESPLIEGUE DINÁMICO DE DETALLES DEL SERVICIO */}
+          {activeServiceId && (
+            <div id="service-detail" className="mt-16 relative w-full bg-white rounded-[2.5rem] overflow-hidden border border-stone-200 shadow-2xl animate-in fade-in slide-in-from-top-8 duration-500">
+              <button 
+                onClick={() => setActiveServiceId(null)}
+                className="absolute top-4 md:top-8 right-4 md:right-8 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-stone-500 shadow-md border border-stone-100 hover:bg-rose-50 hover:text-rose-600 transition-colors z-20"
+              >
+                <X size={20} />
+              </button>
               
-              <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6 leading-tight">
-                El Auténtico Desayuno <br className="hidden md:block"/> Ayacuchano
-              </h2>
-              
-              <p className="text-stone-500 text-sm md:text-base leading-relaxed mb-8">
-                Cada mañana, preparamos un desayuno pensado para que inicies el día lleno de energía. Disfruta de la fusión perfecta entre la frescura de los ingredientes locales y el sabor tradicional que nos caracteriza.
-              </p>
+              {servicesData.filter(s => s.id === activeServiceId).map(service => {
+                const Icon = service.icon;
+                return (
+                  <div key={service.id} className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12 items-stretch">
+                    <div className="h-64 lg:h-auto relative">
+                      <img 
+                        src={service.image} 
+                        alt={service.title} 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/20 to-transparent"></div>
+                      <div className="absolute bottom-6 left-6 right-6 text-white">
+                        <p className="font-serif italic text-lg md:text-xl drop-shadow-md leading-relaxed">Experiencia Kametza</p>
+                      </div>
+                    </div>
 
-              <div className="space-y-4 mb-10">
-                <div className="flex items-start gap-4 bg-stone-50 p-4 md:p-6 rounded-2xl border border-stone-100 transition-colors hover:border-rose-200">
-                  <div className="w-10 h-10 rounded-full bg-white shadow-sm text-rose-600 flex items-center justify-center flex-shrink-0 mt-1">
-                    <Coffee size={20} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-stone-800 mb-1">Bebidas Calientes</h4>
-                    <p className="text-stone-500 text-sm leading-relaxed">Café pasado de la región, variedad de infusiones naturales, mates tradicionales y leche fresca.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4 bg-stone-50 p-4 md:p-6 rounded-2xl border border-stone-100 transition-colors hover:border-amber-200">
-                  <div className="w-10 h-10 rounded-full bg-white shadow-sm text-amber-500 flex items-center justify-center flex-shrink-0 mt-1">
-                    <Check size={20} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-stone-800 mb-1">Acompañamientos de la Región</h4>
-                    <p className="text-stone-500 text-sm leading-relaxed">Delicioso pan chapla recién horneado, queso andino fresco, tamalitos, aceitunas y frutas de la estación.</p>
-                  </div>
-                </div>
-              </div>
+                    <div className="p-8 md:p-12 flex flex-col justify-center">
+                      <div className="flex items-center gap-4 mb-4">
+                        <span className="text-[#e3004f] font-serif italic text-lg md:text-xl font-medium tracking-wide flex items-center gap-2">
+                          <Icon size={20} /> Detalle del Servicio
+                        </span>
+                        <div className="h-[1px] flex-1 bg-rose-200"></div>
+                      </div>
+                      
+                      <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 mb-6 leading-tight">
+                        {service.title}
+                      </h2>
+                      
+                      <p className="text-stone-500 text-sm md:text-base leading-relaxed mb-8">
+                        {service.longDesc}
+                      </p>
 
-              <div className="inline-flex items-center gap-3 bg-white border border-stone-200 rounded-full py-3 px-6 text-stone-600 text-sm font-bold shadow-sm hover:shadow-md transition-shadow">
-                <Clock size={16} className="text-rose-600" />
-                Disponible todos los días de 7:00 AM a 9:30 AM
-              </div>
+                      <div className="space-y-4 mb-10">
+                        {service.features.map((feat, idx) => (
+                          <div key={idx} className="flex items-start gap-4 bg-stone-50 p-4 rounded-2xl border border-stone-100 transition-colors hover:border-rose-200">
+                            <div className="w-8 h-8 rounded-full bg-white shadow-sm text-rose-600 flex items-center justify-center flex-shrink-0 mt-1">
+                              <Check size={16} />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-stone-800 mb-1">{feat.title}</h4>
+                              <p className="text-stone-500 text-xs md:text-sm leading-relaxed">{feat.desc}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row items-center gap-4">
+                        <div className="inline-flex items-center justify-center w-full sm:w-auto gap-3 bg-stone-50 border border-stone-200 rounded-full py-3 px-6 text-stone-600 text-xs md:text-sm font-bold shadow-sm">
+                          <Clock size={16} className="text-rose-600" />
+                          {service.schedule}
+                        </div>
+                        <a
+                          href={`https://wa.me/51966556622?text=${encodeURIComponent(service.waMsg)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center w-full sm:w-auto gap-2 bg-[#25D366] text-white rounded-full py-3 px-8 text-xs md:text-sm font-black tracking-widest shadow-lg hover:bg-green-600 hover:shadow-xl hover:-translate-y-1 transition-all"
+                        >
+                          SOLICITAR <ArrowRight size={16} />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-
           </div>
         </div>
       </section>
