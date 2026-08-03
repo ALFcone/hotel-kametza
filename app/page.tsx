@@ -1516,6 +1516,64 @@ export default function Home() {
         </div>
       </section>
 
+      {/* --- SECCIÓN PREGUNTAS FRECUENTES (FAQ) --- */}
+      <section id="faq" className="scroll-reveal py-24 bg-white relative w-full overflow-hidden">
+        <div className="max-w-4xl mx-auto px-4 md:px-8 xl:px-12 relative z-10">
+          <div className="text-center mb-16">
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="h-[1px] w-12 md:w-20 bg-rose-200"></div>
+              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+                Preguntas Frecuentes
+              </span>
+              <div className="h-[1px] w-12 md:w-20 bg-rose-200"></div>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6">
+              Todo lo que necesitas saber
+            </h2>
+            <p className="text-stone-500 text-sm md:text-base leading-relaxed">
+              Resolvemos tus dudas más comunes para que puedas planificar tu estadía con total tranquilidad y confianza.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              {
+                q: "¿A qué hora es el check-in y el check-out?",
+                a: "El horario de entrada (check-in) es a partir de las 13:00 hrs y la salida (check-out) es hasta las 12:00 hrs (mediodía). Si llegas antes o deseas salir más tarde, contamos con servicio de resguardo de equipaje gratuito para tu comodidad."
+              },
+              {
+                q: "¿El hotel cuenta con estacionamiento privado?",
+                a: "Sí, ofrecemos servicio de cochera privada, techada y segura de manera totalmente gratuita para todos nuestros huéspedes dentro de las mismas instalaciones del hotel."
+              },
+              {
+                q: "¿Tienen agua caliente y conexión a Internet en las habitaciones?",
+                a: "Por supuesto, todas nuestras habitaciones cuentan con baño privado y agua caliente las 24 horas del día. Además, ofrecemos conexión Wi-Fi de alta velocidad (Fibra Óptica) gratis en todas las áreas."
+              },
+              {
+                q: "¿Se admiten mascotas en las habitaciones?",
+                a: "Nos encantan los animales, pero con el fin de garantizar el máximo descanso, mantener los más altos estándares de limpieza y evitar posibles alergias de otros huéspedes, por el momento no estamos admitiendo mascotas en las instalaciones."
+              },
+              {
+                q: "¿Qué incluye el servicio de desayuno y en qué horario se sirve?",
+                a: "Ofrecemos un delicioso y variado desayuno que incluye opciones típicas de la región de Ayacucho para comenzar el día con energía. Se sirve todas las mañanas de 7:00 am a 9:30 am en nuestro exclusivo comedor principal."
+              }
+            ].map((faq, idx) => (
+              <details key={idx} className="group bg-stone-50 rounded-2xl border border-stone-100 overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-rose-100">
+                <summary className="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-stone-800 hover:text-rose-900 transition-colors [&::-webkit-details-marker]:hidden">
+                  <span className="text-sm md:text-base pr-4">{faq.q}</span>
+                  <span className="transition duration-300 group-open:-rotate-180 text-rose-500">
+                    <svg fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                  </span>
+                </summary>
+                <div className="text-stone-600 text-sm md:text-base p-6 pt-0 leading-relaxed font-light bg-stone-50">
+                  {faq.a}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section
         id="contacto"
         className="min-h-screen flex flex-col justify-center py-24 relative overflow-hidden z-10 w-full bg-[url('/bg_contacto.png')] bg-cover bg-center bg-fixed"
