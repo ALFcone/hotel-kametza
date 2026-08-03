@@ -36,6 +36,8 @@ import {
   MessageSquare,
   Mail,
   Lock, // Importamos el candado para el input de email
+  ShieldCheck,
+  CreditCard,
 } from "lucide-react";
 
 // --- FUNCIÓN DE DESCRIPCIONES SENCILLAS ---
