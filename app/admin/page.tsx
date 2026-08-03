@@ -446,13 +446,14 @@ export default async function AdminPage(props: {
                 {/* Cards KPIs */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   {/* Card Ventas */}
-                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all duration-300">
+                  <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_4px_40px_rgba(0,0,0,0.03)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_8px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500">
+                    <Wallet size={120} className="absolute -right-6 -bottom-6 text-stone-50 opacity-50 group-hover:scale-110 group-hover:text-amber-50 transition-all duration-500" />
                     <div className="relative z-10">
-                      <div className="bg-emerald-50 text-emerald-700 p-3 rounded-2xl w-fit mb-4 border border-emerald-100">
+                      <div className="bg-stone-900 text-amber-400 p-3.5 rounded-2xl w-fit mb-5 shadow-md group-hover:scale-110 transition-transform duration-500">
                         <Wallet size={20} />
                       </div>
                       <span className="text-stone-400 text-[10px] font-bold uppercase tracking-wider">Ventas ({rangeLabel})</span>
-                      <p className="text-3xl font-bold text-stone-900 mt-2">{formatMoney(totalIncome)}</p>
+                      <p className="text-3xl font-bold text-stone-900 mt-2 font-serif">{formatMoney(totalIncome)}</p>
                       <div className="flex gap-6 mt-6 border-t border-stone-100 pt-4">
                         <div>
                           <p className="text-[9px] text-stone-400 uppercase font-black">Efectivo</p>
@@ -467,25 +468,27 @@ export default async function AdminPage(props: {
                   </div>
 
                   {/* Card Llegadas */}
-                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                    <div>
-                      <div className="bg-indigo-50 text-indigo-700 p-3 rounded-2xl w-fit mb-4 border border-indigo-100">
+                  <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_4px_40px_rgba(0,0,0,0.03)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_8px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500">
+                    <CalendarCheck size={120} className="absolute -right-6 -bottom-6 text-stone-50 opacity-50 group-hover:scale-110 group-hover:text-amber-50 transition-all duration-500" />
+                    <div className="relative z-10">
+                      <div className="bg-stone-900 text-amber-400 p-3.5 rounded-2xl w-fit mb-5 shadow-md group-hover:scale-110 transition-transform duration-500">
                         <CalendarCheck size={20} />
                       </div>
                       <span className="text-stone-400 text-[10px] font-bold uppercase tracking-wider">Llegadas ({rangeLabel})</span>
-                      <p className="text-3xl font-bold text-stone-900 mt-2">{arrivalsCount}</p>
+                      <p className="text-3xl font-bold text-stone-900 mt-2 font-serif">{arrivalsCount}</p>
                       <p className="text-stone-500 text-[10px] font-medium mt-1 uppercase tracking-wider">Huéspedes Registrados</p>
                     </div>
                   </div>
 
                   {/* Card Ocupación */}
-                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                    <div>
-                      <div className="bg-amber-50 text-amber-700 p-3 rounded-2xl w-fit mb-4 border border-amber-100">
+                  <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_4px_40px_rgba(0,0,0,0.03)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_8px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500">
+                    <Building size={120} className="absolute -right-6 -bottom-6 text-stone-50 opacity-50 group-hover:scale-110 group-hover:text-amber-50 transition-all duration-500" />
+                    <div className="relative z-10">
+                      <div className="bg-stone-900 text-amber-400 p-3.5 rounded-2xl w-fit mb-5 shadow-md group-hover:scale-110 transition-transform duration-500">
                         <Building size={20} />
                       </div>
                       <span className="text-stone-400 text-[10px] font-bold uppercase tracking-wider">Ocupadas ({filterDate})</span>
-                      <p className="text-3xl font-bold text-stone-900 mt-2">{occupiedCount}</p>
+                      <p className="text-3xl font-bold text-stone-900 mt-2 font-serif">{occupiedCount}</p>
                       <p className="text-stone-500 text-[10px] font-medium mt-1 uppercase tracking-wider">
                         {freeRooms} libres de {totalRooms}
                       </p>
@@ -493,13 +496,14 @@ export default async function AdminPage(props: {
                   </div>
 
                   {/* Card Salidas */}
-                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                    <div>
-                      <div className="bg-amber-50 text-amber-700 p-3 rounded-2xl w-fit mb-4 border border-amber-100">
+                  <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_4px_40px_rgba(0,0,0,0.03)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_8px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500">
+                    <Brush size={120} className="absolute -right-6 -bottom-6 text-stone-50 opacity-50 group-hover:scale-110 group-hover:text-amber-50 transition-all duration-500" />
+                    <div className="relative z-10">
+                      <div className="bg-stone-900 text-amber-400 p-3.5 rounded-2xl w-fit mb-5 shadow-md group-hover:scale-110 transition-transform duration-500">
                         <Brush size={20} />
                       </div>
                       <span className="text-stone-400 text-[10px] font-bold uppercase tracking-wider">Salidas ({rangeLabel})</span>
-                      <p className="text-3xl font-bold text-stone-900 mt-2">{cleaningList.length}</p>
+                      <p className="text-3xl font-bold text-stone-900 mt-2 font-serif">{cleaningList.length}</p>
                       <p className="text-stone-500 text-[10px] font-medium mt-1 uppercase tracking-wider">Para Limpieza / Salida</p>
                     </div>
                   </div>
