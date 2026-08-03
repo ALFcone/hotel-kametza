@@ -283,16 +283,16 @@ export default async function AdminPage(props: {
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans flex">
       {/* --- SIDEBAR --- */}
-      <aside className="hidden lg:flex flex-col w-72 bg-[#8a0030] text-white p-6 border-r border-[#4a001a] shrink-0 sticky top-0 h-screen justify-between z-50">
+      <aside className="hidden lg:flex flex-col w-72 bg-stone-950 text-white p-6 border-r border-stone-800 shrink-0 sticky top-0 h-screen justify-between z-50">
         <div className="space-y-8">
           {/* Logo & Hotel Brand */}
           <div className="flex items-center gap-3 pb-6 border-b border-white/10">
-            <div className="bg-white/10 text-rose-300 p-2.5 rounded-2xl border border-white/10 shadow-lg">
+            <div className="bg-white/10 text-amber-300 p-2.5 rounded-2xl border border-white/10 shadow-lg">
               <Building size={24} />
             </div>
             <div>
               <h2 className="font-serif font-bold text-lg text-white leading-tight">Kametza</h2>
-              <span className="text-[10px] text-rose-300/70 uppercase tracking-widest font-black">Panel Admin</span>
+              <span className="text-[10px] text-amber-300/70 uppercase tracking-widest font-black">Panel Admin</span>
             </div>
           </div>
 
@@ -302,8 +302,8 @@ export default async function AdminPage(props: {
               href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                 activeTab === "resumen"
-                  ? "bg-white text-[#e3004f] shadow-md"
-                  : "text-rose-100/80 hover:bg-white/10 hover:text-white"
+                  ? "bg-white text-[#d97706] shadow-md"
+                  : "text-amber-100/80 hover:bg-white/10 hover:text-white"
               }`}
             >
               <TrendingUp size={16} /> Resumen y Ventas
@@ -312,8 +312,8 @@ export default async function AdminPage(props: {
               href={`/admin?tab=estado&from=${dateFrom}&to=${dateTo}`}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                 activeTab === "estado"
-                  ? "bg-white text-[#e3004f] shadow-md"
-                  : "text-rose-100/80 hover:bg-white/10 hover:text-white"
+                  ? "bg-white text-[#d97706] shadow-md"
+                  : "text-amber-100/80 hover:bg-white/10 hover:text-white"
               }`}
             >
               <LayoutDashboard size={16} /> Estado de Habitaciones
@@ -322,8 +322,8 @@ export default async function AdminPage(props: {
               href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                 activeTab === "historial"
-                  ? "bg-white text-[#e3004f] shadow-md"
-                  : "text-rose-100/80 hover:bg-white/10 hover:text-white"
+                  ? "bg-white text-[#d97706] shadow-md"
+                  : "text-amber-100/80 hover:bg-white/10 hover:text-white"
               }`}
             >
               <FileText size={16} /> Historial de Reservas
@@ -332,8 +332,8 @@ export default async function AdminPage(props: {
               href={`/admin?tab=inventario&from=${dateFrom}&to=${dateTo}`}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                 activeTab === "inventario"
-                  ? "bg-white text-[#e3004f] shadow-md"
-                  : "text-rose-100/80 hover:bg-white/10 hover:text-white"
+                  ? "bg-white text-[#d97706] shadow-md"
+                  : "text-amber-100/80 hover:bg-white/10 hover:text-white"
               }`}
             >
               <BedDouble size={16} /> Inventario
@@ -342,8 +342,8 @@ export default async function AdminPage(props: {
               href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                 activeTab === "registrar"
-                  ? "bg-white text-[#e3004f] shadow-md"
-                  : "text-rose-100/80 hover:bg-white/10 hover:text-white"
+                  ? "bg-white text-[#d97706] shadow-md"
+                  : "text-amber-100/80 hover:bg-white/10 hover:text-white"
               }`}
             >
               <CalendarCheck size={16} /> Registrar Reserva
@@ -356,7 +356,7 @@ export default async function AdminPage(props: {
           <Link href="/" className="flex items-center justify-center gap-2 bg-white/10 text-white/90 py-3 rounded-xl text-xs font-bold uppercase hover:bg-white/20 transition-all border border-white/10 w-full">
             <Globe size={14} /> Volver a la Web
           </Link>
-          <div className="text-[9px] text-rose-300/40 text-center uppercase tracking-widest">
+          <div className="text-[9px] text-amber-300/40 text-center uppercase tracking-widest">
             Hecho con ❤️ en Ayacucho
           </div>
         </div>
@@ -367,7 +367,7 @@ export default async function AdminPage(props: {
           {/* TOP BAR / FILTROS */}
           <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-10 gap-6 border-b border-stone-200/60 pb-8">
             <div>
-              <span className="text-[#e3004f] text-xs font-black uppercase tracking-widest bg-rose-50 px-3.5 py-1.5 rounded-full border border-rose-100">
+              <span className="text-[#d97706] text-xs font-black uppercase tracking-widest bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-100">
                 Administración
               </span>
               <h1 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 mt-3">
@@ -403,7 +403,7 @@ export default async function AdminPage(props: {
                 </div>
                 <button
                   type="submit"
-                  className="bg-[#e3004f] hover:bg-black text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider h-[38px] transition shadow-md"
+                  className="bg-[#d97706] hover:bg-black text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider h-[38px] transition shadow-md"
                 >
                   Filtrar
                 </button>
@@ -439,7 +439,7 @@ export default async function AdminPage(props: {
 
               <div id="resumen" className="scroll-mt-24 mb-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="h-1.5 w-8 bg-[#e3004f] rounded-full" />
+                  <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
                   <h2 className="text-xl font-bold text-stone-900 tracking-tight">Resumen General</h2>
                 </div>
                 
@@ -460,7 +460,7 @@ export default async function AdminPage(props: {
                         </div>
                         <div>
                           <p className="text-[9px] text-stone-400 uppercase font-black">Digital</p>
-                          <p className="font-bold text-[#e3004f] text-sm mt-0.5">{formatMoney(digitalIncome)}</p>
+                          <p className="font-bold text-[#d97706] text-sm mt-0.5">{formatMoney(digitalIncome)}</p>
                         </div>
                       </div>
                     </div>
@@ -481,7 +481,7 @@ export default async function AdminPage(props: {
                   {/* Card Ocupación */}
                   <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-all duration-300">
                     <div>
-                      <div className="bg-rose-50 text-rose-700 p-3 rounded-2xl w-fit mb-4 border border-rose-100">
+                      <div className="bg-amber-50 text-amber-700 p-3 rounded-2xl w-fit mb-4 border border-amber-100">
                         <Building size={20} />
                       </div>
                       <span className="text-stone-400 text-[10px] font-bold uppercase tracking-wider">Ocupadas ({filterDate})</span>
@@ -519,8 +519,8 @@ export default async function AdminPage(props: {
                       <svg viewBox="0 0 600 200" className="w-full h-auto max-h-56" preserveAspectRatio="xMidYMid meet">
                         <defs>
                           <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#e3004f" stopOpacity="0.15"/>
-                            <stop offset="100%" stopColor="#e3004f" stopOpacity="0.0"/>
+                            <stop offset="0%" stopColor="#d97706" stopOpacity="0.15"/>
+                            <stop offset="100%" stopColor="#d97706" stopOpacity="0.0"/>
                           </linearGradient>
                         </defs>
                         {/* Grid Lines */}
@@ -532,12 +532,12 @@ export default async function AdminPage(props: {
                         <path d={areaPath} fill="url(#salesGrad)" />
 
                         {/* Line */}
-                        <path d={linePath} fill="none" stroke="#e3004f" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d={linePath} fill="none" stroke="#d97706" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
                         {/* Points */}
                         {points.map((p, i) => (
                           <g key={i}>
-                            <circle cx={p.x} cy={p.y} r="5" fill="#FFFFFF" stroke="#e3004f" strokeWidth="3" />
+                            <circle cx={p.x} cy={p.y} r="5" fill="#FFFFFF" stroke="#d97706" strokeWidth="3" />
                             <text x={p.x} y={p.y - 12} textAnchor="middle" className="text-[10px] font-bold fill-stone-800">
                               S/ {Math.round(p.total)}
                             </text>
@@ -566,7 +566,7 @@ export default async function AdminPage(props: {
                               cx="48"
                               cy="48"
                               r="38"
-                              stroke="#e3004f"
+                              stroke="#d97706"
                               strokeWidth="8"
                               fill="transparent"
                               strokeDasharray={2 * Math.PI * 38}
@@ -607,11 +607,11 @@ export default async function AdminPage(props: {
                         <div>
                           <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
                             <span className="text-stone-500">💳 Digital / Online</span>
-                            <span className="text-[#e3004f]">{formatMoney(digitalIncome)}</span>
+                            <span className="text-[#d97706]">{formatMoney(digitalIncome)}</span>
                           </div>
                           <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
                             <div
-                              className="bg-[#e3004f] h-full rounded-full"
+                              className="bg-[#d97706] h-full rounded-full"
                               style={{ width: `${totalIncome > 0 ? (digitalIncome / totalIncome) * 100 : 0}%` }}
                             />
                           </div>
@@ -629,11 +629,11 @@ export default async function AdminPage(props: {
           {activeTab === "estado" && (
             <div id="estado-actual" className="scroll-mt-24 mb-12 animate-fade-in-up">
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-1.5 w-8 bg-[#e3004f] rounded-full" />
+                <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
                 <h2 className="text-xl font-bold text-stone-900 tracking-tight">Estado de Habitaciones</h2>
                 <div className="flex items-center gap-4 ml-auto text-[9px] font-bold uppercase tracking-wider">
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-white border border-stone-300" /> Libre</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#e3004f]" /> Ocupada</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#d97706]" /> Ocupada</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-400" /> Salida</span>
                 </div>
               </div>
@@ -648,10 +648,10 @@ export default async function AdminPage(props: {
                       key={room.id}
                       className={`p-6 rounded-[2rem] border transition-all duration-300 flex flex-col justify-between h-40 relative overflow-hidden group hover:-translate-y-1 hover:shadow-xl ${
                         isOccupied
-                          ? "bg-gradient-to-br from-rose-950 to-[#e3004f] text-white border-rose-950 shadow-lg shadow-rose-900/10"
+                          ? "bg-gradient-to-br from-stone-900 to-[#d97706] text-white border-stone-900 shadow-lg shadow-amber-900/10"
                           : isCheckout
                           ? "bg-gradient-to-br from-amber-50 to-orange-50 text-amber-900 border-amber-200 border-dashed"
-                          : "bg-white border-stone-200/60 text-stone-600 hover:border-rose-900/30"
+                          : "bg-white border-stone-200/60 text-stone-600 hover:border-amber-900/30"
                       }`}
                     >
                       <span className="absolute -bottom-3 -right-3 text-8xl font-black tracking-tighter opacity-[0.05] select-none group-hover:opacity-[0.1] transition-opacity">
@@ -676,7 +676,7 @@ export default async function AdminPage(props: {
                               ? "bg-amber-400 text-stone-900 shadow-sm"
                               : info.paid
                               ? "bg-emerald-500 text-white shadow-sm"
-                              : "bg-rose-500 text-white shadow-sm"
+                              : "bg-amber-500 text-white shadow-sm"
                           }`}
                         >
                           {info.status === "free"
@@ -699,7 +699,7 @@ export default async function AdminPage(props: {
           {activeTab === "historial" && (
             <div id="historial" className="scroll-mt-24 mb-12 animate-fade-in-up">
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-1.5 w-8 bg-[#e3004f] rounded-full" />
+                <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
                 <h2 className="text-xl font-bold text-stone-900 tracking-tight">Historial de Reservas</h2>
               </div>
 
@@ -708,7 +708,7 @@ export default async function AdminPage(props: {
                   <div>
                     <h3 className="font-bold text-lg text-stone-900">Historial Completo</h3>
                     <p className="text-stone-400 text-[10px] uppercase font-bold tracking-widest mt-1">
-                      Mostrando reservas de <span className="text-[#e3004f]">{dateFrom}</span> a <span className="text-[#e3004f]">{dateTo}</span>
+                      Mostrando reservas de <span className="text-[#d97706]">{dateFrom}</span> a <span className="text-[#d97706]">{dateTo}</span>
                       {filteredBookings && (
                         <span className="ml-2 bg-stone-100 px-2 py-0.5 rounded-full text-stone-500 text-[9px]">
                           {filteredBookings.length} registros
@@ -743,12 +743,12 @@ export default async function AdminPage(props: {
                           <tr
                             key={booking.id}
                             className={`border-b border-stone-100 transition-all duration-200 ${
-                              isCancelled ? "bg-stone-50/50 opacity-60" : "hover:bg-rose-50/20"
+                              isCancelled ? "bg-stone-50/50 opacity-60" : "hover:bg-amber-50/20"
                             }`}
                           >
                             <td className="py-5 px-6">
                               <div className="font-mono text-[9px] text-stone-400">SYS-{booking.id}</div>
-                              <div className={`font-black text-xs ${isCancelled ? "text-stone-500 line-through" : "text-[#e3004f]"}`}>
+                              <div className={`font-black text-xs ${isCancelled ? "text-stone-500 line-through" : "text-[#d97706]"}`}>
                                 RES-{formatTicket(booking.id)}
                               </div>
                             </td>
@@ -783,8 +783,8 @@ export default async function AdminPage(props: {
                                   <span className="w-1 h-1 rounded-full bg-emerald-500" />
                                   {formatDateShort(booking.check_in)}
                                 </span>
-                                <span className="text-rose-600 flex items-center gap-1">
-                                  <span className="w-1 h-1 rounded-full bg-rose-500" />
+                                <span className="text-amber-600 flex items-center gap-1">
+                                  <span className="w-1 h-1 rounded-full bg-amber-500" />
                                   {formatDateShort(booking.check_out)}
                                 </span>
                               </div>
@@ -794,7 +794,7 @@ export default async function AdminPage(props: {
                             </td>
                             <td className="py-5 px-4 text-center">
                               {isCancelled ? (
-                                <span className="inline-flex items-center gap-1 bg-rose-550/10 text-rose-700 px-2.5 py-1 rounded-full text-[9px] font-black uppercase border border-rose-200">
+                                <span className="inline-flex items-center gap-1 bg-red-500/10 text-red-700 px-2.5 py-1 rounded-full text-[9px] font-black uppercase border border-red-200">
                                   <XCircle size={10} /> Cancelada
                                 </span>
                               ) : (
@@ -827,7 +827,7 @@ export default async function AdminPage(props: {
                                   <input type="hidden" name="bookingId" value={booking.id} />
                                   <button
                                     type="submit"
-                                    className="flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-xl hover:border-rose-200 hover:text-rose-600 hover:bg-rose-50 transition"
+                                    className="flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-xl hover:border-amber-200 hover:text-amber-600 hover:bg-amber-50 transition"
                                     title="Borrar"
                                   >
                                     <X size={14} />
@@ -854,7 +854,7 @@ export default async function AdminPage(props: {
           {activeTab === "inventario" && (
             <div id="inventario" className="scroll-mt-24 mb-12 animate-fade-in-up">
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-1.5 w-8 bg-[#e3004f] rounded-full" />
+                <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
                 <h2 className="text-xl font-bold text-stone-900 tracking-tight">Gestión de Inventario</h2>
                 <span className="text-[10px] bg-stone-100 text-stone-500 px-3 py-1 rounded-full font-bold">
                   {rooms?.length} habitaciones
@@ -895,7 +895,7 @@ export default async function AdminPage(props: {
                               name="price"
                               defaultValue={room.price_per_night}
                               type="number"
-                              className="w-full p-3.5 bg-stone-50 rounded-xl border border-stone-250 font-bold focus:ring-2 focus:ring-[#e3004f]/10 focus:border-[#e3004f] outline-none transition text-xs"
+                              className="w-full p-3.5 bg-stone-50 rounded-xl border border-stone-250 font-bold focus:ring-2 focus:ring-[#d97706]/10 focus:border-[#d97706] outline-none transition text-xs"
                             />
                           </div>
                           <div>
@@ -919,12 +919,12 @@ export default async function AdminPage(props: {
                           <textarea
                             name="description"
                             defaultValue={room.description}
-                            className="w-full p-3.5 bg-stone-50 rounded-xl border border-stone-250 text-xs h-24 resize-none focus:ring-2 focus:ring-[#e3004f]/10 focus:border-[#e3004f] outline-none transition"
+                            className="w-full p-3.5 bg-stone-50 rounded-xl border border-stone-250 text-xs h-24 resize-none focus:ring-2 focus:ring-[#d97706]/10 focus:border-[#d97706] outline-none transition"
                             placeholder="Descripción de la habitación..."
                           />
                         </div>
                         
-                        <button className="btn-shimmer w-full bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-[#e3004f] transition-all text-[10px] uppercase tracking-widest shadow-md">
+                        <button className="btn-shimmer w-full bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-[#d97706] transition-all text-[10px] uppercase tracking-widest shadow-md">
                           Guardar Cambios
                         </button>
                       </form>

@@ -13,43 +13,22 @@ interface Room {
 
 export default function WalkInForm({ rooms }: { rooms: Room[] }) {
   const [selectedRoomId, setSelectedRoomId] = useState<number>(rooms[0]?.id || 0);
-  const [checkIn, setCheckIn] = useState<string>(new Date().toISOString().split("T")[0]);
-  const [checkOut, setCheckOut] = useState<string>(
-    new Date(Date.now() + 86400000).toISOString().split("T")[0]
-  );
-  const [nights, setNights] = useState<number>(1);
-  const [price, setPrice] = useState<number>(rooms[0]?.price_per_night || 0);
+  const [checkIn, setCheckIn] = useState<string>(() => new Date().toISOString().split("T")[0]);
+  const [checkOut, setCheckOut] = useState<string>(() => new Date(Date.now() + 86400000).toISOString().split("T")[0]);
   const [customPrice, setCustomPrice] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const selectedRoom = rooms.find((r) => r.id === selectedRoomId);
 
-  // Auto-calculate nights and total price
-  useEffect(() => {
-    if (checkIn && checkOut) {
-      const start = new Date(checkIn);
-      const end = new Date(checkOut);
-      const diffTime = end.getTime() - start.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      if (diffDays > 0) {
-        setNights(diffDays);
-        if (selectedRoom && !customPrice) {
-          setPrice(diffDays * selectedRoom.price_per_night);
-        }
-      } else {
-        setNights(1);
-      }
-    }
-  }, [checkIn, checkOut, selectedRoomId, customPrice, selectedRoom]);
+  // Derived state: Nights
+  const start = new Date(checkIn);
+  const end = new Date(checkOut);
+  const diffTime = end.getTime() - start.getTime();
+  const nights = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
-  // Adjust price when room selection changes
-  useEffect(() => {
-    if (selectedRoom) {
-      setPrice(nights * selectedRoom.price_per_night);
-      setCustomPrice("");
-    }
-  }, [selectedRoomId]);
+  // Derived state: Price
+  const price = selectedRoom ? nights * selectedRoom.price_per_night : 0;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -81,7 +60,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
   return (
     <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 md:p-10 shadow-sm max-w-3xl">
       <div className="flex items-center gap-3 mb-6">
-        <div className="bg-rose-50 text-[#e3004f] p-3 rounded-2xl border border-rose-100">
+        <div className="bg-amber-50 text-[#d97706] p-3 rounded-2xl border border-amber-100">
           <Calendar size={20} />
         </div>
         <div>
@@ -95,7 +74,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
           className={`p-4 rounded-2xl text-xs font-bold text-center mb-6 border ${
             statusMessage.type === "success"
               ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-              : "bg-rose-50 text-rose-800 border-rose-200"
+              : "bg-red-50 text-red-800 border-red-200"
           }`}
         >
           {statusMessage.text}
@@ -111,7 +90,10 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               <Bed className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={16} />
               <select
                 value={selectedRoomId}
-                onChange={(e) => setSelectedRoomId(Number(e.target.value))}
+                onChange={(e) => {
+                  setSelectedRoomId(Number(e.target.value));
+                  setCustomPrice("");
+                }}
                 className="w-full p-4 pl-12 bg-stone-50 rounded-2xl border border-stone-200 text-xs font-bold outline-none appearance-none cursor-pointer text-stone-700 text-ellipsis overflow-hidden"
               >
                 {rooms.map((room) => (
@@ -147,7 +129,10 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               name="checkIn"
               required
               value={checkIn}
-              onChange={(e) => setCheckIn(e.target.value)}
+              onChange={(e) => {
+                setCheckIn(e.target.value);
+                setCustomPrice("");
+              }}
               className="w-full p-4 bg-stone-50 rounded-2xl border border-stone-200 text-xs font-bold outline-none text-stone-700"
             />
           </div>
@@ -160,7 +145,10 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               name="checkOut"
               required
               value={checkOut}
-              onChange={(e) => setCheckOut(e.target.value)}
+              onChange={(e) => {
+                setCheckOut(e.target.value);
+                setCustomPrice("");
+              }}
               className="w-full p-4 bg-stone-50 rounded-2xl border border-stone-200 text-xs font-bold outline-none text-stone-700"
             />
           </div>
@@ -255,10 +243,10 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
         </div>
 
         {/* Resumen de Tarifas */}
-        <div className="bg-rose-50/50 border border-rose-100 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="bg-amber-50/50 border border-amber-100 p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
             <p className="text-[10px] font-black uppercase text-stone-400 tracking-wider">Monto Total Estimado</p>
-            <p className="text-2xl font-black text-[#e3004f] mt-1">
+            <p className="text-2xl font-black text-[#d97706] mt-1">
               S/ {customPrice ? Number(customPrice) : price} <span className="text-xs font-bold text-stone-500">({nights} Noche{nights > 1 ? "s" : ""})</span>
             </p>
           </div>
@@ -272,7 +260,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
                 placeholder="Monto final (S/)"
                 value={customPrice}
                 onChange={(e) => setCustomPrice(e.target.value)}
-                className="w-full p-2.5 pl-8 bg-white rounded-xl border border-stone-200 text-xs font-bold outline-none focus:border-[#e3004f]"
+                className="w-full p-2.5 pl-8 bg-white rounded-xl border border-stone-200 text-xs font-bold outline-none focus:border-[#d97706]"
               />
             </div>
           </div>
@@ -281,7 +269,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="btn-shimmer w-full bg-[#e3004f] hover:bg-black text-white font-black py-4 rounded-2xl transition duration-300 text-xs uppercase tracking-widest shadow-lg shadow-rose-900/10 disabled:opacity-50"
+          className="btn-shimmer w-full bg-[#d97706] hover:bg-black text-white font-black py-4 rounded-2xl transition duration-300 text-xs uppercase tracking-widest shadow-lg shadow-amber-900/10 disabled:opacity-50"
         >
           {isSubmitting ? "Registrando..." : "Registrar Entrada Directa"}
         </button>
