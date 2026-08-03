@@ -1027,25 +1027,25 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="flex flex-col items-center justify-center space-y-4 md:space-y-6">
-            {/* ETIQUETA MINIMALISTA */}
+            {/* ETIQUETA MINIMALISTA DORADA */}
             <div className="flex items-center justify-center gap-6 mb-2 opacity-100">
-              <div className="h-[1px] w-16 md:w-32 bg-gradient-to-r from-transparent to-white/70"></div>
-              <span className="text-xs md:text-sm font-medium text-white tracking-[0.6em] uppercase drop-shadow-md">
+              <div className="h-[1px] w-16 md:w-32 bg-gradient-to-r from-transparent to-amber-300/70"></div>
+              <span className="text-xs md:text-sm font-medium text-amber-200 tracking-[0.6em] uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 Bienvenidos a
               </span>
-              <div className="h-[1px] w-16 md:w-32 bg-gradient-to-l from-transparent to-white/70"></div>
+              <div className="h-[1px] w-16 md:w-32 bg-gradient-to-l from-transparent to-amber-300/70"></div>
             </div>
             
-            {/* NOMBRE DEL HOTEL: MÁS GRUESO Y CON FUERTE SOMBRA PARA DESTACAR */}
-            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif text-white tracking-[0.2em] leading-none uppercase drop-shadow-[0_5px_15px_rgba(0,0,0,0.6)]">
+            {/* NOMBRE DEL HOTEL: DORADO RADIANTE CON FUERTE SOMBRA */}
+            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-yellow-400 to-amber-600 tracking-[0.2em] leading-none uppercase drop-shadow-[0_5px_15px_rgba(0,0,0,0.8)] py-2">
               Kametza
             </h1>
             
-            {/* SUBTÍTULO CLÁSICO CON ACENTO DE MARCA */}
+            {/* SUBTÍTULO CLÁSICO CON ACENTO DORADO */}
             <h2 className="text-2xl md:text-4xl font-serif italic text-white/95 font-medium tracking-wider drop-shadow-lg flex items-center gap-4">
-              <span className="text-[#e3004f] text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(227,0,79,0.8)]">✧</span>
+              <span className="text-yellow-400 text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]">✧</span>
               Hotel & Suites
-              <span className="text-[#e3004f] text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(227,0,79,0.8)]">✧</span>
+              <span className="text-yellow-400 text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]">✧</span>
             </h2>
           </div>
           
