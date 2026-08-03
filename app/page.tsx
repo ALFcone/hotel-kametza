@@ -1032,13 +1032,17 @@ export default function Home() {
             </span>
             <div className="h-[1px] w-12 md:w-24 bg-white/40"></div>
           </div>
-          
-          <h1 className="text-6xl md:text-8xl lg:text-[8rem] font-serif font-black mb-2 text-white tracking-widest leading-none drop-shadow-2xl uppercase">
-            Kametza
-          </h1>
-          <h2 className="text-3xl md:text-5xl font-serif italic text-white/90 mb-10 drop-shadow-xl font-light tracking-wide">
-            Hotel & Suites
-          </h2>
+          {/* LOGO PRINCIPAL CON EFECTO DE RESPLANDOR */}
+          <div className="flex justify-center mb-10 relative">
+            {/* Aura brillante detrás del logo para máxima visibilidad */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-64 md:h-64 bg-white/20 blur-[80px] rounded-full pointer-events-none"></div>
+            
+            <img 
+              src="/logoo.png" 
+              alt="Hotel Kametza" 
+              className="h-40 md:h-56 lg:h-72 object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.6)] relative z-10 animate-in zoom-in duration-1000"
+            />
+          </div>
           
           <p className="text-lg md:text-xl text-white/95 max-w-2xl mx-auto mb-12 font-light leading-relaxed drop-shadow-lg bg-black/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10">
             Un refugio donde la historia colonial de Ayacucho se encuentra con el confort contemporáneo para brindarte una experiencia inolvidable.
