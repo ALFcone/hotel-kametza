@@ -366,16 +366,21 @@ export default async function AdminPage(props: {
         <div className="w-full">
           {/* TOP BAR / FILTROS */}
           <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-10 gap-6 border-b border-stone-200/60 pb-8">
-            <div>
-              <span className="text-[#d97706] text-xs font-black uppercase tracking-widest bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-100">
-                Administración
-              </span>
-              <h1 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 mt-3">
-                Panel de Control
-              </h1>
-              <p className="text-stone-500 text-xs mt-1 font-medium capitalize">
-                {todayFormatted}
-              </p>
+            <div className="flex justify-between w-full xl:w-auto items-start">
+              <div>
+                <span className="text-[#d97706] text-xs font-black uppercase tracking-widest bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-100">
+                  Administración
+                </span>
+                <h1 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 mt-3">
+                  Panel de Control
+                </h1>
+                <p className="text-stone-500 text-xs mt-1 font-medium capitalize">
+                  {todayFormatted}
+                </p>
+              </div>
+              <Link href="/" className="lg:hidden flex items-center justify-center bg-stone-900 text-white w-12 h-12 rounded-full shadow-md hover:bg-amber-600 transition-colors">
+                <Globe size={20} />
+              </Link>
             </div>
 
             {/* Filtros de Fecha */}
