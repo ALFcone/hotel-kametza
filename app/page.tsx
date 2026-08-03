@@ -1024,28 +1024,31 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          {/* ETIQUETA ELEGANTE Y PROFESIONAL */}
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="h-[1px] w-12 md:w-24 bg-white/40"></div>
-            <span className="text-xs md:text-sm font-medium text-white tracking-[0.5em] uppercase drop-shadow-md">
-              Bienvenidos a
-            </span>
-            <div className="h-[1px] w-12 md:w-24 bg-white/40"></div>
-          </div>
-          {/* LOGO PRINCIPAL CON EFECTO DE RESPLANDOR */}
-          <div className="flex justify-center mb-10 relative">
-            {/* Aura brillante detrás del logo para máxima visibilidad */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 md:w-64 md:h-64 bg-white/20 blur-[80px] rounded-full pointer-events-none"></div>
+          <div className="flex flex-col items-center justify-center space-y-4 md:space-y-6">
+            {/* ETIQUETA MINIMALISTA */}
+            <div className="flex items-center justify-center gap-6 mb-2 opacity-90">
+              <div className="h-[1px] w-16 md:w-32 bg-gradient-to-r from-transparent to-white/70"></div>
+              <span className="text-xs md:text-sm font-light text-white tracking-[0.6em] uppercase">
+                Bienvenidos a
+              </span>
+              <div className="h-[1px] w-16 md:w-32 bg-gradient-to-l from-transparent to-white/70"></div>
+            </div>
             
-            <img 
-              src="/logoo.png" 
-              alt="Hotel Kametza" 
-              className="h-40 md:h-56 lg:h-72 object-contain drop-shadow-[0_15px_35px_rgba(0,0,0,0.6)] relative z-10 animate-in zoom-in duration-1000"
-            />
+            {/* NOMBRE DEL HOTEL: FUENTE LIGERA, GIGANTE Y ESPACIADA (Tendencia Luxury) */}
+            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif font-light text-white tracking-[0.2em] leading-none uppercase drop-shadow-2xl">
+              Kametza
+            </h1>
+            
+            {/* SUBTÍTULO CLÁSICO CON ACENTO DE MARCA */}
+            <h2 className="text-2xl md:text-4xl font-serif italic text-white/90 font-light tracking-wider drop-shadow-lg flex items-center gap-4">
+              <span className="text-[#e3004f] text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(227,0,79,0.8)]">✧</span>
+              Hotel & Suites
+              <span className="text-[#e3004f] text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(227,0,79,0.8)]">✧</span>
+            </h2>
           </div>
           
-          <p className="text-lg md:text-xl text-white/95 max-w-2xl mx-auto mb-12 font-light leading-relaxed drop-shadow-lg bg-black/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10">
-            Un refugio donde la historia colonial de Ayacucho se encuentra con el confort contemporáneo para brindarte una experiencia inolvidable.
+          <p className="text-sm md:text-lg text-white/80 max-w-2xl mx-auto mt-12 mb-12 font-light leading-relaxed drop-shadow-md text-center tracking-widest uppercase">
+            Un refugio donde la historia colonial se encuentra con el confort
           </p>
 
           {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
