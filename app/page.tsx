@@ -1332,6 +1332,88 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="resenas" className="scroll-reveal py-24 bg-stone-100 relative w-full overflow-hidden">
+        {/* Decoraciones de fondo */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-rose-100 rounded-full blur-3xl opacity-40 -translate-y-1/2 translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-stone-200 rounded-full blur-3xl opacity-40 translate-y-1/3 -translate-x-1/4"></div>
+
+        <div className="max-w-7xl mx-auto px-4 md:px-8 xl:px-12 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-rose-600 font-bold tracking-wider text-[11px] uppercase bg-rose-50 px-3 py-1.5 rounded-full border border-rose-100 inline-block mb-4 shadow-sm">
+              Testimonios Reales
+            </span>
+            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6">
+              Lo que dicen nuestros huéspedes en Google
+            </h2>
+            <p className="text-stone-500 text-sm md:text-base leading-relaxed">
+              La satisfacción de quienes nos visitan es nuestro mejor respaldo. Descubre por qué Kametza es la opción favorita en Ayacucho con un puntaje excepcional.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Review 1 */}
+            <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-100 relative group hover:-translate-y-2 transition-all duration-500">
+              <div className="flex justify-between items-start mb-6 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-rose-900 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">M</div>
+                  <div>
+                    <h4 className="font-bold text-stone-900 text-sm">María Fernanda</h4>
+                    <p className="text-[10px] text-stone-400 font-bold uppercase">Huésped Verificado</p>
+                  </div>
+                </div>
+                <div className="flex">
+                  {[1,2,3,4,5].map(i => <Star key={i} size={12} className="fill-amber-400 text-amber-400" />)}
+                </div>
+              </div>
+              <p className="text-stone-600 text-sm leading-relaxed italic relative z-10">
+                "Excelente atención y comodidad. El personal fue muy amable y el desayuno ayacuchano estuvo delicioso. Muy cerca del centro, recomendado 100%."
+              </p>
+              <div className="absolute text-8xl text-rose-50 font-serif -top-2 right-6 pointer-events-none group-hover:text-rose-100 transition-colors">"</div>
+            </div>
+
+            {/* Review 2 */}
+            <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-100 relative group hover:-translate-y-2 transition-all duration-500">
+              <div className="flex justify-between items-start mb-6 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-stone-900 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">C</div>
+                  <div>
+                    <h4 className="font-bold text-stone-900 text-sm">Carlos Gómez</h4>
+                    <p className="text-[10px] text-stone-400 font-bold uppercase">Huésped Verificado</p>
+                  </div>
+                </div>
+                <div className="flex">
+                  {[1,2,3,4,5].map(i => <Star key={i} size={12} className="fill-amber-400 text-amber-400" />)}
+                </div>
+              </div>
+              <p className="text-stone-600 text-sm leading-relaxed italic relative z-10">
+                "Un hotel muy acogedor. Las habitaciones siempre impecables, con agua caliente las 24 horas y buena señal de WiFi para trabajar. Excelente relación calidad-precio."
+              </p>
+              <div className="absolute text-8xl text-stone-50 font-serif -top-2 right-6 pointer-events-none group-hover:text-stone-100 transition-colors">"</div>
+            </div>
+
+            {/* Review 3 */}
+            <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-100 relative group hover:-translate-y-2 transition-all duration-500">
+              <div className="flex justify-between items-start mb-6 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-[#e3004f] text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">A</div>
+                  <div>
+                    <h4 className="font-bold text-stone-900 text-sm">Andrea y Luis</h4>
+                    <p className="text-[10px] text-stone-400 font-bold uppercase">Huésped Verificado</p>
+                  </div>
+                </div>
+                <div className="flex">
+                  {[1,2,3,4,5].map(i => <Star key={i} size={12} className="fill-amber-400 text-amber-400" />)}
+                </div>
+              </div>
+              <p className="text-stone-600 text-sm leading-relaxed italic relative z-10">
+                "Me encantó la estadía, es un lugar muy seguro y tranquilo. El servicio al cuarto fue rápido y el trato del personal superó mis expectativas. Volveremos sin duda."
+              </p>
+              <div className="absolute text-8xl text-rose-50 font-serif -top-2 right-6 pointer-events-none group-hover:text-rose-100 transition-colors">"</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="ubicacion" className="scroll-reveal min-h-screen flex items-center py-24 relative z-10 w-full bg-stone-50">
         <div className="w-full px-4 md:px-8 xl:px-12 grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="relative">
