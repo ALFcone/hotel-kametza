@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { createBooking } from "./actions";
@@ -254,6 +255,11 @@ function BookingModal({
   currentUser: any; // Tipo para el usuario
 }) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [checkIn, setCheckIn] = useState(defaultCheckIn || "");
   const [checkOut, setCheckOut] = useState(defaultCheckOut || "");
@@ -286,7 +292,7 @@ function BookingModal({
     }
   }, [checkIn, checkOut, room.price_per_night]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const executeBooking = async (formData: FormData) => {
     const {
@@ -347,7 +353,7 @@ function BookingModal({
 
   const simpleDesc = getSimpleDescription(room.name, room.description);
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200">
       <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
         <div className="hidden md:block w-1/3 bg-stone-100 p-8 relative overflow-hidden">
@@ -571,7 +577,8 @@ function BookingModal({
           </form>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
