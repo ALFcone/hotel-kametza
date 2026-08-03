@@ -138,10 +138,10 @@ function getStatusConfig(status: string) {
       };
     case "cancelled":
       return {
-        bg: "bg-rose-50",
+        bg: "bg-amber-50",
         text: "text-rose-700",
         border: "border-rose-200",
-        dot: "bg-rose-500",
+        dot: "bg-amber-500",
         label: "Cancelada",
       };
     default:
@@ -238,18 +238,18 @@ function StatCard({
       <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/10" />
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-3">
-          <div className="bg-white/20 backdrop-blur-sm p-2 rounded-xl">
-            <Icon size={18} className="text-white" />
+          <div className="bg-amber-500/10 border border-amber-500/20 backdrop-blur-sm p-2 rounded-xl">
+            <Icon size={18} className="text-amber-400" />
           </div>
         </div>
-        <p className="text-2xl md:text-3xl font-black text-white mb-0.5">
+        <p className="text-2xl md:text-3xl font-black text-amber-50 mb-0.5">
           {value}
         </p>
-        <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">
+        <p className="text-[10px] font-bold text-amber-400/70 uppercase tracking-widest">
           {label}
         </p>
         {sub && (
-          <p className="text-[10px] text-white/50 mt-1 font-medium">{sub}</p>
+          <p className="text-[10px] text-amber-400/50 mt-1 font-medium">{sub}</p>
         )}
       </div>
     </div>
@@ -281,7 +281,7 @@ function FilterTabs({
           onClick={() => onChange(tab.key)}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
             active === tab.key
-              ? "bg-[#e3004f] text-white shadow-lg shadow-rose-900/20"
+              ? "bg-amber-600 text-amber-50 shadow-lg shadow-amber-900/20"
               : "bg-white text-stone-500 border border-stone-200 hover:border-stone-300 hover:text-stone-700"
           }`}
         >
@@ -289,7 +289,7 @@ function FilterTabs({
           <span
             className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
               active === tab.key
-                ? "bg-white/20 text-white"
+                ? "bg-white/20 text-amber-50"
                 : "bg-stone-100 text-stone-400"
             }`}
           >
@@ -328,7 +328,7 @@ function CancelModal({
         <p className="text-stone-500 text-sm mb-1">
           Estás por cancelar tu reserva en:
         </p>
-        <p className="text-[#e3004f] font-bold text-sm mb-6">{roomName}</p>
+        <p className="text-amber-600 font-bold text-sm mb-6">{roomName}</p>
         <p className="text-stone-400 text-xs mb-8">
           Esta acción no se puede deshacer.
         </p>
@@ -363,7 +363,7 @@ function EmptyState() {
 
       <div className="relative z-10">
         <div className="animate-float w-28 h-28 rounded-full bg-gradient-to-br from-rose-100 to-amber-50 flex items-center justify-center mx-auto mb-8 shadow-inner">
-          <BedDouble size={48} className="text-[#e3004f]/40" />
+          <BedDouble size={48} className="text-amber-600/40" />
         </div>
         <h2 className="text-3xl font-serif font-bold text-stone-800 mb-3">
           Tu próxima aventura te espera
@@ -374,7 +374,7 @@ function EmptyState() {
         </p>
         <Link
           href="/#habitaciones"
-          className="btn-shimmer inline-flex items-center gap-3 bg-[#e3004f] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl hover:shadow-rose-900/30 hover:-translate-y-0.5"
+          className="btn-shimmer inline-flex items-center gap-3 bg-amber-600 text-amber-50 px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl hover:shadow-amber-900/30 hover:-translate-y-0.5"
         >
           <Sparkles size={16} />
           Explorar Habitaciones
@@ -508,18 +508,18 @@ export default function Dashboard() {
         <div className="animate-fade-in-up flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
           <div className="flex items-center gap-4">
             {/* Avatar */}
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#e3004f] to-rose-600 flex items-center justify-center shadow-lg shadow-rose-900/20 flex-shrink-0">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-900/20 flex-shrink-0">
               <span className="text-white font-black text-2xl">
                 {getInitial(user)}
               </span>
             </div>
             <div>
-              <span className="text-[#e3004f] font-bold tracking-widest text-[10px] uppercase bg-rose-50 px-3 py-1 rounded-full border border-rose-100 inline-block mb-2">
+              <span className="text-amber-600 font-bold tracking-widest text-[10px] uppercase bg-amber-50 px-3 py-1 rounded-full border border-amber-100 inline-block mb-2">
                 Panel de Huésped
               </span>
               <h1 className="text-3xl md:text-4xl font-serif font-medium text-stone-900">
                 {getGreeting()},{" "}
-                <span className="text-[#e3004f]">{getDisplayName(user)}</span>
+                <span className="text-amber-600">{getDisplayName(user)}</span>
               </h1>
               <p className="text-stone-400 mt-1 text-sm font-light capitalize">
                 {getTodayFormatted()}
@@ -536,7 +536,7 @@ export default function Dashboard() {
             </Link>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 bg-stone-900 text-white px-5 py-3 rounded-full hover:bg-[#e3004f] font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-rose-900/20"
+              className="flex items-center gap-2 bg-stone-900 text-amber-50 px-5 py-3 rounded-full hover:bg-amber-600 font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-amber-900/20"
             >
               <LogOut size={16} /> Salir
             </button>
@@ -552,7 +552,7 @@ export default function Dashboard() {
             label="Total Reservas"
             value={stats.total}
             sub={`${stats.active} activa(s)`}
-            gradient="bg-gradient-to-br from-[#e3004f] to-rose-700"
+            gradient="bg-gradient-to-br from-amber-500 to-rose-700"
             delay={100}
           />
           <StatCard
@@ -568,7 +568,7 @@ export default function Dashboard() {
             sub={
               stats.nextCheckIn ? formatDate(stats.nextCheckIn) : "Sin próximas"
             }
-            gradient="bg-gradient-to-br from-emerald-600 to-emerald-700"
+            gradient="bg-gradient-to-br from-stone-900 to-stone-950"
             delay={180}
           />
           <StatCard
@@ -576,7 +576,7 @@ export default function Dashboard() {
             label="Noches Totales"
             value={stats.totalNights}
             sub="Noches reservadas"
-            gradient="bg-gradient-to-br from-indigo-600 to-violet-700"
+            gradient="bg-gradient-to-br from-stone-900 to-stone-950"
             delay={260}
           />
           <StatCard
@@ -584,7 +584,7 @@ export default function Dashboard() {
             label="Total Invertido"
             value={`S/ ${stats.totalSpent}`}
             sub="En estancias"
-            gradient="bg-gradient-to-br from-amber-600 to-orange-600"
+            gradient="bg-gradient-to-br from-stone-900 to-stone-950"
             delay={340}
           />
         </div>
@@ -624,7 +624,7 @@ export default function Dashboard() {
                               ? "bg-emerald-500"
                               : booking.status === "pendiente"
                               ? "bg-amber-500"
-                              : "bg-rose-300"
+                              : "bg-stone-300"
                           }`}
                         />
 
@@ -643,7 +643,7 @@ export default function Dashboard() {
                           )}
                           {booking.status === "cancelled" && (
                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                              <Ban className="text-white/80" size={28} />
+                              <Ban className="text-amber-50/80" size={28} />
                             </div>
                           )}
                         </div>
@@ -652,7 +652,7 @@ export default function Dashboard() {
                         <div className="flex-1 w-full relative z-10">
                           <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-3">
                             <div>
-                              <h3 className="text-lg md:text-xl font-serif font-bold text-[#e3004f] mb-0.5">
+                              <h3 className="text-lg md:text-xl font-serif font-bold text-amber-600 mb-0.5">
                                 {booking.rooms?.name || "Habitación"}
                               </h3>
                               <p className="text-stone-400 text-[10px] font-bold uppercase tracking-[0.2em]">
@@ -676,7 +676,7 @@ export default function Dashboard() {
                           {/* Info Grid */}
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6 mt-4">
                             <div className="flex items-center gap-3">
-                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-rose-50 group-hover:text-[#e3004f] transition-colors duration-300">
+                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-amber-50 group-hover:text-amber-600 transition-colors duration-300">
                                 <CalendarDays size={16} />
                               </div>
                               <div>
@@ -689,7 +689,7 @@ export default function Dashboard() {
                               </div>
                             </div>
                             <div className="flex items-center gap-3">
-                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-rose-50 group-hover:text-[#e3004f] transition-colors duration-300">
+                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-amber-50 group-hover:text-amber-600 transition-colors duration-300">
                                 <Clock size={16} />
                               </div>
                               <div>
@@ -702,14 +702,14 @@ export default function Dashboard() {
                               </div>
                             </div>
                             <div className="flex items-center gap-3 col-span-2 md:col-span-1">
-                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-rose-50 group-hover:text-[#e3004f] transition-colors duration-300">
+                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-amber-50 group-hover:text-amber-600 transition-colors duration-300">
                                 <CreditCard size={16} />
                               </div>
                               <div>
                                 <p className="text-[10px] text-stone-400 font-bold uppercase">
                                   Total
                                 </p>
-                                <p className="text-lg font-black text-[#e3004f]">
+                                <p className="text-lg font-black text-amber-600">
                                   S/ {booking.total_price}
                                 </p>
                               </div>
@@ -727,7 +727,7 @@ export default function Dashboard() {
                                   )
                                 }
                                 disabled={cancellingId === booking.id}
-                                className="flex items-center gap-2 text-rose-600 hover:text-white border border-rose-200 hover:bg-rose-600 hover:border-rose-600 px-4 py-2.5 rounded-xl transition-all duration-300 text-xs font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed group/cancel"
+                                className="flex items-center gap-2 text-rose-600 hover:text-amber-50 border border-rose-200 hover:bg-rose-600 hover:border-rose-600 px-4 py-2.5 rounded-xl transition-all duration-300 text-xs font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed group/cancel"
                               >
                                 <XCircle
                                   size={14}
@@ -752,7 +752,7 @@ export default function Dashboard() {
                 </p>
                 <button
                   onClick={() => setActiveFilter("all")}
-                  className="mt-4 text-[#e3004f] text-xs font-bold uppercase tracking-wider hover:underline"
+                  className="mt-4 text-amber-600 text-xs font-bold uppercase tracking-wider hover:underline"
                 >
                   Ver todas las reservas
                 </button>
