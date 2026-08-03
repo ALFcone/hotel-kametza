@@ -649,30 +649,30 @@ function RoomCard({
             </div>
           </div>
 
-          <p className="text-stone-500 text-sm mb-6 leading-relaxed font-light line-clamp-3">
+          <p className="text-stone-600 text-[15px] mb-7 leading-relaxed line-clamp-3 relative pl-4 border-l-[3px] border-[#e3004f] bg-gradient-to-r from-rose-50/50 to-transparent py-1 pr-2 rounded-r-lg">
             {simpleDesc}
           </p>
 
-          <div className="grid grid-cols-2 gap-3 mb-8">
-            <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
-              <Wifi size={14} className="text-rose-900" />
-              <span className="text-[10px] font-bold uppercase">
+          <div className="grid grid-cols-2 gap-2.5 mb-8">
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Wifi size={16} className="text-[#e3004f]" />
+              <span className="text-[10px] font-black uppercase tracking-wider">
                 WiFi Fibra Óptica
               </span>
             </div>
-            <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
-              <Clock size={14} className="text-rose-900" />
-              <span className="text-[10px] font-bold uppercase">
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Clock size={16} className="text-[#e3004f]" />
+              <span className="text-[10px] font-black uppercase tracking-wider">
                 Agua Caliente 24h
               </span>
             </div>
-            <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
-              <Tv size={14} className="text-rose-900" />
-              <span className="text-[10px] font-bold uppercase">Smart TV</span>
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Tv size={16} className="text-[#e3004f]" />
+              <span className="text-[10px] font-black uppercase tracking-wider">Smart TV</span>
             </div>
-            <div className="flex items-center gap-2 text-stone-600 bg-stone-50 p-2 rounded-lg border border-stone-100">
-              <Users size={14} className="text-rose-900" />
-              <span className="text-[10px] font-bold uppercase">
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Users size={16} className="text-[#e3004f]" />
+              <span className="text-[10px] font-black uppercase tracking-wider">
                 Baño Privado
               </span>
             </div>
