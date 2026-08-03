@@ -1606,6 +1606,34 @@ export default function Home() {
         </div>
       </section>
 
+      {/* --- SECCIÓN DE CONFIANZA Y PAGOS --- */}
+      <section className="w-full bg-stone-900 text-stone-300 py-12 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 xl:px-12 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-stone-800">
+            <div className="flex flex-col items-center justify-center p-4 group">
+              <ShieldCheck size={32} className="text-amber-400 mb-3 group-hover:scale-110 group-hover:text-amber-300 transition-all" />
+              <h4 className="text-white font-bold text-sm mb-1 uppercase tracking-wider">Reserva Segura</h4>
+              <p className="text-xs text-stone-400">Garantía de mejor tarifa</p>
+            </div>
+            <div className="flex flex-col items-center justify-center p-4 group">
+              <CreditCard size={32} className="text-amber-400 mb-3 group-hover:scale-110 group-hover:text-amber-300 transition-all" />
+              <h4 className="text-white font-bold text-sm mb-1 uppercase tracking-wider">Múltiples Pagos</h4>
+              <p className="text-xs text-stone-400">Visa, Mastercard, Yape, Plin</p>
+            </div>
+            <div className="flex flex-col items-center justify-center p-4 group">
+              <Clock size={32} className="text-amber-400 mb-3 group-hover:scale-110 group-hover:text-amber-300 transition-all" />
+              <h4 className="text-white font-bold text-sm mb-1 uppercase tracking-wider">Recepción 24/7</h4>
+              <p className="text-xs text-stone-400">Asistencia en todo momento</p>
+            </div>
+            <div className="flex flex-col items-center justify-center p-4 group">
+              <Sparkles size={32} className="text-amber-400 mb-3 group-hover:scale-110 group-hover:text-amber-300 transition-all" />
+              <h4 className="text-white font-bold text-sm mb-1 uppercase tracking-wider">Limpieza 100%</h4>
+              <p className="text-xs text-stone-400">Estándares de higiene rigurosos</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section
         id="contacto"
         className="min-h-screen flex flex-col justify-center py-24 relative overflow-hidden z-10 w-full bg-[url('/bg_contacto.png')] bg-cover bg-center bg-fixed"
