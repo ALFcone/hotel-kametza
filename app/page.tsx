@@ -1020,27 +1020,29 @@ export default function Home() {
             alt="Hotel Kametza Exterior"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/70 via-stone-900/40 to-[#FDFBF7]" />
+          {/* OVERLAY OSCURECIDO PARA QUE EL TEXTO BLANCO RESALTE MÁS */}
+          <div className="absolute inset-0 bg-stone-950/20" />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/90 via-stone-900/60 to-[#FDFBF7]" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="flex flex-col items-center justify-center space-y-4 md:space-y-6">
             {/* ETIQUETA MINIMALISTA */}
-            <div className="flex items-center justify-center gap-6 mb-2 opacity-90">
+            <div className="flex items-center justify-center gap-6 mb-2 opacity-100">
               <div className="h-[1px] w-16 md:w-32 bg-gradient-to-r from-transparent to-white/70"></div>
-              <span className="text-xs md:text-sm font-light text-white tracking-[0.6em] uppercase">
+              <span className="text-xs md:text-sm font-medium text-white tracking-[0.6em] uppercase drop-shadow-md">
                 Bienvenidos a
               </span>
               <div className="h-[1px] w-16 md:w-32 bg-gradient-to-l from-transparent to-white/70"></div>
             </div>
             
-            {/* NOMBRE DEL HOTEL: FUENTE LIGERA, GIGANTE Y ESPACIADA (Tendencia Luxury) */}
-            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif font-light text-white tracking-[0.2em] leading-none uppercase drop-shadow-2xl">
+            {/* NOMBRE DEL HOTEL: MÁS GRUESO Y CON FUERTE SOMBRA PARA DESTACAR */}
+            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif text-white tracking-[0.2em] leading-none uppercase drop-shadow-[0_5px_15px_rgba(0,0,0,0.6)]">
               Kametza
             </h1>
             
             {/* SUBTÍTULO CLÁSICO CON ACENTO DE MARCA */}
-            <h2 className="text-2xl md:text-4xl font-serif italic text-white/90 font-light tracking-wider drop-shadow-lg flex items-center gap-4">
+            <h2 className="text-2xl md:text-4xl font-serif italic text-white/95 font-medium tracking-wider drop-shadow-lg flex items-center gap-4">
               <span className="text-[#e3004f] text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(227,0,79,0.8)]">✧</span>
               Hotel & Suites
               <span className="text-[#e3004f] text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(227,0,79,0.8)]">✧</span>
