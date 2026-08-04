@@ -1121,25 +1121,25 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="flex flex-col items-center justify-center space-y-4 md:space-y-6">
-            {/* ETIQUETA MINIMALISTA DORADA */}
+            {/* ETIQUETA MINIMALISTA */}
             <div className="flex items-center justify-center gap-6 mb-2 opacity-100">
-              <div className="h-[1px] w-16 md:w-32 bg-gradient-to-r from-transparent to-amber-400/80"></div>
-              <span className="text-xs md:text-sm font-bold text-amber-300 tracking-[0.6em] uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+              <div className="h-[1px] w-16 md:w-32 bg-gradient-to-r from-transparent to-white/80"></div>
+              <span className="text-xs md:text-sm font-bold text-white tracking-[0.6em] uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                 Bienvenidos a
               </span>
-              <div className="h-[1px] w-16 md:w-32 bg-gradient-to-l from-transparent to-amber-400/80"></div>
+              <div className="h-[1px] w-16 md:w-32 bg-gradient-to-l from-transparent to-white/80"></div>
             </div>
             
-            {/* NOMBRE DEL HOTEL: DORADO RADIANTE CON FUERTE SOMBRA Y MÁS GRUESO */}
-            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif font-black text-transparent bg-clip-text bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 tracking-[0.15em] leading-none uppercase drop-shadow-[0_8px_15px_rgba(0,0,0,0.9)] py-2">
+            {/* NOMBRE DEL HOTEL: COLOR DEL LOGO CON FUERTE SOMBRA Y MÁS GRUESO */}
+            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif font-black text-[#e3004f] tracking-[0.15em] leading-none uppercase drop-shadow-[0_8px_15px_rgba(0,0,0,0.9)] py-2">
               Kametza
             </h1>
             
-            {/* SUBTÍTULO CLÁSICO CON ACENTO DORADO */}
+            {/* SUBTÍTULO CLÁSICO CON ACENTO DEL LOGO */}
             <h2 className="text-2xl md:text-4xl font-serif italic text-white font-bold tracking-wider drop-shadow-lg flex items-center gap-4">
-              <span className="text-amber-400 text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]">✧</span>
+              <span className="text-[#e3004f] text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(227,0,79,0.8)]">✧</span>
               Hotel & Suites
-              <span className="text-amber-400 text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]">✧</span>
+              <span className="text-[#e3004f] text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(227,0,79,0.8)]">✧</span>
             </h2>
           </div>
           
