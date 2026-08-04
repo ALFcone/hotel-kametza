@@ -295,3 +295,62 @@ export async function adminUpdateBookingDates(bookingId: number, newCheckOut: st
   revalidatePath("/dashboard");
   return { success: true };
 }
+
+export async function addBookingExtra(formData: FormData) {
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+
+  if (!user || user.email !== "alfesco86@gmail.com") {
+    return { error: "No autorizado." };
+  }
+
+  const bookingId = Number(formData.get("bookingId"));
+  const itemName = formData.get("itemName") as string;
+  const price = Number(formData.get("price"));
+  const quantity = Number(formData.get("quantity")) || 1;
+
+  if (!itemName || price <= 0 || quantity <= 0) {
+    return { error: "Datos inválidos para el consumo." };
+  }
+
+  const { error } = await supabaseServer
+    .from("booking_extras")
+    .insert({
+      booking_id: bookingId,
+      item_name: itemName,
+      price,
+      quantity
+    });
+
+  if (error) {
+    console.error("Error al añadir consumo extra:", error.message);
+    return { error: "No se pudo guardar el consumo." };
+  }
+
+  revalidatePath("/admin");
+  return { success: true };
+}
+
+export async function deleteBookingExtra(formData: FormData) {
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+
+  if (!user || user.email !== "alfesco86@gmail.com") {
+    return { error: "No autorizado." };
+  }
+
+  const extraId = Number(formData.get("extraId"));
+
+  const { error } = await supabaseServer
+    .from("booking_extras")
+    .delete()
+    .eq("id", extraId);
+
+  if (error) {
+    console.error("Error al borrar consumo extra:", error.message);
+    return { error: "No se pudo eliminar el consumo." };
+  }
+
+  revalidatePath("/admin");
+  return { success: true };
+}

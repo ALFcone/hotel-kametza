@@ -155,6 +155,10 @@ export default async function AdminPage(props: {
     .from("bookings")
     .select("*")
     .order("created_at", { ascending: false });
+  const { data: allExtras } = await supabaseServer
+    .from("booking_extras")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   // C. FILTRADO (Reservas creadas o que inician en el rango de fechas)
   const filteredBookings = allBookings?.filter((b) => {
@@ -806,6 +810,10 @@ export default async function AdminPage(props: {
                       {filteredBookings?.map((booking) => {
                         const noches = calculateNights(booking.check_in, booking.check_out);
                         const isCancelled = booking.status === "cancelled" || booking.status === "cancelada";
+                        
+                        const bookingExtras = allExtras?.filter((e) => e.booking_id === booking.id) || [];
+                        const extrasTotal = bookingExtras.reduce((sum, e) => sum + (e.price * e.quantity), 0);
+                        const grandTotal = booking.total_price + extrasTotal;
 
                         return (
                           <tr
@@ -858,7 +866,10 @@ export default async function AdminPage(props: {
                               </div>
                             </td>
                             <td className="py-5 px-4 text-right font-bold text-stone-900">
-                              {formatMoney(booking.total_price)}
+                              {formatMoney(grandTotal)}
+                              {extrasTotal > 0 && (
+                                <div className="text-[8px] text-stone-400 mt-0.5">Incluye {formatMoney(extrasTotal)} extras</div>
+                              )}
                             </td>
                             <td className="py-5 px-4 text-center">
                               {isCancelled ? (
@@ -869,14 +880,14 @@ export default async function AdminPage(props: {
                                 <div className="flex flex-col items-center gap-1">
                                   <span
                                     className={`text-[8px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-full ${
-                                      booking.status === "pagado" || booking.status === "approved" || booking.total_price <= (booking.amount_paid || 0)
+                                      booking.status === "pagado" || booking.status === "approved" || grandTotal <= (booking.amount_paid || 0)
                                         ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
                                         : booking.status === "parcial"
                                         ? "bg-blue-100 text-blue-700 border border-blue-200"
                                         : "bg-amber-100 text-amber-600 border border-amber-200"
                                     }`}
                                   >
-                                    {booking.status === "pagado" || booking.status === "approved" || booking.total_price <= (booking.amount_paid || 0) 
+                                    {booking.status === "pagado" || booking.status === "approved" || grandTotal <= (booking.amount_paid || 0) 
                                       ? "Pagado" 
                                       : booking.status === "parcial" 
                                       ? "Parcial" 
@@ -897,6 +908,7 @@ export default async function AdminPage(props: {
                                 isCancelled={isCancelled}
                                 checkIn={booking.check_in}
                                 checkOut={booking.check_out}
+                                extras={bookingExtras}
                                 onDelete={deleteBooking}
                               />
                             </td>

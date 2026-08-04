@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle, X, DollarSign, Edit3, Calendar } from "lucide-react";
-import { adminRegisterPayment, adminUpdateBookingDates } from "@/app/actions";
+import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2 } from "lucide-react";
+import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra } from "@/app/actions";
 
 interface AdminTableActionsProps {
   bookingId: number;
@@ -12,6 +12,7 @@ interface AdminTableActionsProps {
   isCancelled: boolean;
   checkIn: string;
   checkOut: string;
+  extras?: any[];
   onDelete: (formData: FormData) => void;
 }
 
@@ -23,17 +24,24 @@ export function AdminTableActions({
   isCancelled,
   checkIn,
   checkOut,
+  extras = [],
   onDelete,
 }: AdminTableActionsProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isExtrasModalOpen, setIsExtrasModalOpen] = useState(false);
   
   const [paymentAmount, setPaymentAmount] = useState<string>("");
+  const [extraName, setExtraName] = useState("");
+  const [extraPrice, setExtraPrice] = useState("");
+  const [extraQty, setExtraQty] = useState("1");
   const [editCheckOut, setEditCheckOut] = useState<string>(checkOut);
   const [editTotalPrice, setEditTotalPrice] = useState<string>(totalPrice.toString());
   const [loading, setLoading] = useState(false);
   
-  const balance = totalPrice - (amountPaid || 0);
+  const extrasTotal = extras.reduce((sum, e) => sum + (e.price * e.quantity), 0);
+  const grandTotal = totalPrice + extrasTotal;
+  const balance = grandTotal - (amountPaid || 0);
   const isFullyPaid = status === "pagado" || status === "approved" || balance <= 0;
 
   const handleRegisterPayment = async (e: React.FormEvent) => {
@@ -77,9 +85,51 @@ export function AdminTableActions({
     setLoading(false);
   };
 
+  const handleAddExtra = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("bookingId", bookingId.toString());
+    formData.append("itemName", extraName);
+    formData.append("price", extraPrice);
+    formData.append("quantity", extraQty);
+    
+    const result = await addBookingExtra(formData);
+    if (result.error) alert(result.error);
+    else {
+      setExtraName("");
+      setExtraPrice("");
+      setExtraQty("1");
+    }
+    setLoading(false);
+  };
+
+  const handleDeleteExtra = async (extraId: number) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("extraId", extraId.toString());
+    const result = await deleteBookingExtra(formData);
+    if (result.error) alert(result.error);
+    setLoading(false);
+  };
+
   return (
     <>
       <div className="flex gap-2 justify-center">
+        {!isCancelled && (
+          <button
+            onClick={() => setIsExtrasModalOpen(true)}
+            className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-purple-200 hover:text-purple-600 hover:bg-purple-50 transition-all hover:shadow-[0_2px_10px_rgba(168,85,247,0.1)] hover:-translate-y-0.5"
+            title="Añadir Consumos / Extras"
+          >
+            <ShoppingCart size={14} className="group-hover:scale-110 transition-transform duration-300" />
+            {extras.length > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-purple-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-sm">
+                {extras.length}
+              </span>
+            )}
+          </button>
+        )}
         {!isCancelled && (
           <button
             onClick={() => setIsEditModalOpen(true)}
@@ -134,12 +184,22 @@ export function AdminTableActions({
 
             <div className="bg-stone-50 rounded-2xl p-4 mb-6 border border-stone-100">
               <div className="flex justify-between text-xs mb-2">
-                <span className="text-stone-500 font-medium">Costo Total:</span>
+                <span className="text-stone-500 font-medium">Costo Habitación:</span>
                 <span className="font-bold text-stone-900">S/ {totalPrice.toFixed(2)}</span>
+              </div>
+              {extrasTotal > 0 && (
+                <div className="flex justify-between text-xs mb-2">
+                  <span className="text-stone-500 font-medium">Consumos Extras:</span>
+                  <span className="font-bold text-purple-600">+ S/ {extrasTotal.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-xs mb-2 pt-2 border-t border-stone-200">
+                <span className="text-stone-500 font-medium">Total Acumulado:</span>
+                <span className="font-bold text-stone-900">S/ {grandTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-xs mb-2">
                 <span className="text-stone-500 font-medium">Pagado hasta ahora:</span>
-                <span className="font-bold text-emerald-600">S/ {(amountPaid || 0).toFixed(2)}</span>
+                <span className="font-bold text-emerald-600">- S/ {(amountPaid || 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm pt-2 border-t border-stone-200">
                 <span className="text-stone-900 font-bold">Saldo Pendiente:</span>
@@ -289,6 +349,116 @@ export function AdminTableActions({
                 {loading ? "Guardando..." : "Guardar Cambios"}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Consumos Extras */}
+      {isExtrasModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button 
+              onClick={() => setIsExtrasModalOpen(false)}
+              className="absolute top-4 right-4 text-stone-400 hover:text-stone-700"
+            >
+              <X size={20} />
+            </button>
+            
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+                <ShoppingCart size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold text-stone-900">Consumos Extras</h3>
+                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva #{bookingId}</p>
+              </div>
+            </div>
+
+            {/* Formulario para añadir */}
+            <form onSubmit={handleAddExtra} className="bg-stone-50 border border-stone-200 rounded-2xl p-4 mb-6">
+              <h4 className="text-[10px] font-black uppercase text-stone-400 mb-3">Añadir Nuevo Consumo</h4>
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Ej: Botella de Agua"
+                  value={extraName}
+                  onChange={(e) => setExtraName(e.target.value)}
+                  required
+                  className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold placeholder-stone-300"
+                />
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">S/</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0.1"
+                      placeholder="Precio"
+                      value={extraPrice}
+                      onChange={(e) => setExtraPrice(e.target.value)}
+                      required
+                      className="w-full border border-stone-200 rounded-lg pl-8 pr-3 py-2 text-sm font-bold"
+                    />
+                  </div>
+                  <div className="relative w-24">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">Cant:</span>
+                    <input
+                      type="number"
+                      min="1"
+                      value={extraQty}
+                      onChange={(e) => setExtraQty(e.target.value)}
+                      required
+                      className="w-full border border-stone-200 rounded-lg pl-12 pr-2 py-2 text-sm font-bold"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-2.5 bg-purple-600 text-white rounded-lg font-bold uppercase tracking-wider text-[10px] hover:bg-purple-700 transition"
+                >
+                  {loading ? "Añadiendo..." : "Añadir a la cuenta"}
+                </button>
+              </div>
+            </form>
+
+            {/* Lista de consumos */}
+            <div>
+              <div className="flex justify-between items-end mb-3">
+                <h4 className="text-[10px] font-black uppercase text-stone-400">Detalle de Consumos</h4>
+                <span className="text-[10px] font-black text-purple-600 bg-purple-50 px-2 py-1 rounded">Total: S/ {extrasTotal.toFixed(2)}</span>
+              </div>
+              
+              {extras.length === 0 ? (
+                <div className="text-center py-6 text-stone-400 text-xs italic">
+                  No hay consumos registrados aún.
+                </div>
+              ) : (
+                <ul className="space-y-2">
+                  {extras.map((extra) => (
+                    <li key={extra.id} className="flex justify-between items-center p-3 border border-stone-100 rounded-xl bg-white shadow-sm">
+                      <div>
+                        <p className="text-xs font-bold text-stone-800">{extra.item_name}</p>
+                        <p className="text-[10px] text-stone-500 font-medium">
+                          S/ {extra.price.toFixed(2)} x {extra.quantity} und.
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-black text-stone-900 text-xs">S/ {(extra.price * extra.quantity).toFixed(2)}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteExtra(extra.id)}
+                          disabled={loading}
+                          className="text-stone-300 hover:text-red-500 transition-colors p-1"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         </div>
       )}
