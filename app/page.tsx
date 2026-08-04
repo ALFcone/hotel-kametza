@@ -1149,40 +1149,60 @@ export default function Home() {
 
           {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
           <div className="bg-white/95 backdrop-blur-lg p-2 rounded-[2rem] md:rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-white/40 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-200">
-            <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group">
-              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-rose-900 transition">
+            <div 
+              className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group"
+              onClick={() => {
+                const input = document.getElementById('hero-checkin') as HTMLInputElement;
+                if (input && 'showPicker' in input) input.showPicker();
+              }}
+            >
+              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
                 Check-in
               </label>
               <div className="flex items-center w-full">
                 <CalendarDays
                   size={18}
-                  className="text-stone-300 mr-3 group-hover:text-rose-700 transition"
+                  className="text-stone-300 mr-3 group-hover:text-[#e3004f] transition"
                 />
                 <input
+                  id="hero-checkin"
                   type="date"
                   min={today}
                   value={globalCheckIn}
                   onChange={(e) => setGlobalCheckIn(e.target.value)}
+                  onClick={(e) => {
+                    if ('showPicker' in e.currentTarget) e.currentTarget.showPicker();
+                  }}
                   className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer placeholder-stone-300"
                   placeholder="Agrega fechas"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group">
-              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-rose-900 transition">
+            <div 
+              className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group"
+              onClick={() => {
+                const input = document.getElementById('hero-checkout') as HTMLInputElement;
+                if (input && 'showPicker' in input) input.showPicker();
+              }}
+            >
+              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
                 Check-out
               </label>
               <div className="flex items-center w-full">
                 <CalendarDays
                   size={18}
-                  className="text-stone-300 mr-3 group-hover:text-rose-700 transition"
+                  className="text-stone-300 mr-3 group-hover:text-[#e3004f] transition"
                 />
                 <input
+                  id="hero-checkout"
                   type="date"
                   min={globalCheckIn || today}
                   value={globalCheckOut}
                   onChange={(e) => setGlobalCheckOut(e.target.value)}
+                  onClick={(e) => {
+                    if ('showPicker' in e.currentTarget) e.currentTarget.showPicker();
+                  }}
                   className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer"
                 />
               </div>
