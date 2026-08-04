@@ -822,17 +822,18 @@ export default async function AdminPage(props: {
                                 </span>
                               )}
                             </td>
-                            <td className="py-5 px-8 text-center">
+                            <td className="py-5 px-6 text-center">
                               <div className="flex gap-2 justify-center">
                                 {booking.status !== "pagado" && booking.status !== "approved" && !isCancelled && (
                                   <form action={markAsPaid}>
                                     <input type="hidden" name="bookingId" value={booking.id} />
                                     <button
                                       type="submit"
-                                      className="flex items-center justify-center w-8 h-8 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition shadow-sm hover:shadow-lg"
-                                      title="Marcar como pagado"
+                                      className="group relative flex items-center justify-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-[0_2px_10px_rgba(16,185,129,0.2)] hover:shadow-[0_4px_15px_rgba(16,185,129,0.4)] hover:-translate-y-0.5"
+                                      title="Confirmar Pago"
                                     >
-                                      <DollarSign size={14} />
+                                      <CheckCircle size={14} className="group-hover:scale-110 transition-transform" />
+                                      <span className="text-[9px] font-black uppercase tracking-wider">Aprobar</span>
                                     </button>
                                   </form>
                                 )}
@@ -840,10 +841,10 @@ export default async function AdminPage(props: {
                                   <input type="hidden" name="bookingId" value={booking.id} />
                                   <button
                                     type="submit"
-                                    className="flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-xl hover:border-amber-200 hover:text-amber-600 hover:bg-amber-50 transition"
-                                    title="Borrar"
+                                    className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-red-200 hover:text-red-600 hover:bg-red-50 transition-all hover:shadow-[0_2px_10px_rgba(239,68,68,0.1)] hover:-translate-y-0.5"
+                                    title="Eliminar Reserva"
                                   >
-                                    <X size={14} />
+                                    <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />
                                   </button>
                                 </form>
                               </div>
