@@ -294,18 +294,18 @@ function PaymentContent() {
                 <div className="flex items-center justify-center gap-2 mb-4 text-purple-700 font-bold bg-purple-50 py-2 rounded-lg">
                   <Smartphone size={20} /> <span>Yape / Plin</span>
                 </div>
-                <div className="w-40 h-40 bg-white mx-auto rounded-xl p-2 shadow-sm border border-stone-200 mb-3">
+                <div className="w-40 h-40 bg-white mx-auto rounded-xl p-2 shadow-sm border border-stone-200 mb-3 overflow-hidden">
                   <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png"
+                    src="/qr.png"
                     alt="QR Yape"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain bg-stone-50"
                   />
                 </div>
                 <p className="text-lg font-black text-stone-800 mb-1">
                   966 556 622
                 </p>
-                <p className="text-[10px] text-stone-400 uppercase font-bold">
-                  Titular: Hotel Kametza SAC
+                <p className="text-[10px] text-stone-400 uppercase font-bold px-2 text-center leading-tight">
+                  Titular: MARCELINA BERMUDO ESCALANTE DE RUA
                 </p>
               </div>
             )}
