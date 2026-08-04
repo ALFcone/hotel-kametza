@@ -1151,9 +1151,15 @@ export default function Home() {
           <div className="bg-white/95 backdrop-blur-lg p-2 rounded-[2rem] md:rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-white/40 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-200">
             <div 
               className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group"
-              onClick={() => {
+              onClick={(e) => {
                 const input = document.getElementById('hero-checkin') as HTMLInputElement;
-                if (input && 'showPicker' in input) input.showPicker();
+                if (input && 'showPicker' in input) {
+                  try {
+                    input.showPicker();
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }
               }}
             >
               <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
@@ -1171,9 +1177,16 @@ export default function Home() {
                   value={globalCheckIn}
                   onChange={(e) => setGlobalCheckIn(e.target.value)}
                   onClick={(e) => {
-                    if ('showPicker' in e.currentTarget) e.currentTarget.showPicker();
+                    e.stopPropagation();
+                    if ('showPicker' in e.currentTarget) {
+                      try {
+                        e.currentTarget.showPicker();
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }
                   }}
-                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer placeholder-stone-300"
+                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer placeholder-stone-300 relative z-10"
                   placeholder="Agrega fechas"
                 />
               </div>
@@ -1181,9 +1194,15 @@ export default function Home() {
 
             <div 
               className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group"
-              onClick={() => {
+              onClick={(e) => {
                 const input = document.getElementById('hero-checkout') as HTMLInputElement;
-                if (input && 'showPicker' in input) input.showPicker();
+                if (input && 'showPicker' in input) {
+                  try {
+                    input.showPicker();
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }
               }}
             >
               <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
@@ -1201,9 +1220,16 @@ export default function Home() {
                   value={globalCheckOut}
                   onChange={(e) => setGlobalCheckOut(e.target.value)}
                   onClick={(e) => {
-                    if ('showPicker' in e.currentTarget) e.currentTarget.showPicker();
+                    e.stopPropagation();
+                    if ('showPicker' in e.currentTarget) {
+                      try {
+                        e.currentTarget.showPicker();
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }
                   }}
-                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer"
+                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer relative z-10"
                 />
               </div>
             </div>
