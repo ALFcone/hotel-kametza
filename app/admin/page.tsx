@@ -159,7 +159,12 @@ export default async function AdminPage(props: {
   // C. FILTRADO (Reservas creadas o que inician en el rango de fechas)
   const filteredBookings = allBookings?.filter((b) => {
     const checkInDate = b.check_in ? b.check_in.toString().substring(0, 10) : "";
-    return checkInDate >= dateFrom && checkInDate <= dateTo;
+    const createdAtDate = b.created_at ? b.created_at.toString().substring(0, 10) : "";
+    
+    const isCheckInInRange = checkInDate >= dateFrom && checkInDate <= dateTo;
+    const isCreatedInRange = createdAtDate >= dateFrom && createdAtDate <= dateTo;
+    
+    return isCheckInInRange || isCreatedInRange;
   });
 
   // D. KPIs
