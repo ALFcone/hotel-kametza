@@ -1130,8 +1130,8 @@ export default function Home() {
               <div className="h-[1px] w-16 md:w-32 bg-gradient-to-l from-transparent to-white/80"></div>
             </div>
             
-            {/* NOMBRE DEL HOTEL: COLOR DEL LOGO CON FUERTE SOMBRA Y MÁS GRUESO */}
-            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif font-black text-[#e3004f] tracking-[0.15em] leading-none uppercase drop-shadow-[0_8px_15px_rgba(0,0,0,0.9)] py-2">
+            {/* NOMBRE DEL HOTEL: GRADIENTE CON EL COLOR DEL LOGO */}
+            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif font-black text-transparent bg-clip-text bg-gradient-to-br from-pink-300 via-[#e3004f] to-rose-950 tracking-[0.15em] leading-none uppercase drop-shadow-[0_8px_15px_rgba(0,0,0,0.9)] py-2">
               Kametza
             </h1>
             
