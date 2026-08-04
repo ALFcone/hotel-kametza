@@ -1701,7 +1701,7 @@ export default function Home() {
             {/* Brand Column */}
             <div className="xl:col-span-1">
               <img src="/logoo.png" alt="Hotel Kametza" className="h-24 mb-6" />
-              <p className="text-stone-500 text-sm leading-relaxed mb-8 max-w-sm">
+              <p className="text-stone-700 text-sm leading-relaxed mb-8 max-w-sm font-medium">
                 Un refugio exclusivo donde la historia colonial se encuentra con el confort contemporáneo en el corazón de Ayacucho.
               </p>
               <div className="flex gap-4">
@@ -1721,17 +1721,17 @@ export default function Home() {
             <div>
               <h4 className="text-amber-600 font-bold tracking-widest text-xs uppercase mb-6">Descubre</h4>
               <ul className="space-y-4">
-                <li><a href="#inicio" className="text-stone-500 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Inicio</a></li>
-                <li><a href="#habitaciones" className="text-stone-500 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Habitaciones</a></li>
-                <li><a href="#servicios" className="text-stone-500 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Experiencia Kametza</a></li>
-                <li><a href="#ubicacion" className="text-stone-500 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Ubicación</a></li>
+                <li><a href="#inicio" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Inicio</a></li>
+                <li><a href="#habitaciones" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Habitaciones</a></li>
+                <li><a href="#servicios" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Experiencia Kametza</a></li>
+                <li><a href="#ubicacion" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Ubicación</a></li>
               </ul>
             </div>
 
             {/* Dirección Column */}
             <div>
               <h4 className="text-amber-600 font-bold tracking-widest text-xs uppercase mb-6">Ubicación</h4>
-              <div className="flex items-start gap-3 text-stone-500 mb-4 font-medium">
+              <div className="flex items-start gap-3 text-stone-700 mb-4 font-medium">
                 <MapPin size={18} className="text-[#e3004f] flex-shrink-0 mt-1" />
                 <p className="leading-relaxed">
                   Jirón Las Américas #154<br />
@@ -1744,7 +1744,7 @@ export default function Home() {
             {/* Pagos Column */}
             <div>
               <h4 className="text-amber-600 font-bold tracking-widest text-xs uppercase mb-6">Medios de Pago</h4>
-              <p className="text-stone-500 font-medium text-sm mb-4">
+              <p className="text-stone-700 font-medium text-sm mb-4">
                 Aceptamos todas las tarjetas de crédito, débito y transferencias.
               </p>
               <div className="flex gap-2 mb-6">
@@ -1766,8 +1766,8 @@ export default function Home() {
           {/* Bottom Footer */}
           <div className="border-t border-stone-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
             <div>
-              <p className="font-bold text-stone-400 text-xs">© 2025 Hotel Kametza. Todos los derechos reservados.</p>
-              <p className="text-[10px] text-stone-400 mt-1">RUC: 10452685951</p>
+              <p className="font-bold text-stone-800 text-xs">© 2025 Hotel Kametza. Todos los derechos reservados.</p>
+              <p className="text-[10px] text-stone-700 mt-1">RUC: 10452685951</p>
             </div>
             <div className="text-[10px] text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200 uppercase tracking-widest font-black">
               Experiencia Premium en Ayacucho
