@@ -236,7 +236,24 @@ export function AdminTableActions({
                     type="date"
                     min={checkIn}
                     value={editCheckOut}
-                    onChange={(e) => setEditCheckOut(e.target.value)}
+                    onChange={(e) => {
+                      const newDate = e.target.value;
+                      setEditCheckOut(newDate);
+                      
+                      // Auto-calcular nuevo precio (mantiene tarifa original o descuento proporcional)
+                      if (newDate && newDate >= checkIn) {
+                        const calcNights = (d1: string, d2: string) => {
+                          const start = new Date(d1);
+                          const end = new Date(d2);
+                          const diffTime = Math.abs(end.getTime() - start.getTime());
+                          return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+                        };
+                        const originalNights = calcNights(checkIn, checkOut);
+                        const pricePerNight = totalPrice / originalNights;
+                        const newNights = calcNights(checkIn, newDate);
+                        setEditTotalPrice((pricePerNight * newNights).toFixed(2));
+                      }
+                    }}
                     required
                     className="w-full bg-white border border-stone-200 rounded-xl py-3 pl-10 pr-4 text-sm font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                   />
