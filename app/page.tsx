@@ -3,7 +3,17 @@
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { supabase } from "@/lib/supabase";
+
+const InteractiveMap = dynamic(() => import("./components/Map"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-stone-900 rounded-3xl animate-pulse flex items-center justify-center">
+      <span className="text-amber-500/50 font-serif">Cargando mapa...</span>
+    </div>
+  ),
+});
 import { createBooking } from "./actions";
 import {
   Tv,
@@ -1685,6 +1695,19 @@ export default function Home() {
               <h3 className="font-black text-2xl mb-2 text-stone-100 font-serif">Correo</h3>
               <p className="text-amber-400 font-bold text-sm">kametzahotelayacucho@gmail.com</p>
             </a>
+          </div>
+          
+          {/* MAP INTERACTIVO PREMIUM */}
+          <div className="w-full max-w-6xl mx-auto h-[450px] mt-24 relative p-1.5 rounded-[2.5rem] bg-gradient-to-br from-stone-800 to-stone-950 shadow-2xl overflow-hidden group">
+            {/* Hover shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/0 via-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-20 pointer-events-none" />
+            <div className="w-full h-full rounded-[2.2rem] overflow-hidden relative">
+              <InteractiveMap />
+            </div>
+            
+            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-stone-900 border border-amber-900/50 px-8 py-3 rounded-t-2xl z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
+              <span className="text-amber-400 font-bold text-xs uppercase tracking-[0.2em]">Encuéntranos en Ayacucho</span>
+            </div>
           </div>
         </div>
       </section>
