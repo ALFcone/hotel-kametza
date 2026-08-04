@@ -1,7 +1,7 @@
 import { getSupabaseServer } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { updateRoom } from "../actions";
+import { toggleRoomCleanliness } from "../actions";
 import DownloadButton from "./DownloadButton";
 import Link from "next/link";
 import WalkInForm from "./WalkInForm";
@@ -666,6 +666,7 @@ export default async function AdminPage(props: {
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-white border border-stone-300" /> Libre</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#d97706]" /> Ocupada</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-400" /> Salida</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-rose-100 border border-rose-300" /> Sucia</span>
                 </div>
               </div>
 
@@ -674,6 +675,8 @@ export default async function AdminPage(props: {
                   const info = getRoomStatus(room.id);
                   const isOccupied = info.status === "occupied";
                   const isCheckout = info.status === "checkout";
+                  const isDirty = room.is_clean === false;
+
                   return (
                     <div
                       key={room.id}
@@ -682,27 +685,55 @@ export default async function AdminPage(props: {
                           ? "bg-gradient-to-br from-stone-900 to-[#d97706] text-white border-stone-900 shadow-lg shadow-amber-900/10"
                           : isCheckout
                           ? "bg-gradient-to-br from-amber-50 to-orange-50 text-amber-900 border-amber-200 border-dashed"
+                          : isDirty
+                          ? "bg-rose-50 border-rose-200 text-rose-900 hover:border-rose-300"
                           : "bg-white border-stone-200/60 text-stone-600 hover:border-amber-900/30"
                       }`}
                     >
                       <span className="absolute -bottom-3 -right-3 text-8xl font-black tracking-tighter opacity-[0.05] select-none group-hover:opacity-[0.1] transition-opacity">
                         {room.room_number || room.id}
                       </span>
-                      <div className="z-10">
-                        <p className="font-bold text-xs uppercase tracking-wider truncate">
-                          {room.name}
-                        </p>
-                        {info.guest && (
-                          <p className="text-[10px] mt-2 font-semibold italic opacity-85 truncate max-w-[90%]">
-                            {info.guest}
+                      
+                      <div className="z-10 flex justify-between items-start">
+                        <div>
+                          <p className="font-bold text-xs uppercase tracking-wider truncate">
+                            {room.name}
                           </p>
-                        )}
+                          {info.guest && (
+                            <p className="text-[10px] mt-2 font-semibold italic opacity-85 truncate max-w-[90%]">
+                              {info.guest}
+                            </p>
+                          )}
+                        </div>
+                        
+                        {/* Botón de Limpieza */}
+                        <form action={toggleRoomCleanliness} className="shrink-0 ml-2">
+                          <input type="hidden" name="roomId" value={room.id} />
+                          <input type="hidden" name="isClean" value={(!isDirty).toString()} />
+                          <button
+                            type="submit"
+                            title={isDirty ? "Marcar como Limpia" : "Marcar como Sucia"}
+                            className={`p-1.5 rounded-full transition-colors ${
+                              isDirty 
+                                ? "bg-rose-200 text-rose-700 hover:bg-emerald-100 hover:text-emerald-700" 
+                                : "bg-stone-100 text-stone-400 hover:bg-rose-100 hover:text-rose-600"
+                            }`}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="m15 5 4 4" />
+                              <path d="M13 14l-8.5 8.5a2.12 2.12 0 0 1-3-3L10 11l4-4 5.5-5.5a2.12 2.12 0 0 1 3 3L17 10l-4 4Z" />
+                            </svg>
+                          </button>
+                        </form>
                       </div>
-                      <div className="z-10 mt-4">
+                      
+                      <div className="z-10 mt-4 flex items-center justify-between">
                         <span
                           className={`text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${
-                            info.status === "free"
+                            info.status === "free" && !isDirty
                               ? "bg-stone-100 text-stone-500"
+                              : info.status === "free" && isDirty
+                              ? "bg-rose-200 text-rose-800"
                               : isCheckout
                               ? "bg-amber-400 text-stone-900 shadow-sm"
                               : info.paid
@@ -711,7 +742,7 @@ export default async function AdminPage(props: {
                           }`}
                         >
                           {info.status === "free"
-                            ? "Libre"
+                            ? (isDirty ? "Sucia" : "Libre")
                             : isCheckout
                             ? "Salida"
                             : info.paid
