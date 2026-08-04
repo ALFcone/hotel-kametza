@@ -197,7 +197,7 @@ export default async function AdminPage(props: {
         b.status !== "cancelada"
     ) || [];
 
-  // Ventas creadas dentro del rango de fechas (Solo se consideran si el pago está CONFIRMADO: 'pagado' o 'approved')
+  // Ventas creadas dentro del rango de fechas (Consideramos los abonos reales: 'pagado', 'approved', 'parcial')
   const salesInRange =
     allBookings?.filter((b) => {
       if (!b.created_at) return false;
@@ -205,22 +205,29 @@ export default async function AdminPage(props: {
       return (
         createdAtDate >= dateFrom &&
         createdAtDate <= dateTo &&
-        (b.status === "pagado" || b.status === "approved")
+        (b.status === "pagado" || b.status === "approved" || b.status === "parcial")
       );
     }) || [];
 
+  const getPaidAmount = (b: any) => {
+    if (b.amount_paid !== null && b.amount_paid !== undefined) return Number(b.amount_paid);
+    // Fallback para reservas antiguas antes de agregar la columna
+    if (b.status === "pagado" || b.status === "approved") return Number(b.total_price || 0);
+    return 0;
+  };
+
   const totalIncome = salesInRange.reduce(
-    (acc, b) => acc + (b.total_price || 0),
+    (acc, b) => acc + getPaidAmount(b),
     0
   );
 
   const cashIncome = salesInRange
     .filter((b) => b.payment_method === "recepcion" || b.payment_method === "efectivo")
-    .reduce((acc, b) => acc + (b.total_price || 0), 0);
+    .reduce((acc, b) => acc + getPaidAmount(b), 0);
 
   const digitalIncome = salesInRange
     .filter((b) => b.payment_method === "online" || b.payment_method === "yape" || b.payment_method === "tarjeta")
-    .reduce((acc, b) => acc + (b.total_price || 0), 0);
+    .reduce((acc, b) => acc + getPaidAmount(b), 0);
 
   const totalRooms = rooms?.length || 0;
   const freeRooms = totalRooms - occupiedCount;
@@ -237,9 +244,9 @@ export default async function AdminPage(props: {
       (b) =>
         b.created_at &&
         b.created_at.startsWith(dateStr) &&
-        (b.status === "pagado" || b.status === "approved")
+        (b.status === "pagado" || b.status === "approved" || b.status === "parcial")
     ) || [];
-    const total = daySales.reduce((acc, b) => acc + (b.total_price || 0), 0);
+    const total = daySales.reduce((acc, b) => acc + getPaidAmount(b), 0);
     
     const dayName = new Date(dateStr + "T00:00:00").toLocaleDateString("es-PE", {
       weekday: "short",
