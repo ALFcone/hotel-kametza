@@ -173,6 +173,9 @@ export async function adminCreateBooking(formData: FormData) {
     return { error: "Habitación no disponible en esas fechas." };
   }
 
+  const amountPaid = formData.get("amountPaid") ? Number(formData.get("amountPaid")) : price;
+  const status = amountPaid >= price ? "pagado" : "parcial";
+
   const { error } = await supabaseServer
     .from("bookings")
     .insert({
@@ -181,8 +184,9 @@ export async function adminCreateBooking(formData: FormData) {
       check_in: checkIn,
       check_out: checkOut,
       total_price: price,
+      amount_paid: amountPaid,
       payment_method: paymentMethod,
-      status: "pagado",
+      status: status,
       client_name: formData.get("name"),
       client_email: formData.get("email") || null,
       client_country: formData.get("country") || "Perú",
@@ -197,5 +201,44 @@ export async function adminCreateBooking(formData: FormData) {
   }
 
   revalidatePath("/admin");
+  return { success: true };
+}
+
+export async function adminRegisterPayment(bookingId: number, amount: number) {
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+
+  if (!user || user.email !== "alfesco86@gmail.com") {
+    return { error: "No autorizado." };
+  }
+
+  // Obtener la reserva actual
+  const { data: booking, error: fetchError } = await supabaseServer
+    .from("bookings")
+    .select("total_price, amount_paid, status")
+    .eq("id", bookingId)
+    .single();
+
+  if (fetchError || !booking) {
+    return { error: "Reserva no encontrada." };
+  }
+
+  const newAmountPaid = (Number(booking.amount_paid) || 0) + amount;
+  const newStatus = newAmountPaid >= Number(booking.total_price) ? "pagado" : "parcial";
+
+  const { error: updateError } = await supabaseServer
+    .from("bookings")
+    .update({ 
+      amount_paid: newAmountPaid,
+      status: newStatus 
+    })
+    .eq("id", bookingId);
+
+  if (updateError) {
+    return { error: "Error al actualizar el pago." };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/dashboard");
   return { success: true };
 }

@@ -251,17 +251,33 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
             </p>
           </div>
           
-          <div className="flex flex-col gap-1 w-full md:w-48">
-            <label className="text-[9px] font-black uppercase text-stone-400 ml-1">Tarifa Personalizada</label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={14} />
-              <input
-                type="number"
-                placeholder="Monto final (S/)"
-                value={customPrice}
-                onChange={(e) => setCustomPrice(e.target.value)}
-                className="w-full p-2.5 pl-8 bg-white rounded-xl border border-stone-200 text-xs font-bold outline-none focus:border-[#d97706]"
-              />
+          <div className="flex gap-4 w-full md:w-auto">
+            <div className="flex flex-col gap-1 flex-1">
+              <label className="text-[9px] font-black uppercase text-stone-400 ml-1">Tarifa Total Fija</label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={14} />
+                <input
+                  type="number"
+                  placeholder="S/ Total"
+                  value={customPrice}
+                  onChange={(e) => setCustomPrice(e.target.value)}
+                  className="w-full p-2.5 pl-8 bg-white rounded-xl border border-stone-200 text-xs font-bold outline-none focus:border-[#d97706]"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1 flex-1">
+              <label className="text-[9px] font-black uppercase text-stone-400 ml-1">Monto Cobrado Hoy</label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={14} />
+                <input
+                  type="number"
+                  name="amountPaid"
+                  placeholder="S/ Adelanto"
+                  className="w-full p-2.5 pl-8 bg-white rounded-xl border border-stone-200 text-xs font-bold outline-none focus:border-emerald-500 text-emerald-700"
+                />
+              </div>
+              <span className="text-[8px] text-stone-400 text-center">Dejar vacío si cobró todo</span>
             </div>
           </div>
         </div>

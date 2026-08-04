@@ -5,6 +5,7 @@ import { updateRoom } from "../actions";
 import DownloadButton from "./DownloadButton";
 import Link from "next/link";
 import WalkInForm from "./WalkInForm";
+import { AdminTableActions } from "./AdminTableActions";
 import {
   Calendar,
   CheckCircle,
@@ -43,18 +44,28 @@ import {
 async function markAsPaid(formData: FormData) {
   "use server";
   const bookingId = formData.get("bookingId");
-  if (!bookingId) return;
+  if (!bookingId) {
+    console.log("No bookingId provided");
+    return;
+  }
 
   const supabaseServer = await getSupabaseServer();
   const { data: { user } } = await supabaseServer.auth.getUser();
-  if (!user || user.email !== "alfesco86@gmail.com") return;
+  if (!user || user.email !== "alfesco86@gmail.com") {
+    console.log("Unauthorized or no user:", user?.email);
+    return;
+  }
 
   const id = parseInt(bookingId.toString(), 10);
+  console.log(`Attempting to mark booking ${id} as pagado for user ${user.email}`);
 
-  await supabaseServer
+  const { data, error } = await supabaseServer
     .from("bookings")
     .update({ status: "pagado" })
-    .eq("id", id);
+    .eq("id", id)
+    .select();
+
+  console.log("Update response:", data, error);
   revalidatePath("/admin");
 }
 
@@ -811,43 +822,37 @@ export default async function AdminPage(props: {
                                   <XCircle size={10} /> Cancelada
                                 </span>
                               ) : (
-                                <span
-                                  className={`text-[8px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-full ${
-                                    booking.status === "pagado" || booking.status === "approved"
-                                      ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                                      : "bg-amber-100 text-amber-600 border border-amber-200"
-                                  }`}
-                                >
-                                  {booking.status === "pagado" || booking.status === "approved" ? "Pagado" : "Pendiente"}
-                                </span>
+                                <div className="flex flex-col items-center gap-1">
+                                  <span
+                                    className={`text-[8px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-full ${
+                                      booking.status === "pagado" || booking.status === "approved" || booking.total_price <= (booking.amount_paid || 0)
+                                        ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                        : booking.status === "parcial"
+                                        ? "bg-blue-100 text-blue-700 border border-blue-200"
+                                        : "bg-amber-100 text-amber-600 border border-amber-200"
+                                    }`}
+                                  >
+                                    {booking.status === "pagado" || booking.status === "approved" || booking.total_price <= (booking.amount_paid || 0) 
+                                      ? "Pagado" 
+                                      : booking.status === "parcial" 
+                                      ? "Parcial" 
+                                      : "Pendiente"}
+                                  </span>
+                                  <span className="text-[9px] font-bold text-stone-500">
+                                    Pagado: S/ {(booking.amount_paid || 0).toFixed(2)}
+                                  </span>
+                                </div>
                               )}
                             </td>
                             <td className="py-5 px-6 text-center">
-                              <div className="flex gap-2 justify-center">
-                                {booking.status !== "pagado" && booking.status !== "approved" && !isCancelled && (
-                                  <form action={markAsPaid}>
-                                    <input type="hidden" name="bookingId" value={booking.id} />
-                                    <button
-                                      type="submit"
-                                      className="group relative flex items-center justify-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-[0_2px_10px_rgba(16,185,129,0.2)] hover:shadow-[0_4px_15px_rgba(16,185,129,0.4)] hover:-translate-y-0.5"
-                                      title="Confirmar Pago"
-                                    >
-                                      <CheckCircle size={14} className="group-hover:scale-110 transition-transform" />
-                                      <span className="text-[9px] font-black uppercase tracking-wider">Aprobar</span>
-                                    </button>
-                                  </form>
-                                )}
-                                <form action={deleteBooking}>
-                                  <input type="hidden" name="bookingId" value={booking.id} />
-                                  <button
-                                    type="submit"
-                                    className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-red-200 hover:text-red-600 hover:bg-red-50 transition-all hover:shadow-[0_2px_10px_rgba(239,68,68,0.1)] hover:-translate-y-0.5"
-                                    title="Eliminar Reserva"
-                                  >
-                                    <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />
-                                  </button>
-                                </form>
-                              </div>
+                              <AdminTableActions 
+                                bookingId={booking.id}
+                                status={booking.status}
+                                totalPrice={booking.total_price}
+                                amountPaid={booking.amount_paid || 0}
+                                isCancelled={isCancelled}
+                                onDelete={deleteBooking}
+                              />
                             </td>
                           </tr>
                         );
