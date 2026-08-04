@@ -890,6 +890,8 @@ export default async function AdminPage(props: {
                                 totalPrice={booking.total_price}
                                 amountPaid={booking.amount_paid || 0}
                                 isCancelled={isCancelled}
+                                checkIn={booking.check_in}
+                                checkOut={booking.check_out}
                                 onDelete={deleteBooking}
                               />
                             </td>

@@ -268,3 +268,30 @@ export async function toggleRoomCleanliness(formData: FormData) {
 
   revalidatePath("/admin");
 }
+
+export async function adminUpdateBookingDates(bookingId: number, newCheckOut: string, newTotal: number) {
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+
+  if (!user || user.email !== "alfesco86@gmail.com") {
+    return { error: "No autorizado." };
+  }
+
+  const { data, error } = await supabaseServer
+    .from("bookings")
+    .update({ 
+      check_out: newCheckOut,
+      total_price: newTotal
+    })
+    .eq("id", bookingId)
+    .select();
+
+  if (error || !data || data.length === 0) {
+    console.error("Error al actualizar la reserva:", error?.message);
+    return { error: "No se pudo actualizar la reserva. Revisa si hay conflictos." };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/dashboard");
+  return { success: true };
+}
