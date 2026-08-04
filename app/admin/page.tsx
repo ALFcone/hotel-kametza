@@ -666,7 +666,7 @@ export default async function AdminPage(props: {
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-white border border-stone-300" /> Libre</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#d97706]" /> Ocupada</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-400" /> Salida</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-rose-100 border border-rose-300" /> Sucia</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-rose-500 border border-rose-600" /> Sucia</span>
                 </div>
               </div>
 
@@ -686,7 +686,7 @@ export default async function AdminPage(props: {
                           : isCheckout
                           ? "bg-gradient-to-br from-amber-50 to-orange-50 text-amber-900 border-amber-200 border-dashed"
                           : isDirty
-                          ? "bg-rose-50 border-rose-200 text-rose-900 hover:border-rose-300"
+                          ? "bg-rose-500 border-rose-600 text-white shadow-md shadow-rose-900/20"
                           : "bg-white border-stone-200/60 text-stone-600 hover:border-amber-900/30"
                       }`}
                     >
@@ -696,11 +696,11 @@ export default async function AdminPage(props: {
                       
                       <div className="z-10 flex justify-between items-start">
                         <div>
-                          <p className="font-bold text-xs uppercase tracking-wider truncate">
+                          <p className={`font-bold text-xs uppercase tracking-wider truncate ${isDirty ? "text-white" : ""}`}>
                             {room.name}
                           </p>
                           {info.guest && (
-                            <p className="text-[10px] mt-2 font-semibold italic opacity-85 truncate max-w-[90%]">
+                            <p className={`text-[10px] mt-2 font-semibold italic opacity-85 truncate max-w-[90%] ${isDirty ? "text-white" : ""}`}>
                               {info.guest}
                             </p>
                           )}
@@ -709,14 +709,15 @@ export default async function AdminPage(props: {
                         {/* Botón de Limpieza */}
                         <form action={toggleRoomCleanliness} className="shrink-0 ml-2">
                           <input type="hidden" name="roomId" value={room.id} />
-                          <input type="hidden" name="isClean" value={(!isDirty).toString()} />
+                          {/* Si está sucia (isDirty=true), el nuevo valor debe ser true (limpia). Si está limpia (isDirty=false), el nuevo valor debe ser false (sucia). */}
+                          <input type="hidden" name="isClean" value={isDirty.toString()} />
                           <button
                             type="submit"
                             title={isDirty ? "Marcar como Limpia" : "Marcar como Sucia"}
                             className={`p-1.5 rounded-full transition-colors ${
                               isDirty 
-                                ? "bg-rose-200 text-rose-700 hover:bg-emerald-100 hover:text-emerald-700" 
-                                : "bg-stone-100 text-stone-400 hover:bg-rose-100 hover:text-rose-600"
+                                ? "bg-white text-rose-600 hover:bg-emerald-500 hover:text-white shadow-sm" 
+                                : "bg-stone-100 text-stone-400 hover:bg-rose-500 hover:text-white"
                             }`}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -733,7 +734,7 @@ export default async function AdminPage(props: {
                             info.status === "free" && !isDirty
                               ? "bg-stone-100 text-stone-500"
                               : info.status === "free" && isDirty
-                              ? "bg-rose-200 text-rose-800"
+                              ? "bg-white text-rose-700 shadow-sm"
                               : isCheckout
                               ? "bg-amber-400 text-stone-900 shadow-sm"
                               : info.paid
