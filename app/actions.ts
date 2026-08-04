@@ -248,23 +248,23 @@ export async function toggleRoomCleanliness(formData: FormData) {
   const { data: { user } } = await supabaseServer.auth.getUser();
 
   if (!user || user.email !== "alfesco86@gmail.com") {
-    return { error: "No autorizado." };
+    return;
   }
 
   const roomId = Number(formData.get("roomId"));
   const isCleanStr = formData.get("isClean") as string;
   const isClean = isCleanStr === "true";
 
-  const { error } = await supabaseServer
+  const { data, error } = await supabaseServer
     .from("rooms")
     .update({ is_clean: isClean })
-    .eq("id", roomId);
+    .eq("id", roomId)
+    .select();
 
-  if (error) {
-    console.error("Error toggling room cleanliness:", error.message);
-    return { error: "No se pudo cambiar el estado de limpieza." };
+  if (error || !data || data.length === 0) {
+    console.error("Error toggling room cleanliness:", error?.message || "No rows updated. (Check RLS policies)");
+    return;
   }
 
   revalidatePath("/admin");
-  return { success: true };
 }

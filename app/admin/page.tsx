@@ -1,7 +1,7 @@
 import { getSupabaseServer } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { toggleRoomCleanliness } from "../actions";
+import { toggleRoomCleanliness, updateRoom } from "../actions";
 import DownloadButton from "./DownloadButton";
 import Link from "next/link";
 import WalkInForm from "./WalkInForm";
