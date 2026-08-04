@@ -49,10 +49,12 @@ async function markAsPaid(formData: FormData) {
   const { data: { user } } = await supabaseServer.auth.getUser();
   if (!user || user.email !== "alfesco86@gmail.com") return;
 
+  const id = parseInt(bookingId.toString(), 10);
+
   await supabaseServer
     .from("bookings")
     .update({ status: "pagado" })
-    .eq("id", bookingId);
+    .eq("id", id);
   revalidatePath("/admin");
 }
 
@@ -65,7 +67,9 @@ async function deleteBooking(formData: FormData) {
   const { data: { user } } = await supabaseServer.auth.getUser();
   if (!user || user.email !== "alfesco86@gmail.com") return;
 
-  await supabaseServer.from("bookings").delete().eq("id", bookingId);
+  const id = parseInt(bookingId.toString(), 10);
+
+  await supabaseServer.from("bookings").delete().eq("id", id);
   revalidatePath("/admin");
 }
 
