@@ -218,15 +218,15 @@ function AuthModal({
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-      <div className="bg-stone-900 w-full max-w-sm rounded-3xl p-8 shadow-2xl relative border border-stone-800">
+      <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative border border-stone-100">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-stone-400 hover:text-stone-300"
+          className="absolute top-4 right-4 text-stone-400 hover:text-stone-800"
         >
           <X size={24} />
         </button>
 
-        <h2 className="text-2xl font-serif font-bold text-stone-50 mb-2 text-center">
+        <h2 className="text-2xl font-serif font-bold text-rose-950 mb-2 text-center">
           {isLogin ? "Inicia Sesión" : "Regístrate"}
         </h2>
         <p className="text-stone-500 text-xs text-center mb-6">
@@ -237,7 +237,7 @@ function AuthModal({
 
         <button
           onClick={handleGoogleLogin}
-          className="flex items-center justify-center gap-3 w-full bg-stone-900 border border-stone-700 text-stone-200 font-bold py-3 rounded-xl hover:bg-stone-800 transition text-sm mb-6 shadow-sm"
+          className="flex items-center justify-center gap-3 w-full bg-white border border-stone-200 text-stone-700 font-bold py-3 rounded-xl hover:bg-stone-50 transition text-sm mb-6 shadow-sm"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -282,7 +282,7 @@ function AuthModal({
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="w-full p-3 bg-stone-800 rounded-xl border border-stone-700 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm animate-in slide-in-from-top-2"
+              className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm animate-in slide-in-from-top-2"
             />
           )}
 
@@ -292,7 +292,7 @@ function AuthModal({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full p-3 bg-stone-800 rounded-xl border border-stone-700 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm"
+            className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm"
           />
           <input
             type="password"
@@ -300,7 +300,7 @@ function AuthModal({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full p-3 bg-stone-800 rounded-xl border border-stone-700 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm"
+            className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm"
           />
 
           <button
@@ -319,7 +319,7 @@ function AuthModal({
           {isLogin ? "¿Nuevo aquí? " : "¿Ya tienes cuenta? "}
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="font-bold text-stone-200 hover:underline"
+            className="font-bold text-rose-900 hover:underline"
           >
             {isLogin ? "Crear cuenta" : "Ingresar"}
           </button>
@@ -448,7 +448,7 @@ function BookingModal({
 
   return createPortal(
     <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200">
-      <div className="bg-stone-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
         <div className="hidden md:block w-1/3 bg-stone-100 p-8 relative overflow-hidden">
           <div className="absolute inset-0 bg-rose-900/10 mix-blend-multiply"></div>
           <img
@@ -458,18 +458,18 @@ function BookingModal({
           />
           <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
-              <h3 className="text-2xl font-serif font-bold text-stone-50 mb-2">
+              <h3 className="text-2xl font-serif font-bold text-rose-950 mb-2">
                 {room.name}
               </h3>
-              <p className="text-xs text-stone-400 font-medium line-clamp-4">
+              <p className="text-xs text-stone-600 font-medium line-clamp-4">
                 {simpleDesc}
               </p>
             </div>
-            <div className="bg-stone-950/90 backdrop-blur p-4 rounded-2xl shadow-lg">
+            <div className="bg-white/90 backdrop-blur p-4 rounded-2xl shadow-lg">
               <p className="text-[10px] uppercase font-bold text-stone-500 mb-1">
                 Total a Pagar
               </p>
-              <p className="text-3xl font-black text-amber-500">
+              <p className="text-3xl font-black text-[#e3004f]">
                 S/ {totalPrice}
               </p>
               <p className="text-[10px] text-stone-400 font-bold mt-1">
@@ -487,7 +487,7 @@ function BookingModal({
             <X size={20} />
           </button>
 
-          <h2 className="text-xl font-bold text-stone-300 mb-6 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-stone-800 mb-6 flex items-center gap-2">
             <Calendar className="text-rose-600" size={20} />
             Completa tu Reserva
           </h2>
@@ -499,7 +499,7 @@ function BookingModal({
             <input type="hidden" name="roomId" value={room.firstAvailableId} />
             <input type="hidden" name="price" value={totalPrice} />
 
-            <div className="grid grid-cols-2 gap-3 bg-stone-800 p-4 rounded-2xl border border-stone-800">
+            <div className="grid grid-cols-2 gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-100">
               <div>
                 <label className="text-[10px] font-bold text-stone-400 uppercase ml-1">
                   Llegada
@@ -511,10 +511,10 @@ function BookingModal({
                   min={today}
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
-                  className="w-full bg-transparent text-sm font-bold text-stone-300 outline-none mt-1"
+                  className="w-full bg-transparent text-sm font-bold text-stone-800 outline-none mt-1"
                 />
               </div>
-              <div className="border-l border-stone-700 pl-3">
+              <div className="border-l border-stone-200 pl-3">
                 <label className="text-[10px] font-bold text-stone-400 uppercase ml-1">
                   Salida
                 </label>
@@ -525,7 +525,7 @@ function BookingModal({
                   min={checkIn || today}
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
-                  className="w-full bg-transparent text-sm font-bold text-stone-300 outline-none mt-1"
+                  className="w-full bg-transparent text-sm font-bold text-stone-800 outline-none mt-1"
                 />
               </div>
             </div>
@@ -535,7 +535,7 @@ function BookingModal({
                 <select
                   name="documentType"
                   onChange={(e) => setDocType(e.target.value)}
-                  className="w-full p-3 bg-stone-800 rounded-xl text-xs font-bold border border-stone-700 outline-none"
+                  className="w-full p-3 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none"
                 >
                   <option value="DNI">DNI</option>
                   <option value="CE">C.E.</option>
@@ -549,7 +549,7 @@ function BookingModal({
                   placeholder="Número de Documento"
                   required
                   maxLength={docType === "DNI" ? 8 : 15}
-                  className="w-full p-3 bg-stone-800 rounded-xl text-sm border border-stone-700 outline-none focus:ring-2 focus:ring-rose-900/10"
+                  className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
                 />
               </div>
             </div>
@@ -561,7 +561,7 @@ function BookingModal({
               required
               // MEJORA: Autocompletar nombre si está disponible
               defaultValue={currentUser?.user_metadata?.full_name || ""}
-              className="w-full p-3 bg-stone-800 rounded-xl text-sm border border-stone-700 outline-none focus:ring-2 focus:ring-rose-900/10"
+              className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
             />
 
             {/* MEJORA: INPUT DE CORREO AUTOMÁTICO Y BLOQUEADO */}
@@ -574,7 +574,7 @@ function BookingModal({
                 // Si hay usuario, poner su email y bloquear el campo
                 defaultValue={currentUser?.email || ""}
                 readOnly={!!currentUser}
-                className={`w-full p-3 bg-stone-800 rounded-xl text-sm border border-stone-700 outline-none focus:ring-2 focus:ring-rose-900/10 ${currentUser
+                className={`w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 ${currentUser
                   ? "text-stone-500 cursor-not-allowed bg-stone-100"
                   : ""
                   }`}
@@ -598,7 +598,7 @@ function BookingModal({
                 />
                 <select
                   name="country"
-                  className="w-full p-3 pl-9 bg-stone-800 rounded-xl text-xs font-bold border border-stone-700 outline-none appearance-none"
+                  className="w-full p-3 pl-9 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none appearance-none"
                   required
                 >
                   <option value="Perú">Perú</option>
@@ -622,7 +622,7 @@ function BookingModal({
                   name="phone"
                   placeholder="Celular / WhatsApp"
                   required
-                  className="w-full p-3 pl-9 bg-stone-800 rounded-xl text-sm border border-stone-700 outline-none focus:ring-2 focus:ring-rose-900/10"
+                  className="w-full p-3 pl-9 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
                 />
               </div>
             </div>
@@ -632,7 +632,7 @@ function BookingModal({
                 name="paymentMethod"
                 required
                 defaultValue=""
-                className="w-full p-4 border border-stone-700 bg-stone-800 rounded-xl text-xs font-bold text-stone-200 outline-none appearance-none cursor-pointer"
+                className="w-full p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs font-bold text-rose-900 outline-none appearance-none cursor-pointer"
               >
                 <option value="" disabled>
                   Seleccione método de pago
@@ -651,13 +651,13 @@ function BookingModal({
 
             <div className="md:hidden flex justify-between items-center text-xs font-bold text-stone-500 border-t pt-2">
               <span>Total ({nights} noches):</span>
-              <span className="text-lg text-amber-500">S/ {totalPrice}</span>
+              <span className="text-lg text-[#e3004f]">S/ {totalPrice}</span>
             </div>
 
             <button
               disabled={isSubmitting}
               type="submit"
-              className="w-full bg-amber-600 text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50 mt-2"
+              className="w-full bg-[#e3004f] text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50 mt-2"
             >
               {isSubmitting ? (
                 "Procesando..."
@@ -703,7 +703,7 @@ function RoomCard({
 
   return (
     <>
-      <div className="group bg-stone-900 rounded-[2.5rem] shadow-lg hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 overflow-hidden border border-stone-800 flex flex-col h-full relative">
+      <div className="group bg-white rounded-[2.5rem] shadow-lg hover:shadow-[0_20px_40px_rgba(112,8,36,0.15)] transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full relative">
         <div className="relative h-72 md:h-96 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10 opacity-60"></div>
           <img
@@ -711,16 +711,16 @@ function RoomCard({
             alt={room.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
           />
-          <div className="absolute bottom-4 right-4 z-20 bg-stone-900/95 backdrop-blur-sm px-5 py-2 rounded-2xl shadow-lg border border-white/50">
+          <div className="absolute bottom-4 right-4 z-20 bg-white/95 backdrop-blur-sm px-5 py-2 rounded-2xl shadow-lg border border-white/50">
             <p className="text-[9px] uppercase font-bold text-stone-400 tracking-widest mb-0.5">
               Por noche
             </p>
-            <p className="text-xl font-black text-amber-500">
+            <p className="text-xl font-black text-[#e3004f]">
               S/ {room.price_per_night}
             </p>
           </div>
           <div className="absolute top-4 left-4 z-20">
-            <span className="bg-amber-600 text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] shadow-lg">
+            <span className="bg-[#e3004f] text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] shadow-lg">
               Exclusivo
             </span>
           </div>
@@ -728,7 +728,7 @@ function RoomCard({
 
         <div className="p-8 flex flex-col flex-grow">
           <div className="flex justify-between items-start mb-3">
-            <h3 className="text-2xl font-serif font-bold text-stone-50 leading-tight group-hover:text-amber-400 transition-colors">
+            <h3 className="text-2xl font-serif font-bold text-rose-950 leading-tight group-hover:text-rose-700 transition-colors">
               {room.name}
             </h3>
             <div className="flex gap-0.5 mt-1">
@@ -742,44 +742,44 @@ function RoomCard({
             </div>
           </div>
 
-          <p className="text-stone-400 text-[15px] mb-7 leading-relaxed line-clamp-3 relative pl-4 border-l-[3px] border-amber-500 bg-gradient-to-r from-rose-50/50 to-transparent py-1 pr-2 rounded-r-lg">
+          <p className="text-stone-600 text-[15px] mb-7 leading-relaxed line-clamp-3 relative pl-4 border-l-[3px] border-[#e3004f] bg-gradient-to-r from-rose-50/50 to-transparent py-1 pr-2 rounded-r-lg">
             {simpleDesc}
           </p>
 
           <div className="grid grid-cols-2 gap-2.5 mb-8">
-            <div className="flex items-center gap-2.5 text-stone-50 bg-stone-800/80 p-3 rounded-xl border border-stone-700/50 hover:bg-stone-700/50 transition">
-              <Wifi size={16} className="text-amber-500" />
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Wifi size={16} className="text-[#e3004f]" />
               <span className="text-[10px] font-black uppercase tracking-wider">
                 WiFi Fibra Óptica
               </span>
             </div>
-            <div className="flex items-center gap-2.5 text-stone-50 bg-stone-800/80 p-3 rounded-xl border border-stone-700/50 hover:bg-stone-700/50 transition">
-              <Clock size={16} className="text-amber-500" />
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Clock size={16} className="text-[#e3004f]" />
               <span className="text-[10px] font-black uppercase tracking-wider">
                 Agua Caliente 24h
               </span>
             </div>
-            <div className="flex items-center gap-2.5 text-stone-50 bg-stone-800/80 p-3 rounded-xl border border-stone-700/50 hover:bg-stone-700/50 transition">
-              <Tv size={16} className="text-amber-500" />
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Tv size={16} className="text-[#e3004f]" />
               <span className="text-[10px] font-black uppercase tracking-wider">Smart TV</span>
             </div>
-            <div className="flex items-center gap-2.5 text-stone-50 bg-stone-800/80 p-3 rounded-xl border border-stone-700/50 hover:bg-stone-700/50 transition">
-              <Users size={16} className="text-amber-500" />
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Users size={16} className="text-[#e3004f]" />
               <span className="text-[10px] font-black uppercase tracking-wider">
                 Baño Privado
               </span>
             </div>
           </div>
 
-          <div className="mt-auto pt-4 border-t border-stone-800">
+          <div className="mt-auto pt-4 border-t border-stone-100">
             <button
               onClick={() => setShowModal(true)}
-              className="w-full bg-stone-900 text-white font-bold py-4 rounded-xl hover:bg-amber-600 transition-all shadow-lg hover:shadow-amber-900/20 flex items-center justify-between px-6 group/btn"
+              className="w-full bg-stone-900 text-white font-bold py-4 rounded-xl hover:bg-[#e3004f] transition-all shadow-lg hover:shadow-rose-900/20 flex items-center justify-between px-6 group/btn"
             >
               <span className="text-xs uppercase tracking-[0.2em]">
                 Ver Disponibilidad
               </span>
-              <div className="bg-stone-900/10 p-1.5 rounded-full group-hover/btn:bg-stone-900/20 transition">
+              <div className="bg-white/10 p-1.5 rounded-full group-hover/btn:bg-white/20 transition">
                 <ArrowRight size={16} />
               </div>
             </button>
@@ -899,20 +899,20 @@ export default function Home() {
 
   if (loading)
     return (
-      <div className="h-screen flex items-center justify-center bg-stone-900 text-amber-500 font-bold animate-pulse">
+      <div className="h-screen flex items-center justify-center bg-white text-[#e3004f] font-bold animate-pulse">
         Cargando Hotel Kametza...
       </div>
     );
 
   return (
-    <div className="min-h-screen font-sans text-stone-300 selection:bg-amber-900/50 selection:text-stone-200 relative bg-stone-950">
+    <div className="min-h-screen font-sans text-stone-800 selection:bg-rose-200 selection:text-rose-900 relative bg-[#FDFBF7]">
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         onSuccess={handleLoginSuccess}
       />
 
-      <nav className="fixed top-0 w-full bg-stone-950/90 backdrop-blur-lg z-[100] shadow-xl border-b border-stone-800/50 transition-all">
+      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-lg z-[100] shadow-xl border-b border-stone-100/50 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24 md:h-32">
             <div className="flex-shrink-0 z-[110]">
@@ -937,14 +937,14 @@ export default function Home() {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-400 hover:text-amber-500 transition-colors duration-300"
+                  className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-600 hover:text-[#e3004f] transition-colors duration-300"
                 >
                   <item.icon
                     size={16}
-                    className="text-amber-500 group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 drop-shadow-sm"
+                    className="text-[#e3004f] group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 drop-shadow-sm"
                   />
                   {item.name}
-                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-amber-600 -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
+                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-[#e3004f] -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
                 </a>
               ))}
             </div>
@@ -963,9 +963,9 @@ export default function Home() {
                   {/* BOTÓN DE USUARIO MINIMALISTA */}
                   <a
                     href={isAdmin ? "/admin" : "/dashboard"}
-                    className="group flex items-center gap-2 text-stone-400 hover:text-amber-500 transition-colors duration-300"
+                    className="group flex items-center gap-2 text-stone-600 hover:text-[#e3004f] transition-colors duration-300"
                   >
-                    <div className="p-1.5 rounded-full border border-stone-700 group-hover:border-amber-500 transition-colors">
+                    <div className="p-1.5 rounded-full border border-stone-200 group-hover:border-[#e3004f] transition-colors">
                       <User size={16} strokeWidth={1.5} />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-widest">
@@ -975,7 +975,7 @@ export default function Home() {
                   <button
                     onClick={handleLogout}
                     title="Cerrar Sesión"
-                    className="text-stone-300 hover:text-amber-500 transition-colors"
+                    className="text-stone-300 hover:text-rose-600 transition-colors"
                   >
                     <LogOut size={18} strokeWidth={1.5} />
                   </button>
@@ -984,24 +984,24 @@ export default function Home() {
                 /* BOTÓN ACCEDER ESTILO CÁPSULA */
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="group flex items-center gap-2 bg-stone-800 border border-stone-700 hover:border-amber-500/30 hover:bg-stone-800 text-stone-400 hover:text-amber-500 px-5 py-2.5 rounded-full transition-all duration-300 text-[11px] font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
+                  className="group flex items-center gap-2 bg-stone-50 border border-stone-200 hover:border-[#e3004f]/30 hover:bg-rose-50 text-stone-600 hover:text-[#e3004f] px-5 py-2.5 rounded-full transition-all duration-300 text-[11px] font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
                 >
-                  <div className="bg-stone-900 p-1 rounded-full group-hover:scale-110 transition-transform">
-                    <LogIn size={14} className="text-amber-500" />
+                  <div className="bg-white p-1 rounded-full group-hover:scale-110 transition-transform">
+                    <LogIn size={14} className="text-[#e3004f]" />
                   </div>
                   Acceder
                 </button>
               )}
               <a
                 href="#habitaciones"
-                className="btn-shimmer bg-amber-600 text-white px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-amber-900/40 transform hover:-translate-y-0.5"
+                className="btn-shimmer bg-[#e3004f] text-white px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-rose-900/40 transform hover:-translate-y-0.5"
               >
                 Reservar
               </a>
             </div>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden z-[110] p-2 text-stone-200"
+              className="md:hidden z-[110] p-2 text-rose-900"
             >
               {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
             </button>
@@ -1010,42 +1010,42 @@ export default function Home() {
 
         {/* --- MENÚ MÓVIL --- */}
         <div
-          className={`fixed inset-0 bg-stone-900 z-[105] flex flex-col justify-center items-center transition-all duration-300 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+          className={`fixed inset-0 bg-white z-[105] flex flex-col justify-center items-center transition-all duration-300 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
             } md:hidden`}
         >
           <div className="flex flex-col space-y-8 text-center items-center">
             <a
               href="#inicio"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-300 hover:text-stone-200 transition"
+              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Inicio
             </a>
             <a
               href="#habitaciones"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-300 hover:text-stone-200 transition"
+              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Habitaciones
             </a>
             <a
               href="#servicios"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-300 hover:text-stone-200 transition"
+              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Servicios
             </a>
             <a
               href="#ubicacion"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-300 hover:text-stone-200 transition"
+              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Ubicación
             </a>
             <a
               href="#contacto"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-300 hover:text-stone-200 transition"
+              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Contacto
             </a>
@@ -1055,10 +1055,10 @@ export default function Home() {
             {currentUser ? (
               <div className="flex flex-col items-center gap-6 animate-in slide-in-from-bottom-4 duration-500">
                 <div className="flex flex-col items-center gap-2">
-                  <div className="p-3 rounded-full border-2 border-amber-500/20 bg-stone-800 text-amber-500">
+                  <div className="p-3 rounded-full border-2 border-[#e3004f]/20 bg-rose-50 text-[#e3004f]">
                     <User size={24} strokeWidth={1.5} />
                   </div>
-                  <span className="text-sm font-bold uppercase tracking-widest text-stone-300">
+                  <span className="text-sm font-bold uppercase tracking-widest text-stone-800">
                     {userName}
                   </span>
                 </div>
@@ -1066,7 +1066,7 @@ export default function Home() {
                 <a
                   href={isAdmin ? "/admin" : "/dashboard"}
                   onClick={closeMenu}
-                  className="text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-amber-500 transition-colors"
+                  className="text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-[#e3004f] transition-colors"
                 >
                   Ir al Panel
                 </a>
@@ -1087,7 +1087,7 @@ export default function Home() {
                   setShowAuthModal(true);
                   closeMenu();
                 }}
-                className="text-xl font-bold text-stone-400 hover:text-stone-200 flex items-center gap-2"
+                className="text-xl font-bold text-stone-600 hover:text-rose-900 flex items-center gap-2"
               >
                 <LogIn size={24} /> Iniciar Sesión
               </button>
@@ -1148,42 +1148,42 @@ export default function Home() {
           </p>
 
           {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
-          <div className="bg-stone-900/95 backdrop-blur-lg p-2 rounded-[2rem] md:rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-white/40 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-200">
-            <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-800 transition rounded-full cursor-pointer relative group">
-              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-stone-200 transition">
+          <div className="bg-white/95 backdrop-blur-lg p-2 rounded-[2rem] md:rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-white/40 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-200">
+            <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group">
+              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-rose-900 transition">
                 Check-in
               </label>
               <div className="flex items-center w-full">
                 <CalendarDays
                   size={18}
-                  className="text-stone-300 mr-3 group-hover:text-amber-400 transition"
+                  className="text-stone-300 mr-3 group-hover:text-rose-700 transition"
                 />
                 <input
                   type="date"
                   min={today}
                   value={globalCheckIn}
                   onChange={(e) => setGlobalCheckIn(e.target.value)}
-                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-200 cursor-pointer placeholder-stone-300"
+                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer placeholder-stone-300"
                   placeholder="Agrega fechas"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-800 transition rounded-full cursor-pointer relative group">
-              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-stone-200 transition">
+            <div className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group">
+              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-rose-900 transition">
                 Check-out
               </label>
               <div className="flex items-center w-full">
                 <CalendarDays
                   size={18}
-                  className="text-stone-300 mr-3 group-hover:text-amber-400 transition"
+                  className="text-stone-300 mr-3 group-hover:text-rose-700 transition"
                 />
                 <input
                   type="date"
                   min={globalCheckIn || today}
                   value={globalCheckOut}
                   onChange={(e) => setGlobalCheckOut(e.target.value)}
-                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-200 cursor-pointer"
+                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer"
                 />
               </div>
             </div>
@@ -1191,7 +1191,7 @@ export default function Home() {
             <div className="p-2 w-full md:w-auto">
               <a
                 href="#habitaciones"
-                className="btn-shimmer bg-amber-600 text-white px-8 py-4 rounded-full shadow-lg hover:bg-black transition-all w-full flex items-center justify-center gap-2 group"
+                className="btn-shimmer bg-[#e3004f] text-white px-8 py-4 rounded-full shadow-lg hover:bg-black transition-all w-full flex items-center justify-center gap-2 group"
               >
                 <Search
                   size={20}
@@ -1209,7 +1209,7 @@ export default function Home() {
       <section id="habitaciones" className="scroll-reveal min-h-screen flex flex-col justify-center py-24 relative z-10 w-full">
         <div className="w-full px-4 md:px-8 xl:px-12">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-stone-50">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-rose-950">
               Nuestras Habitaciones
             </h2>
             <p className="text-stone-500 mt-4 text-lg">
@@ -1232,17 +1232,17 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="servicios" className="scroll-reveal min-h-screen flex flex-col justify-center py-24 relative z-10 w-full bg-stone-800">
+      <section id="servicios" className="scroll-reveal min-h-screen flex flex-col justify-center py-24 relative z-10 w-full bg-stone-50">
         <div className="w-full px-4 md:px-12 lg:px-20 xl:px-32">
           <div className="text-center mb-20">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
-              <span className="text-amber-500 font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                 Experiencia Kametza
               </span>
               <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
             </div>
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-stone-50 mt-6 mb-4">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-stone-900 mt-6 mb-4">
               Mucho más que solo descansar
             </h2>
             <p className="text-stone-500 max-w-2xl mx-auto text-lg">
@@ -1268,8 +1268,8 @@ export default function Home() {
                       }, 150);
                     }
                   }}
-                  className={`group bg-stone-900 rounded-[2rem] overflow-hidden transition-all duration-500 flex flex-col text-left border ${
-                    isActive ? 'border-rose-300 ring-4 ring-rose-50 scale-[1.02] shadow-2xl shadow-rose-900/10' : 'border-stone-800 hover:border-rose-100 hover:-translate-y-2 shadow-lg hover:shadow-2xl hover:shadow-rose-900/10'
+                  className={`group bg-white rounded-[2rem] overflow-hidden transition-all duration-500 flex flex-col text-left border ${
+                    isActive ? 'border-rose-300 ring-4 ring-rose-50 scale-[1.02] shadow-2xl shadow-rose-900/10' : 'border-stone-100 hover:border-rose-100 hover:-translate-y-2 shadow-lg hover:shadow-2xl hover:shadow-rose-900/10'
                   }`}
                 >
                   <div className="relative h-60 w-full overflow-hidden">
@@ -1280,17 +1280,17 @@ export default function Home() {
                     />
                     {service.tag && (
                       <div className={`absolute top-4 left-4 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase shadow-sm ${
-                        service.tag === 'Recomendado' ? 'bg-amber-400/90 text-amber-950' : 'bg-stone-950/90 text-stone-300'
+                        service.tag === 'Recomendado' ? 'bg-amber-400/90 text-amber-950' : 'bg-white/90 text-stone-800'
                       }`}>
                         {service.tag}
                       </div>
                     )}
                   </div>
                   <div className="p-8 flex-1 flex flex-col relative">
-                    <div className="w-14 h-14 bg-stone-800 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
+                    <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
                       <Icon size={24} />
                     </div>
-                    <h3 className="text-2xl font-bold text-stone-50 mb-3 font-serif">
+                    <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
                       {service.title}
                     </h3>
                     <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
@@ -1307,10 +1307,10 @@ export default function Home() {
 
           {/* DESPLIEGUE DINÁMICO DE DETALLES DEL SERVICIO */}
           {activeServiceId && (
-            <div id="service-detail" className="mt-16 relative w-full bg-stone-900 rounded-[2.5rem] overflow-hidden border border-stone-700 shadow-2xl animate-in fade-in slide-in-from-top-8 duration-500">
+            <div id="service-detail" className="mt-16 relative w-full bg-white rounded-[2.5rem] overflow-hidden border border-stone-200 shadow-2xl animate-in fade-in slide-in-from-top-8 duration-500">
               <button 
                 onClick={() => setActiveServiceId(null)}
-                className="absolute top-4 md:top-8 right-4 md:right-8 w-10 h-10 bg-stone-900/80 backdrop-blur-md rounded-full flex items-center justify-center text-stone-500 shadow-md border border-stone-800 hover:bg-stone-800 hover:text-amber-500 transition-colors z-20"
+                className="absolute top-4 md:top-8 right-4 md:right-8 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-stone-500 shadow-md border border-stone-100 hover:bg-rose-50 hover:text-rose-600 transition-colors z-20"
               >
                 <X size={20} />
               </button>
@@ -1333,13 +1333,13 @@ export default function Home() {
 
                     <div className="p-8 md:p-12 flex flex-col justify-center">
                       <div className="flex items-center gap-4 mb-4">
-                        <span className="text-amber-500 font-serif italic text-lg md:text-xl font-medium tracking-wide flex items-center gap-2">
+                        <span className="text-[#e3004f] font-serif italic text-lg md:text-xl font-medium tracking-wide flex items-center gap-2">
                           <Icon size={20} /> Detalle del Servicio
                         </span>
                         <div className="h-[1px] flex-1 bg-rose-200"></div>
                       </div>
                       
-                      <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-50 mb-6 leading-tight">
+                      <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 mb-6 leading-tight">
                         {service.title}
                       </h2>
                       
@@ -1349,12 +1349,12 @@ export default function Home() {
 
                       <div className="space-y-4 mb-10">
                         {service.features.map((feat, idx) => (
-                          <div key={idx} className="flex items-start gap-4 bg-stone-800 p-4 rounded-2xl border border-stone-800 transition-colors hover:border-stone-700">
-                            <div className="w-8 h-8 rounded-full bg-stone-900 shadow-sm text-rose-600 flex items-center justify-center flex-shrink-0 mt-1">
+                          <div key={idx} className="flex items-start gap-4 bg-stone-50 p-4 rounded-2xl border border-stone-100 transition-colors hover:border-rose-200">
+                            <div className="w-8 h-8 rounded-full bg-white shadow-sm text-rose-600 flex items-center justify-center flex-shrink-0 mt-1">
                               <Check size={16} />
                             </div>
                             <div>
-                              <h4 className="font-bold text-stone-300 mb-1">{feat.title}</h4>
+                              <h4 className="font-bold text-stone-800 mb-1">{feat.title}</h4>
                               <p className="text-stone-500 text-xs md:text-sm leading-relaxed">{feat.desc}</p>
                             </div>
                           </div>
@@ -1362,7 +1362,7 @@ export default function Home() {
                       </div>
 
                       <div className="flex flex-col sm:flex-row items-center gap-4">
-                        <div className="inline-flex items-center justify-center w-full sm:w-auto gap-3 bg-stone-800 border border-stone-700 rounded-full py-3 px-6 text-stone-400 text-xs md:text-sm font-bold shadow-sm">
+                        <div className="inline-flex items-center justify-center w-full sm:w-auto gap-3 bg-stone-50 border border-stone-200 rounded-full py-3 px-6 text-stone-600 text-xs md:text-sm font-bold shadow-sm">
                           <Clock size={16} className="text-rose-600" />
                           {service.schedule}
                         </div>
@@ -1393,12 +1393,12 @@ export default function Home() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
-              <span className="text-amber-500 font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                 Testimonios Reales
               </span>
               <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
             </div>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-50 mb-6">
+            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6">
               Lo que dicen nuestros huéspedes en Google
             </h2>
             <p className="text-stone-500 text-sm md:text-base leading-relaxed">
@@ -1408,12 +1408,12 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Review 1 */}
-            <div className="bg-stone-900 p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-800 relative group hover:-translate-y-2 transition-all duration-500">
+            <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-100 relative group hover:-translate-y-2 transition-all duration-500">
               <div className="flex justify-between items-start mb-6 relative z-10">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-rose-900 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">M</div>
                   <div>
-                    <h4 className="font-bold text-stone-50 text-sm">María Fernanda</h4>
+                    <h4 className="font-bold text-stone-900 text-sm">María Fernanda</h4>
                     <p className="text-[10px] text-stone-400 font-bold uppercase">Huésped Verificado</p>
                   </div>
                 </div>
@@ -1421,19 +1421,19 @@ export default function Home() {
                   {[1,2,3,4,5].map(i => <Star key={i} size={12} className="fill-amber-400 text-amber-400" />)}
                 </div>
               </div>
-              <p className="text-stone-400 text-sm leading-relaxed italic relative z-10">
+              <p className="text-stone-600 text-sm leading-relaxed italic relative z-10">
                 "Excelente atención y comodidad. El personal fue muy amable y el desayuno ayacuchano estuvo delicioso. Muy cerca del centro, recomendado 100%."
               </p>
               <div className="absolute text-8xl text-rose-50 font-serif -top-2 right-6 pointer-events-none group-hover:text-rose-100 transition-colors">"</div>
             </div>
 
             {/* Review 2 */}
-            <div className="bg-stone-900 p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-800 relative group hover:-translate-y-2 transition-all duration-500">
+            <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-100 relative group hover:-translate-y-2 transition-all duration-500">
               <div className="flex justify-between items-start mb-6 relative z-10">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-stone-900 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">C</div>
                   <div>
-                    <h4 className="font-bold text-stone-50 text-sm">Carlos Gómez</h4>
+                    <h4 className="font-bold text-stone-900 text-sm">Carlos Gómez</h4>
                     <p className="text-[10px] text-stone-400 font-bold uppercase">Huésped Verificado</p>
                   </div>
                 </div>
@@ -1441,19 +1441,19 @@ export default function Home() {
                   {[1,2,3,4,5].map(i => <Star key={i} size={12} className="fill-amber-400 text-amber-400" />)}
                 </div>
               </div>
-              <p className="text-stone-400 text-sm leading-relaxed italic relative z-10">
+              <p className="text-stone-600 text-sm leading-relaxed italic relative z-10">
                 "Un hotel muy acogedor. Las habitaciones siempre impecables, con agua caliente las 24 horas y buena señal de WiFi para trabajar. Excelente relación calidad-precio."
               </p>
               <div className="absolute text-8xl text-stone-50 font-serif -top-2 right-6 pointer-events-none group-hover:text-stone-100 transition-colors">"</div>
             </div>
 
             {/* Review 3 */}
-            <div className="bg-stone-900 p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-800 relative group hover:-translate-y-2 transition-all duration-500">
+            <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-100 relative group hover:-translate-y-2 transition-all duration-500">
               <div className="flex justify-between items-start mb-6 relative z-10">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">A</div>
+                  <div className="w-12 h-12 bg-[#e3004f] text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">A</div>
                   <div>
-                    <h4 className="font-bold text-stone-50 text-sm">Andrea y Luis</h4>
+                    <h4 className="font-bold text-stone-900 text-sm">Andrea y Luis</h4>
                     <p className="text-[10px] text-stone-400 font-bold uppercase">Huésped Verificado</p>
                   </div>
                 </div>
@@ -1461,7 +1461,7 @@ export default function Home() {
                   {[1,2,3,4,5].map(i => <Star key={i} size={12} className="fill-amber-400 text-amber-400" />)}
                 </div>
               </div>
-              <p className="text-stone-400 text-sm leading-relaxed italic relative z-10">
+              <p className="text-stone-600 text-sm leading-relaxed italic relative z-10">
                 "Me encantó la estadía, es un lugar muy seguro y tranquilo. El servicio al cuarto fue rápido y el trato del personal superó mis expectativas. Volveremos sin duda."
               </p>
               <div className="absolute text-8xl text-rose-50 font-serif -top-2 right-6 pointer-events-none group-hover:text-rose-100 transition-colors">"</div>
@@ -1470,7 +1470,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="ubicacion" className="scroll-reveal min-h-screen flex items-center py-24 relative z-10 w-full bg-stone-800">
+      <section id="ubicacion" className="scroll-reveal min-h-screen flex items-center py-24 relative z-10 w-full bg-stone-50">
         <div className="w-full px-4 md:px-8 xl:px-12 grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="relative">
             {/* Elemento decorativo */}
@@ -1478,24 +1478,24 @@ export default function Home() {
             
             <div className="flex items-center gap-4 mb-4 relative z-10">
               <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
-              <span className="text-amber-500 font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                 Ubicación Estratégica
               </span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-50 mt-4 mb-6 relative z-10 leading-tight">
+            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mt-4 mb-6 relative z-10 leading-tight">
               Tranquilidad y Fácil Acceso en la ciudad
             </h2>
             
-            <div className="mb-8 bg-stone-900 p-6 rounded-2xl border border-stone-800 shadow-xl shadow-stone-200/50 relative z-10">
+            <div className="mb-8 bg-white p-6 rounded-2xl border border-stone-100 shadow-xl shadow-stone-200/50 relative z-10">
               <div className="flex items-center gap-4">
-                <div className="bg-stone-800 text-rose-600 p-3 rounded-xl border border-rose-100">
+                <div className="bg-rose-50 text-rose-600 p-3 rounded-xl border border-rose-100">
                   <MapPin size={28} />
                 </div>
                 <div>
                   <p className="text-[10px] text-stone-400 uppercase font-bold tracking-widest mb-0.5">
                     Dirección Exacta
                   </p>
-                  <p className="text-xl font-bold text-stone-300 font-serif">
+                  <p className="text-xl font-bold text-stone-800 font-serif">
                     Jirón Las Américas #154
                   </p>
                   <p className="text-rose-600 font-medium text-sm">
@@ -1511,28 +1511,28 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-stone-800 text-rose-600 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
                   <Check size={14} className="stroke-[3]" />
                 </div>
-                <span className="text-stone-200 font-medium text-sm">Zona segura y silenciosa</span>
+                <span className="text-stone-700 font-medium text-sm">Zona segura y silenciosa</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-stone-800 text-rose-600 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
                   <Check size={14} className="stroke-[3]" />
                 </div>
-                <span className="text-stone-200 font-medium text-sm">Fácil acceso de movilidad</span>
+                <span className="text-stone-700 font-medium text-sm">Fácil acceso de movilidad</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-stone-800 text-rose-600 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
                   <Check size={14} className="stroke-[3]" />
                 </div>
-                <span className="text-stone-200 font-medium text-sm">A un paso del Óvalo Magdalena</span>
+                <span className="text-stone-700 font-medium text-sm">A un paso del Óvalo Magdalena</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-stone-800 text-rose-600 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
                   <Check size={14} className="stroke-[3]" />
                 </div>
-                <span className="text-stone-200 font-medium text-sm">A 5 minutos de la Plaza</span>
+                <span className="text-stone-700 font-medium text-sm">A 5 minutos de la Plaza</span>
               </div>
             </div>
           </div>
@@ -1551,17 +1551,17 @@ export default function Home() {
       </section>
 
       {/* --- SECCIÓN PREGUNTAS FRECUENTES (FAQ) --- */}
-      <section id="faq" className="scroll-reveal py-24 bg-stone-900 relative w-full overflow-hidden">
+      <section id="faq" className="scroll-reveal py-24 bg-white relative w-full overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 md:px-8 xl:px-12 relative z-10">
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="h-[1px] w-12 md:w-20 bg-rose-200"></div>
-              <span className="text-amber-500 font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                 Preguntas Frecuentes
               </span>
               <div className="h-[1px] w-12 md:w-20 bg-rose-200"></div>
             </div>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-50 mb-6">
+            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6">
               Todo lo que necesitas saber
             </h2>
             <p className="text-stone-500 text-sm md:text-base leading-relaxed">
@@ -1592,14 +1592,14 @@ export default function Home() {
                 a: "Ofrecemos un delicioso y variado desayuno que incluye opciones típicas de la región de Ayacucho para comenzar el día con energía. Se sirve todas las mañanas de 7:00 am a 9:30 am en nuestro exclusivo comedor principal."
               }
             ].map((faq, idx) => (
-              <details key={idx} className="group bg-stone-800 rounded-2xl border border-stone-800 overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-rose-100">
-                <summary className="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-stone-300 hover:text-stone-200 transition-colors [&::-webkit-details-marker]:hidden">
+              <details key={idx} className="group bg-stone-50 rounded-2xl border border-stone-100 overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-rose-100">
+                <summary className="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-stone-800 hover:text-rose-900 transition-colors [&::-webkit-details-marker]:hidden">
                   <span className="text-sm md:text-base pr-4">{faq.q}</span>
                   <span className="transition duration-300 group-open:-rotate-180 text-rose-500">
                     <svg fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                   </span>
                 </summary>
-                <div className="text-stone-400 text-sm md:text-base p-6 pt-0 leading-relaxed font-light bg-stone-800">
+                <div className="text-stone-600 text-sm md:text-base p-6 pt-0 leading-relaxed font-light bg-stone-50">
                   {faq.a}
                 </div>
               </details>
@@ -1748,14 +1748,14 @@ export default function Home() {
                 Aceptamos todas las tarjetas de crédito, débito y transferencias.
               </p>
               <div className="flex gap-2 mb-6">
-                <div className="bg-stone-900 px-3 py-2 rounded-lg border border-stone-700 shadow-sm flex items-center justify-center h-10 w-14">
+                <div className="bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm flex items-center justify-center h-10 w-14">
                   <span className="font-black text-[#1A1F71] text-[10px] italic">VISA</span>
                 </div>
-                <div className="bg-stone-900 px-3 py-2 rounded-lg border border-stone-700 shadow-sm flex items-center justify-center h-10 w-14 relative overflow-hidden">
+                <div className="bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm flex items-center justify-center h-10 w-14 relative overflow-hidden">
                   <div className="w-4 h-4 rounded-full bg-[#EB001B] absolute left-2 opacity-80 mix-blend-multiply"></div>
                   <div className="w-4 h-4 rounded-full bg-[#F79E1B] absolute right-2 opacity-80 mix-blend-multiply"></div>
                 </div>
-                <div className="bg-stone-900 px-3 py-2 rounded-lg border border-stone-700 shadow-sm flex items-center justify-center h-10 w-14">
+                <div className="bg-white px-3 py-2 rounded-lg border border-stone-200 shadow-sm flex items-center justify-center h-10 w-14">
                   <span className="font-black text-[#2671B9] text-[10px] italic">AMEX</span>
                 </div>
               </div>
@@ -1767,7 +1767,7 @@ export default function Home() {
           <div className="border-t border-stone-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
             <div>
               <p className="font-bold text-stone-500 text-xs">© 2025 Hotel Kametza. Todos los derechos reservados.</p>
-              <p className="text-[10px] text-stone-400 mt-1">RUC: 10452685951</p>
+              <p className="text-[10px] text-stone-600 mt-1">RUC: 10452685951</p>
             </div>
             <div className="text-[10px] text-amber-500 bg-amber-950/30 px-3 py-1.5 rounded-full border border-amber-900/50 uppercase tracking-widest font-black">
               Experiencia Premium en Ayacucho
@@ -1784,7 +1784,7 @@ export default function Home() {
         className="fixed bottom-6 right-6 z-[100] bg-[#25D366] text-white p-4 rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:scale-110 hover:shadow-[0_6px_25px_rgba(37,211,102,0.6)] transition-all duration-300 flex items-center justify-center group"
         aria-label="Contactar por WhatsApp"
       >
-        <span className="absolute -top-10 bg-stone-900 text-stone-300 text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
+        <span className="absolute -top-10 bg-white text-stone-800 text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
           ¡Escríbenos!
         </span>
         <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
