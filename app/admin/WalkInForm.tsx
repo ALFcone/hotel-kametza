@@ -1,5 +1,12 @@
 "use client";
-
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: app/admin/WalkInForm.tsx
+ * PROPÓSITO: Formulario de Nueva Reserva Rápida (Walk-in).
+ *            Permite a recepción crear reservas manualmente y 
+ *            registrarlas al instante desde el Panel de Administración.
+ * ---------------------------------------------------------------------
+ */
 import { useState, useEffect } from "react";
 import { adminCreateBooking } from "../actions";
 import { Calendar, User, Phone, MapPin, DollarSign, FileText, Bed } from "lucide-react";

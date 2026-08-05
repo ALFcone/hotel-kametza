@@ -1,3 +1,11 @@
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: app/layout.tsx
+ * PROPÓSITO: Plantilla base de toda la web. Aquí se cargan las fuentes,
+ *            los metadatos SEO y se define la estructura HTML que envuelve
+ *            a todas las demás páginas del sistema.
+ * ---------------------------------------------------------------------
+ */
 import type { Metadata } from "next";
 import { Montserrat, Playfair_Display } from "next/font/google";
 import "./globals.css";

@@ -1,5 +1,12 @@
 "use client";
-
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: app/page.tsx
+ * PROPÓSITO: Es la página principal (Landing Page) pública del hotel.
+ *            Aquí los clientes ven el diseño interactivo, información
+ *            de habitaciones, y pueden hacer sus reservas directamente.
+ * ---------------------------------------------------------------------
+ */
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";

@@ -1,4 +1,12 @@
 "use server";
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: app/actions.ts
+ * PROPÓSITO: Contiene todas las funciones del servidor (Server Actions).
+ *            Sirve para conectar la web con la base de datos Supabase
+ *            (Crear reservas, registrar pagos, editar fechas, etc.)
+ * ---------------------------------------------------------------------
+ */
 
 import { revalidatePath } from "next/cache";
 import { getSupabaseServer } from "@/lib/supabase-server";

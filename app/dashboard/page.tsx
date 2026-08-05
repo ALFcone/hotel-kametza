@@ -1,5 +1,12 @@
 "use client";
-
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: app/dashboard/page.tsx
+ * PROPÓSITO: Panel Privado del Huésped (Cliente). Aquí ven sus reservas
+ *            pasadas y futuras, pueden cancelarlas y ver el estado de
+ *            sus pagos.
+ * ---------------------------------------------------------------------
+ */
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";

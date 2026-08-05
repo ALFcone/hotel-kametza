@@ -1,5 +1,12 @@
 "use client";
-
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: app/admin/AdminTableActions.tsx
+ * PROPÓSITO: Componente que renderiza los botones de acción en la tabla 
+ *            del Historial (Abonar, Editar Fechas, Consumos, Eliminar)
+ *            y maneja todas sus ventanas emergentes (modales).
+ * ---------------------------------------------------------------------
+ */
 import { useState } from "react";
 import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2 } from "lucide-react";
 import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra } from "@/app/actions";

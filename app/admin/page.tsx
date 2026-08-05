@@ -1,3 +1,11 @@
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: app/admin/page.tsx
+ * PROPÓSITO: Panel de Administración del Hotel. Solo accesible para ti.
+ *            Muestra los KPIs, estado de habitaciones, y el historial
+ *            de todas las reservas del sistema.
+ * ---------------------------------------------------------------------
+ */
 import { getSupabaseServer } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
