@@ -1,3 +1,11 @@
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: lib/supabase.ts
+ * PROPÓSITO: Cliente de Base de Datos para el Navegador (Frontend).
+ *            Se usa en componentes "use client" para leer datos
+ *            directamente desde el navegador del usuario.
+ * ---------------------------------------------------------------------
+ */
 import { createBrowserClient } from "@supabase/ssr";
 
 // El signo de exclamación (!) al final le dice a TypeScript:

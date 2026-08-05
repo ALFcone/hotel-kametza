@@ -1,3 +1,11 @@
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: lib/supabase-server.ts
+ * PROPÓSITO: Cliente de Base de Datos para el Servidor (Backend).
+ *            Se usa en funciones secretas (acciones o Server Components)
+ *            para operaciones seguras y protegidas.
+ * ---------------------------------------------------------------------
+ */
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 

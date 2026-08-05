@@ -1,5 +1,12 @@
 "use client";
-
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: app/login/page.tsx
+ * PROPÓSITO: Pantalla de Acceso. Sirve tanto para que tú (el Admin) 
+ *            entres a tu panel, como para que los clientes se registren
+ *            o inicien sesión para ver sus reservas.
+ * ---------------------------------------------------------------------
+ */
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";

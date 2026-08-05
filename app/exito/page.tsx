@@ -1,5 +1,12 @@
 "use client";
-
+/**
+ * ---------------------------------------------------------------------
+ * ARCHIVO: app/exito/page.tsx
+ * PROPÓSITO: Pantalla de "Reserva Exitosa". Es la página de confirmación
+ *            que ve el huésped inmediatamente después de completar
+ *            su reserva y pagar en línea.
+ * ---------------------------------------------------------------------
+ */
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
