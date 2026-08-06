@@ -8,7 +8,7 @@
  * ---------------------------------------------------------------------
  */
 import { useState } from "react";
-import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2 } from "lucide-react";
+import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle } from "lucide-react";
 import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra } from "@/app/actions";
 
 interface AdminTableActionsProps {
@@ -20,6 +20,9 @@ interface AdminTableActionsProps {
   checkIn: string;
   checkOut: string;
   extras?: any[];
+  guestName: string;
+  roomName: string;
+  guestPhone?: string;
   onDelete: (formData: FormData) => void;
 }
 
@@ -32,6 +35,9 @@ export function AdminTableActions({
   checkIn,
   checkOut,
   extras = [],
+  guestName,
+  roomName,
+  guestPhone,
   onDelete,
 }: AdminTableActionsProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -120,9 +126,46 @@ export function AdminTableActions({
     setLoading(false);
   };
 
+  const handleShareWhatsApp = () => {
+    let msg = `*🏨 Hotel Kametza - Comprobante de Reserva*\n\n`;
+    msg += `*Huésped:* ${guestName}\n`;
+    msg += `*Habitación:* #${roomName}\n`;
+    msg += `*Ingreso:* ${checkIn}\n`;
+    msg += `*Salida:* ${checkOut}\n\n`;
+    msg += `*Total Reserva:* S/ ${totalPrice.toFixed(2)}\n`;
+    
+    if (extrasTotal > 0) {
+      msg += `*Extras:* S/ ${extrasTotal.toFixed(2)}\n`;
+      msg += `*Total Acumulado:* S/ ${grandTotal.toFixed(2)}\n`;
+    }
+    msg += `*Abonado:* S/ ${(amountPaid || 0).toFixed(2)}\n`;
+    
+    if (balance > 0) {
+      msg += `*Saldo Pendiente:* S/ ${balance.toFixed(2)}\n`;
+    } else {
+      msg += `*Estado:* PAGADO TOTALMENTE ✅\n`;
+    }
+    
+    msg += `\n¡Gracias por su preferencia!`;
+    
+    // Si hay un teléfono, limpiamos espacios y caracteres raros. Si no, abrimos WhatsApp sin número para elegir contacto.
+    const phone = guestPhone ? guestPhone.replace(/\D/g, '') : '';
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <>
       <div className="flex gap-2 justify-center">
+        {!isCancelled && (
+          <button
+            onClick={handleShareWhatsApp}
+            className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-green-300 hover:text-green-600 hover:bg-green-50 transition-all hover:shadow-[0_2px_10px_rgba(34,197,94,0.1)] hover:-translate-y-0.5"
+            title="Compartir Comprobante por WhatsApp"
+          >
+            <MessageCircle size={14} className="group-hover:scale-110 transition-transform duration-300" />
+          </button>
+        )}
         {!isCancelled && (
           <button
             onClick={() => setIsExtrasModalOpen(true)}

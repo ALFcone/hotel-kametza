@@ -699,10 +699,12 @@ function RoomCard({
   globalCheckOut,
   currentUser, // Recibimos el usuario
 }: {
+   
   room: any;
   onRequireAuth: (callback: () => void) => void;
   globalCheckIn: string;
   globalCheckOut: string;
+   
   currentUser: any; // Tipo
 }) {
   const [showModal, setShowModal] = useState(false);
@@ -819,6 +821,7 @@ export default function Home() {
   const today = new Date().toISOString().split("T")[0];
 
   const [showAuthModal, setShowAuthModal] = useState(false);
+   
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeServiceId, setActiveServiceId] = useState<string | null>(null);
   const [pendingBookingAction, setPendingBookingAction] = useState<
@@ -882,6 +885,7 @@ export default function Home() {
   };
 
   const closeMenu = () => setIsMenuOpen(false);
+   
   const roomTypes: any = {};
   rooms.forEach((room) => {
     if (!roomTypes[room.name]) {
@@ -1150,15 +1154,24 @@ export default function Home() {
             </h2>
           </div>
           
-          <p className="text-sm md:text-lg text-white/80 max-w-2xl mx-auto mt-12 mb-12 font-light leading-relaxed drop-shadow-md text-center tracking-widest uppercase">
+          <p className="text-sm md:text-lg text-white/80 max-w-2xl mx-auto mt-12 mb-8 font-light leading-relaxed drop-shadow-md text-center tracking-widest uppercase">
             Un refugio donde la historia colonial se encuentra con el confort
           </p>
+
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-stone-950/40 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full shadow-xl">
+              <Sparkles size={14} className="text-amber-400" />
+              <span className="text-[10px] md:text-xs text-white font-bold tracking-widest uppercase">
+                Mejor Tarifa Garantizada Reservando Aquí
+              </span>
+            </div>
+          </div>
 
           {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
           <div className="bg-white/95 backdrop-blur-lg p-2 rounded-[2rem] md:rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-white/40 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-200">
             <div 
               className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group"
-              onClick={(e) => {
+              onClick={() => {
                 const input = document.getElementById('hero-checkin') as HTMLInputElement;
                 if (input && 'showPicker' in input) {
                   try {
@@ -1201,7 +1214,7 @@ export default function Home() {
 
             <div 
               className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group"
-              onClick={(e) => {
+              onClick={() => {
                 const input = document.getElementById('hero-checkout') as HTMLInputElement;
                 if (input && 'showPicker' in input) {
                   try {
@@ -1257,6 +1270,14 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* --- SCROLL DOWN INDICATOR --- */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center animate-bounce">
+          <span className="text-[9px] text-white/60 uppercase tracking-widest mb-2 font-bold">Explorar</span>
+          <a href="#habitaciones" className="w-8 h-12 rounded-full border-2 border-white/30 flex justify-center p-1 hover:border-white/60 transition">
+            <div className="w-1.5 h-3 bg-white rounded-full"></div>
+          </a>
+        </div>
       </section>
       {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
       <section id="habitaciones" className="scroll-reveal min-h-screen flex flex-col justify-center py-24 relative z-10 w-full">
@@ -1270,6 +1291,7 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-6 md:gap-8 w-full">
+            { }
             {groupedRooms.map((room: any) => (
               <div key={room.name} className="w-full sm:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[calc(25%-1.5rem)] max-w-[420px]">
                 <RoomCard
@@ -1443,81 +1465,138 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-stone-200 rounded-full blur-3xl opacity-40 translate-y-1/3 -translate-x-1/4"></div>
 
         <div className="max-w-7xl mx-auto px-4 md:px-8 xl:px-12 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
-              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
-                Testimonios Reales
-              </span>
-              <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
+          <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-8">
+            <div className="text-left max-w-2xl">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
+                <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+                  Experiencias Reales
+                </span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6">
+                Lo que dicen nuestros huéspedes
+              </h2>
+              <p className="text-stone-500 text-sm md:text-base leading-relaxed">
+                La satisfacción de quienes nos visitan es nuestro mejor respaldo. Descubre por qué Hotel Kametza es la opción favorita en Ayacucho.
+              </p>
             </div>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6">
-              Lo que dicen nuestros huéspedes en Google
-            </h2>
-            <p className="text-stone-500 text-sm md:text-base leading-relaxed">
-              La satisfacción de quienes nos visitan es nuestro mejor respaldo. Descubre por qué Kametza es la opción favorita en Ayacucho con un puntaje excepcional.
-            </p>
+            
+            {/* Global Rating Card */}
+            <div className="bg-white p-6 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-100 flex items-center gap-6 min-w-max">
+              <div className="text-5xl font-black text-stone-900 font-serif">4.9</div>
+              <div>
+                <div className="flex mb-1">
+                  {[1,2,3,4,5].map(i => <Star key={i} size={16} className="fill-amber-400 text-amber-400" />)}
+                </div>
+                <p className="font-bold text-sm text-stone-800">Excelente</p>
+                <p className="text-[10px] text-stone-500 uppercase tracking-widest font-bold mt-0.5">Basado en reseñas</p>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {/* Review 1 */}
-            <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-100 relative group hover:-translate-y-2 transition-all duration-500">
-              <div className="flex justify-between items-start mb-6 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-rose-900 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">M</div>
-                  <div>
-                    <h4 className="font-bold text-stone-900 text-sm">María Fernanda</h4>
-                    <p className="text-[10px] text-stone-400 font-bold uppercase">Huésped Verificado</p>
+            <div className="bg-white p-8 rounded-[2rem] shadow-lg shadow-stone-200/30 border border-stone-100 relative group hover:-translate-y-2 hover:shadow-xl hover:shadow-rose-100 transition-all duration-500 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-center mb-6 relative z-10">
+                  <div className="flex">
+                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
                   </div>
+                  <span className="text-[10px] font-bold text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">Hace 1 mes</span>
                 </div>
-                <div className="flex">
-                  {[1,2,3,4,5].map(i => <Star key={i} size={12} className="fill-amber-400 text-amber-400" />)}
+                <p className="text-stone-700 text-sm leading-relaxed italic relative z-10 mb-8 font-medium">
+                  &quot;Excelente atención y comodidad. El personal fue muy amable y el desayuno ayacuchano estuvo delicioso. Muy cerca del centro, el agua caliente funcionó perfecto. Recomendado 100%.&quot;
+                </p>
+              </div>
+              <div className="flex items-center gap-4 border-t border-stone-100 pt-6 mt-auto">
+                <div className="w-12 h-12 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center font-bold text-xl">M</div>
+                <div>
+                  <h4 className="font-bold text-stone-900 text-sm uppercase">María Fernanda</h4>
+                  <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
+                    <Check size={10} className="text-emerald-500" /> Huésped Verificado
+                  </p>
+                  <p className="text-[10px] text-stone-400 font-medium">📍 Lima, Perú</p>
                 </div>
               </div>
-              <p className="text-stone-600 text-sm leading-relaxed italic relative z-10">
-                "Excelente atención y comodidad. El personal fue muy amable y el desayuno ayacuchano estuvo delicioso. Muy cerca del centro, recomendado 100%."
-              </p>
-              <div className="absolute text-8xl text-rose-50 font-serif -top-2 right-6 pointer-events-none group-hover:text-rose-100 transition-colors">"</div>
+              <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-amber-50 transition-colors">&quot;</div>
             </div>
 
             {/* Review 2 */}
-            <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-100 relative group hover:-translate-y-2 transition-all duration-500">
-              <div className="flex justify-between items-start mb-6 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-stone-900 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">C</div>
-                  <div>
-                    <h4 className="font-bold text-stone-900 text-sm">Carlos Gómez</h4>
-                    <p className="text-[10px] text-stone-400 font-bold uppercase">Huésped Verificado</p>
+            <div className="bg-white p-8 rounded-[2rem] shadow-lg shadow-stone-200/30 border border-stone-100 relative group hover:-translate-y-2 hover:shadow-xl hover:shadow-rose-100 transition-all duration-500 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-center mb-6 relative z-10">
+                  <div className="flex">
+                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
                   </div>
+                  <span className="text-[10px] font-bold text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">Hace 2 semanas</span>
                 </div>
-                <div className="flex">
-                  {[1,2,3,4,5].map(i => <Star key={i} size={12} className="fill-amber-400 text-amber-400" />)}
+                <p className="text-stone-700 text-sm leading-relaxed italic relative z-10 mb-8 font-medium">
+                  &quot;Un hotel muy acogedor. Las habitaciones siempre impecables, limpieza diaria, y buena señal de WiFi para trabajar sin problemas. Excelente relación calidad-precio en Ayacucho.&quot;
+                </p>
+              </div>
+              <div className="flex items-center gap-4 border-t border-stone-100 pt-6 mt-auto">
+                <div className="w-12 h-12 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center font-bold text-xl">C</div>
+                <div>
+                  <h4 className="font-bold text-stone-900 text-sm uppercase">Carlos Gómez</h4>
+                  <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
+                    <Check size={10} className="text-emerald-500" /> Huésped Verificado
+                  </p>
+                  <p className="text-[10px] text-stone-400 font-medium">📍 Bogotá, Colombia</p>
                 </div>
               </div>
-              <p className="text-stone-600 text-sm leading-relaxed italic relative z-10">
-                "Un hotel muy acogedor. Las habitaciones siempre impecables, con agua caliente las 24 horas y buena señal de WiFi para trabajar. Excelente relación calidad-precio."
-              </p>
-              <div className="absolute text-8xl text-stone-50 font-serif -top-2 right-6 pointer-events-none group-hover:text-stone-100 transition-colors">"</div>
+              <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-rose-50 transition-colors">&quot;</div>
             </div>
 
             {/* Review 3 */}
-            <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-stone-200/50 border border-stone-100 relative group hover:-translate-y-2 transition-all duration-500">
-              <div className="flex justify-between items-start mb-6 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-[#e3004f] text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">A</div>
-                  <div>
-                    <h4 className="font-bold text-stone-900 text-sm">Andrea y Luis</h4>
-                    <p className="text-[10px] text-stone-400 font-bold uppercase">Huésped Verificado</p>
+            <div className="bg-white p-8 rounded-[2rem] shadow-lg shadow-stone-200/30 border border-stone-100 relative group hover:-translate-y-2 hover:shadow-xl hover:shadow-rose-100 transition-all duration-500 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-center mb-6 relative z-10">
+                  <div className="flex">
+                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
                   </div>
+                  <span className="text-[10px] font-bold text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">Hace 3 días</span>
                 </div>
-                <div className="flex">
-                  {[1,2,3,4,5].map(i => <Star key={i} size={12} className="fill-amber-400 text-amber-400" />)}
+                <p className="text-stone-700 text-sm leading-relaxed italic relative z-10 mb-8 font-medium">
+                  &quot;Me encantó la estadía, es un lugar muy seguro y tranquilo. Nos encantó que tengan cochera privada. El trato del personal superó mis expectativas. Volveremos sin duda en familia.&quot;
+                </p>
+              </div>
+              <div className="flex items-center gap-4 border-t border-stone-100 pt-6 mt-auto">
+                <div className="w-12 h-12 bg-stone-800 text-stone-100 rounded-full flex items-center justify-center font-bold text-xl">A</div>
+                <div>
+                  <h4 className="font-bold text-stone-900 text-sm uppercase">Andrea y Luis</h4>
+                  <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
+                    <Check size={10} className="text-emerald-500" /> Huésped Verificado
+                  </p>
+                  <p className="text-[10px] text-stone-400 font-medium">📍 Arequipa, Perú</p>
                 </div>
               </div>
-              <p className="text-stone-600 text-sm leading-relaxed italic relative z-10">
-                "Me encantó la estadía, es un lugar muy seguro y tranquilo. El servicio al cuarto fue rápido y el trato del personal superó mis expectativas. Volveremos sin duda."
-              </p>
-              <div className="absolute text-8xl text-rose-50 font-serif -top-2 right-6 pointer-events-none group-hover:text-rose-100 transition-colors">"</div>
+              <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-stone-100 transition-colors">&quot;</div>
+            </div>
+
+            {/* Review 4 (Nuevo) */}
+            <div className="bg-white p-8 rounded-[2rem] shadow-lg shadow-stone-200/30 border border-stone-100 relative group hover:-translate-y-2 hover:shadow-xl hover:shadow-rose-100 transition-all duration-500 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-center mb-6 relative z-10">
+                  <div className="flex">
+                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
+                  </div>
+                  <span className="text-[10px] font-bold text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">Hace 4 meses</span>
+                </div>
+                <p className="text-stone-700 text-sm leading-relaxed italic relative z-10 mb-8 font-medium">
+                  &quot;Fui con mi grupo de amigos por turismo. Las habitaciones son súper amplias y las camas maravillosas para descansar después de los tours. Lo mejor de Ayacucho.&quot;
+                </p>
+              </div>
+              <div className="flex items-center gap-4 border-t border-stone-100 pt-6 mt-auto">
+                <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center font-bold text-xl">V</div>
+                <div>
+                  <h4 className="font-bold text-stone-900 text-sm uppercase">Víctor Mejía</h4>
+                  <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
+                    <Check size={10} className="text-emerald-500" /> Huésped Verificado
+                  </p>
+                  <p className="text-[10px] text-stone-400 font-medium">📍 Huancayo, Perú</p>
+                </div>
+              </div>
+              <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-emerald-50 transition-colors">&quot;</div>
             </div>
           </div>
         </div>
@@ -1559,33 +1638,46 @@ export default function Home() {
             </div>
 
             <p className="text-stone-500 mb-8 leading-relaxed text-lg relative z-10">
-              Descubre lo mejor de Ayacucho desde un punto privilegiado. Te ofrecemos la <strong>tranquilidad absoluta</strong> que necesitas para un verdadero descanso, manteniéndote a tan solo unos minutos del centro histórico, zonas comerciales y principales rutas turísticas.
+              Descubre lo mejor de Ayacucho desde un punto privilegiado. Te ofrecemos la <strong>tranquilidad absoluta</strong> que necesitas para un verdadero descanso, manteniéndote a un paso del centro histórico.
             </p>
 
+            <h3 className="text-xs font-black text-stone-400 uppercase tracking-widest mb-4">Distancias clave</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
-                  <Check size={14} className="stroke-[3]" />
+              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-100 shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+                  <MapPin size={16} />
                 </div>
-                <span className="text-stone-700 font-medium text-sm">Zona segura y silenciosa</span>
+                <div>
+                  <span className="text-stone-700 font-bold text-sm block">Plaza de Armas</span>
+                  <span className="text-[10px] text-stone-400 uppercase font-bold">5 min en auto</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
-                  <Check size={14} className="stroke-[3]" />
+              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-100 shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0">
+                  <Plane size={16} />
                 </div>
-                <span className="text-stone-700 font-medium text-sm">Fácil acceso de movilidad</span>
+                <div>
+                  <span className="text-stone-700 font-bold text-sm block">Aeropuerto</span>
+                  <span className="text-[10px] text-stone-400 uppercase font-bold">10 min en auto</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
-                  <Check size={14} className="stroke-[3]" />
+              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-100 shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                  <Car size={16} />
                 </div>
-                <span className="text-stone-700 font-medium text-sm">A un paso del Óvalo Magdalena</span>
+                <div>
+                  <span className="text-stone-700 font-bold text-sm block">Terminal Terrestre</span>
+                  <span className="text-[10px] text-stone-400 uppercase font-bold">15 min en auto</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
-                  <Check size={14} className="stroke-[3]" />
+              <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-100 shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck size={16} />
                 </div>
-                <span className="text-stone-700 font-medium text-sm">A 5 minutos de la Plaza</span>
+                <div>
+                  <span className="text-stone-700 font-bold text-sm block">Zona Segura</span>
+                  <span className="text-[10px] text-stone-400 uppercase font-bold">Seguridad 24h</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1625,34 +1717,46 @@ export default function Home() {
           <div className="space-y-4">
             {[
               {
+                icon: Clock,
                 q: "¿A qué hora es el check-in y el check-out?",
                 a: "El horario de entrada (check-in) es a partir de las 13:00 hrs y la salida (check-out) es hasta las 12:00 hrs (mediodía). Si llegas antes o deseas salir más tarde, contamos con servicio de resguardo de equipaje gratuito para tu comodidad."
               },
               {
+                icon: Car,
                 q: "¿El hotel cuenta con estacionamiento privado?",
                 a: "Sí, ofrecemos servicio de cochera privada, techada y segura de manera totalmente gratuita para todos nuestros huéspedes dentro de las mismas instalaciones del hotel."
               },
               {
+                icon: Wifi,
                 q: "¿Tienen agua caliente y conexión a Internet en las habitaciones?",
                 a: "Por supuesto, todas nuestras habitaciones cuentan con baño privado y agua caliente las 24 horas del día. Además, ofrecemos conexión Wi-Fi de alta velocidad (Fibra Óptica) gratis en todas las áreas."
               },
               {
+                icon: Users,
                 q: "¿Se admiten mascotas en las habitaciones?",
                 a: "Nos encantan los animales. La admisión de mascotas está permitida, pero debe realizarse siempre previa coordinación con la administración al momento de hacer su reserva, para poder brindarle las mejores facilidades y asegurar la comodidad de todos."
               },
               {
+                icon: Coffee,
                 q: "¿Qué incluye el servicio de desayuno y en qué horario se sirve?",
                 a: "Ofrecemos un delicioso y variado desayuno que incluye opciones típicas de la región de Ayacucho para comenzar el día con energía. Se sirve todas las mañanas de 7:00 am a 9:30 am en nuestro exclusivo comedor principal."
               }
             ].map((faq, idx) => (
-              <details key={idx} className="group bg-stone-50 rounded-2xl border border-stone-100 overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-rose-100">
-                <summary className="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-stone-800 hover:text-rose-900 transition-colors [&::-webkit-details-marker]:hidden">
-                  <span className="text-sm md:text-base pr-4">{faq.q}</span>
-                  <span className="transition duration-300 group-open:-rotate-180 text-rose-500">
-                    <svg fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-                  </span>
+              <details key={idx} className="group bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm transition-all hover:shadow-md hover:border-rose-200">
+                <summary className="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-stone-800 hover:text-rose-700 transition-colors [&::-webkit-details-marker]:hidden">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0 group-open:bg-rose-600 group-open:text-white transition-colors duration-300">
+                      <faq.icon size={20} />
+                    </div>
+                    <span className="text-sm md:text-base leading-tight pr-4">{faq.q}</span>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-stone-50 flex items-center justify-center flex-shrink-0 group-open:bg-rose-50 transition-colors">
+                    <span className="transition duration-300 group-open:-rotate-180 text-rose-500">
+                      <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
+                    </span>
+                  </div>
                 </summary>
-                <div className="text-stone-600 text-sm md:text-base p-6 pt-0 leading-relaxed font-light bg-stone-50">
+                <div className="text-stone-600 text-sm md:text-base px-6 pb-6 pt-2 leading-relaxed ml-16 bg-white border-t border-stone-50">
                   {faq.a}
                 </div>
               </details>
@@ -1753,18 +1857,22 @@ export default function Home() {
             
             {/* Brand Column */}
             <div className="xl:col-span-1">
+              { }
               <img src="/logoo.png" alt="Hotel Kametza" className="h-24 mb-6" />
               <p className="text-stone-700 text-sm leading-relaxed mb-8 max-w-sm font-medium">
                 Un refugio exclusivo donde la historia colonial se encuentra con el confort contemporáneo en el corazón de Ayacucho.
               </p>
               <div className="flex gap-4">
                 <a href="https://www.facebook.com/share/1KhmvycDcR/" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:border-[#1877F2] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                  { }
                   <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" className="w-4 h-4 transition-all" alt="Facebook" />
                 </a>
                 <a href="https://www.instagram.com/kametzahotelayacucho/" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:border-[#E4405F] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                  { }
                   <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" className="w-4 h-4 transition-all" alt="Instagram" />
                 </a>
                 <a href="https://tiktok.com/@HotelKametza" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:border-black group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                  { }
                   <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" className="w-4 h-4 transition-all" alt="TikTok" />
                 </a>
               </div>

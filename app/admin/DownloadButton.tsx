@@ -2,7 +2,7 @@
 
 import { Download } from "lucide-react";
 
-export default function DownloadButton({ data }: { data: any[] }) {
+export default function DownloadButton({ data, extrasData }: { data: any[], extrasData?: any[] }) {
   const downloadReport = () => {
     // 1. Definir cabeceras (Agregamos "Documento")
     const headers = [
@@ -14,7 +14,11 @@ export default function DownloadButton({ data }: { data: any[] }) {
       "Entrada",
       "Salida",
       "Noches",
-      "Total",
+      "Costo_Habitacion",
+      "Consumos_Extras",
+      "Total_Reserva",
+      "Monto_Abonado",
+      "Saldo_Pendiente",
       "Metodo",
       "Estado",
     ];
@@ -27,24 +31,38 @@ export default function DownloadButton({ data }: { data: any[] }) {
       const start = new Date(b.check_in);
       const end = new Date(b.check_out);
       const diffTime = Math.abs(end.getTime() - start.getTime());
-      const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 
       // Formatear documento (Ej: "DNI: 12345678")
       const docString = b.document_number
         ? `${b.document_type || "DNI"}: ${b.document_number}`
         : "No registrado";
+        
+      // Calcular totales
+      const bookingExtras = extrasData?.filter((e) => e.booking_id === b.id) || [];
+      const extrasTotal = bookingExtras.reduce((sum, e) => sum + (e.price * e.quantity), 0);
+      const grandTotal = (b.total_price || 0) + extrasTotal;
+      const amountPaid = b.amount_paid || 0;
+      
+      // Ajustar abono si el estado era pagado antiguo
+      const finalPaid = (b.status === "pagado" || b.status === "approved" || grandTotal <= amountPaid) ? grandTotal : amountPaid;
+      const balance = grandTotal - finalPaid;
 
       return [
         b.id,
         `"${cleanName}"`,
         `"${docString}"`, // <--- NUEVA COLUMNA
-        b.client_email,
+        b.client_email || "N/A",
         b.room_id,
         b.check_in,
         b.check_out,
         nights,
-        b.total_price,
-        b.payment_method,
+        b.total_price || 0,
+        extrasTotal,
+        grandTotal,
+        finalPaid,
+        balance,
+        b.payment_method || "N/A",
         b.status,
       ].join(";");
     });

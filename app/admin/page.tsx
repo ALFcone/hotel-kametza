@@ -41,6 +41,7 @@ import {
   XCircle,
   Sparkles,
   CalendarCheck,
+  CalendarDays,
   Users,
   Building,
 } from "lucide-react";
@@ -249,6 +250,17 @@ export default async function AdminPage(props: {
   const totalRooms = rooms?.length || 0;
   const freeRooms = totalRooms - occupiedCount;
 
+  // Habitaciones más populares (por noches reservadas en el rango)
+  const roomPopularity = rooms?.map(room => {
+    const nights = allBookings?.filter(b => 
+      b.room_id === room.id && 
+      b.status !== "cancelled" && b.status !== "cancelada" &&
+      b.check_in >= dateFrom && b.check_in <= dateTo
+    ).reduce((acc, b) => acc + calculateNights(b.check_in, b.check_out), 0) || 0;
+    
+    return { name: room.name, number: room.room_number || room.id, nights };
+  }).sort((a, b) => b.nights - a.nights).slice(0, 4) || [];
+
   // F. CÁLCULO DE TENDENCIA DE VENTAS (ÚLTIMOS 7 DÍAS)
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
@@ -366,6 +378,16 @@ export default async function AdminPage(props: {
               }`}
             >
               <FileText size={16} /> Historial de Reservas
+            </Link>
+            <Link
+              href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === "calendario"
+                  ? "bg-white text-[#d97706] shadow-md"
+                  : "text-amber-100/80 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <CalendarDays size={16} /> Calendario Visual
             </Link>
             <Link
               href={`/admin?tab=inventario&from=${dateFrom}&to=${dateTo}`}
@@ -669,6 +691,70 @@ export default async function AdminPage(props: {
                   </div>
                 </div>
 
+                {/* Nuevos Gráficos Analíticos */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  {/* Habitaciones Populares */}
+                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm">
+                    <h3 className="font-bold text-base text-stone-900 mb-6">Top Habitaciones (Demandadas)</h3>
+                    <div className="space-y-4">
+                      {roomPopularity.map((r, i) => (
+                        <div key={i}>
+                          <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
+                            <span className="text-stone-500">#{r.number} - {r.name}</span>
+                            <span className="text-stone-900">{r.nights} noches</span>
+                          </div>
+                          <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
+                            <div
+                              className="bg-stone-900 h-full rounded-full"
+                              style={{ width: `${roomPopularity[0]?.nights > 0 ? (r.nights / roomPopularity[0].nights) * 100 : 0}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Distribución por Medio de Pago (Pie Chart visual) */}
+                  <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm">
+                     <h3 className="font-bold text-base text-stone-900 mb-6">Ingresos Totales (Composición)</h3>
+                     {totalIncome > 0 ? (
+                       <div className="flex items-center gap-6">
+                         <div className="relative w-28 h-28 shrink-0">
+                           <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                             {/* Fondo Efectivo (Gris) */}
+                             <circle cx="50" cy="50" r="40" fill="transparent" stroke="#E5E7EB" strokeWidth="20" />
+                             {/* Frente Digital (Naranja) */}
+                             <circle
+                               cx="50" cy="50" r="40" fill="transparent"
+                               stroke="#d97706" strokeWidth="20"
+                               strokeDasharray={`${(digitalIncome/totalIncome) * 251.2} 251.2`}
+                               className="transition-all duration-1000 ease-out"
+                             />
+                           </svg>
+                         </div>
+                         <div className="flex flex-col justify-center gap-4 w-full">
+                           <div className="flex justify-between items-center bg-stone-50 p-3 rounded-xl border border-stone-100">
+                             <div className="flex items-center gap-2">
+                               <div className="w-3 h-3 rounded-full bg-stone-200" />
+                               <span className="text-[10px] font-black uppercase text-stone-500">Efectivo</span>
+                             </div>
+                             <span className="text-xs font-bold text-stone-900">{Math.round((cashIncome/totalIncome)*100)}%</span>
+                           </div>
+                           <div className="flex justify-between items-center bg-amber-50/50 p-3 rounded-xl border border-amber-100">
+                             <div className="flex items-center gap-2">
+                               <div className="w-3 h-3 rounded-full bg-[#d97706]" />
+                               <span className="text-[10px] font-black uppercase text-stone-700">Digital</span>
+                             </div>
+                             <span className="text-xs font-bold text-[#d97706]">{Math.round((digitalIncome/totalIncome)*100)}%</span>
+                           </div>
+                         </div>
+                       </div>
+                     ) : (
+                       <div className="text-center text-stone-400 text-xs italic mt-8">Sin datos de ingresos en este rango</div>
+                     )}
+                  </div>
+                </div>
+
               </div>
             </div>
           )}
@@ -711,36 +797,35 @@ export default async function AdminPage(props: {
                         {room.room_number || room.id}
                       </span>
                       
-                      <div className="z-10 flex justify-between items-start">
-                        <div>
+                      <div className="z-10 flex justify-between items-start w-full gap-2">
+                        <div className="flex-1 min-w-0">
                           <p className={`font-bold text-xs uppercase tracking-wider truncate ${isDirty ? "text-white" : ""}`}>
                             {room.name}
                           </p>
                           {info.guest && (
-                            <p className={`text-[10px] mt-2 font-semibold italic opacity-85 truncate max-w-[90%] ${isDirty ? "text-white" : ""}`}>
+                            <p className={`text-[10px] mt-2 font-semibold italic opacity-85 truncate ${isDirty ? "text-white" : ""}`}>
                               {info.guest}
                             </p>
                           )}
                         </div>
                         
                         {/* Botón de Limpieza */}
-                        <form action={toggleRoomCleanliness} className="shrink-0 ml-2">
+                        <form action={toggleRoomCleanliness} className="shrink-0">
                           <input type="hidden" name="roomId" value={room.id} />
                           {/* Si está sucia (isDirty=true), el nuevo valor debe ser true (limpia). Si está limpia (isDirty=false), el nuevo valor debe ser false (sucia). */}
                           <input type="hidden" name="isClean" value={isDirty.toString()} />
                           <button
                             type="submit"
                             title={isDirty ? "Marcar como Limpia" : "Marcar como Sucia"}
-                            className={`p-1.5 rounded-full transition-colors ${
+                            className={`p-2 rounded-full transition-colors shadow-sm ${
                               isDirty 
-                                ? "bg-white text-rose-600 hover:bg-emerald-500 hover:text-white shadow-sm" 
-                                : "bg-stone-100 text-stone-400 hover:bg-rose-500 hover:text-white"
+                                ? "bg-white text-rose-600 hover:bg-emerald-500 hover:text-white" 
+                                : isOccupied
+                                ? "bg-white/20 text-white hover:bg-rose-500"
+                                : "bg-stone-200 text-stone-500 hover:bg-rose-500 hover:text-white"
                             }`}
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="m15 5 4 4" />
-                              <path d="M13 14l-8.5 8.5a2.12 2.12 0 0 1-3-3L10 11l4-4 5.5-5.5a2.12 2.12 0 0 1 3 3L17 10l-4 4Z" />
-                            </svg>
+                            <Brush size={16} strokeWidth={2.5} />
                           </button>
                         </form>
                       </div>
@@ -784,7 +869,7 @@ export default async function AdminPage(props: {
               </div>
 
               <div className="bg-white rounded-[2.5rem] shadow-sm border border-stone-200/60 overflow-hidden">
-                <div className="p-8 border-b border-stone-100 flex justify-between items-center bg-gradient-to-r from-white to-stone-50/30">
+                <div className="p-8 border-b border-stone-100 flex justify-between items-center bg-gradient-to-r from-white to-stone-50/30 flex-wrap gap-4">
                   <div>
                     <h3 className="font-bold text-lg text-stone-900">Historial Completo</h3>
                     <p className="text-stone-400 text-[10px] uppercase font-bold tracking-widest mt-1">
@@ -796,6 +881,9 @@ export default async function AdminPage(props: {
                       )}
                     </p>
                   </div>
+                  {filteredBookings && filteredBookings.length > 0 && (
+                    <DownloadButton data={filteredBookings} extrasData={allExtras || []} />
+                  )}
                 </div>
 
                 <div className="overflow-x-auto w-full">
@@ -917,6 +1005,9 @@ export default async function AdminPage(props: {
                                 checkIn={booking.check_in}
                                 checkOut={booking.check_out}
                                 extras={bookingExtras}
+                                guestName={booking.client_name || "Huésped"}
+                                roomName={getRoomNumber(booking.room_id).toString()}
+                                guestPhone={booking.client_phone || undefined}
                                 onDelete={deleteBooking}
                               />
                             </td>
@@ -1026,6 +1117,124 @@ export default async function AdminPage(props: {
               <WalkInForm rooms={rooms} />
             </div>
           )}
+
+          {/* --- TAB: CALENDARIO (GANTT) --- */}
+          {activeTab === "calendario" && (
+            <div className="animate-fade-in-up bg-white rounded-[2.5rem] p-8 border border-stone-200/60 shadow-sm overflow-hidden">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
+                <h2 className="text-xl font-bold text-stone-900 tracking-tight">Calendario Visual (Gantt)</h2>
+              </div>
+              
+              <div className="overflow-x-auto w-full pb-4">
+                {(() => {
+                  let calendarStartDate = new Date(dateFrom + "T00:00:00");
+                  let calendarEndDate = new Date(dateTo + "T00:00:00");
+                  
+                  // Ensure at least 14 days
+                  const diffTime = calendarEndDate.getTime() - calendarStartDate.getTime();
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                  if (diffDays < 14) {
+                    calendarEndDate = new Date(calendarStartDate.getTime() + 14 * 24 * 60 * 60 * 1000);
+                  }
+                  
+                  const totalDays = Math.ceil((calendarEndDate.getTime() - calendarStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                  
+                  const calendarDays: Date[] = [];
+                  let curr = new Date(calendarStartDate);
+                  while (curr <= calendarEndDate) {
+                    calendarDays.push(new Date(curr));
+                    curr.setDate(curr.getDate() + 1);
+                  }
+
+                  return (
+                    <div className="min-w-[800px]">
+                      {/* Cabecera de fechas */}
+                      <div className="flex border-b border-stone-200 mb-2">
+                        <div className="w-32 shrink-0 py-3 px-4 font-black text-[10px] uppercase text-stone-400">
+                          Habitación
+                        </div>
+                        <div className="flex-1 flex">
+                          {calendarDays.map((d, i) => (
+                            <div key={i} className="flex-1 flex flex-col items-center justify-center py-2 border-l border-stone-100 min-w-[50px]">
+                              <span className="text-[9px] font-bold text-stone-400 uppercase">
+                                {d.toLocaleDateString("es-PE", { weekday: "short" })}
+                              </span>
+                              <span className="text-xs font-black text-stone-800">
+                                {d.getDate()}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Filas de habitaciones */}
+                      <div className="flex flex-col gap-2">
+                        {rooms?.map((room) => {
+                          // Filtrar reservas que se cruzan con este rango en esta habitación
+                          const roomBookings = allBookings?.filter(b => 
+                            b.room_id === room.id && 
+                            b.status !== "cancelled" && b.status !== "cancelada" &&
+                            new Date(b.check_in + "T00:00:00") <= calendarEndDate &&
+                            new Date(b.check_out + "T00:00:00") >= calendarStartDate
+                          ) || [];
+
+                          return (
+                            <div key={room.id} className="flex items-center bg-stone-50 rounded-xl border border-stone-100 relative group h-14">
+                              {/* Nombre Habitación */}
+                              <div className="w-32 shrink-0 px-4 font-bold text-xs text-stone-900 border-r border-stone-100 bg-white h-full rounded-l-xl flex items-center z-10 shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
+                                {room.name}
+                              </div>
+                              
+                              {/* Track de Días */}
+                              <div className="flex-1 flex h-full relative">
+                                {calendarDays.map((_, i) => (
+                                  <div key={i} className="flex-1 border-r border-stone-200/50 min-w-[50px]" />
+                                ))}
+
+                                {/* Bloques de Reservas */}
+                                {roomBookings.map(booking => {
+                                  const bIn = new Date(booking.check_in + "T00:00:00");
+                                  const bOut = new Date(booking.check_out + "T00:00:00");
+                                  
+                                  const startOffset = Math.max(0, (bIn.getTime() - calendarStartDate.getTime()) / (1000 * 60 * 60 * 24));
+                                  const endOffset = Math.min(totalDays, (bOut.getTime() - calendarStartDate.getTime()) / (1000 * 60 * 60 * 24));
+                                  
+                                  const leftPct = (startOffset / totalDays) * 100;
+                                  const widthPct = ((endOffset - startOffset) / totalDays) * 100;
+                                  
+                                  const isPaid = booking.status === "pagado" || booking.status === "approved" || booking.total_price <= (booking.amount_paid || 0);
+
+                                  return (
+                                    <div
+                                      key={booking.id}
+                                      className={`absolute top-1.5 bottom-1.5 rounded-lg border flex items-center px-2 shadow-sm overflow-hidden transition-all hover:z-20 hover:scale-[1.02] cursor-pointer ${
+                                        isPaid 
+                                          ? "bg-emerald-100 border-emerald-300 text-emerald-800" 
+                                          : booking.status === "parcial"
+                                          ? "bg-blue-100 border-blue-300 text-blue-800"
+                                          : "bg-amber-100 border-amber-300 text-amber-800"
+                                      }`}
+                                      style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
+                                      title={`Huésped: ${booking.client_name} | Ingreso: ${booking.check_in} | Salida: ${booking.check_out}`}
+                                    >
+                                      <span className="text-[10px] font-black truncate">
+                                        {booking.client_name}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
@@ -1042,6 +1251,10 @@ export default async function AdminPage(props: {
         <Link href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "historial" ? "text-amber-500" : "text-stone-400"}`}>
           <FileText size={20} />
           <span className="text-[8px] font-black uppercase">Historial</span>
+        </Link>
+        <Link href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "calendario" ? "text-amber-500" : "text-stone-400"}`}>
+          <CalendarDays size={20} />
+          <span className="text-[8px] font-black uppercase">Calendario</span>
         </Link>
         <Link href={`/admin?tab=inventario&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "inventario" ? "text-amber-500" : "text-stone-400"}`}>
           <BedDouble size={20} />
