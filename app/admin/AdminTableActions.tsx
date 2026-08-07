@@ -5,7 +5,7 @@
  * PROPÓSITO: Componente que renderiza los botones de acción en la tabla 
  *            del Historial (Abonar, Editar Fechas, Consumos, Eliminar)
  *            y maneja todas sus ventanas emergentes (modales).
- * ---------------------------------------------------------------------
+ */
 import { useState, useEffect } from "react";
 import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle, Printer, FileWarning } from "lucide-react";
 import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, fetchRucData, fetchDniData, cancelBooking } from "@/app/actions";
@@ -179,7 +179,6 @@ export function AdminTableActions({
     setLoading(true);
     const formData = new FormData();
     formData.append("extraId", extraId.toString());
-    
     const result = await deleteBookingExtra(formData);
     if (result.error) alert(result.error);
     setLoading(false);

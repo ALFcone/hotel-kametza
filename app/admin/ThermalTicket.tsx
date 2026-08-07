@@ -20,6 +20,8 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
 
   const total = booking.total_price || 0;
   const subtotal = (total / 1.18).toFixed(2);
+  const igv = (total - Number(subtotal)).toFixed(2);
+
   // Estructura oficial del código QR SUNAT
   let tipoComprobante = '03'; // Boleta
   if (type === 'FACTURA') tipoComprobante = '01';
