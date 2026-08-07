@@ -109,7 +109,6 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
         <div className="bg-white mb-2">
           <QRCode value={qrData} size={112} level="Q" />
         </div>
-        <p className="text-[9px] text-center w-full break-all leading-tight">{qrData}</p>
       </div>
 
       <div className="text-center mt-4">
