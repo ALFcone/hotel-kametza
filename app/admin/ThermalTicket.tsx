@@ -30,8 +30,8 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
       {/* Header */}
       <div className="text-center mb-2 flex flex-col items-center">
         {/* LOGO DEL HOTEL */}
-        <img src="/logoo.png" alt="Logo Kametza" className="w-32 -mb-2 -mt-4 grayscale contrast-200" />
-        <h1 className="font-bold text-lg uppercase mb-1">Hotel Kametza</h1>
+        <img src="/logoo.png" alt="Logo Kametza" className="w-32 grayscale" />
+        <h1 className="font-bold text-lg uppercase mt-2 mb-1">Hotel Kametza</h1>
         <p>MARCELINA BERMUDO ESCALANTE DE RUA</p>
         <p>RUC: 10282984984</p>
         <p>Jir. Las Américas #154, Ayacucho</p>
