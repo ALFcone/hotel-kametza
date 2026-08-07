@@ -1,4 +1,5 @@
 import React from "react";
+import QRCode from "react-qr-code";
 
 interface ThermalTicketProps {
   booking: any;
@@ -23,7 +24,6 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
 
   // Estructura oficial del código QR SUNAT
   const qrData = `10282984984|${type === 'FACTURA' ? '01' : '03'}|${correlative.split('-')[0]}|${correlative.split('-')[1]}|${igv}|${total.toFixed(2)}|${new Date().toISOString().split('T')[0]}|${type === 'FACTURA' ? '6' : '1'}|${booking.customer_document || '00000000'}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
 
   return (
     <div id="print-section" className="thermal-ticket hidden print:block text-black bg-white p-4 font-mono text-[11px] w-[302px] mx-auto absolute top-0 left-0 z-[99999] h-screen">
@@ -51,13 +51,13 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
       </div>
 
       {/* Details */}
-      <table className="w-full mb-4 text-[11px]">
+      <table className="w-full mb-4 text-[11px] table-fixed break-words">
         <thead>
           <tr className="border-b border-dashed border-black">
             <th className="text-left py-1 w-8">CANT</th>
-            <th className="text-left py-1">DESCRIPCIÓN</th>
-            <th className="text-right py-1">P.UNIT</th>
-            <th className="text-right py-1">TOTAL</th>
+            <th className="text-left py-1 w-auto">DESCRIPCIÓN</th>
+            <th className="text-right py-1 w-12">P.UNIT</th>
+            <th className="text-right py-1 w-12">TOTAL</th>
           </tr>
         </thead>
         <tbody>
@@ -106,7 +106,9 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
 
       {/* QR Code */}
       <div className="flex flex-col items-center mt-4 border-t border-dashed border-black pt-4">
-        <img src={qrUrl} alt="QR SUNAT" className="w-28 h-28 mb-2" />
+        <div className="bg-white mb-2">
+          <QRCode value={qrData} size={112} level="Q" />
+        </div>
         <p className="text-[9px] text-center w-full break-all leading-tight">{qrData}</p>
       </div>
 
