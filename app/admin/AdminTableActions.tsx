@@ -6,10 +6,9 @@
  *            del Historial (Abonar, Editar Fechas, Consumos, Eliminar)
  *            y maneja todas sus ventanas emergentes (modales).
  * ---------------------------------------------------------------------
- */
 import { useState, useEffect } from "react";
-import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle, Printer } from "lucide-react";
-import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, fetchRucData, fetchDniData } from "@/app/actions";
+import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle, Printer, FileWarning } from "lucide-react";
+import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, fetchRucData, fetchDniData, cancelBooking } from "@/app/actions";
 import ThermalTicket from "./ThermalTicket";
 
 interface AdminTableActionsProps {
@@ -59,7 +58,7 @@ export function AdminTableActions({
   
   // Facturación States
   const [isPrinting, setIsPrinting] = useState(false);
-  const [billingType, setBillingType] = useState<"BOLETA" | "FACTURA">("BOLETA");
+  const [billingType, setBillingType] = useState<"BOLETA" | "FACTURA" | "NOTA DE CRÉDITO">("BOLETA");
   const [billingDocument, setBillingDocument] = useState("");
   const [billingName, setBillingName] = useState("");
   const [isFetchingRuc, setIsFetchingRuc] = useState(false);
@@ -180,9 +179,19 @@ export function AdminTableActions({
     setLoading(true);
     const formData = new FormData();
     formData.append("extraId", extraId.toString());
+    
     const result = await deleteBookingExtra(formData);
     if (result.error) alert(result.error);
     setLoading(false);
+  };
+
+  const handleCancelBooking = async () => {
+    if (confirm("¿Estás seguro de anular esta reserva y generar una Nota de Crédito?")) {
+      setLoading(true);
+      const result = await cancelBooking(bookingId);
+      if (result.error) alert(result.error);
+      setLoading(false);
+    }
   };
 
   const handleShareWhatsApp = () => {
@@ -226,7 +235,7 @@ export function AdminTableActions({
 
   const handleOpenBilling = () => {
     // Valores por defecto al abrir
-    setBillingType("BOLETA");
+    setBillingType(isCancelled ? "NOTA DE CRÉDITO" : "BOLETA");
     setBillingDocument(guestDocument || "");
     setBillingName(guestName);
     setIsBillingModalOpen(true);
@@ -243,15 +252,17 @@ export function AdminTableActions({
       )}
       
       <div className="flex gap-2 justify-center">
-        {!isCancelled && (
-          <button
-            onClick={handleOpenBilling}
-            className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-zinc-800 hover:text-zinc-800 hover:bg-zinc-100 transition-all hover:shadow-[0_2px_10px_rgba(39,39,42,0.1)] hover:-translate-y-0.5"
-            title="Emitir Comprobante (Boleta/Factura)"
-          >
-            <Printer size={14} className="group-hover:scale-110 transition-transform duration-300" />
-          </button>
-        )}
+        <button
+          onClick={handleOpenBilling}
+          className={`group relative flex items-center justify-center w-8 h-8 border rounded-lg transition-all hover:-translate-y-0.5 ${
+            isCancelled 
+              ? "bg-rose-50 border-rose-200 text-rose-500 hover:border-rose-400 hover:bg-rose-100 hover:text-rose-700 hover:shadow-[0_2px_10px_rgba(244,63,94,0.2)]" 
+              : "bg-white border-stone-200 text-stone-400 hover:border-zinc-800 hover:text-zinc-800 hover:bg-zinc-100 hover:shadow-[0_2px_10px_rgba(39,39,42,0.1)]"
+          }`}
+          title={isCancelled ? "Imprimir Nota de Crédito" : "Emitir Comprobante (Boleta/Factura)"}
+        >
+          <Printer size={14} className="group-hover:scale-110 transition-transform duration-300" />
+        </button>
         {!isCancelled && (
           <button
             onClick={handleShareWhatsApp}
@@ -292,6 +303,15 @@ export function AdminTableActions({
           >
             <CheckCircle size={14} className="group-hover:scale-110 transition-transform" />
             <span className="text-[9px] font-black uppercase tracking-wider">Abonar</span>
+          </button>
+        )}
+        {!isCancelled && (
+          <button
+            onClick={handleCancelBooking}
+            className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-orange-200 hover:text-orange-600 hover:bg-orange-50 transition-all hover:shadow-[0_2px_10px_rgba(249,115,22,0.1)] hover:-translate-y-0.5"
+            title="Anular y Emitir Nota de Crédito"
+          >
+            <FileWarning size={14} className="group-hover:scale-110 transition-transform duration-300" />
           </button>
         )}
         <form action={onDelete}>
@@ -629,27 +649,41 @@ export function AdminTableActions({
               </div>
             </div>
 
-            <div className="flex bg-stone-100 p-1 rounded-xl mb-4">
-              <button
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${billingType === 'BOLETA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
-                onClick={() => {
-                  setBillingType('BOLETA');
-                  setBillingDocument(guestDocument || "");
-                  setBillingName(guestName);
-                }}
-              >
-                BOLETA
-              </button>
-              <button
-                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${billingType === 'FACTURA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
-                onClick={() => {
-                  setBillingType('FACTURA');
-                  setBillingDocument("");
-                  setBillingName("");
-                }}
-              >
-                FACTURA
-              </button>
+            <div className="bg-stone-50 p-6 rounded-2xl mb-8">
+              <h3 className="text-xs font-black uppercase text-stone-400 mb-4 tracking-wider">
+                Tipo de Comprobante
+              </h3>
+              
+              {isCancelled ? (
+                <div className="flex bg-stone-200 p-1 rounded-xl">
+                  <button className="flex-1 py-2 text-xs font-bold rounded-lg bg-rose-500 text-white shadow-sm cursor-default">
+                    NOTA DE CRÉDITO
+                  </button>
+                </div>
+              ) : (
+                <div className="flex bg-stone-200 p-1 rounded-xl">
+                  <button
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${billingType === 'BOLETA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
+                    onClick={() => {
+                      setBillingType('BOLETA');
+                      setBillingDocument(guestDocument || "");
+                      setBillingName(guestName);
+                    }}
+                  >
+                    BOLETA
+                  </button>
+                  <button
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${billingType === 'FACTURA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
+                    onClick={() => {
+                      setBillingType('FACTURA');
+                      setBillingDocument("");
+                      setBillingName("");
+                    }}
+                  >
+                    FACTURA
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="space-y-4 mb-6">

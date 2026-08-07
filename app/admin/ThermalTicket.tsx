@@ -3,7 +3,7 @@ import QRCode from "react-qr-code";
 
 interface ThermalTicketProps {
   booking: any;
-  type: "BOLETA" | "FACTURA";
+  type: "BOLETA" | "FACTURA" | "NOTA DE CRÉDITO";
   correlative: string;
 }
 
@@ -20,10 +20,17 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
 
   const total = booking.total_price || 0;
   const subtotal = (total / 1.18).toFixed(2);
-  const igv = (total - Number(subtotal)).toFixed(2);
-
   // Estructura oficial del código QR SUNAT
-  const qrData = `10282984984|${type === 'FACTURA' ? '01' : '03'}|${correlative.split('-')[0]}|${correlative.split('-')[1]}|${igv}|${total.toFixed(2)}|${new Date().toISOString().split('T')[0]}|${type === 'FACTURA' ? '6' : '1'}|${booking.customer_document || '00000000'}`;
+  let tipoComprobante = '03'; // Boleta
+  if (type === 'FACTURA') tipoComprobante = '01';
+  if (type === 'NOTA DE CRÉDITO') tipoComprobante = '07';
+  
+  let tipoDocumentoCliente = '1'; // DNI
+  if (type === 'FACTURA') tipoDocumentoCliente = '6'; // RUC
+  // Para nota de crédito asumimos DNI por defecto a menos que tenga 11 dígitos
+  if (type === 'NOTA DE CRÉDITO' && booking.customer_document?.length === 11) tipoDocumentoCliente = '6';
+
+  const qrData = `10282984984|${tipoComprobante}|${correlative.split('-')[0]}|${correlative.split('-')[1]}|${igv}|${total.toFixed(2)}|${new Date().toISOString().split('T')[0]}|${tipoDocumentoCliente}|${booking.customer_document || '00000000'}`;
 
   return (
     <div id="print-section" className="thermal-ticket hidden print:block text-black bg-white p-4 font-mono text-[11px] w-[302px] mx-auto absolute top-0 left-0 z-[99999] h-screen">
@@ -38,8 +45,8 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
       </div>
 
       <div className="border-t border-b border-dashed border-black py-2 mb-4 text-center">
-        <h2 className="font-bold text-base uppercase">{type} ELECTRÓNICA</h2>
-        <p className="font-bold text-lg tracking-widest">{correlative}</p>
+        <h2 className="font-bold text-base">{type === "NOTA DE CRÉDITO" ? "NOTA DE CRÉDITO ELECTRÓNICA" : `${type} ELECTRÓNICA`}</h2>
+        <p className="text-sm font-bold tracking-widest mt-1">{type === "NOTA DE CRÉDITO" && correlative.startsWith("B") ? correlative.replace("B", "BC") : type === "NOTA DE CRÉDITO" && correlative.startsWith("F") ? correlative.replace("F", "FC") : correlative}</p>
       </div>
 
       {/* Info */}
