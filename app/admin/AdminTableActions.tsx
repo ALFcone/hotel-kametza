@@ -108,9 +108,11 @@ export function AdminTableActions({
 
   useEffect(() => {
     if (isPrinting) {
-      window.print();
-      // Pequeño timeout para volver el estado a falso después de imprimir
-      setTimeout(() => setIsPrinting(false), 1000);
+      // Retardo de 800ms para asegurar que el QR y logo carguen antes de imprimir
+      setTimeout(() => {
+        window.print();
+        setTimeout(() => setIsPrinting(false), 500);
+      }, 800);
     }
   }, [isPrinting]);
 
