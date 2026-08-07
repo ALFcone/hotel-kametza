@@ -1975,7 +1975,7 @@ export default function Home() {
           <div className="border-t border-stone-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
             <div>
               <p className="font-bold text-stone-800 text-xs">© 2025 Hotel Kametza. Todos los derechos reservados.</p>
-              <p className="text-[10px] text-stone-700 mt-1">RUC: 10452685951</p>
+              <p className="text-[10px] text-stone-700 mt-1">RUC: 10282984984</p>
             </div>
             <div className="text-[10px] text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200 uppercase tracking-widest font-black">
               Experiencia Premium en Ayacucho

@@ -7,9 +7,10 @@
  *            y maneja todas sus ventanas emergentes (modales).
  * ---------------------------------------------------------------------
  */
-import { useState } from "react";
-import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle } from "lucide-react";
-import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra } from "@/app/actions";
+import { useState, useEffect } from "react";
+import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle, Printer } from "lucide-react";
+import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, fetchRucData, fetchDniData } from "@/app/actions";
+import ThermalTicket from "./ThermalTicket";
 
 interface AdminTableActionsProps {
   bookingId: number;
@@ -23,7 +24,9 @@ interface AdminTableActionsProps {
   guestName: string;
   roomName: string;
   guestPhone?: string;
+  guestDocument?: string;
   onDelete: (formData: FormData) => void;
+  // added customer_document if it exists in parent, otherwise we'll pass guestName as is
 }
 
 export function AdminTableActions({
@@ -38,11 +41,13 @@ export function AdminTableActions({
   guestName,
   roomName,
   guestPhone,
+  guestDocument,
   onDelete,
 }: AdminTableActionsProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isExtrasModalOpen, setIsExtrasModalOpen] = useState(false);
+  const [isBillingModalOpen, setIsBillingModalOpen] = useState(false);
   
   const [paymentAmount, setPaymentAmount] = useState<string>("");
   const [extraName, setExtraName] = useState("");
@@ -52,10 +57,62 @@ export function AdminTableActions({
   const [editTotalPrice, setEditTotalPrice] = useState<string>(totalPrice.toString());
   const [loading, setLoading] = useState(false);
   
+  // Facturación States
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [billingType, setBillingType] = useState<"BOLETA" | "FACTURA">("BOLETA");
+  const [billingDocument, setBillingDocument] = useState("");
+  const [billingName, setBillingName] = useState("");
+  const [isFetchingRuc, setIsFetchingRuc] = useState(false);
+
+  const handleFetchDocument = async () => {
+    if (billingType === "FACTURA" && billingDocument.length !== 11) {
+      alert("El RUC debe tener 11 dígitos");
+      return;
+    }
+    if (billingType === "BOLETA" && billingDocument.length !== 8) {
+      alert("El DNI debe tener 8 dígitos");
+      return;
+    }
+    
+    setIsFetchingRuc(true);
+    try {
+      const result = billingType === "FACTURA" 
+        ? await fetchRucData(billingDocument)
+        : await fetchDniData(billingDocument);
+        
+      if (billingType === "FACTURA" && result.data && result.data.nombre) {
+        setBillingName(result.data.nombre);
+      } else if (billingType === "BOLETA" && result.data) {
+        // Algunas APIs devuelven "nombre", otras devuelven "nombres", "apellidoPaterno", etc.
+        if (result.data.nombre) {
+          setBillingName(result.data.nombre);
+        } else if (result.data.nombres) {
+          setBillingName(`${result.data.nombres} ${result.data.apellidoPaterno || ""} ${result.data.apellidoMaterno || ""}`.trim());
+        } else {
+          alert("DNI no encontrado o inválido.");
+        }
+      } else {
+        alert(`${billingType === "FACTURA" ? "RUC" : "DNI"} no encontrado o inválido.`);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error conectando con el servidor. Inténtalo de nuevo.");
+    }
+    setIsFetchingRuc(false);
+  };
+  
   const extrasTotal = extras.reduce((sum, e) => sum + (e.price * e.quantity), 0);
   const grandTotal = totalPrice + extrasTotal;
   const balance = grandTotal - (amountPaid || 0);
   const isFullyPaid = status === "pagado" || status === "approved" || balance <= 0;
+
+  useEffect(() => {
+    if (isPrinting) {
+      window.print();
+      // Pequeño timeout para volver el estado a falso después de imprimir
+      setTimeout(() => setIsPrinting(false), 1000);
+    }
+  }, [isPrinting]);
 
   const handleRegisterPayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,9 +211,45 @@ export function AdminTableActions({
     window.open(url, '_blank');
   };
 
+  const mockBookingForTicket = {
+    check_in: checkIn,
+    check_out: checkOut,
+    total_price: grandTotal, // Incluye extras
+    base_price: totalPrice, // Precio solo del alojamiento
+    extras: extras, // Array de consumos adicionales
+    customer_name: billingName || guestName,
+    customer_document: billingDocument || guestPhone || "No Registrado",
+    room_id: roomName,
+  };
+
+  const handleOpenBilling = () => {
+    // Valores por defecto al abrir
+    setBillingType("BOLETA");
+    setBillingDocument(guestDocument || "");
+    setBillingName(guestName);
+    setIsBillingModalOpen(true);
+  };
+
   return (
     <>
+      {isPrinting && (
+        <ThermalTicket 
+          booking={mockBookingForTicket} 
+          type={billingType} 
+          correlative={`${billingType === "FACTURA" ? "F001" : "B001"}-${bookingId.toString().padStart(6, '0')}`} 
+        />
+      )}
+      
       <div className="flex gap-2 justify-center">
+        {!isCancelled && (
+          <button
+            onClick={handleOpenBilling}
+            className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-zinc-800 hover:text-zinc-800 hover:bg-zinc-100 transition-all hover:shadow-[0_2px_10px_rgba(39,39,42,0.1)] hover:-translate-y-0.5"
+            title="Emitir Comprobante (Boleta/Factura)"
+          >
+            <Printer size={14} className="group-hover:scale-110 transition-transform duration-300" />
+          </button>
+        )}
         {!isCancelled && (
           <button
             onClick={handleShareWhatsApp}
@@ -509,6 +602,104 @@ export function AdminTableActions({
                 </ul>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Facturación / Boleta */}
+      {isBillingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
+            <button 
+              onClick={() => setIsBillingModalOpen(false)}
+              className="absolute top-4 right-4 text-stone-400 hover:text-stone-700"
+            >
+              <X size={20} />
+            </button>
+            
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-600 flex items-center justify-center">
+                <Printer size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold text-stone-900">Emitir Comprobante</h3>
+                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva #{bookingId}</p>
+              </div>
+            </div>
+
+            <div className="flex bg-stone-100 p-1 rounded-xl mb-4">
+              <button
+                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${billingType === 'BOLETA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
+                onClick={() => {
+                  setBillingType('BOLETA');
+                  setBillingDocument(guestDocument || "");
+                  setBillingName(guestName);
+                }}
+              >
+                BOLETA
+              </button>
+              <button
+                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${billingType === 'FACTURA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
+                onClick={() => {
+                  setBillingType('FACTURA');
+                  setBillingDocument("");
+                  setBillingName("");
+                }}
+              >
+                FACTURA
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
+                  {billingType === "FACTURA" ? "RUC (11 dígitos)" : "DNI / Documento"}
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={billingDocument}
+                    onChange={(e) => setBillingDocument(e.target.value.replace(/\D/g, ''))}
+                    maxLength={billingType === "FACTURA" ? 11 : 8}
+                    placeholder={billingType === "FACTURA" ? "Ej. 20123456789" : "Ej. 70123456"}
+                    className="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold"
+                  />
+                  <button
+                    onClick={handleFetchDocument}
+                    disabled={isFetchingRuc || (billingType === "FACTURA" ? billingDocument.length !== 11 : billingDocument.length !== 8)}
+                    className="px-3 bg-zinc-800 text-white rounded-lg text-xs font-bold disabled:opacity-50"
+                  >
+                    {isFetchingRuc ? "..." : "Buscar"}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
+                  {billingType === "FACTURA" ? "Razón Social" : "Nombre del Cliente"}
+                </label>
+                <input
+                  type="text"
+                  value={billingName}
+                  onChange={(e) => setBillingName(e.target.value.toUpperCase())}
+                  placeholder="Nombres completos"
+                  className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold uppercase"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                if (!billingDocument || !billingName) {
+                  alert("Complete los datos del cliente");
+                  return;
+                }
+                setIsBillingModalOpen(false);
+                setIsPrinting(true);
+              }}
+              className="w-full py-3 bg-stone-900 text-white rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-stone-800 transition shadow-lg shadow-stone-900/20"
+            >
+              Generar {billingType} e Imprimir
+            </button>
           </div>
         </div>
       )}

@@ -362,3 +362,31 @@ export async function deleteBookingExtra(formData: FormData) {
   revalidatePath("/admin");
   return { success: true };
 }
+
+// ==============================================================================
+// 9. FUNCIÓN: FETCH RUC DATA SERVER-SIDE
+// ==============================================================================
+export async function fetchRucData(ruc: string) {
+  try {
+    const res = await fetch(`https://api.apis.net.pe/v1/ruc?numero=${ruc}`);
+    if (!res.ok) return { error: "Failed to fetch RUC" };
+    const data = await res.json();
+    return { data };
+  } catch (error) {
+    return { error: "Network error" };
+  }
+}
+
+// ==============================================================================
+// 10. FUNCIÓN: FETCH DNI DATA SERVER-SIDE
+// ==============================================================================
+export async function fetchDniData(dni: string) {
+  try {
+    const res = await fetch(`https://api.apis.net.pe/v1/dni?numero=${dni}`);
+    if (!res.ok) return { error: "Failed to fetch DNI" };
+    const data = await res.json();
+    return { data };
+  } catch (error) {
+    return { error: "Network error" };
+  }
+}

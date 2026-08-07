@@ -255,3 +255,20 @@ html {
 .password-toggle:hover {
   color: #e3004f;
 }
+/* Thermal Printer CSS */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .thermal-ticket, .thermal-ticket * {
+    visibility: visible;
+  }
+  .thermal-ticket {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 302px; /* Approx 80mm */
+    margin: 0;
+    padding: 10px;
+  }
+}
