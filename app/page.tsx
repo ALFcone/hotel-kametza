@@ -1797,51 +1797,93 @@ export default function Home() {
         id="contacto"
         className="min-h-screen flex flex-col justify-center py-24 relative overflow-hidden z-10 w-full bg-[url('/bg_contacto.png')] bg-cover bg-center bg-fixed border-t border-stone-200"
       >
-        <div className="absolute inset-0 bg-[#FDFBF7]/90 backdrop-blur-md"></div>
-        <div className="w-full px-4 md:px-8 xl:px-12 text-center relative z-10 max-w-none">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="h-[1px] w-12 md:w-20 bg-amber-400/50"></div>
-            <span className="text-amber-600 font-serif italic text-lg md:text-2xl font-medium tracking-wide">
-              Atención 24/7
-            </span>
-            <div className="h-[1px] w-12 md:w-20 bg-amber-400/50"></div>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-rose-950">
-            {" "}
-            ¿Deseas una atención directa?{" "}
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8 text-center max-w-6xl mx-auto mt-12">
-            <a
-              href="https://wa.me/51966556622"
-              target="_blank"
-              className="p-10 bg-white/80 backdrop-blur-sm border border-stone-200 rounded-[2.5rem] hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(251,191,36,0.15)] transition duration-500 group flex flex-col items-center justify-center hover:-translate-y-2"
-            >
-              <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center text-amber-500 mb-6 group-hover:scale-110 transition duration-500 border border-stone-100">
-                <MessageSquare size={32} />
+        <div className="absolute inset-0 bg-[#FDFBF7]/95 backdrop-blur-md"></div>
+        <div className="w-full px-4 md:px-8 xl:px-12 relative z-10 max-w-7xl mx-auto">
+          
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* TEXTO Y MÉTODOS DE CONTACTO */}
+            <div className="text-left">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-[1px] w-12 bg-amber-400"></div>
+                <span className="text-amber-600 font-serif italic text-lg md:text-xl font-medium tracking-wide">
+                  Atención 24/7
+                </span>
               </div>
-              <h3 className="font-black text-2xl mb-2 text-rose-950 font-serif">WhatsApp</h3>
-              <p className="text-amber-600 font-bold tracking-widest">966 556 622</p>
-            </a>
-            <a
-              href="tel:+51920042099"
-              className="p-10 bg-white/80 backdrop-blur-sm border border-stone-200 rounded-[2.5rem] hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(251,191,36,0.15)] transition duration-500 group flex flex-col items-center justify-center hover:-translate-y-2"
-            >
-              <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center text-amber-500 mb-6 group-hover:scale-110 transition duration-500 border border-stone-100">
-                <Phone size={32} />
+              <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-rose-950 leading-tight">
+                Estamos aquí para ti, a cualquier hora.
+              </h2>
+              <p className="text-stone-600 text-lg mb-12 leading-relaxed">
+                Ya sea que necesites ayuda con tu reserva, coordinar tu llegada de madrugada, o simplemente pedir una recomendación local, nuestro equipo de recepción está disponible las 24 horas para garantizar que tu experiencia sea perfecta.
+              </p>
+
+              <div className="space-y-6">
+                <a
+                  href="https://wa.me/51966556622"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/60 transition group border border-transparent hover:border-amber-200"
+                >
+                  <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition duration-300">
+                    <MessageSquare size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-stone-900 group-hover:text-amber-600 transition">WhatsApp Directo</h3>
+                    <p className="text-stone-500 font-medium">966 556 622</p>
+                  </div>
+                </a>
+
+                <a
+                  href="tel:+51920042099"
+                  className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/60 transition group border border-transparent hover:border-amber-200"
+                >
+                  <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition duration-300">
+                    <Phone size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-stone-900 group-hover:text-amber-600 transition">Recepción</h3>
+                    <p className="text-stone-500 font-medium">920 042 099</p>
+                  </div>
+                </a>
+
+                <a
+                  href="mailto:kametzahotelayacucho@gmail.com"
+                  className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/60 transition group border border-transparent hover:border-amber-200"
+                >
+                  <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition duration-300">
+                    <Mail size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-stone-900 group-hover:text-amber-600 transition">Correo Electrónico</h3>
+                    <p className="text-stone-500 font-medium">kametzahotelayacucho@gmail.com</p>
+                  </div>
+                </a>
               </div>
-              <h3 className="font-black text-2xl mb-2 text-rose-950 font-serif">Recepción</h3>
-              <p className="text-amber-600 font-bold tracking-widest">920 042 099</p>
-            </a>
-            <a
-              href="mailto:kametzahotelayacucho@gmail.com"
-              className="p-10 bg-white/80 backdrop-blur-sm border border-stone-200 rounded-[2.5rem] hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(251,191,36,0.15)] transition duration-500 group flex flex-col items-center justify-center hover:-translate-y-2"
-            >
-              <div className="w-16 h-16 bg-stone-50 rounded-2xl flex items-center justify-center text-amber-500 mb-6 group-hover:scale-110 transition duration-500 border border-stone-100">
-                <Mail size={32} />
-              </div>
-              <h3 className="font-black text-2xl mb-2 text-rose-950 font-serif">Correo</h3>
-              <p className="text-amber-600 font-bold text-sm">kametzahotelayacucho@gmail.com</p>
-            </a>
+            </div>
+
+            {/* FORMULARIO DE CONTACTO */}
+            <div className="bg-white p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-stone-200/50 border border-stone-100 relative">
+              <div className="absolute -top-6 -right-6 w-24 h-24 bg-rose-100 rounded-full blur-2xl opacity-60"></div>
+              <h3 className="text-2xl font-serif font-bold text-stone-900 mb-2 relative z-10">Envíanos un mensaje</h3>
+              <p className="text-stone-500 text-sm mb-8 relative z-10">Te responderemos a la brevedad posible.</p>
+              
+              <form className="space-y-5 relative z-10" onSubmit={(e) => { e.preventDefault(); alert('Mensaje enviado. ¡Gracias por contactarnos!'); }}>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Nombre Completo</label>
+                  <input type="text" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm" placeholder="Ej. Carlos Mendoza" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Correo Electrónico</label>
+                  <input type="email" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm" placeholder="correo@ejemplo.com" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Tu Consulta</label>
+                  <textarea required rows={4} className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
+                </div>
+                <button type="submit" className="w-full bg-stone-900 text-white font-bold py-4 rounded-2xl hover:bg-[#e3004f] transition-all shadow-lg hover:shadow-rose-900/20 text-sm tracking-widest uppercase mt-4">
+                  Enviar Mensaje
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
