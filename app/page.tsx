@@ -1280,9 +1280,9 @@ export default function Home() {
         </div>
       </section>
       {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
-      <section id="habitaciones" className="scroll-reveal min-h-screen flex flex-col justify-center py-24 relative z-10 w-full">
+      <section id="habitaciones" className="min-h-screen flex flex-col justify-center py-24 relative z-10 w-full">
         <div className="w-full px-4 md:px-8 xl:px-12">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 scroll-reveal">
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-rose-950">
               Nuestras Habitaciones
             </h2>
@@ -1292,8 +1292,12 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap justify-center gap-6 md:gap-8 w-full">
             { }
-            {groupedRooms.map((room: any) => (
-              <div key={room.name} className="w-full sm:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[calc(25%-1.5rem)] max-w-[420px]">
+            {groupedRooms.map((room: any, index: number) => (
+              <div 
+                key={room.name} 
+                className="w-full sm:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[calc(25%-1.5rem)] max-w-[420px] scroll-reveal"
+                style={{ transitionDelay: `${index * 150}ms` }}
+              >
                 <RoomCard
                   room={room}
                   onRequireAuth={triggerAuthFlow}
@@ -1326,56 +1330,57 @@ export default function Home() {
           </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {servicesData.map((service) => {
+            {servicesData.map((service, index: number) => {
               const Icon = service.icon;
               const isActive = activeServiceId === service.id;
               return (
-                <button
-                  key={service.id}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (isActive) {
-                      setActiveServiceId(null);
-                    } else {
-                      setActiveServiceId(service.id);
-                      setTimeout(() => {
-                        document.getElementById('service-detail')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      }, 150);
-                    }
-                  }}
-                  className={`group bg-white rounded-[2rem] overflow-hidden transition-all duration-500 flex flex-col text-left border ${
-                    isActive ? 'border-rose-300 ring-4 ring-rose-50 scale-[1.02] shadow-2xl shadow-rose-900/10' : 'border-stone-100 hover:border-rose-100 hover:-translate-y-2 shadow-lg hover:shadow-2xl hover:shadow-rose-900/10'
-                  }`}
-                >
-                  <div className="relative h-60 w-full overflow-hidden">
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    {service.tag && (
-                      <div className={`absolute top-4 left-4 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase shadow-sm ${
-                        service.tag === 'Recomendado' ? 'bg-amber-400/90 text-amber-950' : 'bg-white/90 text-stone-800'
-                      }`}>
-                        {service.tag}
+                <div key={service.id} className="scroll-reveal h-full" style={{ transitionDelay: `${index * 150}ms` }}>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (isActive) {
+                        setActiveServiceId(null);
+                      } else {
+                        setActiveServiceId(service.id);
+                        setTimeout(() => {
+                          document.getElementById('service-detail')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 150);
+                      }
+                    }}
+                    className={`group w-full h-full bg-white rounded-[2rem] overflow-hidden transition-all duration-500 flex flex-col text-left border ${
+                      isActive ? 'border-rose-300 ring-4 ring-rose-50 scale-[1.02] shadow-2xl shadow-rose-900/10' : 'border-stone-100 hover:border-rose-100 hover:-translate-y-2 shadow-lg hover:shadow-2xl hover:shadow-rose-900/10'
+                    }`}
+                  >
+                    <div className="relative h-60 w-full overflow-hidden">
+                      <img
+                        src={service.image}
+                        alt={service.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      {service.tag && (
+                        <div className={`absolute top-4 left-4 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase shadow-sm ${
+                          service.tag === 'Recomendado' ? 'bg-amber-400/90 text-amber-950' : 'bg-white/90 text-stone-800'
+                        }`}>
+                          {service.tag}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-8 flex-1 flex flex-col relative">
+                      <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
+                        <Icon size={24} />
                       </div>
-                    )}
-                  </div>
-                  <div className="p-8 flex-1 flex flex-col relative">
-                    <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-100 absolute -top-7 right-8 group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">
-                      <Icon size={24} />
+                      <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
+                        {service.title}
+                      </h3>
+                      <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
+                        {service.shortDesc}
+                      </p>
+                      <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-colors">
+                        {isActive ? 'Cerrar Detalles' : 'Ver Detalles'} <ArrowRight size={14} className={`transition-transform ${isActive ? 'rotate-90 text-rose-700' : 'group-hover:translate-x-2'}`} />
+                      </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-stone-900 mb-3 font-serif">
-                      {service.title}
-                    </h3>
-                    <p className="text-stone-500 text-sm leading-relaxed mb-6 flex-1">
-                      {service.shortDesc}
-                    </p>
-                    <div className="flex items-center gap-2 text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-colors">
-                      {isActive ? 'Cerrar Detalles' : 'Ver Detalles'} <ArrowRight size={14} className={`transition-transform ${isActive ? 'rotate-90 text-rose-700' : 'group-hover:translate-x-2'}`} />
-                    </div>
-                  </div>
-                </button>
+                  </button>
+                </div>
               );
             })}
           </div>
