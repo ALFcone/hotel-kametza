@@ -56,7 +56,8 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
         <p><strong>FECHA:</strong> {currentDate}</p>
         <p><strong>CLIENTE:</strong> {booking.customer_name}</p>
         <p><strong>{type === "FACTURA" ? "RUC" : "DNI"}:</strong> {booking.customer_document || "00000000"}</p>
-        <p><strong>HABITACIÓN:</strong> {booking.room_id}</p>
+        {booking.customer_address && <p><strong>DIRECCIÓN:</strong> {booking.customer_address}</p>}
+        <p><strong>HABITACIÓN:</strong> {booking.room_id} {booking.room_type ? `(${booking.room_type})` : ''}</p>
       </div>
 
       {/* Details */}
