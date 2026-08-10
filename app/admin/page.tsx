@@ -9,7 +9,7 @@
 import { getSupabaseServer } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { toggleRoomCleanliness, updateRoom } from "../actions";
+import { toggleRoomCleanliness, updateRoom, getUserRole } from "../actions";
 import DownloadButton from "./DownloadButton";
 import Link from "next/link";
 import WalkInForm from "./WalkInForm";
@@ -60,12 +60,12 @@ async function markAsPaid(formData: FormData) {
     return;
   }
 
-  const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
-  if (!user || user.email !== "alfesco86@gmail.com") {
-    console.log("Unauthorized or no user:", user?.email);
+  const { role, user } = await getUserRole();
+  if (!role || !user) {
+    console.log("Unauthorized or no user role");
     return;
   }
+  const supabaseServer = await getSupabaseServer();
 
   const id = parseInt(bookingId.toString(), 10);
   console.log(`Attempting to mark booking ${id} as pagado for user ${user.email}`);
@@ -86,8 +86,8 @@ async function deleteBooking(formData: FormData) {
   if (!bookingId) return;
 
   const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
-  if (!user || user.email !== "alfesco86@gmail.com") return;
+  const { role } = await getUserRole();
+  if (role !== "admin") return; // Only admin can delete bookings without PIN in this simplified action
 
   const id = parseInt(bookingId.toString(), 10);
 
@@ -132,19 +132,21 @@ export default async function AdminPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   // VALIDACIÓN
-  const supabaseServer = await getSupabaseServer();
-  const { data: { user }, error: authError } = await supabaseServer.auth.getUser();
+  // VALIDACIÓN DE ROL
+  const { user, role } = await getUserRole();
 
-  if (!user || authError) {
+  if (!user) {
     redirect("/login");
   }
 
-  if (user.email !== "alfesco86@gmail.com") {
+  if (!role) {
+    // Si no tiene rol (admin o receptionist), es un cliente regular
     redirect("/dashboard");
   }
 
+  const supabaseServer = await getSupabaseServer();
   const searchParams = await props.searchParams;
-  const activeTab = searchParams.tab || "resumen";
+  const activeTab = searchParams.tab || (role === "admin" ? "resumen" : "estado");
 
   // A. FECHAS Y PARÁMETROS
   const today = new Date().toISOString().split("T")[0];
@@ -358,16 +360,18 @@ export default async function AdminPage(props: {
 
           {/* Menú de Navegación */}
           <nav className="flex flex-col gap-1.5">
-            <Link
-              href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === "resumen"
-                  ? "bg-white text-[#d97706] shadow-md"
-                  : "text-amber-100/80 hover:bg-white/10 hover:text-white"
-              }`}
-            >
-              <TrendingUp size={16} /> Resumen y Ventas
-            </Link>
+            {role === "admin" && (
+              <Link
+                href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                  activeTab === "resumen"
+                    ? "bg-white text-[#d97706] shadow-md"
+                    : "text-amber-100/80 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                <TrendingUp size={16} /> Resumen y Ventas
+              </Link>
+            )}
             <Link
               href={`/admin?tab=estado&from=${dateFrom}&to=${dateTo}`}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
@@ -1031,6 +1035,7 @@ export default async function AdminPage(props: {
                                 guestDocument={booking.document_number || undefined}
                                 onDelete={deleteBooking}
                                 products={products || []}
+                                userRole={role}
                               />
                             </td>
                           </tr>
@@ -1269,10 +1274,12 @@ export default async function AdminPage(props: {
 
       {/* --- MOBILE BOTTOM NAV --- */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-stone-950 text-white border-t border-stone-800 flex justify-between items-center px-6 py-4 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)]">
-        <Link href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "resumen" ? "text-amber-500" : "text-stone-400"}`}>
-          <TrendingUp size={20} />
-          <span className="text-[8px] font-black uppercase">Resumen</span>
-        </Link>
+        {role === "admin" && (
+          <Link href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "resumen" ? "text-amber-500" : "text-stone-400"}`}>
+            <TrendingUp size={20} />
+            <span className="text-[8px] font-black uppercase">Resumen</span>
+          </Link>
+        )}
         <Link href={`/admin?tab=estado&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "estado" ? "text-amber-500" : "text-stone-400"}`}>
           <LayoutDashboard size={20} />
           <span className="text-[8px] font-black uppercase">Estado</span>

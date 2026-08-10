@@ -13,6 +13,26 @@ import { getSupabaseServer } from "@/lib/supabase-server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
+// ==============================================================================
+// 1. HELPER: GET USER ROLE
+// ==============================================================================
+export async function getUserRole() {
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+  
+  if (!user) return { user: null, role: null };
+  
+  const { data } = await supabaseServer
+    .from("hotel_staff")
+    .select("role")
+    .eq("email", user.email)
+    .single();
+    
+  return { 
+    user, 
+    role: data?.role || null // 'admin' | 'receptionist' | null
+  };
+}
 
 // ==============================================================================
 // 2. FUNCIÓN: CREAR RESERVA (Directa a tabla 'reserva')
@@ -92,13 +112,13 @@ export async function cancelBooking(bookingId: number) {
 }
 
 export async function updateRoom(formData: FormData) {
-  const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
+  const { role } = await getUserRole();
 
-  if (!user || user.email !== "alfesco86@gmail.com") {
-    console.error("No autorizado: Permisos insuficientes");
+  if (role !== "admin") {
+    console.error("No autorizado: Solo admin puede actualizar habitaciones");
     return;
   }
+  const supabaseServer = await getSupabaseServer();
 
   const idHabitacion = Number(formData.get("roomId"));
   const price = Number(formData.get("price"));
@@ -157,12 +177,12 @@ export async function updateRoom(formData: FormData) {
 }
 
 export async function adminCreateBooking(formData: FormData) {
-  const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
+  const { user, role } = await getUserRole();
 
-  if (!user || user.email !== "alfesco86@gmail.com") {
+  if (!user || !role) {
     return { error: "No autorizado." };
   }
+  const supabaseServer = await getSupabaseServer();
 
   const idHabitacion = Number(formData.get("roomId"));
   const price = Number(formData.get("price"));
@@ -213,12 +233,12 @@ export async function adminCreateBooking(formData: FormData) {
 }
 
 export async function adminRegisterPayment(bookingId: number, amount: number) {
-  const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
+  const { role } = await getUserRole();
 
-  if (!user || user.email !== "alfesco86@gmail.com") {
+  if (!role) {
     return { error: "No autorizado." };
   }
+  const supabaseServer = await getSupabaseServer();
 
   // Obtener la reserva actual
   const { data: booking, error: fetchError } = await supabaseServer
@@ -252,12 +272,12 @@ export async function adminRegisterPayment(bookingId: number, amount: number) {
 }
 
 export async function toggleRoomCleanliness(formData: FormData) {
-  const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
+  const { role } = await getUserRole();
 
-  if (!user || user.email !== "alfesco86@gmail.com") {
+  if (!role) {
     return;
   }
+  const supabaseServer = await getSupabaseServer();
 
   const roomId = Number(formData.get("roomId"));
   const isCleanStr = formData.get("isClean") as string;
@@ -278,12 +298,12 @@ export async function toggleRoomCleanliness(formData: FormData) {
 }
 
 export async function adminUpdateBookingDates(bookingId: number, newCheckOut: string, newTotal: number) {
-  const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
+  const { role } = await getUserRole();
 
-  if (!user || user.email !== "alfesco86@gmail.com") {
+  if (!role) {
     return { error: "No autorizado." };
   }
+  const supabaseServer = await getSupabaseServer();
 
   const { data, error } = await supabaseServer
     .from("bookings")
@@ -305,12 +325,12 @@ export async function adminUpdateBookingDates(bookingId: number, newCheckOut: st
 }
 
 export async function addBookingExtra(formData: FormData) {
-  const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
+  const { role } = await getUserRole();
 
-  if (!user || user.email !== "alfesco86@gmail.com") {
+  if (!role) {
     return { error: "No autorizado." };
   }
+  const supabaseServer = await getSupabaseServer();
 
   const bookingId = Number(formData.get("bookingId"));
   const itemName = formData.get("itemName") as string;
@@ -372,12 +392,12 @@ export async function addBookingExtra(formData: FormData) {
 }
 
 export async function deleteBookingExtra(formData: FormData) {
-  const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
+  const { role } = await getUserRole();
 
-  if (!user || user.email !== "alfesco86@gmail.com") {
+  if (!role) {
     return { error: "No autorizado." };
   }
+  const supabaseServer = await getSupabaseServer();
 
   const extraId = Number(formData.get("extraId"));
 
@@ -450,9 +470,9 @@ export async function fetchDniData(dni: string) {
 // 11. FUNCIONES DE PRODUCTOS E INVENTARIO
 // ==============================================================================
 export async function createProduct(formData: FormData) {
+  const { role } = await getUserRole();
+  if (role !== "admin") return { error: "No autorizado" };
   const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
-  if (!user || user.email !== "alfesco86@gmail.com") return { error: "No autorizado" };
 
   const name = formData.get("name") as string;
   const price = Number(formData.get("price"));
@@ -468,9 +488,9 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(formData: FormData) {
+  const { role } = await getUserRole();
+  if (role !== "admin") return { error: "No autorizado" };
   const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
-  if (!user || user.email !== "alfesco86@gmail.com") return { error: "No autorizado" };
 
   const id = Number(formData.get("id"));
   const name = formData.get("name") as string;
@@ -487,9 +507,9 @@ export async function updateProduct(formData: FormData) {
 }
 
 export async function deleteProduct(formData: FormData) {
+  const { role } = await getUserRole();
+  if (role !== "admin") return { error: "No autorizado" };
   const supabaseServer = await getSupabaseServer();
-  const { data: { user } } = await supabaseServer.auth.getUser();
-  if (!user || user.email !== "alfesco86@gmail.com") return { error: "No autorizado" };
 
   const id = Number(formData.get("id"));
   if (!id) return { error: "ID inválido" };

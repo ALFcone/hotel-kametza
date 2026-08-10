@@ -28,6 +28,7 @@ interface AdminTableActionsProps {
   guestDocument?: string;
   onDelete: (formData: FormData) => void;
   products?: any[];
+  userRole?: string | null;
   // added customer_document if it exists in parent, otherwise we'll pass guestName as is
 }
 
@@ -47,6 +48,7 @@ export function AdminTableActions({
   guestDocument,
   onDelete,
   products = [],
+  userRole,
 }: AdminTableActionsProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -355,7 +357,22 @@ export function AdminTableActions({
             <FileWarning size={14} className="group-hover:scale-110 transition-transform duration-300" />
           </button>
         )}
-        <form action={onDelete}>
+        <form 
+          action={onDelete} 
+          onSubmit={(e) => {
+            if (userRole !== "admin") {
+              const pin = prompt("Ingrese el PIN Maestro para eliminar esta reserva:");
+              if (pin !== "2026") {
+                e.preventDefault();
+                alert("PIN incorrecto. No tiene permisos para eliminar reservas.");
+                return;
+              }
+            }
+            if (!confirm("¿Estás seguro de eliminar completamente esta reserva?")) {
+              e.preventDefault();
+            }
+          }}
+        >
           <input type="hidden" name="bookingId" value={bookingId} />
           <button
             type="submit"
