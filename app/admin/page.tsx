@@ -14,6 +14,7 @@ import DownloadButton from "./DownloadButton";
 import Link from "next/link";
 import WalkInForm from "./WalkInForm";
 import { AdminTableActions } from "./AdminTableActions";
+import AdminProducts from "./AdminProducts";
 import {
   Calendar,
   CheckCircle,
@@ -44,6 +45,7 @@ import {
   CalendarDays,
   Users,
   Building,
+  ShoppingCart,
 } from "lucide-react";
 
 // ==============================================================================
@@ -168,6 +170,10 @@ export default async function AdminPage(props: {
     .from("booking_extras")
     .select("*")
     .order("created_at", { ascending: false });
+  const { data: products } = await supabaseServer
+    .from("products")
+    .select("*")
+    .order("name", { ascending: true });
 
   // C. FILTRADO (Reservas creadas o que inician en el rango de fechas)
   const filteredBookings = allBookings?.filter((b) => {
@@ -411,6 +417,16 @@ export default async function AdminPage(props: {
               }`}
             >
               <CalendarCheck size={16} /> Registrar Reserva
+            </Link>
+            <Link
+              href={`/admin?tab=almacen&from=${dateFrom}&to=${dateTo}`}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === "almacen"
+                  ? "bg-white text-[#d97706] shadow-md"
+                  : "text-amber-100/80 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <ShoppingCart size={16} /> Almacén / Minibar
             </Link>
           </nav>
         </div>
@@ -1014,6 +1030,7 @@ export default async function AdminPage(props: {
                                 guestPhone={booking.client_phone || undefined}
                                 guestDocument={booking.document_number || undefined}
                                 onDelete={deleteBooking}
+                                products={products || []}
                               />
                             </td>
                           </tr>
@@ -1240,6 +1257,13 @@ export default async function AdminPage(props: {
               </div>
             </div>
           )}
+
+          {/* --- TAB: ALMACEN / PRODUCTOS --- */}
+          {activeTab === "almacen" && (
+            <div id="almacen" className="scroll-mt-24 mb-12 animate-fade-in-up">
+              <AdminProducts products={products || []} />
+            </div>
+          )}
         </div>
       </main>
 
@@ -1268,6 +1292,10 @@ export default async function AdminPage(props: {
         <Link href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "registrar" ? "text-amber-500" : "text-stone-400"}`}>
           <CalendarCheck size={20} />
           <span className="text-[8px] font-black uppercase">Registro</span>
+        </Link>
+        <Link href={`/admin?tab=almacen&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "almacen" ? "text-amber-500" : "text-stone-400"}`}>
+          <ShoppingCart size={20} />
+          <span className="text-[8px] font-black uppercase">Almacén</span>
         </Link>
       </nav>
     </div>

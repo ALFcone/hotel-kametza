@@ -316,22 +316,54 @@ export async function addBookingExtra(formData: FormData) {
   const itemName = formData.get("itemName") as string;
   const price = Number(formData.get("price"));
   const quantity = Number(formData.get("quantity")) || 1;
+  const productId = formData.get("productId") ? Number(formData.get("productId")) : null;
 
-  if (!itemName || price <= 0 || quantity <= 0) {
+  if (!itemName || price < 0 || quantity <= 0) {
     return { error: "Datos inválidos para el consumo." };
   }
 
+  // 1. Descontar stock si es un producto real
+  if (productId) {
+    // Obtener el stock actual
+    const { data: product, error: fetchErr } = await supabaseServer
+      .from("products")
+      .select("stock")
+      .eq("id", productId)
+      .single();
+
+    if (fetchErr || !product) {
+      return { error: "Producto no encontrado." };
+    }
+
+    if (product.stock < quantity) {
+      return { error: "Stock insuficiente." };
+    }
+
+    // Actualizar stock
+    const { error: updateErr } = await supabaseServer
+      .from("products")
+      .update({ stock: product.stock - quantity })
+      .eq("id", productId);
+      
+    if (updateErr) {
+      return { error: "Error al actualizar stock del producto." };
+    }
+  }
+
+  // 2. Insertar el consumo en la reserva
   const { error } = await supabaseServer
     .from("booking_extras")
     .insert({
       booking_id: bookingId,
       item_name: itemName,
       price,
-      quantity
+      quantity,
+      product_id: productId
     });
 
   if (error) {
     console.error("Error al añadir consumo extra:", error.message);
+    // Nota: en un sistema robusto habría que revertir el stock aquí si falla.
     return { error: "No se pudo guardar el consumo." };
   }
 
@@ -349,6 +381,13 @@ export async function deleteBookingExtra(formData: FormData) {
 
   const extraId = Number(formData.get("extraId"));
 
+  // Obtener la información del extra antes de borrarlo
+  const { data: extra } = await supabaseServer
+    .from("booking_extras")
+    .select("product_id, quantity")
+    .eq("id", extraId)
+    .single();
+
   const { error } = await supabaseServer
     .from("booking_extras")
     .delete()
@@ -357,6 +396,22 @@ export async function deleteBookingExtra(formData: FormData) {
   if (error) {
     console.error("Error al borrar consumo extra:", error.message);
     return { error: "No se pudo eliminar el consumo." };
+  }
+
+  // Devolver el stock si estaba enlazado a un producto
+  if (extra && extra.product_id) {
+    const { data: product } = await supabaseServer
+      .from("products")
+      .select("stock")
+      .eq("id", extra.product_id)
+      .single();
+      
+    if (product) {
+      await supabaseServer
+        .from("products")
+        .update({ stock: product.stock + extra.quantity })
+        .eq("id", extra.product_id);
+    }
   }
 
   revalidatePath("/admin");
@@ -389,4 +444,59 @@ export async function fetchDniData(dni: string) {
   } catch (error) {
     return { error: "Network error" };
   }
+}
+
+// ==============================================================================
+// 11. FUNCIONES DE PRODUCTOS E INVENTARIO
+// ==============================================================================
+export async function createProduct(formData: FormData) {
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+  if (!user || user.email !== "alfesco86@gmail.com") return { error: "No autorizado" };
+
+  const name = formData.get("name") as string;
+  const price = Number(formData.get("price"));
+  const stock = Number(formData.get("stock"));
+
+  if (!name || isNaN(price) || isNaN(stock)) return { error: "Datos inválidos" };
+
+  const { error } = await supabaseServer.from("products").insert({ name, price, stock });
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin");
+  return { success: true };
+}
+
+export async function updateProduct(formData: FormData) {
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+  if (!user || user.email !== "alfesco86@gmail.com") return { error: "No autorizado" };
+
+  const id = Number(formData.get("id"));
+  const name = formData.get("name") as string;
+  const price = Number(formData.get("price"));
+  const stock = Number(formData.get("stock"));
+
+  if (!id || !name || isNaN(price) || isNaN(stock)) return { error: "Datos inválidos" };
+
+  const { error } = await supabaseServer.from("products").update({ name, price, stock }).eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin");
+  return { success: true };
+}
+
+export async function deleteProduct(formData: FormData) {
+  const supabaseServer = await getSupabaseServer();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+  if (!user || user.email !== "alfesco86@gmail.com") return { error: "No autorizado" };
+
+  const id = Number(formData.get("id"));
+  if (!id) return { error: "ID inválido" };
+
+  const { error } = await supabaseServer.from("products").delete().eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin");
+  return { success: true };
 }

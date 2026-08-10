@@ -27,6 +27,7 @@ interface AdminTableActionsProps {
   guestPhone?: string;
   guestDocument?: string;
   onDelete: (formData: FormData) => void;
+  products?: any[];
   // added customer_document if it exists in parent, otherwise we'll pass guestName as is
 }
 
@@ -45,6 +46,7 @@ export function AdminTableActions({
   guestPhone,
   guestDocument,
   onDelete,
+  products = [],
 }: AdminTableActionsProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -55,6 +57,7 @@ export function AdminTableActions({
   const [extraName, setExtraName] = useState("");
   const [extraPrice, setExtraPrice] = useState("");
   const [extraQty, setExtraQty] = useState("1");
+  const [extraProductId, setExtraProductId] = useState<string>("");
   const [editCheckOut, setEditCheckOut] = useState<string>(checkOut);
   const [editTotalPrice, setEditTotalPrice] = useState<string>(totalPrice.toString());
   const [loading, setLoading] = useState(false);
@@ -181,11 +184,25 @@ export function AdminTableActions({
   const handleAddExtra = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
+    // Validar stock si se seleccionó un producto
+    if (extraProductId) {
+      const selectedProduct = products.find(p => p.id.toString() === extraProductId);
+      if (selectedProduct && selectedProduct.stock < Number(extraQty)) {
+        alert(`No hay stock suficiente. Stock actual: ${selectedProduct.stock}`);
+        setLoading(false);
+        return;
+      }
+    }
+
     const formData = new FormData();
     formData.append("bookingId", bookingId.toString());
-    formData.append("itemName", extraName);
+    formData.append("itemName", extraName.toUpperCase());
     formData.append("price", extraPrice);
     formData.append("quantity", extraQty);
+    if (extraProductId) {
+      formData.append("productId", extraProductId);
+    }
     
     const result = await addBookingExtra(formData);
     if (result.error) alert(result.error);
@@ -193,6 +210,7 @@ export function AdminTableActions({
       setExtraName("");
       setExtraPrice("");
       setExtraQty("1");
+      setExtraProductId("");
     }
     setLoading(false);
   };
@@ -566,14 +584,43 @@ export function AdminTableActions({
             <form onSubmit={handleAddExtra} className="bg-stone-50 border border-stone-200 rounded-2xl p-4 mb-6">
               <h4 className="text-[10px] font-black uppercase text-stone-400 mb-3">Añadir Nuevo Consumo</h4>
               <div className="space-y-3">
-                <input
-                  type="text"
-                  placeholder="Ej: Botella de Agua"
-                  value={extraName}
-                  onChange={(e) => setExtraName(e.target.value)}
-                  required
-                  className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold placeholder-stone-300"
-                />
+                <select
+                  className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold bg-white"
+                  value={extraProductId}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setExtraProductId(val);
+                    if (val) {
+                      const prod = products.find(p => p.id.toString() === val);
+                      if (prod) {
+                        setExtraName(prod.name);
+                        setExtraPrice(prod.price.toString());
+                      }
+                    } else {
+                      setExtraName("");
+                      setExtraPrice("");
+                    }
+                  }}
+                >
+                  <option value="">-- Consumo Personalizado --</option>
+                  {products.map(p => (
+                    <option key={p.id} value={p.id} disabled={p.stock <= 0}>
+                      {p.name} - S/ {p.price.toFixed(2)} (Stock: {p.stock})
+                    </option>
+                  ))}
+                </select>
+
+                {!extraProductId && (
+                  <input
+                    type="text"
+                    placeholder="Ej: Lavandería (Escribe manualmente)"
+                    value={extraName}
+                    onChange={(e) => setExtraName(e.target.value)}
+                    required
+                    className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold placeholder-stone-300"
+                  />
+                )}
+                
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">S/</span>
