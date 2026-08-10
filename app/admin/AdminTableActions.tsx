@@ -61,6 +61,7 @@ export function AdminTableActions({
   const [billingType, setBillingType] = useState<"BOLETA" | "FACTURA" | "NOTA DE CRÉDITO">("BOLETA");
   const [billingDocument, setBillingDocument] = useState("");
   const [billingName, setBillingName] = useState("");
+  const [billingAddress, setBillingAddress] = useState("");
   const [isFetchingRuc, setIsFetchingRuc] = useState(false);
 
   const handleFetchDocument = async () => {
@@ -81,6 +82,17 @@ export function AdminTableActions({
         
       if (billingType === "FACTURA" && result.data && result.data.nombre) {
         setBillingName(result.data.nombre);
+        if (result.data.direccion) {
+          const fullAddress = [
+            result.data.direccion,
+            result.data.distrito,
+            result.data.provincia,
+            result.data.departamento
+          ].filter(Boolean).join(" - ");
+          setBillingAddress(fullAddress);
+        } else {
+          setBillingAddress("");
+        }
       } else if (billingType === "BOLETA" && result.data) {
         // Algunas APIs devuelven "nombre", otras devuelven "nombres", "apellidoPaterno", etc.
         if (result.data.nombre) {
@@ -90,6 +102,7 @@ export function AdminTableActions({
         } else {
           alert("DNI no encontrado o inválido.");
         }
+        setBillingAddress(""); // Usualmente DNI no devuelve dirección
       } else {
         alert(`${billingType === "FACTURA" ? "RUC" : "DNI"} no encontrado o inválido.`);
       }
@@ -229,6 +242,7 @@ export function AdminTableActions({
     extras: extras, // Array de consumos adicionales
     customer_name: billingName || guestName,
     customer_document: billingDocument || guestPhone || "No Registrado",
+    customer_address: billingAddress || undefined,
     room_id: roomName,
   };
 
@@ -717,6 +731,18 @@ export function AdminTableActions({
                   value={billingName}
                   onChange={(e) => setBillingName(e.target.value.toUpperCase())}
                   placeholder="Nombres completos"
+                  className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold uppercase"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
+                  Dirección (Opcional)
+                </label>
+                <input
+                  type="text"
+                  value={billingAddress}
+                  onChange={(e) => setBillingAddress(e.target.value.toUpperCase())}
+                  placeholder="Ej. Av. Principal 123"
                   className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold uppercase"
                 />
               </div>
