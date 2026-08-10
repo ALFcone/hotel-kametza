@@ -1,7 +1,7 @@
-﻿/**
+/**
  * ---------------------------------------------------------------------
  * ARCHIVO: app/admin/page.tsx
- * PROPÃ“SITO: Panel de AdministraciÃ³n del Hotel. Solo accesible para ti.
+ * PROPÓSITO: Panel de Administración del Hotel. Solo accesible para ti.
  *            Muestra los KPIs, estado de habitaciones, y el historial
  *            de todas las reservas del sistema.
  * ---------------------------------------------------------------------
@@ -114,7 +114,7 @@ const formatTicket = (id: number) => {
 };
 
 function formatDateShort(dateStr: string): string {
-  if (!dateStr) return "â€”";
+  if (!dateStr) return "—";
   const d = new Date(dateStr + "T00:00:00");
   return d.toLocaleDateString("es-PE", {
     day: "2-digit",
@@ -123,13 +123,13 @@ function formatDateShort(dateStr: string): string {
 }
 
 // ==============================================================================
-// 3. COMPONENTE PRINCIPAL (PÃGINA DE ADMIN)
+// 3. COMPONENTE PRINCIPAL (PÁGINA DE ADMIN)
 // ==============================================================================
 
 export default async function AdminPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  // VALIDACIÃ“N
+  // VALIDACIÓN
   const supabaseServer = await getSupabaseServer();
   const { data: { user }, error: authError } = await supabaseServer.auth.getUser();
 
@@ -144,7 +144,7 @@ export default async function AdminPage(props: {
   const searchParams = await props.searchParams;
   const activeTab = searchParams.tab || "resumen";
 
-  // A. FECHAS Y PARÃMETROS
+  // A. FECHAS Y PARÁMETROS
   const today = new Date().toISOString().split("T")[0];
   const dateFrom = searchParams.from || today;
   const dateTo = searchParams.to || today;
@@ -181,7 +181,7 @@ export default async function AdminPage(props: {
   });
 
   // D. KPIs
-  // OcupaciÃ³n: Foto diaria especÃ­fica para la fecha inicial (filterDate)
+  // Ocupación: Foto diaria específica para la fecha inicial (filterDate)
   const occupiedCount =
     allBookings?.filter(
       (b) =>
@@ -250,7 +250,7 @@ export default async function AdminPage(props: {
   const totalRooms = rooms?.length || 0;
   const freeRooms = totalRooms - occupiedCount;
 
-  // Habitaciones mÃ¡s populares (por noches reservadas en el rango)
+  // Habitaciones más populares (por noches reservadas en el rango)
   const roomPopularity = rooms?.map(room => {
     const nights = allBookings?.filter(b => 
       b.room_id === room.id && 
@@ -261,7 +261,7 @@ export default async function AdminPage(props: {
     return { name: room.name, number: room.room_number || room.id, nights };
   }).sort((a, b) => b.nights - a.nights).slice(0, 4) || [];
 
-  // F. CÃLCULO DE TENDENCIA DE VENTAS (ÃšLTIMOS 7 DÃAS)
+  // F. CÁLCULO DE TENDENCIA DE VENTAS (ÚLTIMOS 7 DÍAS)
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (6 - i));
@@ -347,7 +347,7 @@ export default async function AdminPage(props: {
             </div>
           </div>
 
-          {/* MenÃº de NavegaciÃ³n */}
+          {/* Menú de Navegación */}
           <nav className="flex flex-col gap-1.5">
             <Link
               href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`}
@@ -418,7 +418,7 @@ export default async function AdminPage(props: {
             <Globe size={14} /> Volver a la Web
           </Link>
           <div className="text-[9px] text-amber-300/40 text-center uppercase tracking-widest">
-            Hecho con â¤ï¸ en Ayacucho
+            Hecho con ❤️ en Ayacucho
           </div>
         </div>
       </aside>
@@ -430,7 +430,7 @@ export default async function AdminPage(props: {
             <div className="flex justify-between w-full xl:w-auto items-start">
               <div>
                 <span className="text-[#d97706] text-xs font-black uppercase tracking-widest bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-100">
-                  AdministraciÃ³n
+                  Administración
                 </span>
                 <h1 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 mt-3">
                   Panel de Control
@@ -447,7 +447,7 @@ export default async function AdminPage(props: {
             {/* Filtros de Fecha */}
             <div className="flex items-end gap-3 flex-wrap w-full xl:w-auto">
               <form className="flex items-end gap-2 bg-white p-3 rounded-2xl border border-stone-200/60 shadow-sm flex-wrap w-full sm:w-auto" method="get">
-                {/* Mantener la pestaÃ±a activa al filtrar */}
+                {/* Mantener la pestaña activa al filtrar */}
                 <input type="hidden" name="tab" value={activeTab} />
                 <div className="flex flex-col gap-1">
                   <span className="text-[8px] font-black uppercase text-stone-400 ml-2">Desde</span>
@@ -542,11 +542,11 @@ export default async function AdminPage(props: {
                       </div>
                       <span className="text-stone-400 text-[10px] font-bold uppercase tracking-wider">Llegadas ({rangeLabel})</span>
                       <p className="text-3xl font-bold text-stone-900 mt-2 font-serif">{arrivalsCount}</p>
-                      <p className="text-stone-500 text-[10px] font-medium mt-1 uppercase tracking-wider">HuÃ©spedes Registrados</p>
+                      <p className="text-stone-500 text-[10px] font-medium mt-1 uppercase tracking-wider">Huéspedes Registrados</p>
                     </div>
                   </div>
 
-                  {/* Card OcupaciÃ³n */}
+                  {/* Card Ocupación */}
                   <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_4px_40px_rgba(0,0,0,0.03)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_8px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-500">
                     <Building size={120} className="absolute -right-6 -bottom-6 text-stone-50 opacity-50 group-hover:scale-110 group-hover:text-amber-50 transition-all duration-500" />
                     <div className="relative z-10">
@@ -575,14 +575,14 @@ export default async function AdminPage(props: {
                   </div>
                 </div>
 
-                {/* GrÃ¡ficos Visuales */}
+                {/* Gráficos Visuales */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                  {/* 1. GrÃ¡fico de LÃ­neas de Ventas */}
+                  {/* 1. Gráfico de Líneas de Ventas */}
                   <div className="xl:col-span-2 bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm">
                     <div className="flex justify-between items-center mb-6">
                       <div>
                         <h3 className="font-bold text-base text-stone-900">Tendencia de Ventas</h3>
-                        <p className="text-stone-400 text-[10px] uppercase font-bold tracking-wider mt-0.5">Ãšltimos 7 dÃ­as de ingresos (S/)</p>
+                        <p className="text-stone-400 text-[10px] uppercase font-bold tracking-wider mt-0.5">Últimos 7 días de ingresos (S/)</p>
                       </div>
                     </div>
                     <div className="w-full overflow-hidden">
@@ -620,12 +620,12 @@ export default async function AdminPage(props: {
                     </div>
                   </div>
 
-                  {/* 2. OcupaciÃ³n y DistribuciÃ³n */}
+                  {/* 2. Ocupación y Distribución */}
                   <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm flex flex-col justify-between">
                     <div>
-                      <h3 className="font-bold text-base text-stone-900 mb-6">OcupaciÃ³n y MÃ©todos</h3>
+                      <h3 className="font-bold text-base text-stone-900 mb-6">Ocupación y Métodos</h3>
                       
-                      {/* Doughnut de OcupaciÃ³n */}
+                      {/* Doughnut de Ocupación */}
                       <div className="flex items-center gap-6 mb-8 border-b border-stone-100 pb-6">
                         <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
                           <svg className="w-full h-full transform -rotate-90">
@@ -652,18 +652,18 @@ export default async function AdminPage(props: {
                           </div>
                         </div>
                         <div>
-                          <h4 className="font-bold text-xs text-stone-850">DistribuciÃ³n FÃ­sica</h4>
+                          <h4 className="font-bold text-xs text-stone-850">Distribución Física</h4>
                           <p className="text-stone-400 text-[10px] mt-1 font-medium">
                             {occupiedCount} habitaciones ocupadas de {totalRooms} totales.
                           </p>
                         </div>
                       </div>
 
-                      {/* ProporciÃ³n de MÃ©todos de Pago */}
+                      {/* Proporción de Métodos de Pago */}
                       <div className="space-y-4">
                         <div>
                           <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
-                            <span className="text-stone-500">ðŸ¨ Efectivo / RecepciÃ³n</span>
+                            <span className="text-stone-500">🏨 Efectivo / Recepción</span>
                             <span className="text-stone-900">{formatMoney(cashIncome)}</span>
                           </div>
                           <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
@@ -676,7 +676,7 @@ export default async function AdminPage(props: {
                         
                         <div>
                           <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
-                            <span className="text-stone-500">ðŸ’³ Digital / Online</span>
+                            <span className="text-stone-500">💳 Digital / Online</span>
                             <span className="text-[#d97706]">{formatMoney(digitalIncome)}</span>
                           </div>
                           <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
@@ -691,7 +691,7 @@ export default async function AdminPage(props: {
                   </div>
                 </div>
 
-                {/* Nuevos GrÃ¡ficos AnalÃ­ticos */}
+                {/* Nuevos Gráficos Analíticos */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                   {/* Habitaciones Populares */}
                   <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm">
@@ -714,9 +714,9 @@ export default async function AdminPage(props: {
                     </div>
                   </div>
                   
-                  {/* DistribuciÃ³n por Medio de Pago (Pie Chart visual) */}
+                  {/* Distribución por Medio de Pago (Pie Chart visual) */}
                   <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm">
-                     <h3 className="font-bold text-base text-stone-900 mb-6">Ingresos Totales (ComposiciÃ³n)</h3>
+                     <h3 className="font-bold text-base text-stone-900 mb-6">Ingresos Totales (Composición)</h3>
                      {totalIncome > 0 ? (
                        <div className="flex items-center gap-6">
                          <div className="relative w-28 h-28 shrink-0">
@@ -809,10 +809,10 @@ export default async function AdminPage(props: {
                           )}
                         </div>
                         
-                        {/* BotÃ³n de Limpieza */}
+                        {/* Botón de Limpieza */}
                         <form action={toggleRoomCleanliness} className="shrink-0">
                           <input type="hidden" name="roomId" value={room.id} />
-                          {/* Si estÃ¡ sucia (isDirty=true), el nuevo valor debe ser true (limpia). Si estÃ¡ limpia (isDirty=false), el nuevo valor debe ser false (sucia). */}
+                          {/* Si está sucia (isDirty=true), el nuevo valor debe ser true (limpia). Si está limpia (isDirty=false), el nuevo valor debe ser false (sucia). */}
                           <input type="hidden" name="isClean" value={isDirty.toString()} />
                           <button
                             type="submit"
@@ -891,7 +891,7 @@ export default async function AdminPage(props: {
                     <thead>
                       <tr className="text-[10px] font-black text-stone-400 uppercase tracking-widest bg-stone-50 border-b border-stone-100">
                         <th className="py-5 px-6">Reserva / Ticket</th>
-                        <th className="py-5 px-6">HuÃ©sped</th>
+                        <th className="py-5 px-6">Huésped</th>
                         <th className="py-5 px-4">Documento</th>
                         <th className="py-5 px-4">Contacto</th>
                         <th className="py-5 px-4 text-center">Noches</th>
@@ -899,7 +899,7 @@ export default async function AdminPage(props: {
                         <th className="py-5 px-4">Estancia</th>
                         <th className="py-5 px-4 text-right">Total</th>
                         <th className="py-5 px-4 text-center">Estado</th>
-                        <th className="py-5 px-8 text-center">AcciÃ³n</th>
+                        <th className="py-5 px-8 text-center">Acción</th>
                       </tr>
                     </thead>
                     <tbody className="text-xs">
@@ -935,8 +935,8 @@ export default async function AdminPage(props: {
                             </td>
                             <td className="py-5 px-4">
                               <div className="flex flex-col gap-0.5 text-[10px]">
-                                <span className="text-stone-500 flex items-center gap-1"><Mail size={10} /> {booking.client_email || "â€”"}</span>
-                                <span className="text-emerald-700 font-bold flex items-center gap-1"><Phone size={10} /> {booking.client_phone || "â€”"}</span>
+                                <span className="text-stone-500 flex items-center gap-1"><Mail size={10} /> {booking.client_email || "—"}</span>
+                                <span className="text-emerald-700 font-bold flex items-center gap-1"><Phone size={10} /> {booking.client_phone || "—"}</span>
                               </div>
                             </td>
                             <td className="py-5 px-4 text-center">
@@ -1005,9 +1005,10 @@ export default async function AdminPage(props: {
                                 checkIn={booking.check_in}
                                 checkOut={booking.check_out}
                                 extras={bookingExtras}
-                                guestName={booking.client_name || "HuÃ©sped"}
+                                guestName={booking.client_name || "Huésped"}
                                 roomName={getRoomNumber(booking.room_id).toString()}
-                                guestPhone={booking.client_phone || undefined} guestDocument={booking.document_number || undefined}
+                                guestPhone={booking.client_phone || undefined}
+                                guestDocument={booking.document_number || undefined}
                                 onDelete={deleteBooking}
                               />
                             </td>
@@ -1031,7 +1032,7 @@ export default async function AdminPage(props: {
             <div id="inventario" className="scroll-mt-24 mb-12 animate-fade-in-up">
               <div className="flex items-center gap-3 mb-6">
                 <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
-                <h2 className="text-xl font-bold text-stone-900 tracking-tight">GestiÃ³n de Inventario</h2>
+                <h2 className="text-xl font-bold text-stone-900 tracking-tight">Gestión de Inventario</h2>
                 <span className="text-[10px] bg-stone-100 text-stone-500 px-3 py-1 rounded-full font-bold">
                   {rooms?.length} habitaciones
                 </span>
@@ -1090,13 +1091,13 @@ export default async function AdminPage(props: {
                         
                         <div>
                           <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
-                            DescripciÃ³n
+                            Descripción
                           </label>
                           <textarea
                             name="description"
                             defaultValue={room.description}
                             className="w-full p-3.5 bg-stone-50 rounded-xl border border-stone-250 text-xs h-24 resize-none focus:ring-2 focus:ring-[#d97706]/10 focus:border-[#d97706] outline-none transition"
-                            placeholder="DescripciÃ³n de la habitaciÃ³n..."
+                            placeholder="Descripción de la habitación..."
                           />
                         </div>
                         
@@ -1152,7 +1153,7 @@ export default async function AdminPage(props: {
                       {/* Cabecera de fechas */}
                       <div className="flex border-b border-stone-200 mb-2">
                         <div className="w-32 shrink-0 py-3 px-4 font-black text-[10px] uppercase text-stone-400">
-                          HabitaciÃ³n
+                          Habitación
                         </div>
                         <div className="flex-1 flex">
                           {calendarDays.map((d, i) => (
@@ -1171,7 +1172,7 @@ export default async function AdminPage(props: {
                       {/* Filas de habitaciones */}
                       <div className="flex flex-col gap-2">
                         {rooms?.map((room) => {
-                          // Filtrar reservas que se cruzan con este rango en esta habitaciÃ³n
+                          // Filtrar reservas que se cruzan con este rango en esta habitación
                           const roomBookings = allBookings?.filter(b => 
                             b.room_id === room.id && 
                             b.status !== "cancelled" && b.status !== "cancelada" &&
@@ -1181,12 +1182,12 @@ export default async function AdminPage(props: {
 
                           return (
                             <div key={room.id} className="flex items-center bg-stone-50 rounded-xl border border-stone-100 relative group h-14">
-                              {/* Nombre HabitaciÃ³n */}
+                              {/* Nombre Habitación */}
                               <div className="w-32 shrink-0 px-4 font-bold text-xs text-stone-900 border-r border-stone-100 bg-white h-full rounded-l-xl flex items-center z-10 shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
                                 {room.name}
                               </div>
                               
-                              {/* Track de DÃ­as */}
+                              {/* Track de Días */}
                               <div className="flex-1 flex h-full relative">
                                 {calendarDays.map((_, i) => (
                                   <div key={i} className="flex-1 border-r border-stone-200/50 min-w-[50px]" />
@@ -1216,7 +1217,7 @@ export default async function AdminPage(props: {
                                           : "bg-amber-100 border-amber-300 text-amber-800"
                                       }`}
                                       style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
-                                      title={`HuÃ©sped: ${booking.client_name} | Ingreso: ${booking.check_in} | Salida: ${booking.check_out}`}
+                                      title={`Huésped: ${booking.client_name} | Ingreso: ${booking.check_in} | Salida: ${booking.check_out}`}
                                     >
                                       <span className="text-[10px] font-black truncate">
                                         {booking.client_name}
