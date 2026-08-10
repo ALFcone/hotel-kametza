@@ -300,6 +300,9 @@ export default async function AdminPage(props: {
     rooms?.find((r) => r.id === id)?.id ||
     "#";
 
+  const getRoomType = (id: number) =>
+    rooms?.find((r) => r.id === id)?.name || "";
+
   const getRoomStatus = (roomId: number) => {
     const leaving = allBookings?.find(
       (b) =>
@@ -1007,6 +1010,7 @@ export default async function AdminPage(props: {
                                 extras={bookingExtras}
                                 guestName={booking.client_name || "Huésped"}
                                 roomName={getRoomNumber(booking.room_id).toString()}
+                                roomType={getRoomType(booking.room_id)}
                                 guestPhone={booking.client_phone || undefined}
                                 guestDocument={booking.document_number || undefined}
                                 onDelete={deleteBooking}

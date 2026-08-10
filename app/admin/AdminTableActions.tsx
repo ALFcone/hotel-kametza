@@ -22,6 +22,7 @@ interface AdminTableActionsProps {
   extras?: any[];
   guestName: string;
   roomName: string;
+  roomType?: string;
   guestPhone?: string;
   guestDocument?: string;
   onDelete: (formData: FormData) => void;
@@ -39,6 +40,7 @@ export function AdminTableActions({
   extras = [],
   guestName,
   roomName,
+  roomType,
   guestPhone,
   guestDocument,
   onDelete,
@@ -244,6 +246,7 @@ export function AdminTableActions({
     customer_document: billingDocument || guestPhone || "No Registrado",
     customer_address: billingAddress || undefined,
     room_id: roomName,
+    room_type: roomType,
   };
 
   const handleOpenBilling = () => {
