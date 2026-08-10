@@ -667,21 +667,21 @@ export function AdminTableActions({
             </div>
 
             <div className="overflow-y-auto pr-1 -mr-1 flex-1">
-              <div className="bg-stone-50 p-4 rounded-2xl mb-4">
-                <h3 className="text-xs font-black uppercase text-stone-400 mb-3 tracking-wider">
+              <div className="bg-stone-50 p-3 rounded-2xl mb-3">
+                <h3 className="text-[10px] font-black uppercase text-stone-400 mb-2 tracking-wider">
                   Tipo de Comprobante
                 </h3>
               
               {isCancelled ? (
                 <div className="flex bg-stone-200 p-1 rounded-xl">
-                  <button className="flex-1 py-2 text-xs font-bold rounded-lg bg-rose-500 text-white shadow-sm cursor-default">
+                  <button className="flex-1 py-1.5 text-xs font-bold rounded-lg bg-rose-500 text-white shadow-sm cursor-default">
                     NOTA DE CRÉDITO
                   </button>
                 </div>
               ) : (
                 <div className="flex bg-stone-200 p-1 rounded-xl">
                   <button
-                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${billingType === 'BOLETA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${billingType === 'BOLETA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
                     onClick={() => {
                       setBillingType('BOLETA');
                       setBillingDocument(guestDocument || "");
@@ -691,7 +691,7 @@ export function AdminTableActions({
                     BOLETA
                   </button>
                   <button
-                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${billingType === 'FACTURA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${billingType === 'FACTURA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
                     onClick={() => {
                       setBillingType('FACTURA');
                       setBillingDocument("");
@@ -704,7 +704,7 @@ export function AdminTableActions({
               )}
             </div>
 
-            <div className="space-y-4 mb-6">
+            <div className="space-y-3 mb-2">
               <div>
                 <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
                   {billingType === "FACTURA" ? "RUC (11 dígitos)" : "DNI / Documento"}
@@ -716,7 +716,7 @@ export function AdminTableActions({
                     onChange={(e) => setBillingDocument(e.target.value.replace(/\D/g, ''))}
                     maxLength={billingType === "FACTURA" ? 11 : 8}
                     placeholder={billingType === "FACTURA" ? "Ej. 20123456789" : "Ej. 70123456"}
-                    className="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold"
+                    className="flex-1 border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold"
                   />
                   <button
                     onClick={handleFetchDocument}
@@ -736,7 +736,7 @@ export function AdminTableActions({
                   value={billingName}
                   onChange={(e) => setBillingName(e.target.value.toUpperCase())}
                   placeholder="Nombres completos"
-                  className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold uppercase"
+                  className="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold uppercase"
                 />
               </div>
               <div>
@@ -748,11 +748,11 @@ export function AdminTableActions({
                   value={billingAddress}
                   onChange={(e) => setBillingAddress(e.target.value.toUpperCase())}
                   placeholder="Ej. Av. Principal 123"
-                  className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold uppercase"
+                  className="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold uppercase"
                 />
               </div>
               
-              <div className="flex items-center gap-2 mt-4">
+              <div className="flex items-center gap-2 mt-2 pb-1">
                 <input
                   type="checkbox"
                   id="includeRoomType"
@@ -761,13 +761,13 @@ export function AdminTableActions({
                   className="w-4 h-4 text-stone-900 bg-stone-100 border-stone-300 rounded focus:ring-stone-900"
                 />
                 <label htmlFor="includeRoomType" className="text-xs font-bold text-stone-600 cursor-pointer select-none">
-                  Incluir tipo de habitación (Ej. Matrimonial) en comprobante
+                  Incluir tipo de habitación (Ej. Matrimonial)
                 </label>
               </div>
             </div>
             </div>
 
-            <div className="pt-2 shrink-0 mt-2">
+            <div className="pt-2 shrink-0 mt-2 border-t border-stone-100">
               <button
                 onClick={() => {
                   if (!billingDocument || !billingName) {
@@ -777,7 +777,7 @@ export function AdminTableActions({
                   setIsBillingModalOpen(false);
                   setIsPrinting(true);
                 }}
-                className="w-full py-3 bg-stone-900 text-white rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-stone-800 transition shadow-lg shadow-stone-900/20"
+                className="w-full py-2.5 bg-stone-900 text-white rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-stone-800 transition shadow-lg shadow-stone-900/20"
               >
                 Generar {billingType} e Imprimir
               </button>
