@@ -648,7 +648,7 @@ export function AdminTableActions({
       {/* Modal de Facturación / Boleta */}
       {isBillingModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl relative">
             <button 
               onClick={() => setIsBillingModalOpen(false)}
               className="absolute top-4 right-4 text-stone-400 hover:text-stone-700"
