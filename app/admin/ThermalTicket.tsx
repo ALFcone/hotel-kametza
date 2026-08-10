@@ -11,7 +11,7 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
   if (!booking) return null;
 
   const currentDate = new Date().toLocaleString("es-PE");
-  
+
   // Calculate nights
   const checkIn = new Date(booking.check_in);
   const checkOut = new Date(booking.check_out);
@@ -26,7 +26,7 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
   let tipoComprobante = '03'; // Boleta
   if (type === 'FACTURA') tipoComprobante = '01';
   if (type === 'NOTA DE CRÉDITO') tipoComprobante = '07';
-  
+
   let tipoDocumentoCliente = '1'; // DNI
   if (type === 'FACTURA') tipoDocumentoCliente = '6'; // RUC
   // Para nota de crédito asumimos DNI por defecto a menos que tenga 11 dígitos
@@ -43,7 +43,7 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
         <h1 className="font-bold text-lg uppercase mt-2 mb-1">Hotel Kametza</h1>
         <p>MARCELINA BERMUDO ESCALANTE DE RUA</p>
         <p>RUC: 10282984984</p>
-        <p>Jir. Las Américas #154, Ayacucho</p>
+        <p>Jr. Las Américas #154, Ayacucho</p>
       </div>
 
       <div className="border-t border-b border-dashed border-black py-2 mb-4 text-center">
@@ -56,8 +56,7 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
         <p><strong>FECHA:</strong> {currentDate}</p>
         <p><strong>CLIENTE:</strong> {booking.customer_name}</p>
         <p><strong>{type === "FACTURA" ? "RUC" : "DNI"}:</strong> {booking.customer_document || "00000000"}</p>
-        {booking.customer_address && <p><strong>DIRECCIÓN:</strong> {booking.customer_address}</p>}
-        <p><strong>HABITACIÓN:</strong> {booking.room_id} {booking.room_type ? `(${booking.room_type})` : ''}</p>
+        <p><strong>HABITACIÓN:</strong> {booking.room_id}</p>
       </div>
 
       {/* Details */}
@@ -83,7 +82,7 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
             <td className="text-right py-2 align-top">{(booking.base_price / nights).toFixed(2)}</td>
             <td className="text-right py-2 align-top">{booking.base_price.toFixed(2)}</td>
           </tr>
-          
+
           {/* Filas de Extras (si existen) */}
           {booking.extras && booking.extras.length > 0 && booking.extras.map((extra: any, index: number) => (
             <tr key={`extra-${index}`}>
@@ -123,7 +122,7 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
 
       <div className="text-center mt-4">
         <p className="font-bold text-sm">¡GRACIAS POR SU PREFERENCIA!</p>
-        <p className="mt-2 text-[10px] leading-tight">Representación impresa de la {type} Electrónica.<br/>Consulte su comprobante en SUNAT.</p>
+        <p className="mt-2 text-[10px] leading-tight">Representación impresa de la {type} Electrónica.<br />Consulte su comprobante en SUNAT.</p>
       </div>
     </div>
   );

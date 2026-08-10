@@ -64,6 +64,7 @@ export function AdminTableActions({
   const [billingDocument, setBillingDocument] = useState("");
   const [billingName, setBillingName] = useState("");
   const [billingAddress, setBillingAddress] = useState("");
+  const [includeRoomType, setIncludeRoomType] = useState(false);
   const [isFetchingRuc, setIsFetchingRuc] = useState(false);
 
   const handleFetchDocument = async () => {
@@ -246,7 +247,7 @@ export function AdminTableActions({
     customer_document: billingDocument || guestPhone || "No Registrado",
     customer_address: billingAddress || undefined,
     room_id: roomName,
-    room_type: roomType,
+    room_type: includeRoomType ? roomType : undefined,
   };
 
   const handleOpenBilling = () => {
@@ -748,6 +749,19 @@ export function AdminTableActions({
                   placeholder="Ej. Av. Principal 123"
                   className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold uppercase"
                 />
+              </div>
+              
+              <div className="flex items-center gap-2 mt-4">
+                <input
+                  type="checkbox"
+                  id="includeRoomType"
+                  checked={includeRoomType}
+                  onChange={(e) => setIncludeRoomType(e.target.checked)}
+                  className="w-4 h-4 text-stone-900 bg-stone-100 border-stone-300 rounded focus:ring-stone-900"
+                />
+                <label htmlFor="includeRoomType" className="text-xs font-bold text-stone-600 cursor-pointer select-none">
+                  Incluir tipo de habitación (Ej. Matrimonial) en comprobante
+                </label>
               </div>
             </div>
 
