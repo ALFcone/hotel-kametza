@@ -7,6 +7,7 @@
  *            y maneja todas sus ventanas emergentes (modales).
  */
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle, Printer, FileWarning } from "lucide-react";
 import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, fetchRucData, fetchDniData, cancelBooking } from "@/app/actions";
 import ThermalTicket from "./ThermalTicket";
@@ -57,6 +58,11 @@ export function AdminTableActions({
   const [editCheckOut, setEditCheckOut] = useState<string>(checkOut);
   const [editTotalPrice, setEditTotalPrice] = useState<string>(totalPrice.toString());
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // Facturación States
   const [isPrinting, setIsPrinting] = useState(false);
@@ -646,7 +652,7 @@ export function AdminTableActions({
       )}
 
       {/* Modal de Facturación / Boleta */}
-      {isBillingModalOpen && (
+      {mounted && isBillingModalOpen && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[90vh] flex flex-col shadow-2xl relative">
             <button 
@@ -783,7 +789,8 @@ export function AdminTableActions({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
