@@ -648,7 +648,7 @@ export function AdminTableActions({
       {/* Modal de Facturación / Boleta */}
       {isBillingModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm max-h-[90vh] overflow-y-auto shadow-2xl relative">
+          <div className="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[90vh] flex flex-col shadow-2xl relative">
             <button 
               onClick={() => setIsBillingModalOpen(false)}
               className="absolute top-4 right-4 text-stone-400 hover:text-stone-700"
@@ -656,7 +656,7 @@ export function AdminTableActions({
               <X size={20} />
             </button>
             
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-4 shrink-0">
               <div className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-600 flex items-center justify-center">
                 <Printer size={20} />
               </div>
@@ -666,10 +666,11 @@ export function AdminTableActions({
               </div>
             </div>
 
-            <div className="bg-stone-50 p-6 rounded-2xl mb-8">
-              <h3 className="text-xs font-black uppercase text-stone-400 mb-4 tracking-wider">
-                Tipo de Comprobante
-              </h3>
+            <div className="overflow-y-auto pr-1 -mr-1 flex-1">
+              <div className="bg-stone-50 p-4 rounded-2xl mb-4">
+                <h3 className="text-xs font-black uppercase text-stone-400 mb-3 tracking-wider">
+                  Tipo de Comprobante
+                </h3>
               
               {isCancelled ? (
                 <div className="flex bg-stone-200 p-1 rounded-xl">
@@ -764,20 +765,23 @@ export function AdminTableActions({
                 </label>
               </div>
             </div>
+            </div>
 
-            <button
-              onClick={() => {
-                if (!billingDocument || !billingName) {
-                  alert("Complete los datos del cliente");
-                  return;
-                }
-                setIsBillingModalOpen(false);
-                setIsPrinting(true);
-              }}
-              className="w-full py-3 bg-stone-900 text-white rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-stone-800 transition shadow-lg shadow-stone-900/20"
-            >
-              Generar {billingType} e Imprimir
-            </button>
+            <div className="pt-2 shrink-0 mt-2">
+              <button
+                onClick={() => {
+                  if (!billingDocument || !billingName) {
+                    alert("Complete los datos del cliente");
+                    return;
+                  }
+                  setIsBillingModalOpen(false);
+                  setIsPrinting(true);
+                }}
+                className="w-full py-3 bg-stone-900 text-white rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-stone-800 transition shadow-lg shadow-stone-900/20"
+              >
+                Generar {billingType} e Imprimir
+              </button>
+            </div>
           </div>
         </div>
       )}
