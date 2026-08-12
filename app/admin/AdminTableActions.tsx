@@ -129,8 +129,13 @@ export function AdminTableActions({
   
   const extrasTotal = extras.reduce((sum, e) => sum + (e.price * e.quantity), 0);
   const grandTotal = totalPrice + extrasTotal;
-  const balance = grandTotal - (amountPaid || 0);
-  const isFullyPaid = status === "pagado" || status === "approved" || balance <= 0;
+  
+  const effectiveAmountPaid = (amountPaid !== null && amountPaid !== undefined) 
+    ? amountPaid 
+    : ((status === "pagado" || status === "approved") ? totalPrice : 0);
+
+  const balance = grandTotal - effectiveAmountPaid;
+  const isFullyPaid = balance <= 0;
 
   useEffect(() => {
     if (isPrinting) {
@@ -294,31 +299,35 @@ export function AdminTableActions({
         />
       )}
       
-      <div className="flex gap-2 justify-center">
-        <button
-          onClick={handleOpenBilling}
-          className={`group relative flex items-center justify-center w-8 h-8 border rounded-lg transition-all hover:-translate-y-0.5 ${
-            isCancelled 
-              ? "bg-rose-50 border-rose-200 text-rose-500 hover:border-rose-400 hover:bg-rose-100 hover:text-rose-700 hover:shadow-[0_2px_10px_rgba(244,63,94,0.2)]" 
-              : "bg-white border-stone-200 text-stone-400 hover:border-zinc-800 hover:text-zinc-800 hover:bg-zinc-100 hover:shadow-[0_2px_10px_rgba(39,39,42,0.1)]"
-          }`}
-          title={isCancelled ? "Imprimir Nota de Crédito" : "Emitir Comprobante (Boleta/Factura)"}
-        >
-          <Printer size={14} className="group-hover:scale-110 transition-transform duration-300" />
-        </button>
+      <div className="flex items-center gap-2 justify-center flex-wrap">
+        {/* === GRUPO DE ACCIONES SEGURAS === */}
+        <div className="flex items-center gap-1.5 bg-white p-1.5 rounded-2xl border border-stone-200 shadow-sm">
+          <button
+            onClick={handleOpenBilling}
+            className={`group relative flex items-center justify-center w-8 h-8 rounded-xl transition-all hover:-translate-y-0.5 ${
+              isCancelled 
+                ? "bg-rose-50 text-rose-500 hover:bg-rose-100 hover:text-rose-700" 
+                : "bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200"
+            }`}
+            title={isCancelled ? "Imprimir Nota de Crédito" : "Emitir Comprobante (Boleta/Factura)"}
+          >
+            <Printer size={14} className="group-hover:scale-110 transition-transform duration-300" />
+          </button>
         {!isCancelled && (
           <button
             onClick={handleShareWhatsApp}
-            className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-green-300 hover:text-green-600 hover:bg-green-50 transition-all hover:shadow-[0_2px_10px_rgba(34,197,94,0.1)] hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center w-8 h-8 bg-green-50 text-green-600 rounded-xl hover:text-green-700 hover:bg-green-100 transition-all hover:-translate-y-0.5"
             title="Compartir Comprobante por WhatsApp"
           >
-            <MessageCircle size={14} className="group-hover:scale-110 transition-transform duration-300" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" className="group-hover:scale-110 transition-transform duration-300">
+              <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+            </svg>
           </button>
         )}
         {!isCancelled && (
           <button
             onClick={() => setIsExtrasModalOpen(true)}
-            className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-purple-200 hover:text-purple-600 hover:bg-purple-50 transition-all hover:shadow-[0_2px_10px_rgba(168,85,247,0.1)] hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center w-8 h-8 bg-purple-50 text-purple-600 rounded-xl hover:text-purple-700 hover:bg-purple-100 transition-all hover:-translate-y-0.5"
             title="Añadir Consumos / Extras"
           >
             <ShoppingCart size={14} className="group-hover:scale-110 transition-transform duration-300" />
@@ -332,7 +341,7 @@ export function AdminTableActions({
         {!isCancelled && (
           <button
             onClick={() => setIsEditModalOpen(true)}
-            className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-blue-200 hover:text-blue-600 hover:bg-blue-50 transition-all hover:shadow-[0_2px_10px_rgba(59,130,246,0.1)] hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-xl hover:text-blue-700 hover:bg-blue-100 transition-all hover:-translate-y-0.5"
             title="Editar Reserva"
           >
             <Edit3 size={14} className="group-hover:scale-110 transition-transform duration-300" />
@@ -341,17 +350,21 @@ export function AdminTableActions({
         {!isFullyPaid && !isCancelled && (
           <button
             onClick={() => setIsPaymentModalOpen(true)}
-            className="group relative flex items-center justify-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-[0_2px_10px_rgba(16,185,129,0.2)] hover:shadow-[0_4px_15px_rgba(16,185,129,0.4)] hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-[0_2px_10px_rgba(16,185,129,0.2)] hover:shadow-[0_4px_15px_rgba(16,185,129,0.4)] hover:-translate-y-0.5"
             title="Registrar Pago"
           >
             <CheckCircle size={14} className="group-hover:scale-110 transition-transform" />
             <span className="text-[9px] font-black uppercase tracking-wider">Abonar</span>
           </button>
         )}
+        </div>
+
+        {/* === GRUPO DE ACCIONES DE PELIGRO === */}
+        <div className="flex items-center gap-1.5 bg-rose-50/50 p-1.5 rounded-2xl border border-rose-100 shadow-sm">
         {!isCancelled && (
           <button
             onClick={handleCancelBooking}
-            className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-orange-200 hover:text-orange-600 hover:bg-orange-50 transition-all hover:shadow-[0_2px_10px_rgba(249,115,22,0.1)] hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center w-8 h-8 bg-orange-100 text-orange-600 rounded-xl hover:text-orange-700 hover:bg-orange-200 transition-all hover:-translate-y-0.5"
             title="Anular y Emitir Nota de Crédito"
           >
             <FileWarning size={14} className="group-hover:scale-110 transition-transform duration-300" />
@@ -376,12 +389,13 @@ export function AdminTableActions({
           <input type="hidden" name="bookingId" value={bookingId} />
           <button
             type="submit"
-            className="group relative flex items-center justify-center w-8 h-8 bg-white border border-stone-200 text-stone-400 rounded-lg hover:border-red-200 hover:text-red-600 hover:bg-red-50 transition-all hover:shadow-[0_2px_10px_rgba(239,68,68,0.1)] hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-xl hover:text-red-700 hover:bg-red-200 transition-all hover:-translate-y-0.5"
             title="Eliminar Reserva"
           >
             <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />
           </button>
         </form>
+        </div>
       </div>
 
       {/* Modal de Pago */}

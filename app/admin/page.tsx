@@ -440,9 +440,6 @@ export default async function AdminPage(props: {
           <Link href="/" className="flex items-center justify-center gap-2 bg-white/10 text-white/90 py-3 rounded-xl text-xs font-bold uppercase hover:bg-white/20 transition-all border border-white/10 w-full">
             <Globe size={14} /> Volver a la Web
           </Link>
-          <div className="text-[9px] text-amber-300/40 text-center uppercase tracking-widest">
-            Hecho con ❤️ en Ayacucho
-          </div>
         </div>
       </aside>
       {/* --- CONTENIDO PRINCIPAL --- */}
@@ -806,65 +803,74 @@ export default async function AdminPage(props: {
                   return (
                     <div
                       key={room.id}
-                      className={`p-6 rounded-[2rem] border transition-all duration-300 flex flex-col justify-between h-40 relative overflow-hidden group hover:-translate-y-1 hover:shadow-xl ${
+                      className={`p-5 rounded-[1.5rem] border transition-all duration-500 flex flex-col justify-between h-40 relative overflow-hidden group hover:-translate-y-1 hover:shadow-2xl ${
                         isOccupied
-                          ? "bg-gradient-to-br from-stone-900 to-[#d97706] text-white border-stone-900 shadow-lg shadow-amber-900/10"
+                          ? "bg-gradient-to-br from-stone-900 to-stone-800 text-white border-stone-800 shadow-[0_8px_30px_rgba(217,119,6,0.15)] ring-1 ring-inset ring-[#d97706]/20"
                           : isCheckout
-                          ? "bg-gradient-to-br from-amber-50 to-orange-50 text-amber-900 border-amber-200 border-dashed"
+                          ? "bg-gradient-to-br from-amber-50 to-orange-50 text-amber-900 border-amber-200 shadow-lg shadow-amber-100/50"
                           : isDirty
-                          ? "bg-rose-500 border-rose-600 text-white shadow-md shadow-rose-900/20"
-                          : "bg-white border-stone-200/60 text-stone-600 hover:border-amber-900/30"
+                          ? "bg-gradient-to-br from-rose-50 to-white border-rose-200 shadow-md shadow-rose-100/50"
+                          : "bg-white border-stone-200/60 text-stone-600 shadow-sm hover:border-stone-300"
                       }`}
                     >
-                      <span className="absolute -bottom-3 -right-3 text-8xl font-black tracking-tighter opacity-[0.05] select-none group-hover:opacity-[0.1] transition-opacity">
+                      {/* Gran Número de Fondo */}
+                      <span className={`absolute -bottom-4 -right-2 text-[6.5rem] font-serif italic tracking-tighter select-none transition-all duration-500 ${
+                        isOccupied ? "text-white opacity-[0.03] group-hover:opacity-[0.08]" 
+                        : isDirty ? "text-rose-900 opacity-[0.03] group-hover:opacity-[0.06]"
+                        : isCheckout ? "text-amber-900 opacity-[0.04] group-hover:opacity-[0.08]"
+                        : "text-stone-900 opacity-[0.03] group-hover:opacity-[0.05]"
+                      }`}>
                         {room.room_number || room.id}
                       </span>
                       
+                      {/* Top Accent Line for specific states */}
+                      {isOccupied && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#d97706] to-amber-300 opacity-80" />}
+                      {isDirty && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-400 to-rose-600 opacity-80" />}
+                      
                       <div className="z-10 flex justify-between items-start w-full gap-2">
                         <div className="flex-1 min-w-0">
-                          <p className={`font-bold text-xs uppercase tracking-wider truncate ${isDirty ? "text-white" : ""}`}>
+                          <p className={`font-bold text-xs uppercase tracking-wider truncate ${isDirty ? "text-rose-950" : ""}`}>
                             {room.name}
                           </p>
                           {info.guest && (
-                            <p className={`text-[10px] mt-2 font-semibold italic opacity-85 truncate ${isDirty ? "text-white" : ""}`}>
+                            <p className={`text-[10px] mt-1.5 font-medium truncate ${isOccupied ? "text-stone-300" : isCheckout ? "text-amber-700/80" : "text-stone-500"}`}>
                               {info.guest}
                             </p>
                           )}
                         </div>
                         
                         {/* Botón de Limpieza */}
-                        <form action={toggleRoomCleanliness} className="shrink-0">
+                        <form action={toggleRoomCleanliness} className="shrink-0 relative z-20">
                           <input type="hidden" name="roomId" value={room.id} />
-                          {/* Si está sucia (isDirty=true), el nuevo valor debe ser true (limpia). Si está limpia (isDirty=false), el nuevo valor debe ser false (sucia). */}
                           <input type="hidden" name="isClean" value={isDirty.toString()} />
                           <button
                             type="submit"
                             title={isDirty ? "Marcar como Limpia" : "Marcar como Sucia"}
-                            className={`p-2 rounded-full transition-colors shadow-sm ${
+                            className={`p-2.5 rounded-full transition-all duration-300 shadow-sm border ${
                               isDirty 
-                                ? "bg-white text-rose-600 hover:bg-emerald-500 hover:text-white" 
+                                ? "bg-white text-rose-500 border-rose-100 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 hover:shadow-md" 
                                 : isOccupied
-                                ? "bg-white/20 text-white hover:bg-rose-500"
-                                : "bg-stone-200 text-stone-500 hover:bg-rose-500 hover:text-white"
+                                ? "bg-white/10 text-stone-300 border-white/5 hover:bg-white hover:text-[#d97706] hover:shadow-md"
+                                : "bg-stone-50 text-stone-400 border-stone-100 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 hover:shadow-md"
                             }`}
                           >
-                            <Brush size={16} strokeWidth={2.5} />
+                            <Brush size={14} strokeWidth={2.5} />
                           </button>
                         </form>
                       </div>
                       
                       <div className="z-10 mt-4 flex items-center justify-between">
                         <span
-                          className={`text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${
+                          className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-sm border ${
                             info.status === "free" && !isDirty
-                              ? "bg-stone-100 text-stone-500"
+                              ? "bg-white text-stone-500 border-stone-200"
                               : info.status === "free" && isDirty
-                              ? "bg-white text-rose-700 shadow-sm"
+                              ? "bg-rose-500 text-white border-rose-600"
                               : isCheckout
-                              ? "bg-amber-400 text-stone-900 shadow-sm"
+                              ? "bg-amber-400 text-amber-950 border-amber-500"
                               : info.paid
-                              ? "bg-emerald-500 text-white shadow-sm"
-                              : "bg-amber-500 text-white shadow-sm"
+                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 backdrop-blur-sm"
+                              : "bg-[#d97706]/20 text-amber-300 border-[#d97706]/30 backdrop-blur-sm"
                           }`}
                         >
                           {info.status === "free"
@@ -942,44 +948,58 @@ export default async function AdminPage(props: {
                             }`}
                           >
                             <td className="py-5 px-6">
-                              <div className="font-mono text-[9px] text-stone-400">SYS-{booking.id}</div>
-                              <div className={`font-black text-xs ${isCancelled ? "text-stone-500 line-through" : "text-[#d97706]"}`}>
-                                RES-{formatTicket(booking.id)}
+                              <div className="flex items-center">
+                                <span className={`inline-flex items-center justify-center px-2 py-1.5 rounded-lg text-[10px] font-black tracking-[0.1em] shadow-sm border ${isCancelled ? "bg-stone-50 text-stone-400 border-stone-200 line-through" : "bg-gradient-to-r from-amber-100 to-amber-50 text-amber-700 border-amber-200"}`}>
+                                  RES-{formatTicket(booking.id)}
+                                </span>
                               </div>
                             </td>
-                            <td className="py-5 px-6 font-bold text-stone-900 uppercase">
-                              {booking.client_name}
-                            </td>
-                            <td className="py-5 px-4">
-                              <div className="flex flex-col">
-                                <span className="text-[9px] font-bold text-stone-400 uppercase">{booking.document_type || "DOC"}</span>
-                                <span className="font-bold text-stone-850 mt-0.5">{booking.document_number}</span>
+                            <td className="py-5 px-6">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 font-bold text-[10px] uppercase shadow-inner shrink-0">
+                                  {booking.client_name ? booking.client_name.charAt(0) : "?"}
+                                </div>
+                                <span className="font-bold text-stone-900 uppercase text-[10px] truncate max-w-[120px]">
+                                  {booking.client_name || "Sin Nombre"}
+                                </span>
                               </div>
                             </td>
                             <td className="py-5 px-4">
-                              <div className="flex flex-col gap-0.5 text-[10px]">
-                                <span className="text-stone-500 flex items-center gap-1"><Mail size={10} /> {booking.client_email || "—"}</span>
-                                <span className="text-emerald-700 font-bold flex items-center gap-1"><Phone size={10} /> {booking.client_phone || "—"}</span>
+                              <div className="flex flex-col items-start gap-0.5">
+                                <span className="bg-stone-100 text-stone-500 px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider">{booking.document_type || "DOC"}</span>
+                                <span className="font-bold text-stone-850 text-[10px] font-mono">{booking.document_number}</span>
+                              </div>
+                            </td>
+                            <td className="py-5 px-4">
+                              <div className="flex flex-col gap-1 text-[9px]">
+                                <a href={`mailto:${booking.client_email}`} className="text-stone-500 hover:text-amber-600 flex items-center gap-1 transition-colors">
+                                  <span className="bg-stone-100 p-1 rounded-full"><Mail size={8} /></span> 
+                                  <span className="truncate max-w-[100px]">{booking.client_email || "Sin email"}</span>
+                                </a>
+                                <a href={`tel:${booking.client_phone}`} className="text-emerald-700 font-bold flex items-center gap-1 transition-colors">
+                                  <span className="bg-emerald-50 p-1 rounded-full"><Phone size={8} /></span> 
+                                  {booking.client_phone || "Sin teléfono"}
+                                </a>
                               </div>
                             </td>
                             <td className="py-5 px-4 text-center">
-                              <span className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-bold text-[10px] border border-indigo-100">
+                              <span className="bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 px-2 py-1 rounded-lg font-bold text-[9px] border border-indigo-100/50 shadow-sm">
                                 {noches} {noches === 1 ? "noche" : "noches"}
                               </span>
                             </td>
-                            <td className="py-5 px-4 text-center font-bold text-stone-900">
-                              <span className="bg-stone-100 px-2.5 py-1 rounded-md text-[10px]">
+                            <td className="py-5 px-4 text-center">
+                              <span className="inline-flex items-center justify-center bg-stone-900 text-amber-400 px-2 py-0.5 rounded-md font-black text-[10px] shadow-sm">
                                 #{getRoomNumber(booking.room_id)}
                               </span>
                             </td>
                             <td className="py-5 px-4">
-                              <div className="flex flex-col font-bold text-[9px] uppercase tracking-wider gap-0.5">
-                                <span className="text-emerald-600 flex items-center gap-1">
-                                  <span className="w-1 h-1 rounded-full bg-emerald-500" />
+                              <div className="flex flex-col bg-stone-50 p-1.5 rounded-lg border border-stone-100 gap-1 w-fit">
+                                <span className="text-emerald-600 flex items-center gap-1 font-bold text-[8px] uppercase tracking-wider">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
                                   {formatDateShort(booking.check_in)}
                                 </span>
-                                <span className="text-amber-600 flex items-center gap-1">
-                                  <span className="w-1 h-1 rounded-full bg-amber-500" />
+                                <span className="text-amber-600 flex items-center gap-1 font-bold text-[8px] uppercase tracking-wider">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
                                   {formatDateShort(booking.check_out)}
                                 </span>
                               </div>
@@ -996,26 +1016,32 @@ export default async function AdminPage(props: {
                                   <XCircle size={10} /> Cancelada
                                 </span>
                               ) : (
-                                <div className="flex flex-col items-center gap-1">
-                                  <span
-                                    className={`text-[8px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-full ${
-                                      booking.status === "pagado" || booking.status === "approved" || grandTotal <= (booking.amount_paid || 0)
-                                        ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                                        : booking.status === "parcial"
-                                        ? "bg-blue-100 text-blue-700 border border-blue-200"
-                                        : "bg-amber-100 text-amber-600 border border-amber-200"
-                                    }`}
-                                  >
-                                    {booking.status === "pagado" || booking.status === "approved" || grandTotal <= (booking.amount_paid || 0) 
-                                      ? "Pagado" 
-                                      : booking.status === "parcial" 
-                                      ? "Parcial" 
-                                      : "Pendiente"}
-                                  </span>
-                                  <span className="text-[9px] font-bold text-stone-500">
-                                    Pagado: S/ {(booking.amount_paid || 0).toFixed(2)}
-                                  </span>
-                                </div>
+                                (() => {
+                                  const effectiveAmountPaid = (booking.amount_paid !== null && booking.amount_paid !== undefined) 
+                                    ? booking.amount_paid 
+                                    : ((booking.status === "pagado" || booking.status === "approved") ? booking.total_price : 0);
+                                  const balance = grandTotal - effectiveAmountPaid;
+                                  const effectiveStatus = balance <= 0 ? "pagado" : ((effectiveAmountPaid > 0 || booking.status === "parcial") ? "parcial" : "pendiente");
+
+                                  return (
+                                    <div className="flex flex-col items-center gap-1">
+                                      <span
+                                        className={`text-[8px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-full ${
+                                          effectiveStatus === "pagado"
+                                            ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                            : effectiveStatus === "parcial"
+                                            ? "bg-blue-100 text-blue-700 border border-blue-200"
+                                            : "bg-amber-100 text-amber-600 border border-amber-200"
+                                        }`}
+                                      >
+                                        {effectiveStatus === "pagado" ? "Pagado" : effectiveStatus === "parcial" ? "Parcial" : "Pendiente"}
+                                      </span>
+                                      <span className="text-[9px] font-bold text-stone-500">
+                                        Pagado: S/ {(effectiveAmountPaid).toFixed(2)}
+                                      </span>
+                                    </div>
+                                  );
+                                })()
                               )}
                             </td>
                             <td className="py-5 px-6 text-center">
@@ -1068,41 +1094,50 @@ export default async function AdminPage(props: {
                 {rooms?.map((room) => (
                   <div
                     key={room.id}
-                    className="bg-white rounded-[2.5rem] shadow-sm border border-stone-200/60 overflow-hidden group hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                    className="bg-white rounded-[2rem] shadow-xl shadow-stone-200/40 border border-stone-100 overflow-hidden group hover:shadow-2xl hover:shadow-stone-200/60 hover:-translate-y-1.5 transition-all duration-500"
                   >
-                    <div className="h-48 overflow-hidden relative">
+                    <div className="h-52 overflow-hidden relative">
                       <img
                         src={room.image_url}
                         alt={room.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+                        className="w-full h-full object-cover group-hover:scale-110 transition duration-1000 ease-in-out"
                       />
-                      <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-xl text-[10px] font-black shadow-sm">
+                      {/* Gradient Overlay for smooth transition */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 via-transparent to-transparent opacity-80" />
+                      
+                      <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md border border-amber-500/30 text-amber-400 px-4 py-2 rounded-xl text-lg font-black shadow-lg shadow-black/20">
                         #{room.room_number || room.id}
+                      </div>
+                      
+                      {/* Título integrado en la imagen */}
+                      <div className="absolute bottom-4 left-6 right-6">
+                        <h3 className="font-serif italic text-2xl text-white drop-shadow-md tracking-tight">
+                          {room.name}
+                        </h3>
                       </div>
                     </div>
                     
-                    <div className="p-8">
-                      <h3 className="font-bold text-lg text-stone-900 mb-6 uppercase tracking-tight">
-                        {room.name}
-                      </h3>
-                      
+                    <div className="p-6">
                       <form action={updateRoom} className="space-y-5">
                         <input type="hidden" name="roomId" value={room.id} />
                         
                         <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
-                              Precio por Noche
+                          <div className="group/input">
+                            <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-1.5 group-focus-within/input:text-[#d97706] transition-colors">
+                              Precio Noche
                             </label>
-                            <input
-                              name="price"
-                              defaultValue={room.price_per_night}
-                              type="number"
-                              className="w-full p-3.5 bg-stone-50 rounded-xl border border-stone-250 font-bold focus:ring-2 focus:ring-[#d97706]/10 focus:border-[#d97706] outline-none transition text-xs"
-                            />
+                            <div className="relative w-28">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 font-bold text-[10px]">S/</span>
+                              <input
+                                name="price"
+                                defaultValue={room.price_per_night}
+                                type="number"
+                                className="w-full pl-7 pr-2 py-2 bg-stone-50/50 rounded-lg border border-stone-200 font-bold text-stone-700 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] outline-none transition-all text-xs shadow-inner shadow-stone-100/50"
+                              />
+                            </div>
                           </div>
-                          <div>
-                            <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
+                          <div className="group/input">
+                            <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-1.5 group-focus-within/input:text-[#d97706] transition-colors">
                               Cambiar Imagen
                             </label>
                             <input type="hidden" name="oldImage" value={room.image_url || ""} />
@@ -1110,25 +1145,28 @@ export default async function AdminPage(props: {
                               name="image"
                               type="file"
                               accept="image/*"
-                              className="w-full bg-stone-50 rounded-xl border border-stone-250 text-[10px] file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-[9px] file:font-bold file:bg-stone-200 file:text-stone-700 hover:file:bg-stone-300 outline-none transition"
+                              className="w-full bg-stone-50/50 rounded-xl border border-stone-200 text-[10px] file:mr-3 file:py-3 file:px-4 file:border-0 file:text-[9px] file:font-black file:uppercase file:tracking-wider file:bg-stone-200 file:text-stone-700 hover:file:bg-[#d97706] hover:file:text-white file:transition-colors outline-none transition-all shadow-inner shadow-stone-100/50 focus:border-[#d97706] focus:bg-white"
                             />
                           </div>
                         </div>
                         
-                        <div>
-                          <label className="text-[9px] font-black uppercase text-stone-400 block mb-1">
+                        <div className="group/input">
+                          <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-1.5 group-focus-within/input:text-[#d97706] transition-colors">
                             Descripción
                           </label>
                           <textarea
                             name="description"
                             defaultValue={room.description}
-                            className="w-full p-3.5 bg-stone-50 rounded-xl border border-stone-250 text-xs h-24 resize-none focus:ring-2 focus:ring-[#d97706]/10 focus:border-[#d97706] outline-none transition"
+                            className="w-full p-3.5 bg-stone-50/50 rounded-xl border border-stone-200 text-xs h-20 resize-none font-medium text-stone-600 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] outline-none transition-all shadow-inner shadow-stone-100/50"
                             placeholder="Descripción de la habitación..."
                           />
                         </div>
                         
-                        <button className="btn-shimmer w-full bg-stone-900 text-white font-black py-4 rounded-xl hover:bg-[#d97706] transition-all text-[10px] uppercase tracking-widest shadow-md">
-                          Guardar Cambios
+                        <button className="relative overflow-hidden w-full bg-stone-900 text-amber-500 font-black py-3.5 rounded-xl transition-all duration-300 text-[10px] uppercase tracking-widest shadow-lg hover:shadow-[#d97706]/20 hover:-translate-y-0.5 group/btn">
+                          <span className="relative z-10 flex items-center justify-center gap-2">
+                            Guardar Cambios
+                          </span>
+                          <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900 transform translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                         </button>
                       </form>
                     </div>
@@ -1147,15 +1185,22 @@ export default async function AdminPage(props: {
 
           {/* --- TAB: CALENDARIO (GANTT) --- */}
           {activeTab === "calendario" && (
-            <div className="animate-fade-in-up bg-white rounded-[2.5rem] p-8 border border-stone-200/60 shadow-sm overflow-hidden">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
-                <h2 className="text-xl font-bold text-stone-900 tracking-tight">Calendario Visual (Gantt)</h2>
+            <div className="animate-fade-in-up bg-white rounded-[2rem] p-6 md:p-8 border border-stone-100 shadow-xl shadow-stone-200/40 overflow-hidden">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
+                  <h2 className="text-xl font-bold text-stone-900 tracking-tight">Calendario Visual (Gantt)</h2>
+                </div>
+                <div className="flex gap-4 text-[9px] font-black uppercase tracking-wider">
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm" /> Pagado</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 shadow-sm" /> Parcial</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#d97706] shadow-sm" /> Pendiente</span>
+                </div>
               </div>
               
               <div className="overflow-x-auto w-full pb-4">
                 {(() => {
-                  let calendarStartDate = new Date(dateFrom + "T00:00:00");
+                  const calendarStartDate = new Date(dateFrom + "T00:00:00");
                   let calendarEndDate = new Date(dateTo + "T00:00:00");
                   
                   // Ensure at least 14 days
@@ -1168,7 +1213,7 @@ export default async function AdminPage(props: {
                   const totalDays = Math.ceil((calendarEndDate.getTime() - calendarStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
                   
                   const calendarDays: Date[] = [];
-                  let curr = new Date(calendarStartDate);
+                  const curr = new Date(calendarStartDate);
                   while (curr <= calendarEndDate) {
                     calendarDays.push(new Date(curr));
                     curr.setDate(curr.getDate() + 1);
@@ -1177,21 +1222,25 @@ export default async function AdminPage(props: {
                   return (
                     <div className="min-w-[800px]">
                       {/* Cabecera de fechas */}
-                      <div className="flex border-b border-stone-200 mb-2">
-                        <div className="w-32 shrink-0 py-3 px-4 font-black text-[10px] uppercase text-stone-400">
+                      <div className="flex border-b-2 border-stone-100 mb-4 pb-2 sticky top-0 bg-white/85 backdrop-blur-md z-40 w-fit">
+                        <div className="w-36 shrink-0 py-2 px-4 font-black text-[10px] uppercase text-stone-400 flex items-end sticky left-0 bg-white/90 backdrop-blur-md z-50 border-r border-stone-100 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
                           Habitación
                         </div>
-                        <div className="flex-1 flex">
-                          {calendarDays.map((d, i) => (
-                            <div key={i} className="flex-1 flex flex-col items-center justify-center py-2 border-l border-stone-100 min-w-[50px]">
-                              <span className="text-[9px] font-bold text-stone-400 uppercase">
-                                {d.toLocaleDateString("es-PE", { weekday: "short" })}
-                              </span>
-                              <span className="text-xs font-black text-stone-800">
-                                {d.getDate()}
-                              </span>
-                            </div>
-                          ))}
+                        <div className="flex">
+                          {calendarDays.map((d, i) => {
+                            const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                            const isToday = d.toDateString() === new Date().toDateString();
+                            return (
+                              <div key={i} className={`flex flex-col items-center justify-center py-2 border-l border-stone-200 w-[55px] shrink-0 ${isToday ? "bg-blue-50/80 rounded-t-lg border-blue-200" : isWeekend ? "bg-stone-50/80 rounded-t-lg" : ""}`}>
+                                <span className={`text-[9px] font-bold uppercase ${isToday ? "text-blue-600" : isWeekend ? "text-[#d97706]" : "text-stone-400"}`}>
+                                  {d.toLocaleDateString("es-PE", { weekday: "short" }).replace(".","")}
+                                </span>
+                                <span className={`text-sm font-black ${isToday ? "text-blue-700 bg-blue-100/50 px-2 rounded-md" : isWeekend ? "text-[#d97706]" : "text-stone-800"}`}>
+                                  {d.getDate()}
+                                </span>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
 
@@ -1207,17 +1256,26 @@ export default async function AdminPage(props: {
                           ) || [];
 
                           return (
-                            <div key={room.id} className="flex items-center bg-stone-50 rounded-xl border border-stone-100 relative group h-14">
+                            <div key={room.id} className="flex items-center bg-white rounded-xl border border-stone-100 relative group h-14 hover:border-stone-200 transition-colors shadow-sm mb-1.5 w-fit">
                               {/* Nombre Habitación */}
-                              <div className="w-32 shrink-0 px-4 font-bold text-xs text-stone-900 border-r border-stone-100 bg-white h-full rounded-l-xl flex items-center z-10 shadow-[2px_0_10px_rgba(0,0,0,0.02)]">
-                                {room.name}
+                              <div className="w-36 shrink-0 px-4 font-bold text-xs text-stone-800 border-r border-stone-200 bg-white h-full rounded-l-xl flex flex-col justify-center z-30 sticky left-0 shadow-[2px_0_10px_rgba(0,0,0,0.03)] group-hover:bg-stone-50/50 transition-colors">
+                                <span className="truncate">{room.name}</span>
+                                <span className="text-[8px] font-black uppercase tracking-wider text-stone-400 mt-0.5">#{room.room_number || room.id}</span>
                               </div>
                               
                               {/* Track de Días */}
-                              <div className="flex-1 flex h-full relative">
-                                {calendarDays.map((_, i) => (
-                                  <div key={i} className="flex-1 border-r border-stone-200/50 min-w-[50px]" />
-                                ))}
+                              <div className="flex h-full relative">
+                                {calendarDays.map((d, i) => {
+                                  const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                                  const isToday = d.toDateString() === new Date().toDateString();
+                                  return (
+                                    <div key={i} className={`border-r border-stone-200 w-[55px] shrink-0 transition-colors relative ${isToday ? "bg-blue-50/20" : isWeekend ? "bg-stone-50/50" : "hover:bg-stone-50/30"}`}>
+                                      {isToday && (
+                                        <div className="absolute top-0 bottom-0 left-1/2 w-[2px] -translate-x-1/2 bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.6)] z-20 pointer-events-none" />
+                                      )}
+                                    </div>
+                                  );
+                                })}
 
                                 {/* Bloques de Reservas */}
                                 {roomBookings.map(booking => {
@@ -1227,25 +1285,29 @@ export default async function AdminPage(props: {
                                   const startOffset = Math.max(0, (bIn.getTime() - calendarStartDate.getTime()) / (1000 * 60 * 60 * 24));
                                   const endOffset = Math.min(totalDays, (bOut.getTime() - calendarStartDate.getTime()) / (1000 * 60 * 60 * 24));
                                   
-                                  const leftPct = (startOffset / totalDays) * 100;
-                                  const widthPct = ((endOffset - startOffset) / totalDays) * 100;
+                                  const leftPx = startOffset * 55;
+                                  const widthPx = (endOffset - startOffset) * 55;
                                   
                                   const isPaid = booking.status === "pagado" || booking.status === "approved" || booking.total_price <= (booking.amount_paid || 0);
 
                                   return (
                                     <div
                                       key={booking.id}
-                                      className={`absolute top-1.5 bottom-1.5 rounded-lg border flex items-center px-2 shadow-sm overflow-hidden transition-all hover:z-20 hover:scale-[1.02] cursor-pointer ${
+                                      className={`absolute top-2 bottom-2 rounded-full flex items-center gap-2 px-1.5 shadow-md overflow-hidden transition-all duration-300 hover:z-30 hover:scale-[1.03] hover:-translate-y-0.5 cursor-pointer border border-white/30 backdrop-blur-sm ${
                                         isPaid 
-                                          ? "bg-emerald-100 border-emerald-300 text-emerald-800" 
+                                          ? "bg-gradient-to-r from-emerald-400 to-emerald-500 text-white shadow-emerald-500/30" 
                                           : booking.status === "parcial"
-                                          ? "bg-blue-100 border-blue-300 text-blue-800"
-                                          : "bg-amber-100 border-amber-300 text-amber-800"
+                                          ? "bg-gradient-to-r from-blue-400 to-blue-500 text-white shadow-blue-500/30"
+                                          : "bg-gradient-to-r from-[#d97706] to-amber-500 text-white shadow-amber-500/30"
                                       }`}
-                                      style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
+                                      style={{ left: `calc(${leftPx}px + 6px)`, width: `calc(${widthPx}px - 12px)` }}
                                       title={`Huésped: ${booking.client_name} | Ingreso: ${booking.check_in} | Salida: ${booking.check_out}`}
                                     >
-                                      <span className="text-[10px] font-black truncate">
+                                      {/* Avatar circular con la inicial */}
+                                      <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 shadow-inner">
+                                        <span className="text-[9px] font-black">{booking.client_name ? booking.client_name.charAt(0).toUpperCase() : "?"}</span>
+                                      </div>
+                                      <span className="text-[10px] font-bold tracking-wide truncate drop-shadow-sm leading-none">
                                         {booking.client_name}
                                       </span>
                                     </div>
@@ -1266,7 +1328,7 @@ export default async function AdminPage(props: {
           {/* --- TAB: ALMACEN / PRODUCTOS --- */}
           {activeTab === "almacen" && (
             <div id="almacen" className="scroll-mt-24 mb-12 animate-fade-in-up">
-              <AdminProducts products={products || []} />
+              <AdminProducts products={products || []} userRole={role} />
             </div>
           )}
         </div>

@@ -40,7 +40,13 @@ export default function LoginPage() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          if (user.email === "alfesco86@gmail.com") {
+          const { data: staffData } = await supabase
+            .from("hotel_staff")
+            .select("role")
+            .eq("email", user.email)
+            .single();
+
+          if (staffData?.role) {
             router.push("/admin");
           } else {
             router.push("/dashboard");
@@ -87,7 +93,13 @@ export default function LoginPage() {
         if (loginError) throw loginError;
 
         if (data?.user) {
-          if (data.user.email === "alfesco86@gmail.com") {
+          const { data: staffData } = await supabase
+            .from("hotel_staff")
+            .select("role")
+            .eq("email", data.user.email)
+            .single();
+
+          if (staffData?.role) {
             router.push("/admin");
           } else {
             router.push("/dashboard");
@@ -105,7 +117,13 @@ export default function LoginPage() {
 
         alert("Cuenta creada. ¡Bienvenido!");
         if (data?.user) {
-          if (data.user.email === "alfesco86@gmail.com") {
+          const { data: staffData } = await supabase
+            .from("hotel_staff")
+            .select("role")
+            .eq("email", data.user.email)
+            .single();
+
+          if (staffData?.role) {
             router.push("/admin");
           } else {
             router.push("/dashboard");

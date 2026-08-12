@@ -27,11 +27,73 @@ export async function getUserRole() {
     .select("role")
     .eq("email", user.email)
     .single();
-    
+
   return { 
     user, 
-    role: data?.role || null // 'admin' | 'receptionist' | null
+    role: data?.role || null
   };
+}
+
+// ==============================================================================
+// 2. FUNCIÓN: BUSCAR HUÉSPED FRECUENTE POR DNI + API RENIEC
+// ==============================================================================
+export async function searchGuestByDocument(documentNumber: string) {
+  const supabaseServer = await getSupabaseServer();
+  
+  const { data, error } = await supabaseServer
+    .from("bookings")
+    .select("client_name, client_email, client_country, client_phone, document_type")
+    .eq("document_number", documentNumber)
+    .not("client_name", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  // Si lo encontró en la base de datos local, lo devolvemos
+  if (!error && data) {
+    return data;
+  }
+
+  // Si no se encontró localmente y parece un DNI válido (8 dígitos numéricos)
+  if (documentNumber.length === 8 && /^\d+$/.test(documentNumber)) {
+    try {
+      // Usar API pública gratuita de Perú
+      const res = await fetch(`https://api.apis.net.pe/v1/dni?numero=${documentNumber}`, {
+        method: "GET",
+        headers: { 
+          "Accept": "application/json",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        },
+        // Evitar caché persistente agresivo si hay error, pero guardarlo si funciona
+        cache: "no-store" 
+      });
+
+      if (res.ok) {
+        const apiData = await res.json();
+        if (apiData && apiData.nombre) {
+          // Capitalizar nombres (ej: JUAN PEREZ -> Juan Perez)
+          const formatName = (str: string) => 
+            str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+          
+          return {
+            client_name: formatName(apiData.nombre),
+            client_country: "Perú",
+            document_type: "DNI",
+            client_email: "",
+            client_phone: ""
+          };
+        }
+      } else {
+        console.error("API Error Status:", res.status, res.statusText);
+        const text = await res.text();
+        console.error("API Error Text:", text);
+      }
+    } catch (err) {
+      console.error("Error consultando API externa de RENIEC:", err);
+    }
+  }
+
+  return null;
 }
 
 // ==============================================================================
@@ -283,13 +345,12 @@ export async function toggleRoomCleanliness(formData: FormData) {
   const isCleanStr = formData.get("isClean") as string;
   const isClean = isCleanStr === "true";
 
-  const { data, error } = await supabaseServer
+  const { error } = await supabaseServer
     .from("rooms")
     .update({ is_clean: isClean })
-    .eq("id", roomId)
-    .select();
+    .eq("id", roomId);
 
-  if (error || !data || data.length === 0) {
+  if (error) {
     console.error("Error toggling room cleanliness:", error?.message || "No rows updated. (Check RLS policies)");
     return;
   }
@@ -385,6 +446,20 @@ export async function addBookingExtra(formData: FormData) {
     console.error("Error al añadir consumo extra:", error.message);
     // Nota: en un sistema robusto habría que revertir el stock aquí si falla.
     return { error: "No se pudo guardar el consumo." };
+  }
+
+  // 3. Si la reserva estaba pagada, cambiarla a parcial porque ahora debe consumos
+  const { data: bookingData } = await supabaseServer
+    .from("bookings")
+    .select("status")
+    .eq("id", bookingId)
+    .single();
+
+  if (bookingData && (bookingData.status === "pagado" || bookingData.status === "approved")) {
+    await supabaseServer
+      .from("bookings")
+      .update({ status: "parcial" })
+      .eq("id", bookingId);
   }
 
   revalidatePath("/admin");

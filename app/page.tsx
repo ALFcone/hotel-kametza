@@ -823,6 +823,7 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false);
    
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [activeServiceId, setActiveServiceId] = useState<string | null>(null);
   const [pendingBookingAction, setPendingBookingAction] = useState<
     (() => void) | null
@@ -841,6 +842,16 @@ export default function Home() {
         data: { user },
       } = await supabase.auth.getUser();
       setCurrentUser(user);
+      if (user) {
+        const { data: staffData } = await supabase
+          .from("hotel_staff")
+          .select("role")
+          .eq("email", user.email)
+          .single();
+        if (staffData?.role) {
+          setUserRole(staffData.role);
+        }
+      }
     };
     fetchData();
   }, []);
@@ -906,7 +917,7 @@ export default function Home() {
   const userName =
     firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
 
-  const isAdmin = currentUser?.email === "alfesco86@gmail.com";
+  const isStaff = !!userRole;
 
   if (loading)
     return (
@@ -963,7 +974,7 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-4">
               {currentUser ? (
                 <div className="flex items-center gap-4">
-                  {isAdmin && (
+                  {isStaff && (
                     <a
                       href="/admin"
                       className="text-[10px] font-black bg-stone-900 text-white px-3 py-1.5 rounded-lg hover:bg-rose-900 transition tracking-widest uppercase"
@@ -973,7 +984,7 @@ export default function Home() {
                   )}
                   {/* BOTÓN DE USUARIO MINIMALISTA */}
                   <a
-                    href={isAdmin ? "/admin" : "/dashboard"}
+                    href={isStaff ? "/admin" : "/dashboard"}
                     className="group flex items-center gap-2 text-stone-600 hover:text-[#e3004f] transition-colors duration-300"
                   >
                     <div className="p-1.5 rounded-full border border-stone-200 group-hover:border-[#e3004f] transition-colors">
@@ -1075,7 +1086,7 @@ export default function Home() {
                 </div>
 
                 <a
-                  href={isAdmin ? "/admin" : "/dashboard"}
+                  href={isStaff ? "/admin" : "/dashboard"}
                   onClick={closeMenu}
                   className="text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-[#e3004f] transition-colors"
                 >
@@ -1972,13 +1983,10 @@ export default function Home() {
           </div>
 
           {/* Bottom Footer */}
-          <div className="border-t border-stone-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+          <div className="border-t border-stone-200 pt-8 flex flex-col md:flex-row justify-center md:justify-start items-center gap-4 text-center md:text-left">
             <div>
               <p className="font-bold text-stone-800 text-xs">© 2025 Hotel Kametza. Todos los derechos reservados.</p>
               <p className="text-[10px] text-stone-700 mt-1">RUC: 10282984984</p>
-            </div>
-            <div className="text-[10px] text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200 uppercase tracking-widest font-black">
-              Experiencia Premium en Ayacucho
             </div>
           </div>
         </div>

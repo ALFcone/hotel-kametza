@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Plus, Edit3, Trash2, Save, X, ShoppingCart, Package } from "lucide-react";
 import { createProduct, updateProduct, deleteProduct } from "../actions";
 
-export default function AdminProducts({ products = [] }: { products: any[] }) {
+export default function AdminProducts({ products = [], userRole }: { products: any[], userRole?: string | null }) {
   const [loading, setLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   
@@ -73,7 +73,7 @@ export default function AdminProducts({ products = [] }: { products: any[] }) {
           <h3 className="font-bold text-2xl text-stone-900 tracking-tight">Listado de Productos</h3>
           <p className="text-stone-500 text-sm mt-1">Controla tu stock y precios del minibar.</p>
         </div>
-        {!isAdding && (
+        {!isAdding && userRole === "admin" && (
           <button 
             onClick={() => setIsAdding(true)}
             className="bg-[#d97706] text-white px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-amber-600 transition shadow-lg shadow-amber-500/20"
@@ -134,10 +134,12 @@ export default function AdminProducts({ products = [] }: { products: any[] }) {
                   <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-amber-500">
                     <Package size={20} />
                   </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => handleEdit(product)} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-amber-600 hover:border-amber-300 transition-colors"><Edit3 size={14} /></button>
-                    <button onClick={() => handleDelete(product.id)} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-200 transition-colors"><Trash2 size={14} /></button>
-                  </div>
+                  {userRole === "admin" && (
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => handleEdit(product)} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-amber-600 hover:border-amber-300 transition-colors"><Edit3 size={14} /></button>
+                      <button onClick={() => handleDelete(product.id)} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-200 transition-colors"><Trash2 size={14} /></button>
+                    </div>
+                  )}
                 </div>
                 <h4 className="font-bold text-stone-900 leading-tight mb-2 line-clamp-2" title={product.name}>{product.name}</h4>
                 <div className="flex justify-between items-end mt-4 pt-4 border-t border-stone-200/60">
