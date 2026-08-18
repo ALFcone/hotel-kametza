@@ -11,6 +11,7 @@ import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import Swal from "sweetalert2";
 import { createBooking } from "./actions";
 import {
   Tv,
@@ -887,7 +888,16 @@ export default function Home() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setCurrentUser(null);
-    alert("Has cerrado sesión.");
+    setUserRole(null);
+    Swal.fire({
+      title: "¡Hasta pronto!",
+      text: "Has cerrado sesión exitosamente.",
+      icon: "success",
+      timer: 2000,
+      showConfirmButton: false,
+      toast: true,
+      position: "top-end"
+    });
   };
 
   const triggerAuthFlow = (continueBooking: () => void) => {

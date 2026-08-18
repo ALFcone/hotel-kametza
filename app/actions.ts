@@ -41,12 +41,9 @@ export async function searchGuestByDocument(documentNumber: string) {
   const supabaseServer = await getSupabaseServer();
   
   const { data, error } = await supabaseServer
-    .from("bookings")
-    .select("client_name, client_email, client_country, client_phone, document_type")
+    .from("clients")
+    .select("id, name, email, country, phone, document_type, document_number")
     .eq("document_number", documentNumber)
-    .not("client_name", "is", null)
-    .order("created_at", { ascending: false })
-    .limit(1)
     .maybeSingle();
 
   // Si lo encontró en la base de datos local, lo devolvemos
@@ -76,11 +73,11 @@ export async function searchGuestByDocument(documentNumber: string) {
             str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
           
           return {
-            client_name: formatName(apiData.nombre),
-            client_country: "Perú",
+            name: formatName(apiData.nombre),
+            country: "Perú",
             document_type: "DNI",
-            client_email: "",
-            client_phone: ""
+            email: "",
+            phone: ""
           };
         }
       } else {
@@ -94,6 +91,26 @@ export async function searchGuestByDocument(documentNumber: string) {
   }
 
   return null;
+}
+
+async function upsertClient(formData: FormData, supabaseServer: any) {
+  const docNum = formData.get("documentNumber") as string;
+  if (!docNum) return null;
+
+  const { data: clientData, error } = await supabaseServer.from("clients").upsert({
+    document_number: docNum,
+    document_type: formData.get("documentType"),
+    name: formData.get("name"),
+    email: formData.get("email"),
+    phone: formData.get("phone"),
+    country: formData.get("country") || "Perú",
+  }, { onConflict: "document_number" }).select("id").single();
+  
+  if (error) {
+    console.error("Error upserting client:", error.message);
+    return null;
+  }
+  return clientData ? clientData.id : null;
 }
 
 // ==============================================================================
@@ -118,6 +135,9 @@ export async function createBooking(formData: FormData) {
 
   if (!isAvailable) return { error: "Habitación no disponible en esas fechas." };
 
+  // Manejo del cliente
+  const clientId = await upsertClient(formData, supabaseServer);
+
   // Inserción en Base de Datos - ESQUEMA REAL
   const { data: booking, error } = await supabaseServer
     .from("bookings") 
@@ -129,12 +149,7 @@ export async function createBooking(formData: FormData) {
       total_price: total,
       payment_method: paymentMethod, 
       status: "pendiente",
-      client_name: formData.get("name"),
-      client_email: formData.get("email"),
-      client_country: formData.get("country"),
-      client_phone: formData.get("phone"),
-      document_type: formData.get("documentType"),
-      document_number: formData.get("documentNumber"),
+      client_id: clientId,
     })
     .select()
     .single();
@@ -266,6 +281,8 @@ export async function adminCreateBooking(formData: FormData) {
   const amountPaid = formData.get("amountPaid") ? Number(formData.get("amountPaid")) : price;
   const status = amountPaid >= price ? "pagado" : "parcial";
 
+  const clientId = await upsertClient(formData, supabaseServer);
+
   const { error } = await supabaseServer
     .from("bookings")
     .insert({
@@ -277,12 +294,8 @@ export async function adminCreateBooking(formData: FormData) {
       amount_paid: amountPaid,
       payment_method: paymentMethod,
       status: status,
-      client_name: formData.get("name"),
-      client_email: formData.get("email") || null,
-      client_country: formData.get("country") || "Perú",
-      client_phone: formData.get("phone"),
-      document_type: formData.get("documentType"),
-      document_number: formData.get("documentNumber"),
+      client_id: clientId,
+      special_requests: formData.get("notes"),
     });
 
   if (error) {

@@ -11,6 +11,7 @@ import { createPortal } from "react-dom";
 import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle, Printer, FileWarning } from "lucide-react";
 import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, fetchRucData, fetchDniData, cancelBooking } from "@/app/actions";
 import ThermalTicket from "./ThermalTicket";
+import Swal from "sweetalert2";
 
 interface AdminTableActionsProps {
   bookingId: number;
@@ -232,10 +233,25 @@ export function AdminTableActions({
   };
 
   const handleCancelBooking = async () => {
-    if (confirm("¿Estás seguro de anular esta reserva y generar una Nota de Crédito?")) {
+    const result = await Swal.fire({
+      title: "¿Anular reserva?",
+      text: "Se generará una Nota de Crédito y la habitación quedará libre. Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#e3004f", // Kametza red
+      cancelButtonColor: "#a8a29e",
+      confirmButtonText: "Sí, anular reserva",
+      cancelButtonText: "No, mantener"
+    });
+
+    if (result.isConfirmed) {
       setLoading(true);
-      const result = await cancelBooking(bookingId);
-      if (result.error) alert(result.error);
+      const cancelResult = await cancelBooking(bookingId);
+      if (cancelResult.error) {
+        Swal.fire("Error", cancelResult.error, "error");
+      } else {
+        Swal.fire("Anulada", "La reserva fue anulada y se liberó la habitación.", "success");
+      }
       setLoading(false);
     }
   };
@@ -373,17 +389,19 @@ export function AdminTableActions({
         <form 
           action={onDelete} 
           onSubmit={(e) => {
-            if (userRole !== "admin") {
-              const pin = prompt("Ingrese el PIN Maestro para eliminar esta reserva:");
-              if (pin !== "2026") {
-                e.preventDefault();
-                alert("PIN incorrecto. No tiene permisos para eliminar reservas.");
-                return;
+            e.preventDefault();
+            Swal.fire({
+              title: "¿Estás seguro?",
+              text: "Esta acción eliminará la reserva permanentemente.",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "Sí, eliminar",
+              cancelButtonText: "Cancelar"
+            }).then((result) => {
+              if (result.isConfirmed) {
+                e.currentTarget.submit();
               }
-            }
-            if (!confirm("¿Estás seguro de eliminar completamente esta reserva?")) {
-              e.preventDefault();
-            }
+            });
           }}
         >
           <input type="hidden" name="bookingId" value={bookingId} />

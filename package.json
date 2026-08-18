@@ -16,7 +16,8 @@
     "postcss": "^8.5.15",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-qr-code": "^2.2.0"
+    "react-qr-code": "^2.2.0",
+    "sweetalert2": "^11.26.25"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

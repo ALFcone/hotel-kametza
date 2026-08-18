@@ -85,13 +85,13 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
     try {
       const guest = await searchGuestByDocument(docNumber);
       if (guest) {
-        if (nameRef.current) nameRef.current.value = guest.client_name || "";
-        if (phoneRef.current) phoneRef.current.value = guest.client_phone || "";
-        if (emailRef.current) emailRef.current.value = guest.client_email || "";
-        if (countryRef.current) countryRef.current.value = guest.client_country || "Perú";
+        if (nameRef.current) nameRef.current.value = guest.name || "";
+        if (phoneRef.current) phoneRef.current.value = guest.phone || "";
+        if (emailRef.current) emailRef.current.value = guest.email || "";
+        if (countryRef.current) countryRef.current.value = guest.country || "Perú";
         if (docTypeRef.current && guest.document_type) docTypeRef.current.value = guest.document_type;
         
-        if (guest.client_phone) {
+        if (guest.phone) {
           setStatusMessage({ type: "success", text: "¡Huésped frecuente! Datos cargados del historial." });
         } else {
           setStatusMessage({ type: "success", text: "DNI válido (RENIEC). Completa los datos restantes." });

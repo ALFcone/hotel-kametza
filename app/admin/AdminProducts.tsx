@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Edit3, Trash2, Save, X, ShoppingCart, Package } from "lucide-react";
 import { createProduct, updateProduct, deleteProduct } from "../actions";
+import Swal from "sweetalert2";
 
 export default function AdminProducts({ products = [], userRole }: { products: any[], userRole?: string | null }) {
   const [loading, setLoading] = useState(false);
@@ -58,7 +59,19 @@ export default function AdminProducts({ products = [], userRole }: { products: a
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
+    const confirmDelete = await Swal.fire({
+      title: "¿Eliminar producto?",
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#e3004f",
+      cancelButtonColor: "#a8a29e",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar"
+    });
+    
+    if (!confirmDelete.isConfirmed) return;
+    
     setLoading(true);
     const formData = new FormData();
     formData.append("id", id.toString());

@@ -164,10 +164,24 @@ export default async function AdminPage(props: {
 
   // B. CONSULTAS
   const { data: rooms } = await supabaseServer.from("rooms").select("*").order("id");
-  const { data: allBookings } = await supabaseServer
+  const { data: rawBookings } = await supabaseServer
     .from("bookings")
-    .select("*")
+    .select("*, clients(*)")
     .order("created_at", { ascending: false });
+
+  // Mapear la nueva estructura relacional a la estructura plana original
+  // para no romper la compatibilidad con el resto del panel y componentes.
+  // Usamos un fallback a b.client_name antiguo por si el cache de Supabase
+  // aún no detecta la relación Foránea (Foreign Key).
+  const allBookings = rawBookings?.map((b: any) => ({
+    ...b,
+    client_name: b.clients?.name || b.client_name || null,
+    client_email: b.clients?.email || b.client_email || null,
+    client_phone: b.clients?.phone || b.client_phone || null,
+    client_country: b.clients?.country || b.client_country || null,
+    document_type: b.clients?.document_type || b.document_type || null,
+    document_number: b.clients?.document_number || b.document_number || null,
+  })) || [];
   const { data: allExtras } = await supabaseServer
     .from("booking_extras")
     .select("*")
