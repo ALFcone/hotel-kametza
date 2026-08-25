@@ -702,59 +702,98 @@ function RoomCard({
 }: {
    
   room: any;
-  index: number;
   onRequireAuth: (callback: () => void) => void;
   globalCheckIn: string;
   globalCheckOut: string;
-  currentUser: any;
+   
+  currentUser: any; // Tipo
 }) {
   const [showModal, setShowModal] = useState(false);
-  const isReversed = index % 2 !== 0;
+  const simpleDesc = getSimpleDescription(room.name, room.description);
 
   return (
     <>
-      <div className={`flex flex-col md:flex-row gap-8 lg:gap-20 items-center w-full ${isReversed ? 'md:flex-row-reverse' : ''}`}>
-        {/* Imagen Editorial */}
-        <div className="w-full md:w-1/2 relative h-[450px] lg:h-[600px] group overflow-hidden">
-          <div className="absolute inset-0 bg-stone-950/10 group-hover:bg-transparent transition duration-700 z-10" />
-          <img 
-            src={room.image_url} 
-            alt={room.name} 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+      <div className="group bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(227,0,79,0.15)] transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full relative">
+        <div className="relative h-72 md:h-96 w-full overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10 opacity-60"></div>
+          <img
+            src={room.image_url}
+            alt={room.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
           />
-          <div className="absolute bottom-8 left-8 z-20">
-             <span className="bg-white/95 text-stone-900 text-[10px] md:text-xs font-bold px-6 py-3 uppercase tracking-[0.2em] shadow-xl">
-               S/ {room.price_per_night} / NOCHE
-             </span>
+          <div className="absolute bottom-4 right-4 z-20 bg-white/95 backdrop-blur-sm px-5 py-2 rounded-2xl shadow-lg border border-white/50">
+            <p className="text-[9px] uppercase font-bold text-stone-400 tracking-widest mb-0.5">
+              Por noche
+            </p>
+            <p className="text-xl font-black text-[#e3004f]">
+              S/ {room.price_per_night}
+            </p>
+          </div>
+          <div className="absolute top-4 left-4 z-20">
+            <span className="bg-[#e3004f] text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] shadow-lg">
+              Exclusivo
+            </span>
           </div>
         </div>
-        
-        {/* Contenido Editorial */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center py-8">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-[1px] bg-[#e3004f]" />
-            <span className="text-[#e3004f] uppercase tracking-[0.25em] text-xs font-bold">KAMETZA SUITES</span>
+
+        <div className="p-8 flex flex-col flex-grow">
+          <div className="flex justify-between items-start mb-3">
+            <h3 className="text-2xl font-serif font-bold text-rose-950 leading-tight group-hover:text-rose-700 transition-colors">
+              {room.name}
+            </h3>
+            <div className="flex gap-0.5 mt-1">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Star
+                  key={i}
+                  size={12}
+                  className="fill-amber-400 text-amber-400"
+                />
+              ))}
+            </div>
           </div>
-          <h3 className="text-4xl lg:text-5xl font-serif text-stone-900 mb-8 leading-tight">
-            {room.name}
-          </h3>
-          <p className="text-stone-500 mb-12 leading-relaxed font-light text-lg">
-            {room.description}
+
+          <p className="text-stone-600 text-[15px] mb-7 leading-relaxed line-clamp-3 relative pl-4 border-l-[3px] border-[#e3004f] bg-gradient-to-r from-rose-50/50 to-transparent py-1 pr-2 rounded-r-lg">
+            {simpleDesc}
           </p>
-          <div className="grid grid-cols-2 gap-y-6 gap-x-8 mb-12 text-stone-900 text-[11px] tracking-widest uppercase font-bold">
-             <div className="flex items-center gap-4 border-b border-stone-200 pb-3"><Wifi size={16} className="text-[#e3004f]"/> WiFi Fibra</div>
-             <div className="flex items-center gap-4 border-b border-stone-200 pb-3"><Tv size={16} className="text-[#e3004f]"/> Smart TV</div>
-             <div className="flex items-center gap-4 border-b border-stone-200 pb-3"><Users size={16} className="text-[#e3004f]"/> Privado</div>
-             <div className="flex items-center gap-4 border-b border-stone-200 pb-3"><Clock size={16} className="text-[#e3004f]"/> Agua Caliente</div>
+
+          <div className="grid grid-cols-2 gap-2.5 mb-8">
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Wifi size={16} className="text-[#e3004f]" />
+              <span className="text-[10px] font-black uppercase tracking-wider">
+                WiFi Fibra Óptica
+              </span>
+            </div>
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Clock size={16} className="text-[#e3004f]" />
+              <span className="text-[10px] font-black uppercase tracking-wider">
+                Agua Caliente 24h
+              </span>
+            </div>
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Tv size={16} className="text-[#e3004f]" />
+              <span className="text-[10px] font-black uppercase tracking-wider">Smart TV</span>
+            </div>
+            <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
+              <Users size={16} className="text-[#e3004f]" />
+              <span className="text-[10px] font-black uppercase tracking-wider">
+                Baño Privado
+              </span>
+            </div>
           </div>
-          
-          <button 
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-4 text-stone-900 font-bold uppercase tracking-[0.2em] text-[11px] lg:text-sm group hover:text-[#e3004f] transition-colors w-max"
-          >
-            <span>Ver Disponibilidad</span>
-            <div className="w-12 h-[1px] bg-stone-900 group-hover:w-20 group-hover:bg-[#e3004f] transition-all duration-500" />
-          </button>
+
+          <div className="mt-auto pt-4 border-t border-stone-100">
+            <button
+              onClick={() => setShowModal(true)}
+              className="w-full bg-gradient-to-r from-[#e3004f] to-[#b3003e] text-white font-bold py-4 rounded-xl hover:shadow-[0_10px_20px_rgba(227,0,79,0.3)] hover:-translate-y-1 transition-all flex items-center justify-between px-6 group/btn"
+            >
+              <span className="text-xs uppercase tracking-[0.2em]">
+                Ver Disponibilidad
+              </span>
+              <div className="bg-white/10 p-1.5 rounded-full group-hover/btn:bg-white/20 transition">
+                <ArrowRight size={16} />
+              </div>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1272,19 +1311,20 @@ export default function Home() {
               Espacios diseñados para tu máximo descanso
             </p>
           </div>
-          <div className="flex flex-col justify-center gap-32 md:gap-40 w-full max-w-7xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-8 w-full">
+            { }
             {groupedRooms.map((room: any, index: number) => (
               <div 
                 key={room.name} 
-                className="w-full scroll-reveal"
+                className="w-full sm:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[calc(25%-1.5rem)] max-w-[420px] scroll-reveal"
+                style={{ transitionDelay: `${index * 150}ms` }}
               >
                 <RoomCard
                   room={room}
-                  index={index}
                   onRequireAuth={triggerAuthFlow}
                   globalCheckIn={globalCheckIn}
                   globalCheckOut={globalCheckOut}
-                  currentUser={currentUser}
+                  currentUser={currentUser} // Pasamos el usuario al RoomCard
                 />
               </div>
             ))}
