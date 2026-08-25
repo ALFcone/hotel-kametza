@@ -457,32 +457,53 @@ function BookingModal({
   return createPortal(
     <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200">
       <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
-        <div className="hidden md:block w-1/3 bg-stone-100 p-8 relative overflow-hidden">
-          <div className="absolute inset-0 bg-rose-900/10 mix-blend-multiply"></div>
-          <img
-            src={room.image_url}
-            className="absolute inset-0 w-full h-full object-cover opacity-50 grayscale"
-            alt=""
-          />
-          <div className="relative z-10 flex flex-col h-full justify-between">
-            <div>
-              <h3 className="text-2xl font-serif font-bold text-rose-950 mb-2">
-                {room.name}
-              </h3>
-              <p className="text-xs text-stone-600 font-medium line-clamp-4">
-                {simpleDesc}
-              </p>
+        {/* --- GALERÍA DE FOTOS (Panel Izquierdo) --- */}
+        <div className="hidden md:flex flex-col w-[40%] bg-stone-100 p-6 relative overflow-hidden">
+          {/* Main Photo */}
+          <div className="w-full h-[50%] rounded-2xl overflow-hidden mb-4 relative shadow-sm">
+            <img
+              src={room.image_url}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              alt={room.name}
+            />
+          </div>
+          
+          {/* Thumbnails Gallery */}
+          <div className="grid grid-cols-2 gap-4 h-[25%] mb-4">
+            <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm">
+              <img
+                src={room.image_url}
+                className="w-full h-full object-cover hover:scale-110 transition-transform duration-700 opacity-90"
+                alt="Vista 2"
+              />
             </div>
-            <div className="bg-white/90 backdrop-blur p-4 rounded-2xl shadow-lg">
-              <p className="text-[10px] uppercase font-bold text-stone-500 mb-1">
-                Total a Pagar
-              </p>
-              <p className="text-3xl font-black text-[#e3004f]">
-                S/ {totalPrice}
-              </p>
-              <p className="text-[10px] text-stone-400 font-bold mt-1">
-                {nights} Noche(s)
-              </p>
+            <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm relative">
+              <img
+                src={room.image_url}
+                className="w-full h-full object-cover hover:scale-110 transition-transform duration-700 opacity-90"
+                alt="Vista 3"
+              />
+              <div className="absolute inset-0 bg-stone-900/40 flex items-center justify-center cursor-pointer hover:bg-stone-900/50 transition">
+                <span className="text-white font-bold text-xs uppercase tracking-widest">+ Ver Más</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col justify-end">
+            <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-stone-100 flex justify-between items-center">
+              <div>
+                <p className="text-[9px] uppercase font-bold text-stone-500 mb-1 tracking-widest">
+                  Total a Pagar
+                </p>
+                <p className="text-2xl font-black text-[#e3004f]">
+                  S/ {totalPrice}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
+                  {nights} Noche(s)
+                </p>
+              </div>
             </div>
           </div>
         </div>
