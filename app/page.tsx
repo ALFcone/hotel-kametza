@@ -713,7 +713,7 @@ function RoomCard({
 
   return (
     <>
-      <div className="group bg-white rounded-[2.5rem] shadow-lg hover:shadow-[0_20px_40px_rgba(112,8,36,0.15)] transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full relative">
+      <div className="group bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(227,0,79,0.15)] transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full relative">
         <div className="relative h-72 md:h-96 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10 opacity-60"></div>
           <img
@@ -784,7 +784,7 @@ function RoomCard({
           <div className="mt-auto pt-4 border-t border-stone-100">
             <button
               onClick={() => setShowModal(true)}
-              className="w-full bg-stone-900 text-white font-bold py-4 rounded-xl hover:bg-[#e3004f] transition-all shadow-lg hover:shadow-rose-900/20 flex items-center justify-between px-6 group/btn"
+              className="w-full bg-gradient-to-r from-[#e3004f] to-[#b3003e] text-white font-bold py-4 rounded-xl hover:shadow-[0_10px_20px_rgba(227,0,79,0.3)] hover:-translate-y-1 transition-all flex items-center justify-between px-6 group/btn"
             >
               <span className="text-xs uppercase tracking-[0.2em]">
                 Ver Disponibilidad
@@ -944,7 +944,7 @@ export default function Home() {
         onSuccess={handleLoginSuccess}
       />
 
-      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-lg z-[100] shadow-xl border-b border-stone-100/50 transition-all">
+      <nav className="fixed top-0 w-full bg-white z-[100] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-b border-stone-100 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24 md:h-32">
             <div className="flex-shrink-0 z-[110]">
@@ -1147,8 +1147,8 @@ export default function Home() {
             className="w-full h-full object-cover object-center"
           />
           {/* OVERLAY OSCURECIDO PARA QUE EL TEXTO BLANCO RESALTE MÁS */}
-          <div className="absolute inset-0 bg-stone-950/20" />
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/90 via-stone-900/60 to-[#FDFBF7]" />
+          <div className="absolute inset-0 bg-[#3a0614]/40 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-900/40 to-[#FDFBF7]" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -1188,8 +1188,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
-          <div className="bg-white/95 backdrop-blur-lg p-2 rounded-[2rem] md:rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-white/40 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-200">
+          {/* --- BUSCADOR PROFESIONAL BOLD --- */}
+          <div className="bg-white p-2 md:p-3 rounded-2xl md:rounded-full shadow-[0_20px_40px_rgba(227,0,79,0.15)] max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-rose-100 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-100">
             <div 
               className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group"
               onClick={() => {
@@ -1278,7 +1278,7 @@ export default function Home() {
             <div className="p-2 w-full md:w-auto">
               <a
                 href="#habitaciones"
-                className="btn-shimmer bg-[#e3004f] text-white px-8 py-4 rounded-full shadow-lg hover:bg-black transition-all w-full flex items-center justify-center gap-2 group"
+                className="bg-gradient-to-r from-[#e3004f] to-[#b3003e] text-white px-8 py-4 rounded-xl md:rounded-full shadow-[0_10px_20px_rgba(227,0,79,0.3)] hover:shadow-[0_15px_30px_rgba(227,0,79,0.4)] hover:-translate-y-1 transition-all w-full flex items-center justify-center gap-2 group"
               >
                 <Search
                   size={20}
@@ -1368,8 +1368,8 @@ export default function Home() {
                         }, 150);
                       }
                     }}
-                    className={`group w-full h-full bg-white rounded-[2rem] overflow-hidden transition-all duration-500 flex flex-col text-left border ${
-                      isActive ? 'border-rose-300 ring-4 ring-rose-50 scale-[1.02] shadow-2xl shadow-rose-900/10' : 'border-stone-100 hover:border-rose-100 hover:-translate-y-2 shadow-lg hover:shadow-2xl hover:shadow-rose-900/10'
+                    className={`group w-full h-full bg-white rounded-3xl overflow-hidden transition-all duration-500 flex flex-col text-left border ${
+                      isActive ? 'border-rose-400 ring-4 ring-rose-50 scale-[1.02] shadow-[0_20px_40px_rgba(227,0,79,0.15)]' : 'border-stone-100 hover:border-rose-200 hover:-translate-y-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(227,0,79,0.1)]'
                     }`}
                   >
                     <div className="relative h-60 w-full overflow-hidden">
