@@ -369,6 +369,39 @@ function BookingModal({
   const [nights, setNights] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [docType, setDocType] = useState("DNI");
+  
+  // -- NEW STATES --
+  const [docNumber, setDocNumber] = useState("");
+  const [customerName, setCustomerName] = useState(currentUser?.user_metadata?.full_name || "");
+  const [isFetchingDni, setIsFetchingDni] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
+
+  const mockGallery = [
+    room.image_url,
+    "/rooms/1783000136108-20230927_104221.jpg",
+    "/rooms/1783001920612-20230927_104221.jpg",
+    "/rooms/1783023911777-20230927_104221.jpg"
+  ].filter(Boolean);
+
+  const handleDocNumberChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setDocNumber(val);
+    
+    if (docType === "DNI" && val.length === 8) {
+      setIsFetchingDni(true);
+      try {
+        const res = await fetch(`/api/dni?numero=${val}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.nombre) setCustomerName(data.nombre);
+        }
+      } catch (err) {
+        console.error("Error fetching DNI");
+      }
+      setIsFetchingDni(false);
+    }
+  };
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -460,9 +493,9 @@ function BookingModal({
         {/* --- GALERÍA DE FOTOS (Panel Izquierdo) --- */}
         <div className="hidden md:flex flex-col w-[40%] bg-stone-100 p-6 relative overflow-hidden">
           {/* Main Photo */}
-          <div className="w-full h-[50%] rounded-2xl overflow-hidden mb-4 relative shadow-sm">
+          <div className="w-full h-[50%] rounded-2xl overflow-hidden mb-4 relative shadow-sm cursor-pointer" onClick={() => { setCurrentGalleryIndex(0); setGalleryOpen(true); }}>
             <img
-              src={room.image_url}
+              src={mockGallery[0]}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               alt={room.name}
             />
@@ -470,20 +503,20 @@ function BookingModal({
           
           {/* Thumbnails Gallery */}
           <div className="grid grid-cols-2 gap-4 h-[25%] mb-4">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm">
+            <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm cursor-pointer" onClick={() => { setCurrentGalleryIndex(1); setGalleryOpen(true); }}>
               <img
-                src={room.image_url}
+                src={mockGallery[1]}
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-700 opacity-90"
                 alt="Vista 2"
               />
             </div>
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm relative">
+            <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm relative cursor-pointer" onClick={() => { setCurrentGalleryIndex(2); setGalleryOpen(true); }}>
               <img
-                src={room.image_url}
+                src={mockGallery[2]}
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-700 opacity-90"
                 alt="Vista 3"
               />
-              <div className="absolute inset-0 bg-stone-900/40 flex items-center justify-center cursor-pointer hover:bg-stone-900/50 transition">
+              <div className="absolute inset-0 bg-stone-900/40 flex items-center justify-center hover:bg-stone-900/50 transition">
                 <span className="text-white font-bold text-xs uppercase tracking-widest">+ Ver Más</span>
               </div>
             </div>
@@ -571,15 +604,22 @@ function BookingModal({
                   <option value="PASAPORTE">Pasaporte</option>
                 </select>
               </div>
-              <div className="col-span-2">
+              <div className="col-span-2 relative">
                 <input
                   type="text"
                   name="documentNumber"
                   placeholder="Número de Documento"
                   required
+                  value={docNumber}
+                  onChange={handleDocNumberChange}
                   maxLength={docType === "DNI" ? 8 : 15}
                   className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
                 />
+                {isFetchingDni && (
+                  <div className="absolute right-3 top-3">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#e3004f]"></div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -588,8 +628,8 @@ function BookingModal({
               name="name"
               placeholder="Nombre completo"
               required
-              // MEJORA: Autocompletar nombre si está disponible
-              defaultValue={currentUser?.user_metadata?.full_name || ""}
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
               className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
             />
 
@@ -699,6 +739,48 @@ function BookingModal({
           </form>
         </div>
       </div>
+
+      {/* OVERLAY DE GALERÍA FULLSCREEN */}
+      {galleryOpen && (
+        <div className="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center p-4">
+          <button
+            onClick={() => setGalleryOpen(false)}
+            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition z-10"
+          >
+            <X size={24} />
+          </button>
+          
+          <button 
+            onClick={() => setCurrentGalleryIndex((prev) => (prev > 0 ? prev - 1 : mockGallery.length - 1))}
+            className="absolute left-4 md:left-12 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition z-10"
+          >
+            <ArrowRight size={32} className="rotate-180" />
+          </button>
+
+          <img 
+            src={mockGallery[currentGalleryIndex]} 
+            className="max-h-[85vh] max-w-full object-contain"
+            alt={`Galería ${currentGalleryIndex + 1}`}
+          />
+
+          <button 
+            onClick={() => setCurrentGalleryIndex((prev) => (prev < mockGallery.length - 1 ? prev + 1 : 0))}
+            className="absolute right-4 md:right-12 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition z-10"
+          >
+            <ArrowRight size={32} />
+          </button>
+
+          <div className="absolute bottom-6 flex gap-2">
+            {mockGallery.map((_, idx) => (
+              <button 
+                key={idx}
+                onClick={() => setCurrentGalleryIndex(idx)}
+                className={`w-3 h-3 rounded-full transition-all ${idx === currentGalleryIndex ? 'bg-[#e3004f] scale-125' : 'bg-white/50 hover:bg-white'}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>,
     document.body
   );
