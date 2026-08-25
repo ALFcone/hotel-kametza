@@ -719,20 +719,28 @@ export default function Dashboard() {
                       style={{ animationDelay: `${400 + index * 80}ms` }}
                     >
                       <div
-                        className={`group bg-white rounded-[2rem] p-5 md:p-7 shadow-lg border border-stone-100/80 flex flex-col md:flex-row gap-6 items-center relative overflow-hidden transition-all duration-500 ${
+                        className={`group bg-gradient-to-r from-white to-[#FDFBF7] rounded-[2rem] p-5 md:p-7 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] border border-white/60 flex flex-col md:flex-row gap-6 items-center relative overflow-hidden transition-all duration-700 ring-1 ring-stone-900/5 backdrop-blur-xl ${
                           booking.status === "cancelled"
-                            ? "opacity-70 grayscale-[0.3]"
-                            : "hover:shadow-xl hover:-translate-y-0.5 hover:border-stone-200"
+                            ? "opacity-60 grayscale-[0.5]"
+                            : "hover:shadow-[0_20px_50px_-10px_rgba(227,0,79,0.15)] hover:-translate-y-1"
                         }`}
                       >
+                        {/* Decorative background logo */}
+                        <Building size={200} strokeWidth={0.5} className="absolute -right-10 -top-10 text-[#e3004f] opacity-[0.02] group-hover:scale-110 group-hover:rotate-6 transition-transform duration-1000 pointer-events-none" />
+                        
+                        {/* Cutouts for ticket effect */}
+                        <div className="hidden md:block absolute left-[280px] top-0 bottom-0 w-0 border-l-[3px] border-dashed border-stone-200/60" />
+                        <div className="hidden md:block absolute left-[272px] -top-3 w-6 h-6 rounded-full bg-[#FDFBF7] shadow-inner" />
+                        <div className="hidden md:block absolute left-[272px] -bottom-3 w-6 h-6 rounded-full bg-[#FDFBF7] shadow-inner" />
+
                         {/* Accent line */}
                         <div
-                          className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-[2rem] ${
+                          className={`absolute left-0 top-0 bottom-0 w-2 rounded-l-[2rem] shadow-[2px_0_10px_rgba(0,0,0,0.1)] ${
                             effectiveStatus === "pagado" || effectiveStatus === "approved"
-                              ? "bg-emerald-500"
+                              ? "bg-gradient-to-b from-emerald-400 to-emerald-600"
                               : effectiveStatus === "pendiente"
-                              ? "bg-[#e3004f]"
-                              : "bg-stone-300"
+                              ? "bg-gradient-to-b from-[#e3004f] to-rose-700"
+                              : "bg-gradient-to-b from-stone-300 to-stone-400"
                           }`}
                         />
 
