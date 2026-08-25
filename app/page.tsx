@@ -713,7 +713,7 @@ function RoomCard({
 
   return (
     <>
-      <div className="group bg-white rounded-[2.5rem] shadow-lg hover:shadow-[0_20px_40px_rgba(112,8,36,0.15)] transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full relative">
+      <div className="group bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2.5rem] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_25px_50px_-12px_rgba(227,0,79,0.25)] transition-all duration-700 hover:-translate-y-2 overflow-hidden ring-1 ring-stone-900/5 backdrop-blur-xl flex flex-col h-full relative">
         <div className="relative h-72 md:h-96 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10 opacity-60"></div>
           <img
@@ -944,7 +944,7 @@ export default function Home() {
         onSuccess={handleLoginSuccess}
       />
 
-      <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-lg z-[100] shadow-xl border-b border-stone-100/50 transition-all">
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl bg-white/70 backdrop-blur-2xl z-[100] shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/60 rounded-3xl md:rounded-full transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24 md:h-32">
             <div className="flex-shrink-0 z-[110]">
@@ -1140,15 +1140,14 @@ export default function Home() {
         id="inicio"
         className="relative pt-48 pb-32 lg:pt-56 lg:pb-40 overflow-hidden z-10 px-4 text-center min-h-[90vh] flex flex-col justify-center"
       >
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/hero.png"
-            alt="Hotel Kametza Exterior"
-            className="w-full h-full object-cover object-center"
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div
+            className="w-full h-[120%] bg-cover bg-center bg-fixed"
+            style={{ backgroundImage: "url('/hero.png')" }}
           />
           {/* OVERLAY OSCURECIDO PARA QUE EL TEXTO BLANCO RESALTE MÁS */}
-          <div className="absolute inset-0 bg-stone-950/20" />
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/90 via-stone-900/60 to-[#FDFBF7]" />
+          <div className="absolute inset-0 bg-stone-950/30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-900/40 to-[#FDFBF7]" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -1188,8 +1187,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* --- BUSCADOR PROFESIONAL (CÁPSULA) --- */}
-          <div className="bg-white/95 backdrop-blur-lg p-2 rounded-[2rem] md:rounded-full shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-white/40 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-200">
+          {/* --- BUSCADOR PROFESIONAL PREMIUM --- */}
+          <div className="bg-white/80 backdrop-blur-2xl p-2.5 rounded-[2rem] md:rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.15)] ring-1 ring-white/60 max-w-4xl mx-auto flex flex-col md:flex-row items-center mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-200/50">
             <div 
               className="flex flex-col items-start px-6 py-3 w-full md:w-auto flex-grow hover:bg-stone-50 transition rounded-full cursor-pointer relative group"
               onClick={() => {
@@ -1368,8 +1367,8 @@ export default function Home() {
                         }, 150);
                       }
                     }}
-                    className={`group w-full h-full bg-white rounded-[2rem] overflow-hidden transition-all duration-500 flex flex-col text-left border ${
-                      isActive ? 'border-rose-300 ring-4 ring-rose-50 scale-[1.02] shadow-2xl shadow-rose-900/10' : 'border-stone-100 hover:border-rose-100 hover:-translate-y-2 shadow-lg hover:shadow-2xl hover:shadow-rose-900/10'
+                    className={`group w-full h-full bg-gradient-to-b from-white to-[#FDFBF7] rounded-[2.5rem] overflow-hidden transition-all duration-700 flex flex-col text-left ring-1 backdrop-blur-xl ${
+                      isActive ? 'ring-rose-300 scale-[1.02] shadow-[0_20px_50px_rgba(227,0,79,0.15)]' : 'ring-stone-900/5 hover:ring-rose-200 hover:-translate-y-2 shadow-[0_10px_30px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_rgba(227,0,79,0.1)]'
                     }`}
                   >
                     <div className="relative h-60 w-full overflow-hidden">
@@ -1408,7 +1407,7 @@ export default function Home() {
 
           {/* DESPLIEGUE DINÁMICO DE DETALLES DEL SERVICIO */}
           {activeServiceId && (
-            <div id="service-detail" className="mt-16 relative w-full bg-white rounded-[2.5rem] overflow-hidden border border-stone-200 shadow-2xl animate-in fade-in slide-in-from-top-8 duration-500">
+            <div id="service-detail" className="mt-16 relative w-full bg-gradient-to-r from-white to-[#FDFBF7] rounded-[2.5rem] overflow-hidden ring-1 ring-stone-900/5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] backdrop-blur-2xl animate-in fade-in slide-in-from-top-8 duration-700">
               <button 
                 onClick={() => setActiveServiceId(null)}
                 className="absolute top-4 md:top-8 right-4 md:right-8 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-stone-500 shadow-md border border-stone-100 hover:bg-rose-50 hover:text-rose-600 transition-colors z-20"
