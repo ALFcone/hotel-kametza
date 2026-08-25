@@ -53,10 +53,14 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
 
       {/* Info */}
       <div className="mb-4 space-y-1">
-        <p><strong>FECHA:</strong> {currentDate}</p>
-        <p><strong>CLIENTE:</strong> {booking.customer_name}</p>
-        <p><strong>{type === "FACTURA" ? "RUC" : "DNI"}:</strong> {booking.customer_document || "00000000"}</p>
+        <p><strong>FECHA EMISIÓN:</strong> {currentDate.split(",")[0]}</p>
+        <p><strong>HORA EMISIÓN:</strong> {currentDate.split(",")[1] || ""}</p>
+        <p><strong>CAJERO:</strong> ADMIN</p>
+        <p><strong>CLIENTE:</strong> {booking.customer_name || booking.client_name || "CLIENTE GENERAL"}</p>
+        <p><strong>{type === "FACTURA" ? "RUC" : "DNI"}:</strong> {booking.customer_document || booking.client_dni || "00000000"}</p>
         {booking.customer_address && <p><strong>DIRECCIÓN:</strong> {booking.customer_address}</p>}
+        <p><strong>MONEDA:</strong> SOLES (PEN)</p>
+        <p><strong>FORMA DE PAGO:</strong> CONTADO</p>
         <p><strong>HABITACIÓN:</strong> {booking.room_id} {booking.room_type ? `(${booking.room_type})` : ''}</p>
       </div>
 
@@ -73,15 +77,15 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
         <tbody>
           {/* Fila Principal de Alojamiento */}
           <tr>
-            <td className="py-2 align-top">{nights}</td>
+            <td className="py-2 align-top font-bold">{nights}</td>
             <td className="py-2">
-              Noche(s) de Alojamiento
-              <div className="text-[9px] mt-0.5 opacity-80 leading-tight">
+              <span className="font-bold uppercase">Servicio de Alojamiento</span>
+              <div className="text-[9px] mt-0.5 opacity-90 leading-tight">
                 Del {checkIn.toLocaleDateString("es-PE")} al {checkOut.toLocaleDateString("es-PE")}
               </div>
             </td>
-            <td className="text-right py-2 align-top">{(booking.base_price / nights).toFixed(2)}</td>
-            <td className="text-right py-2 align-top">{booking.base_price.toFixed(2)}</td>
+            <td className="text-right py-2 align-top">{((booking.total_price || 0) / nights).toFixed(2)}</td>
+            <td className="text-right py-2 align-top font-bold">{(booking.total_price || 0).toFixed(2)}</td>
           </tr>
 
           {/* Filas de Extras (si existen) */}
@@ -97,18 +101,22 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
       </table>
 
       {/* Totals */}
-      <div className="border-t border-dashed border-black pt-2 mb-4 flex justify-end">
-        <div className="w-full">
+      <div className="border-t border-dashed border-black pt-3 mb-4 flex justify-end">
+        <div className="w-full space-y-1">
           <div className="flex justify-between">
-            <span>SUBTOTAL:</span>
+            <span>OP. GRAVADAS:</span>
             <span>S/ {subtotal}</span>
           </div>
           <div className="flex justify-between">
             <span>IGV (18%):</span>
             <span>S/ {igv}</span>
           </div>
-          <div className="flex justify-between font-bold text-sm mt-1">
-            <span>TOTAL:</span>
+          <div className="flex justify-between">
+            <span>OP. EXONERADAS:</span>
+            <span>S/ 0.00</span>
+          </div>
+          <div className="flex justify-between font-bold text-sm mt-2 border-t border-black pt-1">
+            <span>IMPORTE TOTAL:</span>
             <span>S/ {total.toFixed(2)}</span>
           </div>
         </div>

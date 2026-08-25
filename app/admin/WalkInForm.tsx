@@ -108,7 +108,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
   };
 
   return (
-    <div className="bg-white rounded-[2rem] border border-stone-100 p-8 md:p-12 shadow-2xl shadow-stone-200/50 max-w-3xl">
+    <div className="bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2.5rem] border border-white/60 p-8 md:p-12 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] ring-1 ring-stone-900/5 max-w-3xl backdrop-blur-xl">
       <div className="flex items-center gap-4 mb-8">
         <div className="bg-gradient-to-br from-amber-100 to-amber-50 text-[#d97706] p-4 rounded-2xl border border-amber-200 shadow-inner">
           <Calendar size={24} />
