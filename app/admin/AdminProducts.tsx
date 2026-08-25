@@ -80,7 +80,7 @@ export default function AdminProducts({ products = [], userRole }: { products: a
   };
 
   return (
-    <div className="bg-white rounded-[2.5rem] p-6 lg:p-10 shadow-sm border border-stone-200/60 relative">
+    <div className="bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2.5rem] p-6 lg:p-10 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] ring-1 ring-stone-900/5 backdrop-blur-xl relative overflow-hidden">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h3 className="font-bold text-2xl text-stone-900 tracking-tight">Listado de Productos</h3>
@@ -97,7 +97,7 @@ export default function AdminProducts({ products = [], userRole }: { products: a
       </div>
 
       {isAdding && (
-        <form onSubmit={handleAdd} className="bg-amber-50 border border-amber-100 rounded-2xl p-6 mb-8 animate-fade-in-up">
+        <form onSubmit={handleAdd} className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-[1.5rem] p-6 md:p-8 mb-8 animate-fade-in-up shadow-sm">
           <h4 className="font-bold text-amber-900 mb-4">Añadir Nuevo Producto</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -122,7 +122,7 @@ export default function AdminProducts({ products = [], userRole }: { products: a
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {products.map(product => (
-          <div key={product.id} className="border border-stone-200 rounded-2xl p-5 hover:border-amber-300 transition-colors bg-stone-50 group">
+          <div key={product.id} className="bg-white border border-stone-100 rounded-[1.5rem] p-5 hover:border-amber-200 hover:shadow-[0_10px_30px_-5px_rgba(217,119,6,0.15)] transition-all duration-300 group hover:-translate-y-1 relative">
             {editingId === product.id ? (
               <form onSubmit={handleSaveEdit} className="space-y-3">
                 <input type="text" required value={editName} onChange={e => setEditName(e.target.value)} className="w-full border border-amber-300 rounded-lg px-3 py-1.5 text-sm font-bold" />
