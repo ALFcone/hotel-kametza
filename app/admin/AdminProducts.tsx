@@ -86,7 +86,7 @@ export default function AdminProducts({ products = [], userRole }: { products: a
           <h3 className="font-bold text-2xl text-stone-900 tracking-tight">Listado de Productos</h3>
           <p className="text-stone-500 text-sm mt-1">Controla tu stock y precios del minibar.</p>
         </div>
-        {!isAdding && userRole === "admin" && (
+        {!isAdding && (userRole === "admin" || userRole === "dueño") && (
           <button 
             onClick={() => setIsAdding(true)}
             className="bg-[#d97706] text-white px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-amber-600 transition shadow-lg shadow-amber-500/20"
@@ -147,7 +147,7 @@ export default function AdminProducts({ products = [], userRole }: { products: a
                   <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-amber-500">
                     <Package size={20} />
                   </div>
-                  {userRole === "admin" && (
+                  {(userRole === "admin" || userRole === "dueño") && (
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={() => handleEdit(product)} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-amber-600 hover:border-amber-300 transition-colors"><Edit3 size={14} /></button>
                       <button onClick={() => handleDelete(product.id)} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-200 transition-colors"><Trash2 size={14} /></button>

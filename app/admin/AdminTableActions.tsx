@@ -386,33 +386,35 @@ export function AdminTableActions({
             <FileWarning size={14} className="group-hover:scale-110 transition-transform duration-300" />
           </button>
         )}
-        <form 
-          action={onDelete} 
-          onSubmit={(e) => {
-            e.preventDefault();
-            Swal.fire({
-              title: "¿Estás seguro?",
-              text: "Esta acción eliminará la reserva permanentemente.",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonText: "Sí, eliminar",
-              cancelButtonText: "Cancelar"
-            }).then((result) => {
-              if (result.isConfirmed) {
-                e.currentTarget.submit();
-              }
-            });
-          }}
-        >
-          <input type="hidden" name="bookingId" value={bookingId} />
-          <button
-            type="submit"
-            className="group relative flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-xl hover:text-red-700 hover:bg-red-200 transition-all hover:-translate-y-0.5"
-            title="Eliminar Reserva"
+        {(userRole === "admin" || userRole === "dueño") && (
+          <form 
+            action={onDelete} 
+            onSubmit={(e) => {
+              e.preventDefault();
+              Swal.fire({
+                title: "¿Estás seguro?",
+                text: "Esta acción eliminará la reserva permanentemente.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  e.currentTarget.submit();
+                }
+              });
+            }}
           >
-            <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />
-          </button>
-        </form>
+            <input type="hidden" name="bookingId" value={bookingId} />
+            <button
+              type="submit"
+              className="group relative flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-xl hover:text-red-700 hover:bg-red-200 transition-all hover:-translate-y-0.5"
+              title="Eliminar Reserva"
+            >
+              <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />
+            </button>
+          </form>
+        )}
         </div>
       </div>
 

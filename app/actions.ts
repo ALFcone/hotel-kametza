@@ -191,8 +191,8 @@ export async function cancelBooking(bookingId: number) {
 export async function updateRoom(formData: FormData) {
   const { role } = await getUserRole();
 
-  if (role !== "admin") {
-    console.error("No autorizado: Solo admin puede actualizar habitaciones");
+  if (role !== "admin" && role !== "dueño") {
+    console.error("No autorizado: Solo admin o dueño puede actualizar habitaciones");
     return;
   }
   const supabaseServer = await getSupabaseServer();
@@ -559,7 +559,7 @@ export async function fetchDniData(dni: string) {
 // ==============================================================================
 export async function createProduct(formData: FormData) {
   const { role } = await getUserRole();
-  if (role !== "admin") return { error: "No autorizado" };
+  if (role !== "admin" && role !== "dueño") return { error: "No autorizado" };
   const supabaseServer = await getSupabaseServer();
 
   const name = formData.get("name") as string;
@@ -577,7 +577,7 @@ export async function createProduct(formData: FormData) {
 
 export async function updateProduct(formData: FormData) {
   const { role } = await getUserRole();
-  if (role !== "admin") return { error: "No autorizado" };
+  if (role !== "admin" && role !== "dueño") return { error: "No autorizado" };
   const supabaseServer = await getSupabaseServer();
 
   const id = Number(formData.get("id"));
@@ -596,7 +596,7 @@ export async function updateProduct(formData: FormData) {
 
 export async function deleteProduct(formData: FormData) {
   const { role } = await getUserRole();
-  if (role !== "admin") return { error: "No autorizado" };
+  if (role !== "admin" && role !== "dueño") return { error: "No autorizado" };
   const supabaseServer = await getSupabaseServer();
 
   const id = Number(formData.get("id"));
@@ -604,6 +604,127 @@ export async function deleteProduct(formData: FormData) {
 
   const { error } = await supabaseServer.from("products").delete().eq("id", id);
   if (error) return { error: error.message };
+
+  revalidatePath("/admin");
+  return { success: true };
+}
+
+// ==============================================================================
+// 12. FUNCIONES DE GESTIÓN DE PERSONAL Y ROLES (MÓDULO DUEÑO)
+// ==============================================================================
+export async function getStaffList() {
+  const { user, role } = await getUserRole();
+  if (!user || (role !== "admin" && role !== "dueño")) {
+    return { error: "No autorizado", data: [] };
+  }
+
+  const supabaseServer = await getSupabaseServer();
+  const { data, error } = await supabaseServer
+    .from("hotel_staff")
+    .select("*");
+
+  if (error) {
+    console.error("Error fetching staff:", error.message);
+    return { error: error.message, data: [] };
+  }
+
+  return { data: data || [] };
+}
+
+export async function addOrUpdateStaff(formData: FormData) {
+  const { user, role } = await getUserRole();
+  if (!user || (role !== "admin" && role !== "dueño")) {
+    return { error: "No autorizado" };
+  }
+
+  const email = (formData.get("email") as string)?.toLowerCase().trim();
+  const name = (formData.get("name") as string)?.trim() || null;
+  const newRole = (formData.get("role") as string)?.toLowerCase().trim() || "recepcionista";
+
+  if (!email || !email.includes("@")) {
+    return { error: "Correo electrónico no válido." };
+  }
+
+  const validRoles = ["dueño", "admin", "recepcionista", "limpieza"];
+  if (!validRoles.includes(newRole)) {
+    return { error: "Rol no válido." };
+  }
+
+  const supabaseServer = await getSupabaseServer();
+
+  const payload: any = { email, role: newRole };
+  if (name) payload.name = name;
+
+  let { error } = await supabaseServer
+    .from("hotel_staff")
+    .upsert(payload, { onConflict: "email" });
+
+  // Si da error porque la columna 'name' no ha sido creada aún en Supabase, reintentar solo con email y role
+  if (error && (error.message.includes("name") || error.code === "42703")) {
+    const fallback = await supabaseServer
+      .from("hotel_staff")
+      .upsert({ email, role: newRole }, { onConflict: "email" });
+    error = fallback.error;
+  }
+
+  if (error) {
+    console.error("Error upserting staff member:", error.message);
+    return { error: error.message };
+  }
+
+  revalidatePath("/admin");
+  return { success: true };
+}
+
+export async function updateStaffRole(targetEmail: string, newRole: string) {
+  const { user, role } = await getUserRole();
+  if (!user || (role !== "admin" && role !== "dueño")) {
+    return { error: "No autorizado" };
+  }
+
+  const validRoles = ["dueño", "admin", "recepcionista", "limpieza"];
+  if (!validRoles.includes(newRole)) {
+    return { error: "Rol no válido." };
+  }
+
+  const supabaseServer = await getSupabaseServer();
+  const { error } = await supabaseServer
+    .from("hotel_staff")
+    .update({ role: newRole })
+    .eq("email", targetEmail.toLowerCase().trim());
+
+  if (error) {
+    console.error("Error updating staff role:", error.message);
+    return { error: error.message };
+  }
+
+  revalidatePath("/admin");
+  return { success: true };
+}
+
+export async function deleteStaffMember(targetEmail: string) {
+  const { user, role } = await getUserRole();
+  if (!user || (role !== "admin" && role !== "dueño")) {
+    return { error: "No autorizado" };
+  }
+
+  const cleanEmail = targetEmail.toLowerCase().trim();
+
+  // Protección contra auto-bloqueo
+  if (user.email?.toLowerCase().trim() === cleanEmail) {
+    return { error: "No puedes eliminarte a ti mismo del panel de administración." };
+  }
+
+  const supabaseServer = await getSupabaseServer();
+  const { error } = await supabaseServer
+    .from("hotel_staff")
+    .delete()
+    .eq("email", cleanEmail);
+
+  if (error) {
+    console.error("Error deleting staff member:", error.message);
+    return { error: error.message };
+  }
 
   revalidatePath("/admin");
   return { success: true };

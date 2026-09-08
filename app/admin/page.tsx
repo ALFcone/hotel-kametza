@@ -9,12 +9,13 @@
 import { getSupabaseServer } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { toggleRoomCleanliness, updateRoom, getUserRole } from "../actions";
+import { toggleRoomCleanliness, updateRoom, getUserRole, getStaffList } from "../actions";
 import DownloadButton from "./DownloadButton";
 import Link from "next/link";
 import WalkInForm from "./WalkInForm";
 import { AdminTableActions } from "./AdminTableActions";
 import AdminProducts from "./AdminProducts";
+import AdminStaffManagement from "./AdminStaffManagement";
 import {
   Calendar,
   CheckCircle,
@@ -46,6 +47,8 @@ import {
   Users,
   Building,
   ShoppingCart,
+  ShieldCheck,
+  Crown,
 } from "lucide-react";
 
 // ==============================================================================
@@ -87,7 +90,7 @@ async function deleteBooking(formData: FormData) {
 
   const supabaseServer = await getSupabaseServer();
   const { role } = await getUserRole();
-  if (role !== "admin") return; // Only admin can delete bookings without PIN in this simplified action
+  if (role !== "admin" && role !== "dueño") return; // Only admin or dueño can delete bookings
 
   const id = parseInt(bookingId.toString(), 10);
 
@@ -140,13 +143,14 @@ export default async function AdminPage(props: {
   }
 
   if (!role) {
-    // Si no tiene rol (admin o receptionist), es un cliente regular
+    // Si no tiene rol (admin, dueño o receptionist), es un cliente regular
     redirect("/dashboard");
   }
 
+  const isOwner = role === "dueño" || role === "admin";
   const supabaseServer = await getSupabaseServer();
   const searchParams = await props.searchParams;
-  const activeTab = searchParams.tab || (role === "admin" ? "resumen" : "estado");
+  const activeTab = searchParams.tab || (isOwner ? "resumen" : "estado");
 
   // A. FECHAS Y PARÁMETROS
   const today = new Date().toISOString().split("T")[0];
@@ -190,6 +194,12 @@ export default async function AdminPage(props: {
     .from("products")
     .select("*")
     .order("name", { ascending: true });
+
+  let staffList: any[] = [];
+  if (isOwner) {
+    const staffRes = await getStaffList();
+    staffList = staffRes.data || [];
+  }
 
   // C. FILTRADO (Reservas creadas o que inician en el rango de fechas)
   const filteredBookings = allBookings?.filter((b) => {
@@ -374,7 +384,7 @@ export default async function AdminPage(props: {
 
           {/* Menú de Navegación */}
           <nav className="flex flex-col gap-1.5">
-            {role === "admin" && (
+            {isOwner && (
               <Link
                 href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`}
                 className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
@@ -384,6 +394,18 @@ export default async function AdminPage(props: {
                 }`}
               >
                 <TrendingUp size={16} /> Resumen y Ventas
+              </Link>
+            )}
+            {isOwner && (
+              <Link
+                href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                  activeTab === "personal"
+                    ? "bg-gradient-to-r from-rose-600 to-rose-500 text-white shadow-[0_4px_15px_rgba(227,0,79,0.3)] shadow-rose-950/50 ring-1 ring-rose-400/20 translate-x-1"
+                    : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
+                }`}
+              >
+                <ShieldCheck size={16} /> Personal / Dueño
               </Link>
             )}
             <Link
@@ -1458,15 +1480,28 @@ export default async function AdminPage(props: {
               <AdminProducts products={products || []} userRole={role} />
             </div>
           )}
+
+          {/* --- TAB: GESTIÓN DE PERSONAL Y ROLES (DUEÑO) --- */}
+          {activeTab === "personal" && isOwner && (
+            <div id="personal" className="scroll-mt-24 mb-12 animate-fade-in-up">
+              <AdminStaffManagement staffList={staffList} currentUserEmail={user.email || ""} />
+            </div>
+          )}
         </div>
       </main>
 
       {/* --- MOBILE BOTTOM NAV --- */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-stone-950 text-white border-t border-stone-800 flex justify-between items-center px-6 py-4 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)]">
-        {role === "admin" && (
+        {isOwner && (
           <Link href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "resumen" ? "text-amber-500" : "text-stone-400"}`}>
             <TrendingUp size={20} />
             <span className="text-[8px] font-black uppercase">Resumen</span>
+          </Link>
+        )}
+        {isOwner && (
+          <Link href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "personal" ? "text-rose-500" : "text-stone-400"}`}>
+            <ShieldCheck size={20} />
+            <span className="text-[8px] font-black uppercase">Personal</span>
           </Link>
         )}
         <Link href={`/admin?tab=estado&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "estado" ? "text-amber-500" : "text-stone-400"}`}>
