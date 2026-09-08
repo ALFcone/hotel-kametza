@@ -49,6 +49,12 @@ import {
   ShoppingCart,
   ShieldCheck,
   Crown,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Smartphone,
+  Receipt,
+  Plus,
 } from "lucide-react";
 
 // ==============================================================================
@@ -282,6 +288,61 @@ export default async function AdminPage(props: {
   const totalRooms = rooms?.length || 0;
   const freeRooms = totalRooms - occupiedCount;
 
+  // Arqueo contable por método de pago (Caja y Finanzas)
+  const cashPayments = salesInRange.filter((b) => {
+    const m = (b.payment_method || "").toLowerCase();
+    return m.includes("efectivo") || m.includes("cash") || m.includes("recepcion");
+  });
+  const yapePayments = salesInRange.filter((b) => {
+    const m = (b.payment_method || "").toLowerCase();
+    return m.includes("yape") || m.includes("plin");
+  });
+  const cardPayments = salesInRange.filter((b) => {
+    const m = (b.payment_method || "").toLowerCase();
+    return m.includes("tarjeta") || m.includes("pos") || m.includes("card") || m.includes("online");
+  });
+  const transferPayments = salesInRange.filter((b) => {
+    const m = (b.payment_method || "").toLowerCase();
+    return m.includes("transferencia") || m.includes("bcp") || m.includes("bbva");
+  });
+
+  const totalCash = cashPayments.reduce((acc, b) => acc + getPaidAmount(b), 0);
+  const totalYape = yapePayments.reduce((acc, b) => acc + getPaidAmount(b), 0);
+  const totalCard = cardPayments.reduce((acc, b) => acc + getPaidAmount(b), 0);
+  const totalTransfer = transferPayments.reduce((acc, b) => acc + getPaidAmount(b), 0);
+
+  // Cuentas por cobrar acumuladas (saldos pendientes)
+  const totalPendingDebt = allBookings
+    .filter((b) => b.status !== "cancelled" && b.status !== "cancelada")
+    .reduce((acc, b) => {
+      const debt = Math.max(0, Number(b.total_price) - getPaidAmount(b));
+      return acc + debt;
+    }, 0);
+
+  const shiftDate = (dateStr: string, daysDelta: number) => {
+    const d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + daysDelta);
+    return d.toISOString().split("T")[0];
+  };
+
+  // Búsqueda en Historial
+  const searchQuery = (searchParams.q || "").toLowerCase().trim();
+  const searchedBookings = filteredBookings?.filter((b) => {
+    if (!searchQuery) return true;
+    const client = (b.client_name || "").toLowerCase();
+    const doc = (b.document_number || "").toLowerCase();
+    const roomNum = (rooms?.find((r) => r.id === b.room_id)?.room_number || b.room_id || "").toString().toLowerCase();
+    const ticket = b.id.toString();
+    const phone = (b.client_phone || "").toLowerCase();
+    return (
+      client.includes(searchQuery) ||
+      doc.includes(searchQuery) ||
+      roomNum.includes(searchQuery) ||
+      ticket.includes(searchQuery) ||
+      phone.includes(searchQuery)
+    );
+  });
+
   // Habitaciones más populares (por noches reservadas en el rango)
   const roomPopularity = rooms?.map(room => {
     const nights = allBookings?.filter(b => 
@@ -393,7 +454,7 @@ export default async function AdminPage(props: {
                     : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
                 }`}
               >
-                <TrendingUp size={16} /> Resumen y Ventas
+                <TrendingUp size={16} /> Caja y Ventas
               </Link>
             )}
             {isOwner && (
@@ -436,7 +497,7 @@ export default async function AdminPage(props: {
                   : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
               }`}
             >
-              <CalendarDays size={16} /> Calendario Visual
+              <CalendarDays size={16} /> Room Rack (Calendario)
             </Link>
             <Link
               href={`/admin?tab=inventario&from=${dateFrom}&to=${dateTo}`}
@@ -740,6 +801,88 @@ export default async function AdminPage(props: {
                            </div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Arqueo de Caja y Métodos de Cobro */}
+                <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
+                      <div>
+                        <h3 className="font-bold text-base text-stone-900">Arqueo de Caja y Finanzas</h3>
+                        <p className="text-stone-400 text-[10px] uppercase font-bold tracking-wider mt-0.5">
+                          Desglose por canal de recaudación ({rangeLabel})
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-stone-400 bg-stone-50 px-3 py-1.5 rounded-full border border-stone-200/60">
+                        Total en Caja: <strong className="text-stone-900 font-bold ml-1">{formatMoney(totalIncome)}</strong>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {/* Efectivo */}
+                    <div className="bg-gradient-to-br from-stone-50 to-white p-5 rounded-2xl border border-stone-200/70 hover:border-amber-400/60 transition-all">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 flex items-center gap-1.5">
+                          <Coins size={14} className="text-stone-600" /> Efectivo
+                        </span>
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      </div>
+                      <p className="text-xl font-black text-stone-900 font-serif">{formatMoney(totalCash)}</p>
+                      <p className="text-[9px] text-stone-400 mt-1 font-medium">Recepción / Mano</p>
+                    </div>
+
+                    {/* Yape / Plin */}
+                    <div className="bg-gradient-to-br from-purple-50/40 to-white p-5 rounded-2xl border border-purple-100 hover:border-purple-300 transition-all">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 flex items-center gap-1.5">
+                          <Smartphone size={14} className="text-purple-600" /> Yape / Plin
+                        </span>
+                        <span className="w-2 h-2 rounded-full bg-purple-500" />
+                      </div>
+                      <p className="text-xl font-black text-stone-900 font-serif">{formatMoney(totalYape)}</p>
+                      <p className="text-[9px] text-purple-400 mt-1 font-medium">Billeteras QR</p>
+                    </div>
+
+                    {/* Tarjetas / POS */}
+                    <div className="bg-gradient-to-br from-blue-50/40 to-white p-5 rounded-2xl border border-blue-100 hover:border-blue-300 transition-all">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-blue-700 flex items-center gap-1.5">
+                          <CreditCard size={14} className="text-blue-600" /> Tarjetas / POS
+                        </span>
+                        <span className="w-2 h-2 rounded-full bg-blue-500" />
+                      </div>
+                      <p className="text-xl font-black text-stone-900 font-serif">{formatMoney(totalCard)}</p>
+                      <p className="text-[9px] text-blue-400 mt-1 font-medium">Izipay / Niubiz</p>
+                    </div>
+
+                    {/* Transferencias */}
+                    <div className="bg-gradient-to-br from-amber-50/40 to-white p-5 rounded-2xl border border-amber-100 hover:border-amber-300 transition-all">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                          <Wallet size={14} className="text-[#d97706]" /> Transferencia
+                        </span>
+                        <span className="w-2 h-2 rounded-full bg-amber-500" />
+                      </div>
+                      <p className="text-xl font-black text-stone-900 font-serif">{formatMoney(totalTransfer)}</p>
+                      <p className="text-[9px] text-amber-500 mt-1 font-medium">BCP / BBVA / Interbank</p>
+                    </div>
+
+                    {/* Cuentas por Cobrar */}
+                    <div className="bg-gradient-to-br from-rose-50/40 to-white p-5 rounded-2xl border border-rose-100 hover:border-rose-300 transition-all col-span-2 md:col-span-1">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-rose-700 flex items-center gap-1.5">
+                          <Receipt size={14} className="text-rose-600" /> Por Cobrar
+                        </span>
+                        <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                      </div>
+                      <p className="text-xl font-black text-rose-600 font-serif">{formatMoney(totalPendingDebt)}</p>
+                      <p className="text-[9px] text-rose-400 mt-1 font-medium">Saldos pendientes</p>
                     </div>
                   </div>
                 </div>
@@ -1052,16 +1195,44 @@ export default async function AdminPage(props: {
                     <h3 className="font-bold text-lg text-stone-900">Historial Completo</h3>
                     <p className="text-stone-400 text-[10px] uppercase font-bold tracking-widest mt-1">
                       Mostrando reservas de <span className="text-[#d97706]">{dateFrom}</span> a <span className="text-[#d97706]">{dateTo}</span>
-                      {filteredBookings && (
+                      {searchedBookings && (
                         <span className="ml-2 bg-stone-100 px-2 py-0.5 rounded-full text-stone-500 text-[9px]">
-                          {filteredBookings.length} registros
+                          {searchedBookings.length} registros
                         </span>
                       )}
                     </p>
                   </div>
-                  {filteredBookings && filteredBookings.length > 0 && (
-                    <DownloadButton data={filteredBookings} extrasData={allExtras || []} />
-                  )}
+
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {/* Buscador en vivo de reservas */}
+                    <form method="get" className="flex items-center gap-2">
+                      <input type="hidden" name="tab" value="historial" />
+                      <input type="hidden" name="from" value={dateFrom} />
+                      <input type="hidden" name="to" value={dateTo} />
+                      <div className="relative">
+                        <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+                        <input
+                          type="text"
+                          name="q"
+                          defaultValue={searchParams.q || ""}
+                          placeholder="Buscar por huésped, DNI..."
+                          className="pl-9 pr-4 py-2 bg-white/80 border border-stone-200/80 rounded-2xl text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 shadow-sm w-44 sm:w-60"
+                        />
+                      </div>
+                      {searchParams.q && (
+                        <Link
+                          href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`}
+                          className="text-[9px] font-black uppercase text-stone-400 hover:text-stone-700 px-2 py-1 bg-stone-100 rounded-lg"
+                        >
+                          Limpiar
+                        </Link>
+                      )}
+                    </form>
+
+                    {searchedBookings && searchedBookings.length > 0 && (
+                      <DownloadButton data={searchedBookings} extrasData={allExtras || []} />
+                    )}
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto w-full">
@@ -1081,7 +1252,7 @@ export default async function AdminPage(props: {
                       </tr>
                     </thead>
                     <tbody className="text-xs">
-                      {filteredBookings?.map((booking) => {
+                      {searchedBookings?.map((booking) => {
                         const noches = calculateNights(booking.check_in, booking.check_out);
                         const isCancelled = booking.status === "cancelled" || booking.status === "cancelada";
                         
@@ -1218,9 +1389,9 @@ export default async function AdminPage(props: {
                       })}
                     </tbody>
                   </table>
-                  {filteredBookings?.length === 0 && (
+                  {searchedBookings?.length === 0 && (
                     <div className="p-12 text-center text-stone-400 italic text-sm">
-                      No se encontraron reservas en este rango de fechas.
+                      No se encontraron reservas con los filtros seleccionados.
                     </div>
                   )}
                 </div>
@@ -1332,18 +1503,55 @@ export default async function AdminPage(props: {
             </div>
           )}
 
-          {/* --- TAB: CALENDARIO (GANTT) --- */}
+          {/* --- TAB: CALENDARIO (GANTT) / ROOM RACK --- */}
           {activeTab === "calendario" && (
             <div className="animate-fade-in-up bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2.5rem] p-6 md:p-8 border border-white/60 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] ring-1 ring-stone-900/5 overflow-hidden backdrop-blur-xl">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-3">
                   <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
-                  <h2 className="text-xl font-bold text-stone-900 tracking-tight">Calendario Visual (Gantt)</h2>
+                  <div>
+                    <h2 className="text-xl font-bold text-stone-900 tracking-tight">Room Rack (Calendario Visual)</h2>
+                    <p className="text-stone-400 text-[10px] uppercase font-bold tracking-wider mt-0.5">
+                      Matriz de ocupación diaria por habitación
+                    </p>
+                  </div>
                 </div>
-                <div className="flex gap-4 text-[9px] font-black uppercase tracking-wider">
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm" /> Pagado</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 shadow-sm" /> Parcial</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#d97706] shadow-sm" /> Pendiente</span>
+
+                {/* Controles de navegación temporal integrados */}
+                <div className="flex items-center gap-3 flex-wrap">
+                  <div className="inline-flex rounded-xl border border-stone-200 bg-white p-1 shadow-xs">
+                    <Link
+                      href={`/admin?tab=calendario&from=${shiftDate(dateFrom, -7)}&to=${shiftDate(dateTo, -7)}`}
+                      className="px-3 py-1.5 text-xs text-stone-600 hover:text-stone-900 hover:bg-amber-50 rounded-lg transition font-bold flex items-center gap-1"
+                      title="Retroceder 7 días"
+                    >
+                      <ChevronLeft size={14} /> -7d
+                    </Link>
+                    <Link
+                      href={`/admin?tab=calendario&from=${today}&to=${shiftDate(today, 14)}`}
+                      className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+                        dateFrom === today
+                          ? "bg-stone-900 text-white shadow-sm"
+                          : "text-stone-700 hover:bg-stone-100"
+                      }`}
+                    >
+                      Hoy
+                    </Link>
+                    <Link
+                      href={`/admin?tab=calendario&from=${shiftDate(dateFrom, 7)}&to=${shiftDate(dateTo, 7)}`}
+                      className="px-3 py-1.5 text-xs text-stone-600 hover:text-stone-900 hover:bg-amber-50 rounded-lg transition font-bold flex items-center gap-1"
+                      title="Avanzar 7 días"
+                    >
+                      +7d <ChevronRight size={14} />
+                    </Link>
+                  </div>
+
+                  <div className="flex gap-4 text-[9px] font-black uppercase tracking-wider bg-white/70 px-4 py-2.5 rounded-xl border border-stone-200/60 shadow-xs">
+                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm" /> Pagado</span>
+                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 shadow-sm" /> Parcial</span>
+                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#d97706] shadow-sm" /> Pendiente</span>
+                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-stone-200 shadow-sm" /> Libre (+)</span>
+                  </div>
                 </div>
               </div>
               
@@ -1406,10 +1614,18 @@ export default async function AdminPage(props: {
 
                           return (
                             <div key={room.id} className="flex items-center bg-white rounded-xl border border-stone-100 relative group h-14 hover:border-stone-200 transition-colors shadow-sm mb-1.5 w-fit">
-                              {/* Nombre Habitación */}
-                              <div className="w-36 shrink-0 px-4 font-bold text-xs text-stone-800 border-r border-stone-200 bg-white h-full rounded-l-xl flex flex-col justify-center z-30 sticky left-0 shadow-[2px_0_10px_rgba(0,0,0,0.03)] group-hover:bg-stone-50/50 transition-colors">
-                                <span className="truncate">{room.name}</span>
-                                <span className="text-[8px] font-black uppercase tracking-wider text-stone-400 mt-0.5">#{room.room_number || room.id}</span>
+                              {/* Nombre Habitación con estado de limpieza */}
+                              <div className="w-40 shrink-0 px-4 font-bold text-xs text-stone-800 border-r border-stone-200 bg-white h-full rounded-l-xl flex items-center justify-between z-30 sticky left-0 shadow-[2px_0_10px_rgba(0,0,0,0.03)] group-hover:bg-stone-50/50 transition-colors">
+                                <div className="truncate">
+                                  <span className="truncate block font-bold text-stone-900">{room.name}</span>
+                                  <span className="text-[8px] font-black uppercase tracking-wider text-stone-400">#{room.room_number || room.id}</span>
+                                </div>
+                                <span
+                                  className={`w-2.5 h-2.5 rounded-full shrink-0 ml-2 ${
+                                    room.is_clean ?? true ? "bg-emerald-500 shadow-xs" : "bg-rose-500 animate-pulse shadow-xs"
+                                  }`}
+                                  title={room.is_clean ?? true ? "Habitación Limpia" : "Requiere Limpieza"}
+                                />
                               </div>
                               
                               {/* Track de Días */}
@@ -1417,11 +1633,19 @@ export default async function AdminPage(props: {
                                 {calendarDays.map((d, i) => {
                                   const isWeekend = d.getDay() === 0 || d.getDay() === 6;
                                   const isToday = d.toDateString() === new Date().toDateString();
+                                  const dayDateStr = d.toISOString().split("T")[0];
                                   return (
-                                    <div key={i} className={`border-r border-stone-200 w-[55px] shrink-0 transition-colors relative ${isToday ? "bg-blue-50/20" : isWeekend ? "bg-stone-50/50" : "hover:bg-stone-50/30"}`}>
+                                    <div key={i} className={`border-r border-stone-200 w-[55px] shrink-0 transition-colors relative group/slot ${isToday ? "bg-blue-50/20" : isWeekend ? "bg-stone-50/50" : "hover:bg-stone-50/30"}`}>
                                       {isToday && (
                                         <div className="absolute top-0 bottom-0 left-1/2 w-[2px] -translate-x-1/2 bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.6)] z-20 pointer-events-none" />
                                       )}
+                                      <Link
+                                        href={`/admin?tab=registrar&roomId=${room.id}&checkIn=${dayDateStr}`}
+                                        className="w-full h-full flex items-center justify-center text-stone-200 hover:text-amber-600 transition"
+                                        title={`Disponible. Clic para reservar Hab #${room.room_number || room.id} el ${dayDateStr}`}
+                                      >
+                                        <Plus size={10} className="opacity-0 group-hover/slot:opacity-100 transition-opacity" />
+                                      </Link>
                                     </div>
                                   );
                                 })}
