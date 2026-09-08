@@ -462,13 +462,33 @@ export default async function AdminPage(props: {
                 href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`}
                 className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                   activeTab === "personal"
-                    ? "bg-gradient-to-r from-rose-600 to-rose-500 text-white shadow-[0_4px_15px_rgba(227,0,79,0.3)] shadow-rose-950/50 ring-1 ring-rose-400/20 translate-x-1"
+                    ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
                     : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
                 }`}
               >
                 <ShieldCheck size={16} /> Personal / Dueño
               </Link>
             )}
+            <Link
+              href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === "calendario"
+                  ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
+                  : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
+              }`}
+            >
+              <CalendarDays size={16} /> Room Rack (Calendario)
+            </Link>
+            <Link
+              href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                activeTab === "registrar"
+                  ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
+                  : "text-amber-400 hover:text-white hover:bg-amber-500/10 font-black border border-amber-500/20"
+              }`}
+            >
+              <CalendarCheck size={16} className="text-amber-400" /> Registrar Reserva
+            </Link>
             <Link
               href={`/admin?tab=estado&from=${dateFrom}&to=${dateTo}`}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
@@ -490,16 +510,6 @@ export default async function AdminPage(props: {
               <FileText size={16} /> Historial de Reservas
             </Link>
             <Link
-              href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === "calendario"
-                  ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
-                  : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
-              }`}
-            >
-              <CalendarDays size={16} /> Room Rack (Calendario)
-            </Link>
-            <Link
               href={`/admin?tab=inventario&from=${dateFrom}&to=${dateTo}`}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                 activeTab === "inventario"
@@ -508,16 +518,6 @@ export default async function AdminPage(props: {
               }`}
             >
               <BedDouble size={16} /> Inventario
-            </Link>
-            <Link
-              href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === "registrar"
-                  ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
-                  : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
-              }`}
-            >
-              <CalendarCheck size={16} /> Registrar Reserva
             </Link>
             <Link
               href={`/admin?tab=almacen&from=${dateFrom}&to=${dateTo}`}
@@ -597,7 +597,14 @@ export default async function AdminPage(props: {
                 </button>
               </form>
               
-              <div className="flex gap-2 w-full sm:w-auto h-[42px] mt-auto">
+              <div className="flex items-center gap-2.5 w-full sm:w-auto h-[42px] mt-auto">
+                <Link
+                  href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
+                  className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-900/10 transition-all hover:scale-105 active:scale-95 whitespace-nowrap h-full"
+                  title="Registrar Nueva Reserva Manual"
+                >
+                  <CalendarCheck size={14} /> + Registrar Reserva
+                </Link>
                 {allBookings && <DownloadButton data={allBookings} />}
               </div>
             </div>
@@ -1498,7 +1505,7 @@ export default async function AdminPage(props: {
 
           {/* --- TAB: REGISTRAR RESERVA (WALK-IN CLIENT SIDE FORM) --- */}
           {activeTab === "registrar" && rooms && (
-            <div className="animate-fade-in-up">
+            <div className="animate-fade-in-up flex flex-col items-center justify-center w-full">
               <WalkInForm rooms={rooms} />
             </div>
           )}
@@ -1715,43 +1722,40 @@ export default async function AdminPage(props: {
       </main>
 
       {/* --- MOBILE BOTTOM NAV --- */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-stone-950 text-white border-t border-stone-800 flex justify-between items-center px-6 py-4 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-stone-950 text-white border-t border-stone-800 flex justify-between items-center px-4 py-2.5 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
         {isOwner && (
           <Link href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "resumen" ? "text-amber-500" : "text-stone-400"}`}>
-            <TrendingUp size={20} />
-            <span className="text-[8px] font-black uppercase">Resumen</span>
+            <TrendingUp size={18} />
+            <span className="text-[8px] font-black uppercase">Caja</span>
           </Link>
         )}
+        <Link href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "calendario" ? "text-amber-500" : "text-stone-400"}`}>
+          <CalendarDays size={18} />
+          <span className="text-[8px] font-black uppercase">Rack</span>
+        </Link>
+        
+        {/* Registrar Reserva al centro destacado */}
+        <Link
+          href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
+          className={`flex flex-col items-center justify-center -mt-6 bg-gradient-to-r from-amber-600 to-amber-500 text-white w-14 h-14 rounded-full shadow-xl shadow-amber-900/60 ring-4 ring-stone-950 transition-all active:scale-95 ${
+            activeTab === "registrar" ? "scale-110 ring-amber-500" : ""
+          }`}
+          title="Registrar Reserva"
+        >
+          <CalendarCheck size={22} />
+          <span className="text-[7px] font-black uppercase tracking-tighter">Reservar</span>
+        </Link>
+
+        <Link href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "historial" ? "text-amber-500" : "text-stone-400"}`}>
+          <FileText size={18} />
+          <span className="text-[8px] font-black uppercase">Historial</span>
+        </Link>
         {isOwner && (
-          <Link href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "personal" ? "text-rose-500" : "text-stone-400"}`}>
-            <ShieldCheck size={20} />
+          <Link href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "personal" ? "text-amber-500" : "text-stone-400"}`}>
+            <ShieldCheck size={18} />
             <span className="text-[8px] font-black uppercase">Personal</span>
           </Link>
         )}
-        <Link href={`/admin?tab=estado&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "estado" ? "text-amber-500" : "text-stone-400"}`}>
-          <LayoutDashboard size={20} />
-          <span className="text-[8px] font-black uppercase">Estado</span>
-        </Link>
-        <Link href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "historial" ? "text-amber-500" : "text-stone-400"}`}>
-          <FileText size={20} />
-          <span className="text-[8px] font-black uppercase">Historial</span>
-        </Link>
-        <Link href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "calendario" ? "text-amber-500" : "text-stone-400"}`}>
-          <CalendarDays size={20} />
-          <span className="text-[8px] font-black uppercase">Calendario</span>
-        </Link>
-        <Link href={`/admin?tab=inventario&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "inventario" ? "text-amber-500" : "text-stone-400"}`}>
-          <BedDouble size={20} />
-          <span className="text-[8px] font-black uppercase">Cuartos</span>
-        </Link>
-        <Link href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "registrar" ? "text-amber-500" : "text-stone-400"}`}>
-          <CalendarCheck size={20} />
-          <span className="text-[8px] font-black uppercase">Registro</span>
-        </Link>
-        <Link href={`/admin?tab=almacen&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "almacen" ? "text-amber-500" : "text-stone-400"}`}>
-          <ShoppingCart size={20} />
-          <span className="text-[8px] font-black uppercase">Almacén</span>
-        </Link>
       </nav>
     </div>
   );

@@ -177,46 +177,46 @@ export default function AdminStaffManagement({
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* HEADER DE SECCIÓN */}
-      <div className="bg-gradient-to-br from-stone-900 via-stone-900 to-stone-950 text-white p-8 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden border border-stone-800">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-gradient-to-br from-amber-500/10 to-rose-500/10 blur-3xl pointer-events-none" />
+      <div className="bg-gradient-to-br from-white via-[#FDFBF7] to-amber-50/70 text-stone-900 p-8 md:p-10 rounded-[2.5rem] shadow-sm relative overflow-hidden border border-amber-200/80">
+        <div className="absolute right-0 top-0 w-96 h-96 bg-gradient-to-br from-amber-400/15 to-orange-300/10 blur-3xl pointer-events-none" />
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
           <div>
-            <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.25em] text-amber-400 bg-amber-400/10 px-4 py-1.5 rounded-full border border-amber-400/20 mb-3">
-              <ShieldCheck size={14} /> Portal Exclusivo del Dueño
+            <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.25em] text-amber-800 bg-amber-100/80 px-4 py-1.5 rounded-full border border-amber-300/60 mb-3 shadow-xs">
+              <ShieldCheck size={14} className="text-amber-600" /> Portal Exclusivo del Dueño
             </span>
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-white tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 tracking-tight">
               Gestión de Personal y Roles
             </h2>
-            <p className="text-stone-400 text-xs md:text-sm mt-2 max-w-xl">
+            <p className="text-stone-600 text-xs md:text-sm mt-2 max-w-xl">
               Autoriza qué colaboradores tienen acceso al panel de administración de Hotel Kametza y define exactamente qué acciones pueden realizar según su cargo.
             </p>
           </div>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2.5 bg-gradient-to-r from-[#e3004f] to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold px-6 py-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg shadow-rose-950/40 hover:scale-105 active:scale-95 transition-all duration-300 shrink-0 cursor-pointer"
+            className="flex items-center gap-2.5 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white font-bold px-6 py-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg shadow-amber-900/15 hover:scale-105 active:scale-95 transition-all duration-300 shrink-0 cursor-pointer"
           >
             <UserPlus size={18} /> Autorizar Nuevo Personal
           </button>
         </div>
 
         {/* METRICAS RÁPIDAS */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-8 border-t border-white/10">
-          <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/5">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-stone-400">Total Equipo</span>
-            <div className="text-2xl md:text-3xl font-bold font-serif text-white mt-1">{totalCount}</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-8 border-t border-stone-200/70">
+          <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-stone-200/70 shadow-xs hover:border-stone-300 transition-colors">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-stone-500">Total Equipo</span>
+            <div className="text-2xl md:text-3xl font-bold font-serif text-stone-900 mt-1">{totalCount}</div>
           </div>
-          <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/5">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-amber-400">Dueños / Admins</span>
-            <div className="text-2xl md:text-3xl font-bold font-serif text-white mt-1">{ownerCount}</div>
+          <div className="bg-amber-50/80 backdrop-blur-md p-4 rounded-2xl border border-amber-200/80 shadow-xs hover:border-amber-300 transition-colors">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-amber-800">Dueños / Admins</span>
+            <div className="text-2xl md:text-3xl font-bold font-serif text-amber-900 mt-1">{ownerCount}</div>
           </div>
-          <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/5">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-blue-400">Recepcionistas</span>
-            <div className="text-2xl md:text-3xl font-bold font-serif text-white mt-1">{receptionistCount}</div>
+          <div className="bg-blue-50/80 backdrop-blur-md p-4 rounded-2xl border border-blue-200/80 shadow-xs hover:border-blue-300 transition-colors">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-blue-700">Recepcionistas</span>
+            <div className="text-2xl md:text-3xl font-bold font-serif text-blue-950 mt-1">{receptionistCount}</div>
           </div>
-          <div className="bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/5">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-400">Limpieza</span>
-            <div className="text-2xl md:text-3xl font-bold font-serif text-white mt-1">{cleaningCount}</div>
+          <div className="bg-emerald-50/80 backdrop-blur-md p-4 rounded-2xl border border-emerald-200/80 shadow-xs hover:border-emerald-300 transition-colors">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-700">Limpieza</span>
+            <div className="text-2xl md:text-3xl font-bold font-serif text-emerald-950 mt-1">{cleaningCount}</div>
           </div>
         </div>
       </div>
