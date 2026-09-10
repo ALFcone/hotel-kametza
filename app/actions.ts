@@ -10,8 +10,8 @@
 
 import { revalidatePath } from "next/cache";
 import { getSupabaseServer } from "@/lib/supabase-server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+
+const ROOM_IMAGES_BUCKET = "rooms";
 
 // ==============================================================================
 // 1. HELPER: GET USER ROLE
@@ -205,44 +205,37 @@ export async function updateRoom(formData: FormData) {
 
   let imageUrl = oldImage;
 
-  console.log("DEBUG updateRoom:", {
-    idHabitacion,
-    price,
-    description,
-    imageFileType: typeof imageFile,
-    imageFileExists: !!imageFile,
-    imageFileName: imageFile ? (imageFile as any).name : null,
-    imageFileSize: imageFile ? (imageFile as any).size : null,
-    oldImage
-  });
-
   const isUpload = imageFile && typeof imageFile === "object" && "arrayBuffer" in imageFile && (imageFile as any).size > 0;
 
   if (isUpload) {
     const arrayBuffer = await (imageFile as any).arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const filename = `${Date.now()}-${(imageFile as any).name.replace(/\s+/g, '_')}`;
-    const uploadDir = path.join(process.cwd(), "public", "rooms");
-    
-    try {
-      await mkdir(uploadDir, { recursive: true });
-      await writeFile(path.join(uploadDir, filename), buffer);
-      imageUrl = `/rooms/${filename}`;
-      console.log("DEBUG: Imagen guardada exitosamente en:", imageUrl);
-    } catch (err) {
-      console.error("Error guardando imagen:", err);
+
+    const { error: uploadError } = await supabaseServer.storage
+      .from(ROOM_IMAGES_BUCKET)
+      .upload(filename, buffer, {
+        contentType: (imageFile as any).type || "image/jpeg",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("Error subiendo imagen a Supabase Storage:", uploadError.message);
+      return { error: "No se pudo subir la imagen." };
     }
-  } else {
-    console.log("DEBUG: No se detectó un archivo File válido o el tamaño es 0.");
+
+    const { data: publicUrlData } = supabaseServer.storage
+      .from(ROOM_IMAGES_BUCKET)
+      .getPublicUrl(filename);
+
+    imageUrl = publicUrlData.publicUrl;
   }
 
-  const { data: updateData, error } = await supabaseServer.from("rooms").update({ 
+  const { error } = await supabaseServer.from("rooms").update({
     price_per_night: price,
     description: description,
     image_url: imageUrl,
   }).eq("id", idHabitacion).select();
-
-  console.log("DEBUG: Supabase update response:", { updateData, error });
 
   if (error) {
     console.error("No se pudo actualizar la habitación:", error.message);
