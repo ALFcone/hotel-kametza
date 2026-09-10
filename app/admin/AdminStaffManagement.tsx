@@ -249,7 +249,7 @@ export default function AdminStaffManagement({
           </div>
           <h3 className="font-bold text-stone-900 text-sm">Personal de Limpieza</h3>
           <p className="text-xs text-stone-500 mt-1.5 leading-relaxed">
-            Housekeeping. Solo visualiza el estado de las habitaciones (libres/ocupadas) y puede cambiar el indicador entre "Limpio" y "Sucia".
+            Housekeeping. Solo visualiza el estado de las habitaciones (libres/ocupadas) y puede cambiar el indicador entre &quot;Limpio&quot; y &quot;Sucia&quot;.
           </p>
         </div>
       </div>
