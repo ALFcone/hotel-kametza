@@ -387,33 +387,28 @@ export function AdminTableActions({
           </button>
         )}
         {(userRole === "admin" || userRole === "dueño") && (
-          <form 
-            action={onDelete} 
-            onSubmit={(e) => {
-              e.preventDefault();
-              Swal.fire({
+          <button
+            type="button"
+            onClick={async () => {
+              const result = await Swal.fire({
                 title: "¿Estás seguro?",
                 text: "Esta acción eliminará la reserva permanentemente.",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Sí, eliminar",
                 cancelButtonText: "Cancelar"
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  e.currentTarget.submit();
-                }
               });
+              if (result.isConfirmed) {
+                const formData = new FormData();
+                formData.append("bookingId", bookingId.toString());
+                onDelete(formData);
+              }
             }}
+            className="group relative flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-xl hover:text-red-700 hover:bg-red-200 transition-all hover:-translate-y-0.5"
+            title="Eliminar Reserva"
           >
-            <input type="hidden" name="bookingId" value={bookingId} />
-            <button
-              type="submit"
-              className="group relative flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-xl hover:text-red-700 hover:bg-red-200 transition-all hover:-translate-y-0.5"
-              title="Eliminar Reserva"
-            >
-              <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />
-            </button>
-          </form>
+            <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />
+          </button>
         )}
         </div>
       </div>

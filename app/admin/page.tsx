@@ -62,34 +62,6 @@ import {
 // 1. ACCIONES DE SERVIDOR (SERVER ACTIONS)
 // ==============================================================================
 
-async function markAsPaid(formData: FormData) {
-  "use server";
-  const bookingId = formData.get("bookingId");
-  if (!bookingId) {
-    console.log("No bookingId provided");
-    return;
-  }
-
-  const { role, user } = await getUserRole();
-  if (!role || !user) {
-    console.log("Unauthorized or no user role");
-    return;
-  }
-  const supabaseServer = await getSupabaseServer();
-
-  const id = parseInt(bookingId.toString(), 10);
-  console.log(`Attempting to mark booking ${id} as pagado for user ${user.email}`);
-
-  const { data, error } = await supabaseServer
-    .from("bookings")
-    .update({ status: "pagado" })
-    .eq("id", id)
-    .select();
-
-  console.log("Update response:", data, error);
-  revalidatePath("/admin");
-}
-
 async function deleteBooking(formData: FormData) {
   "use server";
   const bookingId = formData.get("bookingId");
@@ -197,6 +169,15 @@ export default async function AdminPage(props: {
     .from("booking_extras")
     .select("*")
     .order("created_at", { ascending: false });
+
+  // Mapa precalculado booking_id -> extras, para no recorrer allExtras completo por cada fila de la tabla.
+  const extrasByBooking = new Map<number, any[]>();
+  for (const extra of allExtras || []) {
+    const list = extrasByBooking.get(extra.booking_id);
+    if (list) list.push(extra);
+    else extrasByBooking.set(extra.booking_id, [extra]);
+  }
+
   const { data: products } = await supabaseServer
     .from("products")
     .select("*")
@@ -343,6 +324,18 @@ export default async function AdminPage(props: {
       phone.includes(searchQuery)
     );
   });
+
+  // Paginación del Historial de Reservas
+  const HISTORIAL_PAGE_SIZE = 20;
+  const currentPage = Math.max(1, parseInt(searchParams.page || "1", 10) || 1);
+  const totalHistorialPages = Math.max(1, Math.ceil((searchedBookings?.length || 0) / HISTORIAL_PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalHistorialPages);
+  const paginatedBookings = searchedBookings?.slice(
+    (safePage - 1) * HISTORIAL_PAGE_SIZE,
+    safePage * HISTORIAL_PAGE_SIZE
+  );
+  const historialLinkParams = (page: number) =>
+    `tab=historial&from=${dateFrom}&to=${dateTo}${searchParams.q ? `&q=${encodeURIComponent(searchParams.q)}` : ""}&page=${page}`;
 
   // Habitaciones más populares (por noches reservadas en el rango)
   const roomPopularity = rooms?.map(room => {
@@ -1260,11 +1253,11 @@ export default async function AdminPage(props: {
                       </tr>
                     </thead>
                     <tbody className="text-xs">
-                      {searchedBookings?.map((booking) => {
+                      {paginatedBookings?.map((booking) => {
                         const noches = calculateNights(booking.check_in, booking.check_out);
                         const isCancelled = booking.status === "cancelled" || booking.status === "cancelada";
                         
-                        const bookingExtras = allExtras?.filter((e) => e.booking_id === booking.id) || [];
+                        const bookingExtras = extrasByBooking.get(booking.id) || [];
                         const extrasTotal = bookingExtras.reduce((sum, e) => sum + (e.price * e.quantity), 0);
                         const grandTotal = booking.total_price + extrasTotal;
 
@@ -1402,6 +1395,37 @@ export default async function AdminPage(props: {
                       No se encontraron reservas con los filtros seleccionados.
                     </div>
                   )}
+                  {totalHistorialPages > 1 && (
+                    <div className="flex items-center justify-between px-8 py-5 border-t border-stone-100 bg-stone-50/30">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                        Página {safePage} de {totalHistorialPages}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/admin?${historialLinkParams(Math.max(1, safePage - 1))}`}
+                          aria-disabled={safePage <= 1}
+                          className={`flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition ${
+                            safePage <= 1
+                              ? "bg-stone-100 text-stone-300 pointer-events-none"
+                              : "bg-white border border-stone-200 text-stone-600 hover:bg-stone-100"
+                          }`}
+                        >
+                          <ChevronLeft size={14} /> Anterior
+                        </Link>
+                        <Link
+                          href={`/admin?${historialLinkParams(Math.min(totalHistorialPages, safePage + 1))}`}
+                          aria-disabled={safePage >= totalHistorialPages}
+                          className={`flex items-center gap-1 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition ${
+                            safePage >= totalHistorialPages
+                              ? "bg-stone-100 text-stone-300 pointer-events-none"
+                              : "bg-white border border-stone-200 text-stone-600 hover:bg-stone-100"
+                          }`}
+                        >
+                          Siguiente <ChevronRight size={14} />
+                        </Link>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1532,6 +1556,20 @@ export default async function AdminPage(props: {
                     curr.setDate(curr.getDate() + 1);
                   }
 
+                  // Mapa precalculado room_id -> reservas que se cruzan con el rango, para no recorrer
+                  // todas las reservas por cada habitación.
+                  const bookingsByRoom = new Map<number, any[]>();
+                  for (const b of allBookings || []) {
+                    if (
+                      b.status === "cancelled" || b.status === "cancelada" ||
+                      new Date(b.check_in + "T00:00:00") > calendarEndDate ||
+                      new Date(b.check_out + "T00:00:00") < calendarStartDate
+                    ) continue;
+                    const list = bookingsByRoom.get(b.room_id);
+                    if (list) list.push(b);
+                    else bookingsByRoom.set(b.room_id, [b]);
+                  }
+
                   return (
                     <div className="min-w-[800px]">
                       {/* Cabecera de fechas */}
@@ -1560,13 +1598,7 @@ export default async function AdminPage(props: {
                       {/* Filas de habitaciones */}
                       <div className="flex flex-col gap-2">
                         {rooms?.map((room) => {
-                          // Filtrar reservas que se cruzan con este rango en esta habitación
-                          const roomBookings = allBookings?.filter(b => 
-                            b.room_id === room.id && 
-                            b.status !== "cancelled" && b.status !== "cancelada" &&
-                            new Date(b.check_in + "T00:00:00") <= calendarEndDate &&
-                            new Date(b.check_out + "T00:00:00") >= calendarStartDate
-                          ) || [];
+                          const roomBookings = bookingsByRoom.get(room.id) || [];
 
                           return (
                             <div key={room.id} className="flex items-center bg-white rounded-xl border border-stone-100 relative group h-14 hover:border-stone-200 transition-colors shadow-sm mb-1.5 w-fit">
