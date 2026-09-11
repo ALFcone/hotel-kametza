@@ -27,6 +27,7 @@ interface AdminTableActionsProps {
   roomType?: string;
   guestPhone?: string;
   guestDocument?: string;
+  paymentMethod?: string;
   onDelete: (formData: FormData) => void;
   products?: any[];
   userRole?: string | null;
@@ -47,6 +48,7 @@ export function AdminTableActions({
   roomType,
   guestPhone,
   guestDocument,
+  paymentMethod,
   onDelete,
   products = [],
   userRole,
@@ -78,6 +80,8 @@ export function AdminTableActions({
   const [billingAddress, setBillingAddress] = useState("");
   const [includeRoomType, setIncludeRoomType] = useState(false);
   const [isFetchingRuc, setIsFetchingRuc] = useState(false);
+  const [billingPaymentMethod, setBillingPaymentMethod] = useState("Efectivo");
+  const [billingAmountPaid, setBillingAmountPaid] = useState("0");
 
   const handleFetchDocument = async () => {
     if (billingType === "FACTURA" && billingDocument.length !== 11) {
@@ -130,10 +134,19 @@ export function AdminTableActions({
   
   const extrasTotal = extras.reduce((sum, e) => sum + (e.price * e.quantity), 0);
   const grandTotal = totalPrice + extrasTotal;
-  
-  const effectiveAmountPaid = (amountPaid !== null && amountPaid !== undefined) 
-    ? amountPaid 
+
+  const effectiveAmountPaid = (amountPaid !== null && amountPaid !== undefined)
+    ? amountPaid
     : ((status === "pagado" || status === "approved") ? totalPrice : 0);
+
+  const paymentMethodLabel = (m?: string) => {
+    const key = (m || "").toLowerCase();
+    if (key.includes("yape") || key.includes("plin")) return "Yape / Plin";
+    if (key.includes("tarjeta") || key.includes("pos") || key.includes("online")) return "Tarjeta / Online";
+    if (key.includes("transferencia") || key.includes("bcp") || key.includes("bbva")) return "Transferencia";
+    if (key.includes("recepcion") || key.includes("efectivo") || key.includes("cash")) return "Efectivo";
+    return "Efectivo";
+  };
 
   const balance = grandTotal - effectiveAmountPaid;
   const isFullyPaid = balance <= 0;
@@ -291,17 +304,21 @@ export function AdminTableActions({
     base_price: totalPrice, // Precio solo del alojamiento
     extras: extras, // Array de consumos adicionales
     customer_name: billingName || guestName,
-    customer_document: billingDocument || guestPhone || "No Registrado",
+    customer_document: billingDocument || "No Registrado",
     customer_address: billingAddress || undefined,
     room_id: roomName,
     room_type: includeRoomType ? roomType : undefined,
+    payment_method: billingPaymentMethod,
+    amount_paid: Number(billingAmountPaid) || 0,
   };
 
   const handleOpenBilling = () => {
-    // Valores por defecto al abrir
+    // Valores por defecto al abrir (todos editables antes de imprimir)
     setBillingType(isCancelled ? "NOTA DE CRÉDITO" : "BOLETA");
     setBillingDocument(guestDocument || "");
     setBillingName(guestName);
+    setBillingPaymentMethod(paymentMethodLabel(paymentMethod));
+    setBillingAmountPaid((isFullyPaid ? grandTotal : effectiveAmountPaid).toFixed(2));
     setIsBillingModalOpen(true);
   };
 
@@ -854,7 +871,46 @@ export function AdminTableActions({
                   className="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold uppercase"
                 />
               </div>
-              
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
+                    Forma de Pago
+                  </label>
+                  <select
+                    value={billingPaymentMethod}
+                    onChange={(e) => setBillingPaymentMethod(e.target.value)}
+                    className="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold bg-white"
+                  >
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Yape / Plin">Yape / Plin</option>
+                    <option value="Tarjeta / Online">Tarjeta / Online</option>
+                    <option value="Transferencia">Transferencia</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
+                    Monto Pagado (S/)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max={grandTotal}
+                    value={billingAmountPaid}
+                    onChange={(e) => setBillingAmountPaid(e.target.value)}
+                    className="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold"
+                  />
+                </div>
+              </div>
+              <p className={`text-[10px] font-bold uppercase tracking-wide -mt-1 ${
+                (grandTotal - Number(billingAmountPaid || 0)) > 0.009 ? "text-rose-600" : "text-emerald-600"
+              }`}>
+                {(grandTotal - Number(billingAmountPaid || 0)) > 0.009
+                  ? `Saldo pendiente en el comprobante: S/ ${(grandTotal - Number(billingAmountPaid || 0)).toFixed(2)}`
+                  : "Se imprimirá como pagado en su totalidad"}
+              </p>
+
               <div className="flex items-center gap-2 mt-2 pb-1">
                 <input
                   type="checkbox"

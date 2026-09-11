@@ -21,6 +21,8 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
   const total = booking.total_price || 0;
   const subtotal = (total / 1.18).toFixed(2);
   const igv = (total - Number(subtotal)).toFixed(2);
+  const amountPaid = booking.amount_paid ?? total;
+  const pendingBalance = Math.max(0, total - amountPaid);
 
   // Estructura oficial del código QR SUNAT
   let tipoComprobante = '03'; // Boleta
@@ -60,7 +62,7 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
         <p><strong>{type === "FACTURA" ? "RUC" : "DNI"}:</strong> {booking.customer_document || booking.client_dni || "00000000"}</p>
         {booking.customer_address && <p><strong>DIRECCIÓN:</strong> {booking.customer_address}</p>}
         <p><strong>MONEDA:</strong> SOLES (PEN)</p>
-        <p><strong>FORMA DE PAGO:</strong> CONTADO</p>
+        <p><strong>FORMA DE PAGO:</strong> {booking.payment_method || "CONTADO"}</p>
         <p><strong>HABITACIÓN:</strong> {booking.room_id} {booking.room_type ? `(${booking.room_type})` : ''}</p>
       </div>
 
@@ -119,6 +121,16 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
             <span>IMPORTE TOTAL:</span>
             <span>S/ {total.toFixed(2)}</span>
           </div>
+          <div className="flex justify-between mt-1">
+            <span>MONTO PAGADO:</span>
+            <span>S/ {amountPaid.toFixed(2)}</span>
+          </div>
+          {pendingBalance > 0.009 && (
+            <div className="flex justify-between font-bold">
+              <span>SALDO PENDIENTE:</span>
+              <span>S/ {pendingBalance.toFixed(2)}</span>
+            </div>
+          )}
         </div>
       </div>
 

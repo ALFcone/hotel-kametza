@@ -1517,6 +1517,7 @@ export default async function AdminPage(props: {
                                 roomType={getRoomType(booking.room_id)}
                                 guestPhone={booking.client_phone || undefined}
                                 guestDocument={booking.document_number || undefined}
+                                paymentMethod={booking.payment_method || undefined}
                                 onDelete={deleteBooking}
                                 products={products || []}
                                 userRole={role}
