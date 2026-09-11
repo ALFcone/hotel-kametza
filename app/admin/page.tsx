@@ -148,6 +148,9 @@ export default async function AdminPage(props: {
   const supabaseServer = await getSupabaseServer();
   const searchParams = await props.searchParams;
   const activeTab = searchParams.tab || (isOwner ? "resumen" : "estado");
+  // El filtro de fechas y los accesos rápidos (Registrar/Excel) solo aplican a las
+  // pestañas que realmente muestran datos de reservas en un rango de fechas.
+  const showBookingsToolbar = ["resumen", "estado", "calendario", "historial"].includes(activeTab);
 
   // A. FECHAS Y PARÁMETROS
   const today = new Date().toISOString().split("T")[0];
@@ -612,51 +615,53 @@ export default async function AdminPage(props: {
               </Link>
             </div>
 
-            {/* Filtros de Fecha Premium */}
-            <div className="flex items-end gap-4 flex-wrap w-full xl:w-auto">
-              <form className="flex items-end gap-3 bg-white/60 backdrop-blur-xl p-4 rounded-[1.5rem] border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-stone-900/5 flex-wrap w-full sm:w-auto hover:shadow-[0_8px_30px_rgba(217,119,6,0.08)] transition-shadow duration-500" method="get">
-                {/* Mantener la pestaña activa al filtrar */}
-                <input type="hidden" name="tab" value={activeTab} />
-                
-                <div className="flex flex-col gap-1.5 relative">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-stone-400 ml-3">Desde</span>
-                  <input
-                    type="date"
-                    name="from"
-                    defaultValue={dateFrom}
-                    className="bg-white/80 border border-stone-200/80 rounded-2xl px-4 py-2.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all shadow-sm w-full sm:w-[140px]"
-                  />
+            {/* Filtros de Fecha Premium: solo en pestañas que usan rango de fechas */}
+            {showBookingsToolbar && (
+              <div className="flex items-end gap-4 flex-wrap w-full xl:w-auto">
+                <form className="flex items-end gap-3 bg-white/60 backdrop-blur-xl p-4 rounded-[1.5rem] border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-stone-900/5 flex-wrap w-full sm:w-auto hover:shadow-[0_8px_30px_rgba(217,119,6,0.08)] transition-shadow duration-500" method="get">
+                  {/* Mantener la pestaña activa al filtrar */}
+                  <input type="hidden" name="tab" value={activeTab} />
+
+                  <div className="flex flex-col gap-1.5 relative">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-stone-400 ml-3">Desde</span>
+                    <input
+                      type="date"
+                      name="from"
+                      defaultValue={dateFrom}
+                      className="bg-white/80 border border-stone-200/80 rounded-2xl px-4 py-2.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all shadow-sm w-full sm:w-[140px]"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-stone-400 ml-3">Hasta</span>
+                    <input
+                      type="date"
+                      name="to"
+                      defaultValue={dateTo}
+                      className="bg-white/80 border border-stone-200/80 rounded-2xl px-4 py-2.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all shadow-sm w-full sm:w-[140px]"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="bg-gradient-to-r from-stone-900 to-stone-800 hover:from-amber-600 hover:to-amber-500 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest h-[42px] transition-all duration-300 shadow-lg shadow-stone-900/20 hover:shadow-amber-500/30 hover:-translate-y-0.5 w-full sm:w-auto flex items-center justify-center gap-2 group"
+                  >
+                    <Filter size={14} className="group-hover:scale-110 transition-transform" /> Filtrar
+                  </button>
+                </form>
+
+                <div className="flex items-center gap-2.5 w-full sm:w-auto h-[42px] mt-auto">
+                  <Link
+                    href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
+                    className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-900/10 transition-all hover:scale-105 active:scale-95 whitespace-nowrap h-full"
+                    title="Registrar Nueva Reserva Manual"
+                  >
+                    <CalendarCheck size={14} /> + Registrar Reserva
+                  </Link>
+                  {allBookings && <DownloadButton data={allBookings} />}
                 </div>
-                
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-stone-400 ml-3">Hasta</span>
-                  <input
-                    type="date"
-                    name="to"
-                    defaultValue={dateTo}
-                    className="bg-white/80 border border-stone-200/80 rounded-2xl px-4 py-2.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all shadow-sm w-full sm:w-[140px]"
-                  />
-                </div>
-                
-                <button
-                  type="submit"
-                  className="bg-gradient-to-r from-stone-900 to-stone-800 hover:from-amber-600 hover:to-amber-500 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest h-[42px] transition-all duration-300 shadow-lg shadow-stone-900/20 hover:shadow-amber-500/30 hover:-translate-y-0.5 w-full sm:w-auto flex items-center justify-center gap-2 group"
-                >
-                  <Filter size={14} className="group-hover:scale-110 transition-transform" /> Filtrar
-                </button>
-              </form>
-              
-              <div className="flex items-center gap-2.5 w-full sm:w-auto h-[42px] mt-auto">
-                <Link
-                  href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
-                  className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-900/10 transition-all hover:scale-105 active:scale-95 whitespace-nowrap h-full"
-                  title="Registrar Nueva Reserva Manual"
-                >
-                  <CalendarCheck size={14} /> + Registrar Reserva
-                </Link>
-                {allBookings && <DownloadButton data={allBookings} />}
               </div>
-            </div>
+            )}
           </div>
 
           {/* --- TAB: RESUMEN GENERAL --- */}
@@ -671,7 +676,7 @@ export default async function AdminPage(props: {
                     </div>
                     <div>
                       <p className="text-amber-950 font-bold text-base">
-                        Salidas para Limpieza hoy: {cleaningList.length} habitaciones
+                        Salidas para Limpieza hoy: {cleaningList.length} {cleaningList.length === 1 ? "habitación" : "habitaciones"}
                       </p>
                       <p className="text-amber-700 text-xs font-bold uppercase tracking-wider mt-0.5">
                         Habitaciones a desinfectar:{" "}
@@ -842,7 +847,7 @@ export default async function AdminPage(props: {
                           <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-stone-900 to-stone-600 font-serif tracking-tight drop-shadow-sm">
                             {cleaningList.length}
                           </p>
-                          <span className="text-stone-400 text-xs font-bold mb-1.5 uppercase tracking-wider">salidas</span>
+                          <span className="text-stone-400 text-xs font-bold mb-1.5 uppercase tracking-wider">{cleaningList.length === 1 ? "salida" : "salidas"}</span>
                         </div>
                         
                         <div className="mt-6 pt-5 border-t border-stone-200/50">
