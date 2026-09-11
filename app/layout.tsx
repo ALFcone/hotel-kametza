@@ -20,9 +20,35 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
 });
 
+const title = "Hotel Kametza | Ayacucho";
+const description = "Un refugio donde la historia colonial se encuentra con el confort contemporáneo.";
+
 export const metadata: Metadata = {
-  title: "Hotel Kametza | Ayacucho",
-  description: "Un refugio donde la historia colonial se encuentra con el confort contemporáneo.",
+  metadataBase: new URL("https://hotel-kametza.vercel.app"),
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    url: "/",
+    siteName: "Hotel Kametza",
+    images: [
+      {
+        url: "/hero.png",
+        width: 1024,
+        height: 1024,
+        alt: "Hotel Kametza - Ayacucho",
+      },
+    ],
+    locale: "es_PE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/hero.png"],
+  },
 };
 
 export default function RootLayout({
