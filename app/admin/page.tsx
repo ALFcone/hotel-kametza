@@ -26,6 +26,7 @@ import {
   Home as HomeIcon,
   X,
   TrendingUp,
+  TrendingDown,
   LogIn,
   LogOut,
   Brush,
@@ -96,6 +97,23 @@ function calculateNights(checkIn: string, checkOut: string) {
 const formatTicket = (id: number) => {
   return (100 + id).toString().padStart(5, "0");
 };
+
+/** Insignia "vs. período anterior" para las tarjetas KPI del Resumen. */
+function ChangeBadge({ pct }: { pct: number }) {
+  const isUp = pct >= 0;
+  const rounded = Math.round(Math.abs(pct));
+  return (
+    <span
+      className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-full ${
+        isUp ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
+      }`}
+      title="Comparado con el período anterior de igual duración"
+    >
+      {isUp ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+      {rounded}% vs. anterior
+    </span>
+  );
+}
 
 function formatDateShort(dateStr: string): string {
   if (!dateStr) return "—";
@@ -293,6 +311,44 @@ export default async function AdminPage(props: {
   const totalCard = cardPayments.reduce((acc, b) => acc + getPaidAmount(b), 0);
   const totalTransfer = transferPayments.reduce((acc, b) => acc + getPaidAmount(b), 0);
 
+  // Comparación contra el período anterior de igual duración
+  const shiftDate = (dateStr: string, daysDelta: number) => {
+    const d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + daysDelta);
+    return d.toISOString().split("T")[0];
+  };
+  const periodDays = Math.round(
+    (new Date(dateTo + "T00:00:00").getTime() - new Date(dateFrom + "T00:00:00").getTime()) / (1000 * 60 * 60 * 24)
+  ) + 1;
+  const prevDateTo = shiftDate(dateFrom, -1);
+  const prevDateFrom = shiftDate(prevDateTo, -(periodDays - 1));
+
+  const prevSalesInRange = allBookings?.filter((b) => {
+    if (!b.created_at) return false;
+    const createdAtDate = b.created_at.substring(0, 10);
+    return (
+      createdAtDate >= prevDateFrom &&
+      createdAtDate <= prevDateTo &&
+      (b.status === "pagado" || b.status === "approved" || b.status === "parcial")
+    );
+  }) || [];
+  const prevTotalIncome = prevSalesInRange.reduce((acc, b) => acc + getPaidAmount(b), 0);
+  const salesChangePct = prevTotalIncome > 0
+    ? ((totalIncome - prevTotalIncome) / prevTotalIncome) * 100
+    : (totalIncome > 0 ? 100 : 0);
+
+  const prevArrivalsCount = allBookings?.filter(
+    (b) =>
+      b.check_in &&
+      b.check_in >= prevDateFrom &&
+      b.check_in <= prevDateTo &&
+      b.status !== "cancelled" &&
+      b.status !== "cancelada"
+  ).length || 0;
+  const arrivalsChangePct = prevArrivalsCount > 0
+    ? ((arrivalsCount - prevArrivalsCount) / prevArrivalsCount) * 100
+    : (arrivalsCount > 0 ? 100 : 0);
+
   // Cuentas por cobrar acumuladas (saldos pendientes)
   const totalPendingDebt = allBookings
     .filter((b) => b.status !== "cancelled" && b.status !== "cancelada")
@@ -300,12 +356,6 @@ export default async function AdminPage(props: {
       const debt = Math.max(0, Number(b.total_price) - getPaidAmount(b));
       return acc + debt;
     }, 0);
-
-  const shiftDate = (dateStr: string, daysDelta: number) => {
-    const d = new Date(dateStr + "T00:00:00");
-    d.setDate(d.getDate() + daysDelta);
-    return d.toISOString().split("T")[0];
-  };
 
   // Búsqueda en Historial
   const searchQuery = (searchParams.q || "").toLowerCase().trim();
@@ -337,25 +387,28 @@ export default async function AdminPage(props: {
   const historialLinkParams = (page: number) =>
     `tab=historial&from=${dateFrom}&to=${dateTo}${searchParams.q ? `&q=${encodeURIComponent(searchParams.q)}` : ""}&page=${page}`;
 
-  // Habitaciones más populares (por noches reservadas en el rango)
+  // Habitaciones más demandadas (noches e ingresos generados en el rango)
   const roomPopularity = rooms?.map(room => {
-    const nights = allBookings?.filter(b => 
-      b.room_id === room.id && 
+    const roomBookings = allBookings?.filter(b =>
+      b.room_id === room.id &&
       b.status !== "cancelled" && b.status !== "cancelada" &&
       b.check_in >= dateFrom && b.check_in <= dateTo
-    ).reduce((acc, b) => acc + calculateNights(b.check_in, b.check_out), 0) || 0;
-    
-    return { name: room.name, number: room.room_number || room.id, nights };
-  }).sort((a, b) => b.nights - a.nights).slice(0, 4) || [];
+    ) || [];
+    const nights = roomBookings.reduce((acc, b) => acc + calculateNights(b.check_in, b.check_out), 0);
+    const revenue = roomBookings.reduce((acc, b) => acc + Number(b.total_price || 0), 0);
 
-  // F. CÁLCULO DE TENDENCIA DE VENTAS (ÚLTIMOS 7 DÍAS)
-  const last7Days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (6 - i));
-    return d.toISOString().split("T")[0];
-  });
+    return { name: room.name, number: room.room_number || room.id, nights, revenue };
+  }).sort((a, b) => b.revenue - a.revenue).slice(0, 4) || [];
 
-  const salesTrend = last7Days.map((dateStr) => {
+  // F. CÁLCULO DE TENDENCIA DE VENTAS (respeta el rango filtrado, con tope de 31 puntos)
+  const TREND_MAX_POINTS = 31;
+  const trendDayCount = Math.min(Math.max(periodDays, 1), TREND_MAX_POINTS);
+  const trendTruncated = periodDays > TREND_MAX_POINTS;
+  const trendDates = Array.from({ length: trendDayCount }, (_, i) =>
+    shiftDate(dateTo, -(trendDayCount - 1 - i))
+  );
+
+  const salesTrend = trendDates.map((dateStr) => {
     const daySales = allBookings?.filter(
       (b) =>
         b.created_at &&
@@ -363,7 +416,7 @@ export default async function AdminPage(props: {
         (b.status === "pagado" || b.status === "approved" || b.status === "parcial")
     ) || [];
     const total = daySales.reduce((acc, b) => acc + getPaidAmount(b), 0);
-    
+
     const dayName = new Date(dateStr + "T00:00:00").toLocaleDateString("es-PE", {
       weekday: "short",
     });
@@ -371,9 +424,11 @@ export default async function AdminPage(props: {
   });
 
   const maxSales = Math.max(...salesTrend.map((s) => s.total), 100);
+  const showTrendPointLabels = salesTrend.length <= 10;
+  const trendLabelStep = Math.max(1, Math.ceil(salesTrend.length / 6));
 
   const points = salesTrend.map((s, i) => {
-    const x = Math.round(40 + i * (520 / 6));
+    const x = Math.round(40 + i * (520 / Math.max(1, salesTrend.length - 1)));
     const y = Math.round(160 - (s.total / maxSales) * 140);
     return { x, y, ...s };
   });
@@ -655,6 +710,9 @@ export default async function AdminPage(props: {
                         <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-stone-900 to-stone-600 font-serif tracking-tight drop-shadow-sm">
                           {formatMoney(totalIncome)}
                         </p>
+                        <div className="mt-2">
+                          <ChangeBadge pct={salesChangePct} />
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-6 mt-8 pt-5 border-t border-stone-200/50">
@@ -697,6 +755,9 @@ export default async function AdminPage(props: {
                             {arrivalsCount}
                           </p>
                           <span className="text-stone-400 text-xs font-bold mb-1.5 uppercase tracking-wider">reservas</span>
+                        </div>
+                        <div className="mt-2">
+                          <ChangeBadge pct={arrivalsChangePct} />
                         </div>
                         <div className="mt-6 pt-5 border-t border-stone-200/50 flex items-center gap-2">
                           <div className="flex -space-x-2">
@@ -895,7 +956,13 @@ export default async function AdminPage(props: {
                     <div className="flex justify-between items-center mb-6">
                       <div>
                         <h3 className="font-bold text-base text-stone-900">Tendencia de Ventas</h3>
-                        <p className="text-stone-400 text-[10px] uppercase font-bold tracking-wider mt-0.5">Últimos 7 días de ingresos (S/)</p>
+                        <p className="text-stone-400 text-[10px] uppercase font-bold tracking-wider mt-0.5">
+                          {trendTruncated
+                            ? `Últimos ${TREND_MAX_POINTS} días del rango (S/)`
+                            : trendDayCount === 1
+                            ? "Ingresos del día seleccionado (S/)"
+                            : `Ingresos del ${dateFrom} al ${dateTo} (S/)`}
+                        </p>
                       </div>
                     </div>
                     <div className="w-full overflow-hidden">
@@ -920,13 +987,18 @@ export default async function AdminPage(props: {
                         {/* Points */}
                         {points.map((p, i) => (
                           <g key={i}>
+                            <title>{`${p.date}: S/ ${p.total.toFixed(2)}`}</title>
                             <circle cx={p.x} cy={p.y} r="5" fill="#FFFFFF" stroke="#d97706" strokeWidth="3" />
-                            <text x={p.x} y={p.y - 12} textAnchor="middle" className="text-[10px] font-bold fill-stone-800">
-                              S/ {Math.round(p.total)}
-                            </text>
-                            <text x={p.x} y="180" textAnchor="middle" className="text-[9px] font-black uppercase tracking-wider fill-stone-400">
-                              {p.dayName}
-                            </text>
+                            {showTrendPointLabels && (
+                              <text x={p.x} y={p.y - 12} textAnchor="middle" className="text-[10px] font-bold fill-stone-800">
+                                S/ {Math.round(p.total)}
+                              </text>
+                            )}
+                            {(i % trendLabelStep === 0 || i === points.length - 1) && (
+                              <text x={p.x} y="180" textAnchor="middle" className="text-[9px] font-black uppercase tracking-wider fill-stone-400">
+                                {p.dayName}
+                              </text>
+                            )}
                           </g>
                         ))}
                       </svg>
@@ -976,26 +1048,52 @@ export default async function AdminPage(props: {
                       <div className="space-y-4">
                         <div>
                           <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
-                            <span className="text-stone-500">🏨 Efectivo / Recepción</span>
-                            <span className="text-stone-900">{formatMoney(cashIncome)}</span>
+                            <span className="text-stone-500">💵 Efectivo</span>
+                            <span className="text-stone-900">{formatMoney(totalCash)}</span>
                           </div>
                           <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
                             <div
                               className="bg-stone-850 h-full rounded-full"
-                              style={{ width: `${totalIncome > 0 ? (cashIncome / totalIncome) * 100 : 0}%` }}
+                              style={{ width: `${totalIncome > 0 ? (totalCash / totalIncome) * 100 : 0}%` }}
                             />
                           </div>
                         </div>
-                        
+
                         <div>
                           <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
-                            <span className="text-stone-500">💳 Digital / Online</span>
-                            <span className="text-[#d97706]">{formatMoney(digitalIncome)}</span>
+                            <span className="text-stone-500">📱 Yape / Plin</span>
+                            <span className="text-purple-600">{formatMoney(totalYape)}</span>
+                          </div>
+                          <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
+                            <div
+                              className="bg-purple-500 h-full rounded-full"
+                              style={{ width: `${totalIncome > 0 ? (totalYape / totalIncome) * 100 : 0}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
+                            <span className="text-stone-500">💳 Tarjeta / Online</span>
+                            <span className="text-[#d97706]">{formatMoney(totalCard)}</span>
                           </div>
                           <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
                             <div
                               className="bg-[#d97706] h-full rounded-full"
-                              style={{ width: `${totalIncome > 0 ? (digitalIncome / totalIncome) * 100 : 0}%` }}
+                              style={{ width: `${totalIncome > 0 ? (totalCard / totalIncome) * 100 : 0}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
+                            <span className="text-stone-500">🏦 Transferencia</span>
+                            <span className="text-blue-600">{formatMoney(totalTransfer)}</span>
+                          </div>
+                          <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
+                            <div
+                              className="bg-blue-500 h-full rounded-full"
+                              style={{ width: `${totalIncome > 0 ? (totalTransfer / totalIncome) * 100 : 0}%` }}
                             />
                           </div>
                         </div>
@@ -1008,18 +1106,21 @@ export default async function AdminPage(props: {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                   {/* Habitaciones Populares */}
                   <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm">
-                    <h3 className="font-bold text-base text-stone-900 mb-6">Top Habitaciones (Demandadas)</h3>
+                    <h3 className="font-bold text-base text-stone-900 mb-6">Top Habitaciones (Ingresos)</h3>
                     <div className="space-y-4">
                       {roomPopularity.map((r, i) => (
                         <div key={i}>
-                          <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
+                          <div className="flex justify-between items-baseline text-[10px] font-bold uppercase mb-1.5">
                             <span className="text-stone-500">#{r.number} - {r.name}</span>
-                            <span className="text-stone-900">{r.nights} noches</span>
+                            <span className="text-stone-900">
+                              {formatMoney(r.revenue)}
+                              <span className="text-stone-400 font-medium normal-case ml-1.5">· {r.nights} noches</span>
+                            </span>
                           </div>
                           <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
                             <div
                               className="bg-stone-900 h-full rounded-full"
-                              style={{ width: `${roomPopularity[0]?.nights > 0 ? (r.nights / roomPopularity[0].nights) * 100 : 0}%` }}
+                              style={{ width: `${roomPopularity[0]?.revenue > 0 ? (r.revenue / roomPopularity[0].revenue) * 100 : 0}%` }}
                             />
                           </div>
                         </div>
