@@ -13,6 +13,30 @@ import { getSupabaseServer } from "@/lib/supabase-server";
 
 const ROOM_IMAGES_BUCKET = "rooms";
 
+async function uploadRoomImage(supabaseServer: any, file: File): Promise<{ url?: string; error?: string }> {
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${file.name.replace(/\s+/g, '_')}`;
+
+  const { error: uploadError } = await supabaseServer.storage
+    .from(ROOM_IMAGES_BUCKET)
+    .upload(filename, buffer, {
+      contentType: file.type || "image/jpeg",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    console.error("Error subiendo imagen a Supabase Storage:", uploadError.message);
+    return { error: "No se pudo subir la imagen." };
+  }
+
+  const { data: publicUrlData } = supabaseServer.storage
+    .from(ROOM_IMAGES_BUCKET)
+    .getPublicUrl(filename);
+
+  return { url: publicUrlData.publicUrl };
+}
+
 // ==============================================================================
 // 1. HELPER: GET USER ROLE
 // ==============================================================================
@@ -208,27 +232,9 @@ export async function updateRoom(formData: FormData) {
   const isUpload = imageFile && typeof imageFile === "object" && "arrayBuffer" in imageFile && (imageFile as any).size > 0;
 
   if (isUpload) {
-    const arrayBuffer = await (imageFile as any).arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const filename = `${Date.now()}-${(imageFile as any).name.replace(/\s+/g, '_')}`;
-
-    const { error: uploadError } = await supabaseServer.storage
-      .from(ROOM_IMAGES_BUCKET)
-      .upload(filename, buffer, {
-        contentType: (imageFile as any).type || "image/jpeg",
-        upsert: false,
-      });
-
-    if (uploadError) {
-      console.error("Error subiendo imagen a Supabase Storage:", uploadError.message);
-      return { error: "No se pudo subir la imagen." };
-    }
-
-    const { data: publicUrlData } = supabaseServer.storage
-      .from(ROOM_IMAGES_BUCKET)
-      .getPublicUrl(filename);
-
-    imageUrl = publicUrlData.publicUrl;
+    const result = await uploadRoomImage(supabaseServer, imageFile);
+    if (result.error) return { error: result.error };
+    imageUrl = result.url!;
   }
 
   const { error } = await supabaseServer.from("rooms").update({
@@ -239,11 +245,98 @@ export async function updateRoom(formData: FormData) {
 
   if (error) {
     console.error("No se pudo actualizar la habitación:", error.message);
-    return;
+    return { error: "No se pudo actualizar la habitación." };
   }
 
   revalidatePath("/admin");
   revalidatePath("/");
+  return { success: true };
+}
+
+// ==============================================================================
+// GALERÍA DE FOTOS POR HABITACIÓN (varias imágenes además de la portada)
+// ==============================================================================
+export async function addRoomGalleryImages(formData: FormData) {
+  const { role } = await getUserRole();
+  if (role !== "admin" && role !== "dueño") {
+    return { error: "No autorizado." };
+  }
+  const supabaseServer = await getSupabaseServer();
+
+  const roomId = Number(formData.get("roomId"));
+  const files = formData.getAll("images") as File[];
+  const validFiles = files.filter((f) => f && typeof f === "object" && "arrayBuffer" in f && f.size > 0);
+
+  if (validFiles.length === 0) {
+    return { error: "Selecciona al menos una imagen." };
+  }
+
+  const { data: room, error: fetchError } = await supabaseServer
+    .from("rooms")
+    .select("gallery_urls")
+    .eq("id", roomId)
+    .single();
+
+  if (fetchError || !room) {
+    return { error: "Habitación no encontrada." };
+  }
+
+  const uploadedUrls: string[] = [];
+  for (const file of validFiles) {
+    const result = await uploadRoomImage(supabaseServer, file);
+    if (result.error) return { error: result.error };
+    uploadedUrls.push(result.url!);
+  }
+
+  const newGallery = [...(room.gallery_urls || []), ...uploadedUrls];
+
+  const { error: updateError } = await supabaseServer
+    .from("rooms")
+    .update({ gallery_urls: newGallery })
+    .eq("id", roomId);
+
+  if (updateError) {
+    console.error("Error al guardar la galería:", updateError.message);
+    return { error: "No se pudo guardar la galería." };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function removeRoomGalleryImage(roomId: number, imageUrl: string) {
+  const { role } = await getUserRole();
+  if (role !== "admin" && role !== "dueño") {
+    return { error: "No autorizado." };
+  }
+  const supabaseServer = await getSupabaseServer();
+
+  const { data: room, error: fetchError } = await supabaseServer
+    .from("rooms")
+    .select("gallery_urls")
+    .eq("id", roomId)
+    .single();
+
+  if (fetchError || !room) {
+    return { error: "Habitación no encontrada." };
+  }
+
+  const newGallery = (room.gallery_urls || []).filter((url: string) => url !== imageUrl);
+
+  const { error: updateError } = await supabaseServer
+    .from("rooms")
+    .update({ gallery_urls: newGallery })
+    .eq("id", roomId);
+
+  if (updateError) {
+    console.error("Error al quitar la imagen de la galería:", updateError.message);
+    return { error: "No se pudo quitar la imagen." };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/");
+  return { success: true };
 }
 
 export async function adminCreateBooking(formData: FormData) {

@@ -377,12 +377,9 @@ function BookingModal({
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
 
-  const mockGallery = [
-    room.image_url,
-    "/rooms/1783000136108-20230927_104221.jpg",
-    "/rooms/1783001920612-20230927_104221.jpg",
-    "/rooms/1783023911777-20230927_104221.jpg"
-  ].filter(Boolean);
+  const roomGallery: string[] = [room.image_url, ...(room.gallery_urls || [])].filter(Boolean);
+  // Para el panel de miniaturas (siempre 3 recuadros): si hay menos de 3 fotos, se repite la portada como relleno.
+  const galleryThumbs = [0, 1, 2].map((i) => roomGallery[i] ?? roomGallery[0]);
 
   const handleDocNumberChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -495,7 +492,7 @@ function BookingModal({
           {/* Main Photo */}
           <div className="w-full h-[50%] rounded-2xl overflow-hidden mb-4 relative shadow-sm cursor-pointer" onClick={() => { setCurrentGalleryIndex(0); setGalleryOpen(true); }}>
             <img
-              src={mockGallery[0]}
+              src={galleryThumbs[0]}
               className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               alt={room.name}
             />
@@ -505,19 +502,21 @@ function BookingModal({
           <div className="grid grid-cols-2 gap-4 h-[25%] mb-4">
             <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm cursor-pointer" onClick={() => { setCurrentGalleryIndex(1); setGalleryOpen(true); }}>
               <img
-                src={mockGallery[1]}
+                src={galleryThumbs[1]}
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-700 opacity-90"
                 alt="Vista 2"
               />
             </div>
             <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm relative cursor-pointer" onClick={() => { setCurrentGalleryIndex(2); setGalleryOpen(true); }}>
               <img
-                src={mockGallery[2]}
+                src={galleryThumbs[2]}
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-700 opacity-90"
                 alt="Vista 3"
               />
               <div className="absolute inset-0 bg-stone-900/40 flex items-center justify-center hover:bg-stone-900/50 transition">
-                <span className="text-white font-bold text-xs uppercase tracking-widest">+ Ver Más</span>
+                <span className="text-white font-bold text-xs uppercase tracking-widest">
+                  {roomGallery.length > 3 ? `+${roomGallery.length - 2} Ver Más` : "Ver Más"}
+                </span>
               </div>
             </div>
           </div>
@@ -751,27 +750,27 @@ function BookingModal({
           </button>
           
           <button 
-            onClick={() => setCurrentGalleryIndex((prev) => (prev > 0 ? prev - 1 : mockGallery.length - 1))}
+            onClick={() => setCurrentGalleryIndex((prev) => (prev > 0 ? prev - 1 : roomGallery.length - 1))}
             className="absolute left-4 md:left-12 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition z-10"
           >
             <ArrowRight size={32} className="rotate-180" />
           </button>
 
           <img 
-            src={mockGallery[currentGalleryIndex]} 
+            src={roomGallery[currentGalleryIndex]} 
             className="max-h-[85vh] max-w-full object-contain"
             alt={`Galería ${currentGalleryIndex + 1}`}
           />
 
           <button 
-            onClick={() => setCurrentGalleryIndex((prev) => (prev < mockGallery.length - 1 ? prev + 1 : 0))}
+            onClick={() => setCurrentGalleryIndex((prev) => (prev < roomGallery.length - 1 ? prev + 1 : 0))}
             className="absolute right-4 md:right-12 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition z-10"
           >
             <ArrowRight size={32} />
           </button>
 
           <div className="absolute bottom-6 flex gap-2">
-            {mockGallery.map((_, idx) => (
+            {roomGallery.map((_, idx) => (
               <button 
                 key={idx}
                 onClick={() => setCurrentGalleryIndex(idx)}
@@ -792,6 +791,7 @@ interface Room {
   description: string;
   price_per_night: number;
   image_url: string | null;
+  gallery_urls?: string[] | null;
   room_number: string;
 }
 

@@ -1,17 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { updateRoom } from "../actions";
+import { useRef, useState } from "react";
+import { updateRoom, addRoomGalleryImages, removeRoomGalleryImage } from "../actions";
+import { X, ImagePlus } from "lucide-react";
 import Swal from "sweetalert2";
 
 export default function RoomEditForm({ room }: { room: any }) {
   const [saving, setSaving] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [removingUrl, setRemovingUrl] = useState<string | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  const gallery: string[] = room.gallery_urls || [];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
     setSaving(true);
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     const result = await updateRoom(formData);
 
     setSaving(false);
@@ -26,7 +33,55 @@ export default function RoomEditForm({ room }: { room: any }) {
         timer: 1800,
         showConfirmButton: false,
       });
-      e.currentTarget.reset();
+      // Solo se limpia el selector de archivo; precio/descripción se dejan con lo que el admin acaba de guardar.
+      const fileInput = form.querySelector<HTMLInputElement>('input[name="image"]');
+      if (fileInput) fileInput.value = "";
+    }
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingGallery(true);
+    const formData = new FormData();
+    formData.append("roomId", room.id);
+    Array.from(files).forEach((file) => formData.append("images", file));
+
+    const result = await addRoomGalleryImages(formData);
+    setUploadingGallery(false);
+    if (galleryInputRef.current) galleryInputRef.current.value = "";
+
+    if (result?.error) {
+      Swal.fire("Error", result.error, "error");
+    } else {
+      Swal.fire({
+        title: "Fotos agregadas",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    }
+  };
+
+  const handleRemoveGalleryImage = async (url: string) => {
+    const confirm = await Swal.fire({
+      title: "¿Quitar esta foto de la galería?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#e3004f",
+      cancelButtonColor: "#a8a29e",
+      confirmButtonText: "Sí, quitar",
+      cancelButtonText: "Cancelar",
+    });
+    if (!confirm.isConfirmed) return;
+
+    setRemovingUrl(url);
+    const result = await removeRoomGalleryImage(room.id, url);
+    setRemovingUrl(null);
+
+    if (result?.error) {
+      Swal.fire("Error", result.error, "error");
     }
   };
 
@@ -52,7 +107,7 @@ export default function RoomEditForm({ room }: { room: any }) {
           </div>
           <div className="group/input">
             <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-1.5 group-focus-within/input:text-[#d97706] transition-colors">
-              Cambiar Imagen
+              Foto de Portada
             </label>
             <input type="hidden" name="oldImage" value={room.image_url || ""} />
             <input
@@ -87,6 +142,50 @@ export default function RoomEditForm({ room }: { room: any }) {
           <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-stone-900 via-stone-800 to-stone-900 transform translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
         </button>
       </form>
+
+      {/* GALERÍA DE FOTOS ADICIONALES */}
+      <div className="mt-6 pt-6 border-t border-stone-100">
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-[9px] font-black uppercase tracking-wider text-stone-400">
+            Galería ({gallery.length} fotos)
+          </label>
+          <label className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#d97706] cursor-pointer hover:text-amber-700 transition-colors ${uploadingGallery ? "opacity-50 pointer-events-none" : ""}`}>
+            <ImagePlus size={13} />
+            {uploadingGallery ? "Subiendo..." : "Agregar fotos"}
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleGalleryUpload}
+              disabled={uploadingGallery}
+            />
+          </label>
+        </div>
+
+        {gallery.length === 0 ? (
+          <p className="text-[10px] text-stone-400 italic">
+            Sin fotos adicionales. Se mostrará solo la portada en la galería de reserva.
+          </p>
+        ) : (
+          <div className="grid grid-cols-4 gap-2">
+            {gallery.map((url) => (
+              <div key={url} className="relative group/thumb aspect-square rounded-lg overflow-hidden border border-stone-200">
+                <img src={url} alt="Foto de galería" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveGalleryImage(url)}
+                  disabled={removingUrl === url}
+                  className="absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center text-white disabled:opacity-70"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
