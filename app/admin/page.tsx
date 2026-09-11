@@ -290,6 +290,7 @@ export default async function AdminPage(props: {
 
   const totalRooms = rooms?.length || 0;
   const freeRooms = totalRooms - occupiedCount;
+  const dirtyRoomsCount = rooms?.filter((r) => (r.is_clean ?? true) === false).length || 0;
 
   // Arqueo contable por método de pago (Caja y Finanzas)
   const cashPayments = salesInRange.filter((b) => {
@@ -816,10 +817,32 @@ export default async function AdminPage(props: {
                             <span className="text-[10px] font-black text-stone-400">{Math.round((occupiedCount/totalRooms)*100) || 0}%</span>
                           </div>
                           <div className="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                            <div 
+                            <div
                               className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)] transition-all duration-1000 ease-out"
                               style={{ width: `${(occupiedCount / totalRooms) * 100}%` }}
                             ></div>
+                          </div>
+
+                          {/* Mini mapa de habitaciones */}
+                          <div className="flex flex-wrap gap-1.5 mt-4">
+                            {rooms?.map((room) => {
+                              const rs = getRoomStatus(room.id);
+                              const color =
+                                rs.status === "checkout"
+                                  ? "bg-rose-400"
+                                  : rs.status === "occupied"
+                                  ? "bg-[#d97706]"
+                                  : "bg-stone-200";
+                              return (
+                                <span
+                                  key={room.id}
+                                  className={`w-3.5 h-3.5 rounded-[5px] ${color} shadow-sm`}
+                                  title={`#${room.room_number || room.id} · ${
+                                    rs.status === "checkout" ? "Sale hoy" : rs.status === "occupied" ? "Ocupada" : "Libre"
+                                  }`}
+                                />
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
@@ -865,6 +888,14 @@ export default async function AdminPage(props: {
                              {cleaningList.length === 0 && (
                                <span className="text-xs text-stone-400 font-medium italic">Sin check-outs programados</span>
                              )}
+                           </div>
+                           <div className="flex items-center gap-2 mt-4">
+                             <span className={`w-2 h-2 rounded-full ${dirtyRoomsCount > 0 ? "bg-rose-500 animate-pulse" : "bg-emerald-500"}`} />
+                             <span className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
+                               {dirtyRoomsCount === 0
+                                 ? "Todas las habitaciones están limpias"
+                                 : `${dirtyRoomsCount} ${dirtyRoomsCount === 1 ? "habitación pendiente" : "habitaciones pendientes"} de limpieza`}
+                             </span>
                            </div>
                         </div>
                       </div>
