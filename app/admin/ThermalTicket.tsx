@@ -1,5 +1,4 @@
 import React from "react";
-import QRCode from "react-qr-code";
 
 interface ThermalTicketProps {
   booking: any;
@@ -7,6 +6,12 @@ interface ThermalTicketProps {
   correlative: string;
 }
 
+/**
+ * Comprobante interno de pago (piloto). NO es una Boleta/Factura Electronica
+ * SUNAT: no se emite ni se envia a SUNAT, es solo constancia de cobro del
+ * hotel. Cuando se conecte un facturador electronico real, este ticket debe
+ * reemplazarse por el comprobante que devuelva ese proveedor.
+ */
 export default function ThermalTicket({ booking, type, correlative }: ThermalTicketProps) {
   if (!booking) return null;
 
@@ -22,18 +27,6 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
   const subtotal = (total / 1.18).toFixed(2);
   const igv = (total - Number(subtotal)).toFixed(2);
 
-  // Estructura oficial del código QR SUNAT
-  let tipoComprobante = '03'; // Boleta
-  if (type === 'FACTURA') tipoComprobante = '01';
-  if (type === 'NOTA DE CRÉDITO') tipoComprobante = '07';
-
-  let tipoDocumentoCliente = '1'; // DNI
-  if (type === 'FACTURA') tipoDocumentoCliente = '6'; // RUC
-  // Para nota de crédito asumimos DNI por defecto a menos que tenga 11 dígitos
-  if (type === 'NOTA DE CRÉDITO' && booking.customer_document?.length === 11) tipoDocumentoCliente = '6';
-
-  const qrData = `10282984984|${tipoComprobante}|${correlative.split('-')[0]}|${correlative.split('-')[1]}|${igv}|${total.toFixed(2)}|${new Date().toISOString().split('T')[0]}|${tipoDocumentoCliente}|${booking.customer_document || '00000000'}`;
-
   return (
     <div id="print-section" className="thermal-ticket hidden print:block text-black bg-white p-4 font-mono text-[11px] w-[302px] mx-auto absolute top-0 left-0 z-[99999] h-screen">
       {/* Header */}
@@ -47,8 +40,9 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
       </div>
 
       <div className="border-t border-b border-dashed border-black py-2 mb-4 text-center">
-        <h2 className="font-bold text-base">{type === "NOTA DE CRÉDITO" ? "NOTA DE CRÉDITO ELECTRÓNICA" : `${type} ELECTRÓNICA`}</h2>
+        <h2 className="font-bold text-base">{type}</h2>
         <p className="text-sm font-bold tracking-widest mt-1">{type === "NOTA DE CRÉDITO" && correlative.startsWith("B") ? correlative.replace("B", "BC") : type === "NOTA DE CRÉDITO" && correlative.startsWith("F") ? correlative.replace("F", "FC") : correlative}</p>
+        <p className="text-[9px] font-bold uppercase tracking-wider mt-1">Comprobante interno &middot; no es documento SUNAT</p>
       </div>
 
       {/* Info */}
@@ -122,16 +116,9 @@ export default function ThermalTicket({ booking, type, correlative }: ThermalTic
         </div>
       </div>
 
-      {/* QR Code */}
-      <div className="flex flex-col items-center mt-4 border-t border-dashed border-black pt-4">
-        <div className="bg-white mb-2">
-          <QRCode value={qrData} size={112} level="Q" />
-        </div>
-      </div>
-
-      <div className="text-center mt-4">
+      <div className="text-center mt-4 border-t border-dashed border-black pt-4">
         <p className="font-bold text-sm">¡GRACIAS POR SU PREFERENCIA!</p>
-        <p className="mt-2 text-[10px] leading-tight">Representación impresa de la {type} Electrónica.<br />Consulte su comprobante en SUNAT.</p>
+        <p className="mt-2 text-[10px] leading-tight">Comprobante interno de pago (piloto).<br />No reemplaza boleta/factura electrónica SUNAT.</p>
       </div>
     </div>
   );
