@@ -1434,7 +1434,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               Mucho más que solo descansar
             </h2>
             <p className="text-stone-500 max-w-2xl mx-auto text-lg">
-              Descubre todos los servicios exclusivos pensados para hacer de tu estadía una experiencia inolvidable.
+              Cada detalle está pensado para hacer de tu estadía una experiencia inolvidable.
             </p>
           </div>
 
@@ -1591,7 +1591,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 Lo que dicen nuestros huéspedes
               </h2>
               <p className="text-stone-500 text-sm md:text-base leading-relaxed">
-                La satisfacción de quienes nos visitan es nuestro mejor respaldo. Descubre por qué Hotel Kametza es la opción favorita en Ayacucho.
+                La satisfacción de quienes nos visitan es nuestro mejor respaldo. Conoce por qué Hotel Kametza es la opción favorita en Ayacucho.
               </p>
             </div>
             
@@ -1752,7 +1752,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             </div>
 
             <p className="text-stone-500 mb-8 leading-relaxed text-lg relative z-10">
-              Descubre lo mejor de Ayacucho desde un punto privilegiado. Te ofrecemos la <strong>tranquilidad absoluta</strong> que necesitas para un verdadero descanso, manteniéndote a un paso del centro histórico.
+              Vive lo mejor de Ayacucho desde un punto privilegiado. Te ofrecemos la <strong>tranquilidad absoluta</strong> que necesitas para un verdadero descanso, manteniéndote a un paso del centro histórico.
             </p>
 
             <h3 className="text-xs font-black text-stone-400 uppercase tracking-widest mb-4">Distancias clave</h3>
