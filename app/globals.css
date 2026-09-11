@@ -256,6 +256,10 @@ html {
   color: #e3004f;
 }
 /* Thermal Printer CSS */
+@page {
+  size: 80mm auto; /* Ancho fijo del rollo, alto libre segun el contenido */
+  margin: 0;
+}
 @media print {
   body * {
     visibility: hidden;
@@ -268,6 +272,7 @@ html {
     left: 0;
     top: 0;
     width: 302px; /* Approx 80mm */
+    height: auto !important;
     margin: 0;
     padding: 10px;
   }
