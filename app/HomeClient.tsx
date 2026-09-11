@@ -1257,9 +1257,9 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             
             {/* SUBTÍTULO CLÁSICO CON ACENTO DEL LOGO */}
             <h2 className="text-2xl md:text-4xl font-serif italic text-white font-bold tracking-wider drop-shadow-lg flex items-center gap-4">
-              <span className="text-[#e3004f] text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(227,0,79,0.8)]">✧</span>
+              <span className="h-px w-10 md:w-16 bg-gradient-to-r from-transparent to-[#e3004f]/80"></span>
               Hotel & Suites
-              <span className="text-[#e3004f] text-lg md:text-2xl drop-shadow-[0_0_8px_rgba(227,0,79,0.8)]">✧</span>
+              <span className="h-px w-10 md:w-16 bg-gradient-to-l from-transparent to-[#e3004f]/80"></span>
             </h2>
           </div>
           
@@ -1629,7 +1629,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
                     <Check size={10} className="text-emerald-500" /> Huésped Verificado
                   </p>
-                  <p className="text-[10px] text-stone-400 font-medium">📍 Lima, Perú</p>
+                  <p className="text-[10px] text-stone-400 font-medium flex items-center gap-1"><MapPin size={10} /> Lima, Perú</p>
                 </div>
               </div>
               <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-amber-50 transition-colors">&quot;</div>
@@ -1655,7 +1655,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
                     <Check size={10} className="text-emerald-500" /> Huésped Verificado
                   </p>
-                  <p className="text-[10px] text-stone-400 font-medium">📍 Bogotá, Colombia</p>
+                  <p className="text-[10px] text-stone-400 font-medium flex items-center gap-1"><MapPin size={10} /> Bogotá, Colombia</p>
                 </div>
               </div>
               <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-rose-50 transition-colors">&quot;</div>
@@ -1681,7 +1681,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
                     <Check size={10} className="text-emerald-500" /> Huésped Verificado
                   </p>
-                  <p className="text-[10px] text-stone-400 font-medium">📍 Arequipa, Perú</p>
+                  <p className="text-[10px] text-stone-400 font-medium flex items-center gap-1"><MapPin size={10} /> Arequipa, Perú</p>
                 </div>
               </div>
               <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-stone-100 transition-colors">&quot;</div>
@@ -1707,7 +1707,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
                     <Check size={10} className="text-emerald-500" /> Huésped Verificado
                   </p>
-                  <p className="text-[10px] text-stone-400 font-medium">📍 Huancayo, Perú</p>
+                  <p className="text-[10px] text-stone-400 font-medium flex items-center gap-1"><MapPin size={10} /> Huancayo, Perú</p>
                 </div>
               </div>
               <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-emerald-50 transition-colors">&quot;</div>
