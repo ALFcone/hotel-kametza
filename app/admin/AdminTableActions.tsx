@@ -414,7 +414,7 @@ export function AdminTableActions({
       </div>
 
       {/* Modal de Pago */}
-      {isPaymentModalOpen && (
+      {mounted && isPaymentModalOpen && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
             <button 
@@ -498,11 +498,12 @@ export function AdminTableActions({
               </button>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal de Editar Reserva */}
-      {isEditModalOpen && (
+      {mounted && isEditModalOpen && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
             <button 
@@ -602,11 +603,12 @@ export function AdminTableActions({
               </button>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal de Consumos Extras */}
-      {isExtrasModalOpen && (
+      {mounted && isExtrasModalOpen && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button 
@@ -741,7 +743,8 @@ export function AdminTableActions({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal de Facturación / Boleta */}
