@@ -1263,14 +1263,14 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             </h2>
           </div>
           
-          <p className="text-sm md:text-lg text-white/80 max-w-2xl mx-auto mt-12 mb-8 font-light leading-relaxed drop-shadow-md text-center tracking-widest uppercase">
+          <p className="text-sm md:text-lg text-white max-w-2xl mx-auto mt-12 mb-8 font-light leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] text-center tracking-widest uppercase">
             Un refugio donde la historia colonial se encuentra con el confort
           </p>
 
           <div className="flex justify-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-stone-950/40 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full shadow-xl">
-              <Sparkles size={14} className="text-amber-400" />
-              <span className="text-[10px] md:text-xs text-white font-bold tracking-widest uppercase">
+            <div className="inline-flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C4023E] animate-pulse"></span>
+              <span className="text-[10px] md:text-xs text-stone-800 font-bold tracking-widest uppercase">
                 Mejor Tarifa Garantizada Reservando Aquí
               </span>
             </div>
