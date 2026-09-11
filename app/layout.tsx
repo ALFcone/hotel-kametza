@@ -34,9 +34,9 @@ export const metadata: Metadata = {
     siteName: "Hotel Kametza",
     images: [
       {
-        url: "/og-image.jpg",
-        width: 1024,
-        height: 1024,
+        url: "/Portada.jpg",
+        width: 1827,
+        height: 709,
         alt: "Hotel Kametza - Ayacucho",
       },
     ],
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: ["/og-image.jpg"],
+    images: ["/Portada.jpg"],
   },
 };
 
