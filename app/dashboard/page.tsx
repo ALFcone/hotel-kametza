@@ -241,39 +241,33 @@ function StatCard({
   label,
   value,
   sub,
-  gradient,
+  accentBorder,
+  accentText,
   delay,
 }: {
   icon: any;
   label: string;
   value: string | number;
   sub?: string;
-  gradient: string;
+  accentBorder: string;
+  accentText: string;
   delay: number;
 }) {
   return (
     <div
-      className={`animate-fade-in-up relative overflow-hidden rounded-2xl p-5 border border-white/40 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${gradient}`}
+      className={`animate-fade-in-up bg-white rounded-2xl p-5 border border-stone-100 border-t-[3px] ${accentBorder} shadow-sm hover:shadow-md transition-shadow duration-300`}
       style={{ animationDelay: `${delay}ms` }}
     >
-      {/* Decorative circle */}
-      <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/10" />
-      <div className="relative z-10">
-        <div className="flex items-center justify-between mb-3">
-          <div className="bg-[#e3004f]/10 border border-[#e3004f]/20 backdrop-blur-sm p-2 rounded-xl">
-            <Icon size={18} className="text-[#e3004f]" />
-          </div>
-        </div>
-        <p className="text-2xl md:text-3xl font-black text-rose-50 mb-0.5">
-          {value}
-        </p>
-        <p className="text-[10px] font-bold text-rose-300 uppercase tracking-widest">
+      <div className="flex items-center gap-2 mb-4">
+        <Icon size={16} className={accentText} />
+        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
           {label}
         </p>
-        {sub && (
-          <p className="text-[10px] text-rose-300/60 mt-1 font-medium">{sub}</p>
-        )}
       </div>
+      <p className="text-2xl md:text-3xl font-serif font-bold text-stone-900">
+        {value}
+      </p>
+      {sub && <p className="text-xs text-stone-400 mt-1">{sub}</p>}
     </div>
   );
 }
@@ -547,7 +541,7 @@ export default function Dashboard() {
                   <Building size={32} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h2 className="font-serif font-black text-3xl text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-[#e3004f] to-rose-500 leading-tight drop-shadow-[0_2px_4px_rgba(227,0,79,0.5)]">
+                  <h2 className="font-serif font-black text-3xl text-[#e3004f] leading-tight [text-shadow:0_0_20px_rgba(227,0,79,0.5)]">
                     Kametza
                   </h2>
                   <span className="text-[10px] text-[#e3004f] uppercase tracking-[0.2em] font-black flex items-center gap-1 mt-0.5">
@@ -595,7 +589,8 @@ export default function Dashboard() {
             label="Total Reservas"
             value={stats.total}
             sub={`${stats.active} activa(s)`}
-            gradient="bg-gradient-to-br from-[#e3004f] to-rose-700"
+            accentBorder="border-t-[#e3004f]"
+            accentText="text-[#e3004f]"
             delay={100}
           />
           <StatCard
@@ -611,7 +606,8 @@ export default function Dashboard() {
             sub={
               stats.nextCheckIn ? formatDate(stats.nextCheckIn) : "Sin próximas"
             }
-            gradient="bg-gradient-to-br from-stone-900 to-stone-950"
+            accentBorder="border-t-amber-500"
+            accentText="text-amber-600"
             delay={180}
           />
           <StatCard
@@ -619,7 +615,8 @@ export default function Dashboard() {
             label="Noches Totales"
             value={stats.totalNights}
             sub="Noches reservadas"
-            gradient="bg-gradient-to-br from-stone-900 to-stone-950"
+            accentBorder="border-t-teal-600"
+            accentText="text-teal-700"
             delay={260}
           />
           <StatCard
@@ -627,7 +624,8 @@ export default function Dashboard() {
             label="Total Invertido"
             value={`S/ ${stats.totalSpent}`}
             sub="En estancias"
-            gradient="bg-gradient-to-br from-stone-900 to-stone-950"
+            accentBorder="border-t-emerald-600"
+            accentText="text-emerald-700"
             delay={340}
           />
         </div>
@@ -635,15 +633,11 @@ export default function Dashboard() {
         {/* ================================================================
             INFORMACIÓN ÚTIL
            ================================================================ */}
-        <div className="animate-fade-in-up bg-white rounded-[2rem] p-6 md:p-8 shadow-lg shadow-stone-200/50 border border-stone-100 mb-10 flex flex-col lg:flex-row gap-8 items-center justify-between relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#e3004f]/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
-          
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 w-full relative z-10">
+        <div className="animate-fade-in-up bg-white rounded-[2rem] p-6 md:p-8 shadow-lg shadow-stone-200/50 border border-stone-100 mb-10 flex flex-col lg:flex-row gap-8 items-center justify-between">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
             {/* WiFi */}
-            <div className="flex items-start gap-4">
-              <div className="bg-rose-50 text-[#e3004f] p-3 rounded-2xl">
-                <Wifi size={24} />
-              </div>
+            <div className="flex items-start gap-3">
+              <Wifi size={20} className="text-[#e3004f] mt-0.5 shrink-0" />
               <div>
                 <h4 className="font-bold text-stone-900 text-sm mb-1">Conexión WiFi</h4>
                 <p className="text-xs text-stone-500 font-medium">Red: <span className="font-bold text-stone-800">Kametza_5G</span></p>
@@ -652,10 +646,8 @@ export default function Dashboard() {
             </div>
 
             {/* Horarios */}
-            <div className="flex items-start gap-4 border-t md:border-t-0 md:border-l border-stone-100 pt-4 md:pt-0 md:pl-6">
-              <div className="bg-rose-50 text-[#e3004f] p-3 rounded-2xl">
-                <Clock size={24} />
-              </div>
+            <div className="flex items-start gap-3 border-t md:border-t-0 md:border-l border-stone-100 pt-4 md:pt-0 md:pl-6">
+              <Clock size={20} className="text-[#e3004f] mt-0.5 shrink-0" />
               <div>
                 <h4 className="font-bold text-stone-900 text-sm mb-1">Horarios</h4>
                 <p className="text-xs text-stone-500 font-medium">Check-in: <span className="font-bold text-stone-800">14:00</span> / Check-out: <span className="font-bold text-stone-800">12:00</span></p>
@@ -664,10 +656,8 @@ export default function Dashboard() {
             </div>
 
             {/* Ubicación */}
-            <div className="flex items-start gap-4 border-t md:border-t-0 md:border-l border-stone-100 pt-4 md:pt-0 md:pl-6">
-              <div className="bg-rose-50 text-[#e3004f] p-3 rounded-2xl">
-                <MapPin size={24} />
-              </div>
+            <div className="flex items-start gap-3 border-t md:border-t-0 md:border-l border-stone-100 pt-4 md:pt-0 md:pl-6">
+              <MapPin size={20} className="text-[#e3004f] mt-0.5 shrink-0" />
               <div>
                 <h4 className="font-bold text-stone-900 text-sm mb-1">Ubicación</h4>
                 <p className="text-xs text-stone-500 font-medium leading-relaxed">Jirón Las Américas #154<br/>Ref. Óvalo Magdalena, Ayacucho</p>
@@ -676,7 +666,7 @@ export default function Dashboard() {
           </div>
 
           {/* Action Button */}
-          <div className="w-full lg:w-auto relative z-10 shrink-0">
+          <div className="w-full lg:w-auto shrink-0">
             <a
               href="https://www.google.com/maps/search/?api=1&query=KAMETZA+HOTEL+Jr+Las+Americas+154+Ovalo+de+la+Magdalena+Ayacucho"
               target="_blank"
@@ -729,15 +719,12 @@ export default function Dashboard() {
                       style={{ animationDelay: `${400 + index * 80}ms` }}
                     >
                       <div
-                        className={`group bg-gradient-to-r from-white to-[#FDFBF7] rounded-[2rem] p-5 md:p-7 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] border border-white/60 flex flex-col md:flex-row gap-6 items-center relative overflow-hidden transition-all duration-700 ring-1 ring-stone-900/5 backdrop-blur-xl ${
+                        className={`group bg-white rounded-[2rem] p-5 md:p-7 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] border border-stone-100 flex flex-col md:flex-row gap-6 items-center relative overflow-hidden transition-all duration-500 ${
                           booking.status === "cancelled"
                             ? "opacity-60 grayscale-[0.5]"
                             : "hover:shadow-[0_20px_50px_-10px_rgba(227,0,79,0.15)] hover:-translate-y-1"
                         }`}
                       >
-                        {/* Decorative background logo */}
-                        <Building size={200} strokeWidth={0.5} className="absolute -right-10 -top-10 text-[#e3004f] opacity-[0.02] group-hover:scale-110 group-hover:rotate-6 transition-transform duration-1000 pointer-events-none" />
-                        
                         {/* Cutouts for ticket effect */}
                         <div className="hidden md:block absolute left-[280px] top-0 bottom-0 w-0 border-l-[3px] border-dashed border-stone-200/60" />
                         <div className="hidden md:block absolute left-[272px] -top-3 w-6 h-6 rounded-full bg-[#FDFBF7] shadow-inner" />
