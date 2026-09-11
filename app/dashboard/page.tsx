@@ -132,13 +132,23 @@ function getStats(bookings: any[]) {
 /** Color & texto por estado */
 function getStatusConfig(status: string) {
   switch (status) {
+    case "pagado":
+    case "approved":
     case "confirmed":
       return {
         bg: "bg-emerald-50",
         text: "text-emerald-700",
         border: "border-emerald-200",
         dot: "bg-emerald-500",
-        label: "Confirmada",
+        label: "Pagado",
+      };
+    case "parcial":
+      return {
+        bg: "bg-orange-50",
+        text: "text-orange-700",
+        border: "border-orange-200",
+        dot: "bg-orange-500",
+        label: "Pago Parcial",
       };
     case "pendiente":
       return {
@@ -668,7 +678,7 @@ export default function Dashboard() {
           {/* Action Button */}
           <div className="w-full lg:w-auto relative z-10 shrink-0">
             <a
-              href="https://maps.app.goo.gl/Kametza" 
+              href="https://www.google.com/maps/search/?api=1&query=KAMETZA+HOTEL+Jr+Las+Americas+154+Ovalo+de+la+Magdalena+Ayacucho"
               target="_blank"
               rel="noreferrer"
               className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#e3004f] hover:bg-black text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-lg shadow-rose-900/20"
@@ -738,6 +748,8 @@ export default function Dashboard() {
                           className={`absolute left-0 top-0 bottom-0 w-2 rounded-l-[2rem] shadow-[2px_0_10px_rgba(0,0,0,0.1)] ${
                             effectiveStatus === "pagado" || effectiveStatus === "approved"
                               ? "bg-gradient-to-b from-emerald-400 to-emerald-600"
+                              : effectiveStatus === "parcial"
+                              ? "bg-gradient-to-b from-orange-400 to-orange-600"
                               : effectiveStatus === "pendiente"
                               ? "bg-gradient-to-b from-[#e3004f] to-rose-700"
                               : "bg-gradient-to-b from-stone-300 to-stone-400"
@@ -923,7 +935,7 @@ export default function Dashboard() {
 
       {/* WhatsApp Flotante */}
       <a
-        href="https://wa.me/51999999999?text=Hola%20Recepci%C3%B3n,%20soy%20hu%C3%A9sped%20y%20necesito%20ayuda"
+        href="https://wa.me/51966556622?text=Hola%20Recepci%C3%B3n,%20soy%20hu%C3%A9sped%20y%20necesito%20ayuda"
         target="_blank"
         rel="noreferrer"
         className="fixed bottom-6 right-6 md:bottom-10 md:right-10 bg-[#25D366] text-white p-4 rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:scale-110 hover:shadow-[0_8px_30px_rgba(37,211,102,0.6)] transition-all duration-300 z-50 group flex items-center justify-center animate-bounce-slow"
