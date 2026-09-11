@@ -307,12 +307,13 @@ export function AdminTableActions({
 
   return (
     <>
-      {isPrinting && (
-        <ThermalTicket 
-          booking={mockBookingForTicket} 
-          type={billingType} 
-          correlative={`${billingType === "FACTURA" ? "F001" : "B001"}-${bookingId.toString().padStart(6, '0')}`} 
-        />
+      {mounted && isPrinting && createPortal(
+        <ThermalTicket
+          booking={mockBookingForTicket}
+          type={billingType}
+          correlative={`${billingType === "FACTURA" ? "F001" : "B001"}-${bookingId.toString().padStart(6, '0')}`}
+        />,
+        document.body
       )}
       
       <div className="flex items-center gap-2 justify-center flex-wrap">
