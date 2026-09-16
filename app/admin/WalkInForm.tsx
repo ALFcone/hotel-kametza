@@ -7,9 +7,9 @@
  *            registrarlas al instante desde el Panel de Administración.
  * ---------------------------------------------------------------------
  */
-import { useState, useRef } from "react";
-import { adminCreateBooking, searchGuestByDocument } from "../actions";
-import { Calendar, User, Phone, MapPin, DollarSign, FileText, Bed, Search, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { adminCreateBooking, searchGuestByDocument, checkRoomAvailability } from "../actions";
+import { Calendar, User, Phone, MapPin, DollarSign, FileText, Bed, Search, Loader2, CheckCircle2, XCircle, StickyNote } from "lucide-react";
 
 interface Room {
   id: number;
@@ -26,6 +26,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSearchingDni, setIsSearchingDni] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error" | "info"; text: string } | null>(null);
+  const [availability, setAvailability] = useState<"idle" | "checking" | "available" | "unavailable">("idle");
 
   // Refs para autocompletado
   const docNumRef = useRef<HTMLInputElement>(null);
@@ -42,12 +43,37 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
   const end = new Date(checkOut);
   const diffTime = end.getTime() - start.getTime();
   const nights = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+  const datesValid = end.getTime() > start.getTime();
 
   // Derived state: Price
   const price = selectedRoom ? nights * selectedRoom.price_per_night : 0;
 
+  // Chequeo de disponibilidad en vivo cuando cambian habitación/fechas
+  useEffect(() => {
+    if (!selectedRoomId || !datesValid) {
+      setAvailability("idle");
+      return;
+    }
+    let cancelled = false;
+    setAvailability("checking");
+    const timer = setTimeout(async () => {
+      const res = await checkRoomAvailability(selectedRoomId, checkIn, checkOut);
+      if (!cancelled) setAvailability(res.available ? "available" : "unavailable");
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [selectedRoomId, checkIn, checkOut, datesValid]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!datesValid) {
+      setStatusMessage({ type: "error", text: "La fecha de salida debe ser posterior a la de entrada." });
+      return;
+    }
+
     setIsSubmitting(true);
     setStatusMessage(null);
 
@@ -199,16 +225,42 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               type="date"
               name="checkOut"
               required
+              min={checkIn}
               value={checkOut}
               onClick={(e) => e.currentTarget.showPicker()}
               onChange={(e) => {
                 setCheckOut(e.target.value);
                 setCustomPrice("");
               }}
-              className="w-full p-4 bg-stone-50/50 rounded-2xl border border-stone-200 text-xs font-bold outline-none text-stone-700 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] transition-all shadow-inner shadow-stone-100/50 cursor-pointer"
+              className={`w-full p-4 bg-stone-50/50 rounded-2xl border text-xs font-bold outline-none text-stone-700 focus:bg-white focus:ring-2 transition-all shadow-inner shadow-stone-100/50 cursor-pointer ${
+                datesValid ? "border-stone-200 focus:ring-[#d97706]/20 focus:border-[#d97706]" : "border-red-300 focus:ring-red-500/20 focus:border-red-500"
+              }`}
             />
+            {!datesValid && (
+              <span className="text-[10px] font-bold text-red-600 ml-2">La salida debe ser posterior a la entrada.</span>
+            )}
           </div>
         </div>
+
+        {/* Aviso de Disponibilidad en vivo */}
+        {datesValid && availability !== "idle" && (
+          <div
+            className={`flex items-center gap-2 px-4 py-3 rounded-2xl text-xs font-bold ${
+              availability === "checking"
+                ? "bg-stone-50 text-stone-500 border border-stone-200"
+                : availability === "available"
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                : "bg-red-50 text-red-700 border border-red-200"
+            }`}
+          >
+            {availability === "checking" && <Loader2 size={14} className="animate-spin" />}
+            {availability === "available" && <CheckCircle2 size={14} />}
+            {availability === "unavailable" && <XCircle size={14} />}
+            {availability === "checking" && "Verificando disponibilidad..."}
+            {availability === "available" && "Habitación disponible en esas fechas."}
+            {availability === "unavailable" && "Esta habitación ya está ocupada en esas fechas."}
+          </div>
+        )}
 
         {/* Datos del Cliente */}
         <div className="border-t border-stone-100 pt-8 mt-4 space-y-5">
@@ -338,6 +390,19 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               />
             </div>
           </div>
+
+          <div className="flex flex-col gap-1.5 group/input">
+            <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Notas / Pedidos Especiales (Opcional)</label>
+            <div className="relative">
+              <StickyNote className="absolute left-4 top-4 text-stone-400 group-focus-within/input:text-[#d97706] transition-colors" size={16} />
+              <textarea
+                name="notes"
+                rows={2}
+                placeholder="Ej: cuna adicional, alergia, llegada tardía..."
+                className="w-full p-4 pl-12 bg-stone-50/50 rounded-2xl border border-stone-200 text-xs font-bold outline-none text-stone-700 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] transition-all shadow-inner shadow-stone-100/50 resize-none"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Resumen de Tarifas */}
@@ -374,6 +439,8 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
                 <input
                   type="number"
                   name="amountPaid"
+                  min="0"
+                  step="0.01"
                   placeholder="S/ Adelanto"
                   className="w-full p-3 pl-8 bg-white/60 backdrop-blur-sm rounded-xl border border-stone-200 text-xs font-bold outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-emerald-700 transition-all shadow-inner shadow-stone-100/50"
                 />
@@ -385,8 +452,8 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
 
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="relative overflow-hidden w-full bg-stone-900 text-amber-500 font-black py-4.5 rounded-[1.5rem] transition-all duration-300 text-xs uppercase tracking-widest shadow-xl hover:shadow-[#d97706]/20 hover:-translate-y-0.5 group/btn disabled:opacity-50 mt-4"
+          disabled={isSubmitting || !datesValid || availability === "unavailable"}
+          className="relative overflow-hidden w-full bg-stone-900 text-amber-500 font-black py-4.5 rounded-[1.5rem] transition-all duration-300 text-xs uppercase tracking-widest shadow-xl hover:shadow-[#d97706]/20 hover:-translate-y-0.5 group/btn disabled:opacity-50 disabled:hover:translate-y-0 mt-4"
         >
           <span className="relative z-10 flex items-center justify-center gap-2">
             {isSubmitting ? "Registrando..." : "Registrar Entrada Directa"}

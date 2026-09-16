@@ -344,6 +344,20 @@ export async function removeRoomGalleryImage(roomId: number, imageUrl: string) {
   return { success: true };
 }
 
+export async function checkRoomAvailability(roomId: number, checkIn: string, checkOut: string) {
+  const { role } = await getUserRole();
+  if (!role) return { available: false };
+
+  const supabaseServer = await getSupabaseServer();
+  const { data: isAvailable } = await supabaseServer.rpc("check_availability", {
+    room_id_input: roomId,
+    check_in_input: checkIn,
+    check_out_input: checkOut,
+  });
+
+  return { available: !!isAvailable };
+}
+
 export async function adminCreateBooking(formData: FormData) {
   const { user, role } = await getUserRole();
 
