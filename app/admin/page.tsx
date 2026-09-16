@@ -1713,7 +1713,7 @@ export default async function AdminPage(props: {
                     <div className="min-w-[800px]">
                       {/* Cabecera de fechas */}
                       <div className="flex border-b-2 border-stone-100 mb-4 pb-2 sticky top-0 bg-white/85 backdrop-blur-md z-40 w-fit">
-                        <div className="w-36 shrink-0 py-2 px-4 font-black text-[10px] uppercase text-stone-400 flex items-end sticky left-0 bg-white/90 backdrop-blur-md z-50 border-r border-stone-100 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
+                        <div className="w-52 shrink-0 py-2 px-4 font-black text-[10px] uppercase text-stone-400 flex items-end sticky left-0 bg-white/90 backdrop-blur-md z-50 border-r border-stone-100 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
                           Habitación
                         </div>
                         <div className="flex">
@@ -1742,7 +1742,7 @@ export default async function AdminPage(props: {
                           return (
                             <div key={room.id} className="flex items-center bg-white rounded-xl border border-stone-100 relative group h-14 hover:border-stone-200 transition-colors shadow-sm mb-1.5 w-fit">
                               {/* Nombre Habitación con estado de limpieza */}
-                              <div className="w-40 shrink-0 px-4 font-bold text-xs text-stone-800 border-r border-stone-200 bg-white h-full rounded-l-xl flex items-center justify-between z-30 sticky left-0 shadow-[2px_0_10px_rgba(0,0,0,0.03)] group-hover:bg-stone-50/50 transition-colors">
+                              <div className="w-52 shrink-0 px-4 font-bold text-xs text-stone-800 border-r border-stone-200 bg-white h-full rounded-l-xl flex items-center justify-between z-30 sticky left-0 shadow-[2px_0_10px_rgba(0,0,0,0.03)] group-hover:bg-stone-50/50 transition-colors">
                                 <div className="truncate">
                                   <span className="truncate block font-bold text-stone-900">{room.name}</span>
                                   <span className="text-[8px] font-black uppercase tracking-wider text-stone-400">#{room.room_number || room.id}</span>
