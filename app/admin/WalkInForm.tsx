@@ -84,13 +84,15 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
     setStatusMessage(null);
     try {
       const guest = await searchGuestByDocument(docNumber);
-      if (guest) {
+      if (guest && "rateLimited" in guest && guest.rateLimited) {
+        setStatusMessage({ type: "error", text: "Muchas búsquedas seguidas a RENIEC. Espera unos segundos e intenta de nuevo." });
+      } else if (guest) {
         if (nameRef.current) nameRef.current.value = guest.name || "";
         if (phoneRef.current) phoneRef.current.value = guest.phone || "";
         if (emailRef.current) emailRef.current.value = guest.email || "";
         if (countryRef.current) countryRef.current.value = guest.country || "Perú";
         if (docTypeRef.current && guest.document_type) docTypeRef.current.value = guest.document_type;
-        
+
         if (guest.phone) {
           setStatusMessage({ type: "success", text: "¡Huésped frecuente! Datos cargados del historial." });
         } else {
@@ -342,8 +344,11 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
         <div className="bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-200/60 p-8 rounded-[2rem] flex flex-col md:flex-row justify-between items-center gap-6 shadow-sm mt-4">
           <div>
             <p className="text-[10px] font-black uppercase text-amber-700/60 tracking-wider">Monto Total Estimado</p>
-            <p className="text-3xl font-black text-[#d97706] mt-1.5 drop-shadow-sm">
-              S/ {customPrice ? Number(customPrice) : price} <span className="text-xs font-bold text-amber-600/70 ml-1">({nights} Noche{nights > 1 ? "s" : ""})</span>
+            <p className="text-3xl font-black text-[#d97706] mt-1.5 drop-shadow-sm break-words">
+              S/ {customPrice ? Number(customPrice) : price}
+            </p>
+            <p className="text-xs font-bold text-amber-600/70 mt-0.5">
+              {nights} Noche{nights > 1 ? "s" : ""}
             </p>
           </div>
           

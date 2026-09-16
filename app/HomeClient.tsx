@@ -373,7 +373,6 @@ function BookingModal({
   // -- NEW STATES --
   const [docNumber, setDocNumber] = useState("");
   const [customerName, setCustomerName] = useState(currentUser?.user_metadata?.full_name || "");
-  const [isFetchingDni, setIsFetchingDni] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
 
@@ -381,23 +380,10 @@ function BookingModal({
   // Para el panel de miniaturas (siempre 3 recuadros): si hay menos de 3 fotos, se repite la portada como relleno.
   const galleryThumbs = [0, 1, 2].map((i) => roomGallery[i] ?? roomGallery[0]);
 
-  const handleDocNumberChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setDocNumber(val);
-    
-    if (docType === "DNI" && val.length === 8) {
-      setIsFetchingDni(true);
-      try {
-        const res = await fetch(`/api/dni?numero=${val}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.nombre) setCustomerName(data.nombre);
-        }
-      } catch (err) {
-        console.error("Error fetching DNI");
-      }
-      setIsFetchingDni(false);
-    }
+  // La consulta a RENIEC se reserva para el panel admin (walk-in) para no
+  // gastar la cuota del token cada vez que un huésped escribe su DNI aquí.
+  const handleDocNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDocNumber(e.target.value);
   };
 
   const today = new Date().toISOString().split("T")[0];
@@ -614,11 +600,6 @@ function BookingModal({
                   maxLength={docType === "DNI" ? 8 : 15}
                   className="w-full p-3 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
                 />
-                {isFetchingDni && (
-                  <div className="absolute right-3 top-3">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#e3004f]"></div>
-                  </div>
-                )}
               </div>
             </div>
 

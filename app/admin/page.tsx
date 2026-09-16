@@ -17,6 +17,7 @@ import RoomEditForm from "./RoomEditForm";
 import { AdminTableActions } from "./AdminTableActions";
 import AdminProducts from "./AdminProducts";
 import AdminStaffManagement from "./AdminStaffManagement";
+import MobileMoreMenu from "./MobileMoreMenu";
 import {
   Calendar,
   CheckCircle,
@@ -1869,6 +1870,10 @@ export default async function AdminPage(props: {
           <FileText size={18} />
           <span className="text-[8px] font-black uppercase">Historial</span>
         </Link>
+
+        {/* Más: secciones que no caben en la barra (Estado, Inventario, Almacén) */}
+        <MobileMoreMenu activeTab={activeTab} dateFrom={dateFrom} dateTo={dateTo} />
+
         {isOwner && (
           <Link href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "personal" ? "text-amber-500" : "text-stone-400"}`}>
             <ShieldCheck size={18} />

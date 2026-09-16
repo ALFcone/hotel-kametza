@@ -81,8 +81,9 @@ export async function searchGuestByDocument(documentNumber: string) {
       // Usar API pública gratuita de Perú
       const res = await fetch(`https://api.apis.net.pe/v1/dni?numero=${documentNumber}`, {
         method: "GET",
-        headers: { 
+        headers: {
           "Accept": "application/json",
+          "Authorization": `Bearer ${process.env.DNI_API_TOKEN}`,
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         },
         // Evitar caché persistente agresivo si hay error, pero guardarlo si funciona
@@ -93,9 +94,9 @@ export async function searchGuestByDocument(documentNumber: string) {
         const apiData = await res.json();
         if (apiData && apiData.nombre) {
           // Capitalizar nombres (ej: JUAN PEREZ -> Juan Perez)
-          const formatName = (str: string) => 
+          const formatName = (str: string) =>
             str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-          
+
           return {
             name: formatName(apiData.nombre),
             country: "Perú",
@@ -104,6 +105,10 @@ export async function searchGuestByDocument(documentNumber: string) {
             phone: ""
           };
         }
+      } else if (res.status === 429) {
+        // Límite de consultas de la API alcanzado: no es que el DNI no exista
+        console.error("API DNI: límite de consultas alcanzado (429)");
+        return { rateLimited: true as const };
       } else {
         console.error("API Error Status:", res.status, res.statusText);
         const text = await res.text();
