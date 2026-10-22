@@ -167,12 +167,25 @@ export default async function AdminPage(props: {
     day: "numeric",
   });
 
-  // B. CONSULTAS
-  const { data: rooms } = await supabaseServer.from("rooms").select("*").order("id");
-  const { data: rawBookings } = await supabaseServer
-    .from("bookings")
-    .select("*, clients(*)")
-    .order("created_at", { ascending: false });
+  // B. CONSULTAS (en paralelo; productos y personal solo en las pestañas que los usan)
+  const needsProducts = activeTab === "historial" || activeTab === "almacen";
+  const needsStaff = isOwner && activeTab === "personal";
+
+  const [roomsRes, bookingsRes, extrasRes, productsRes, staffRes] = await Promise.all([
+    supabaseServer.from("rooms").select("*").order("id"),
+    supabaseServer.from("bookings").select("*, clients(*)").order("created_at", { ascending: false }),
+    supabaseServer.from("booking_extras").select("*").order("created_at", { ascending: false }),
+    needsProducts
+      ? supabaseServer.from("products").select("*").order("name", { ascending: true })
+      : Promise.resolve({ data: null }),
+    needsStaff ? getStaffList() : Promise.resolve({ data: [] as any[] }),
+  ]);
+
+  const rooms = roomsRes.data;
+  const rawBookings = bookingsRes.data;
+  const allExtras = extrasRes.data;
+  const products = productsRes.data;
+  const staffList: any[] = staffRes.data || [];
 
   // Mapear la nueva estructura relacional a la estructura plana original
   // para no romper la compatibilidad con el resto del panel y componentes.
@@ -187,10 +200,6 @@ export default async function AdminPage(props: {
     document_type: b.clients?.document_type || b.document_type || null,
     document_number: b.clients?.document_number || b.document_number || null,
   })) || [];
-  const { data: allExtras } = await supabaseServer
-    .from("booking_extras")
-    .select("*")
-    .order("created_at", { ascending: false });
 
   // Mapa precalculado booking_id -> extras, para no recorrer allExtras completo por cada fila de la tabla.
   const extrasByBooking = new Map<number, any[]>();
@@ -198,17 +207,6 @@ export default async function AdminPage(props: {
     const list = extrasByBooking.get(extra.booking_id);
     if (list) list.push(extra);
     else extrasByBooking.set(extra.booking_id, [extra]);
-  }
-
-  const { data: products } = await supabaseServer
-    .from("products")
-    .select("*")
-    .order("name", { ascending: true });
-
-  let staffList: any[] = [];
-  if (isOwner) {
-    const staffRes = await getStaffList();
-    staffList = staffRes.data || [];
   }
 
   // C. FILTRADO (Reservas creadas o que inician en el rango de fechas)
