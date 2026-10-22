@@ -202,19 +202,19 @@ export default function AdminStaffManagement({
 
         {/* METRICAS RÁPIDAS */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-8 border-t border-stone-200/70">
-          <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-stone-200/70 shadow-xs hover:border-stone-300 transition-colors">
+          <div className="bg-white/90 p-4 rounded-2xl border border-stone-200/70 shadow-xs hover:border-stone-300 transition-colors">
             <span className="text-[10px] uppercase font-bold tracking-widest text-stone-500">Total Equipo</span>
             <div className="text-2xl md:text-3xl font-bold font-serif text-stone-900 mt-1">{totalCount}</div>
           </div>
-          <div className="bg-amber-50/80 backdrop-blur-md p-4 rounded-2xl border border-amber-200/80 shadow-xs hover:border-amber-300 transition-colors">
+          <div className="bg-amber-50/80 p-4 rounded-2xl border border-amber-200/80 shadow-xs hover:border-amber-300 transition-colors">
             <span className="text-[10px] uppercase font-bold tracking-widest text-amber-800">Dueños / Admins</span>
             <div className="text-2xl md:text-3xl font-bold font-serif text-amber-900 mt-1">{ownerCount}</div>
           </div>
-          <div className="bg-blue-50/80 backdrop-blur-md p-4 rounded-2xl border border-blue-200/80 shadow-xs hover:border-blue-300 transition-colors">
+          <div className="bg-blue-50/80 p-4 rounded-2xl border border-blue-200/80 shadow-xs hover:border-blue-300 transition-colors">
             <span className="text-[10px] uppercase font-bold tracking-widest text-blue-700">Recepcionistas</span>
             <div className="text-2xl md:text-3xl font-bold font-serif text-blue-950 mt-1">{receptionistCount}</div>
           </div>
-          <div className="bg-emerald-50/80 backdrop-blur-md p-4 rounded-2xl border border-emerald-200/80 shadow-xs hover:border-emerald-300 transition-colors">
+          <div className="bg-emerald-50/80 p-4 rounded-2xl border border-emerald-200/80 shadow-xs hover:border-emerald-300 transition-colors">
             <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-700">Limpieza</span>
             <div className="text-2xl md:text-3xl font-bold font-serif text-emerald-950 mt-1">{cleaningCount}</div>
           </div>

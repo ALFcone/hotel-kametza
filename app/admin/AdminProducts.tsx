@@ -80,7 +80,7 @@ export default function AdminProducts({ products = [], userRole }: { products: a
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2.5rem] p-6 lg:p-10 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] ring-1 ring-stone-900/5 backdrop-blur-xl relative overflow-hidden">
+    <div className="bg-white rounded-[2.5rem] p-6 lg:p-10 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] relative overflow-hidden">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h3 className="font-bold text-2xl text-stone-900 tracking-tight">Listado de Productos</h3>

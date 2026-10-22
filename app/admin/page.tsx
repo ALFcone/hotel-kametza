@@ -498,91 +498,34 @@ export default async function AdminPage(props: {
           </div>
 
           {/* Menú de Navegación */}
-          <nav className="flex flex-col gap-1.5">
-            {isOwner && (
-              <Link
-                href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                  activeTab === "resumen"
-                    ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
-                    : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
-                }`}
-              >
-                <TrendingUp size={16} /> Caja y Ventas
-              </Link>
-            )}
-            {isOwner && (
-              <Link
-                href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                  activeTab === "personal"
-                    ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
-                    : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
-                }`}
-              >
-                <ShieldCheck size={16} /> Personal / Dueño
-              </Link>
-            )}
-            <Link
-              href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === "calendario"
-                  ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
-                  : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
-              }`}
-            >
-              <CalendarDays size={16} /> Room Rack (Calendario)
-            </Link>
-            <Link
-              href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === "registrar"
-                  ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
-                  : "text-amber-400 hover:text-white hover:bg-amber-500/10 font-black border border-amber-500/20"
-              }`}
-            >
-              <CalendarCheck size={16} className="text-amber-400" /> Registrar Reserva
-            </Link>
-            <Link
-              href={`/admin?tab=estado&from=${dateFrom}&to=${dateTo}`}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === "estado"
-                  ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
-                  : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
-              }`}
-            >
-              <LayoutDashboard size={16} /> Estado de Habitaciones
-            </Link>
-            <Link
-              href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === "historial"
-                  ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
-                  : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
-              }`}
-            >
-              <FileText size={16} /> Historial de Reservas
-            </Link>
-            <Link
-              href={`/admin?tab=inventario&from=${dateFrom}&to=${dateTo}`}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === "inventario"
-                  ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
-                  : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
-              }`}
-            >
-              <BedDouble size={16} /> Inventario
-            </Link>
-            <Link
-              href={`/admin?tab=almacen&from=${dateFrom}&to=${dateTo}`}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
-                activeTab === "almacen"
-                  ? "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-[0_4px_15px_rgba(217,119,6,0.3)] shadow-amber-900/50 ring-1 ring-amber-400/20 translate-x-1"
-                  : "text-stone-400 hover:text-amber-100 hover:bg-white/5 hover:translate-x-1"
-              }`}
-            >
-              <ShoppingCart size={16} /> Almacén / Minibar
-            </Link>
+          <nav className="flex flex-col gap-1">
+            {[
+              { tab: "resumen", label: "Caja y Ventas", Icon: TrendingUp, ownerOnly: true },
+              { tab: "personal", label: "Personal / Dueño", Icon: ShieldCheck, ownerOnly: true },
+              { tab: "calendario", label: "Room Rack (Calendario)", Icon: CalendarDays, ownerOnly: false },
+              { tab: "registrar", label: "Registrar Reserva", Icon: CalendarCheck, ownerOnly: false },
+              { tab: "estado", label: "Estado de Habitaciones", Icon: LayoutDashboard, ownerOnly: false },
+              { tab: "historial", label: "Historial de Reservas", Icon: FileText, ownerOnly: false },
+              { tab: "inventario", label: "Inventario", Icon: BedDouble, ownerOnly: false },
+              { tab: "almacen", label: "Almacén / Minibar", Icon: ShoppingCart, ownerOnly: false },
+            ]
+              .filter((item) => !item.ownerOnly || isOwner)
+              .map(({ tab, label, Icon }) => {
+                const isActive = activeTab === tab;
+                return (
+                  <Link
+                    key={tab}
+                    href={`/admin?tab=${tab}&from=${dateFrom}&to=${dateTo}`}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border-l-2 text-xs font-bold uppercase tracking-wider transition-colors ${
+                      isActive
+                        ? "bg-white/10 text-white border-amber-500"
+                        : "text-stone-400 border-transparent hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <Icon size={16} className={isActive ? "text-amber-400" : ""} /> {label}
+                  </Link>
+                );
+              })}
           </nav>
         </div>
 
@@ -602,17 +545,17 @@ export default async function AdminPage(props: {
             
             <div className="flex justify-between w-full xl:w-auto items-start">
               <div>
-                <span className="text-amber-600 text-[10px] font-black uppercase tracking-[0.2em] bg-amber-50/80 backdrop-blur-sm px-4 py-1.5 rounded-full border border-amber-200/50 shadow-sm flex items-center w-fit gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Administración
+                <span className="text-amber-600 text-[10px] font-black uppercase tracking-[0.2em] bg-amber-50 px-4 py-1.5 rounded-full border border-amber-200 flex items-center w-fit gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Administración
                 </span>
-                <h1 className="text-3xl md:text-4xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-stone-900 to-stone-600 mt-4 tracking-tight drop-shadow-sm">
+                <h1 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 mt-4 tracking-tight whitespace-nowrap">
                   Panel de Control
                 </h1>
                 <p className="text-stone-400 text-[11px] mt-1.5 font-bold uppercase tracking-wider">
                   {todayFormatted}
                 </p>
               </div>
-              <Link href="/" className="lg:hidden flex items-center justify-center bg-gradient-to-br from-stone-900 to-stone-800 text-amber-400 w-12 h-12 rounded-2xl shadow-lg shadow-stone-900/20 hover:scale-105 transition-all duration-300">
+              <Link href="/" className="lg:hidden flex items-center justify-center bg-stone-900 text-amber-400 w-12 h-12 rounded-2xl hover:bg-stone-800 transition-colors">
                 <Globe size={20} />
               </Link>
             </div>
@@ -620,7 +563,7 @@ export default async function AdminPage(props: {
             {/* Filtros de Fecha Premium: solo en pestañas que usan rango de fechas */}
             {showBookingsToolbar && (
               <div className="flex items-end gap-4 flex-wrap w-full xl:w-auto">
-                <form className="flex items-end gap-3 bg-white/60 backdrop-blur-xl p-4 rounded-[1.5rem] border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-stone-900/5 flex-wrap w-full sm:w-auto hover:shadow-[0_8px_30px_rgba(217,119,6,0.08)] transition-shadow duration-500" method="get">
+                <form className="flex items-end gap-3 bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex-wrap w-full sm:w-auto" method="get">
                   {/* Mantener la pestaña activa al filtrar */}
                   <input type="hidden" name="tab" value={activeTab} />
 
@@ -630,7 +573,7 @@ export default async function AdminPage(props: {
                       type="date"
                       name="from"
                       defaultValue={dateFrom}
-                      className="bg-white/80 border border-stone-200/80 rounded-2xl px-4 py-2.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all shadow-sm w-full sm:w-[140px]"
+                      className="bg-white border border-stone-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all w-full sm:w-[140px]"
                     />
                   </div>
 
@@ -640,22 +583,22 @@ export default async function AdminPage(props: {
                       type="date"
                       name="to"
                       defaultValue={dateTo}
-                      className="bg-white/80 border border-stone-200/80 rounded-2xl px-4 py-2.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all shadow-sm w-full sm:w-[140px]"
+                      className="bg-white border border-stone-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all w-full sm:w-[140px]"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="bg-gradient-to-r from-stone-900 to-stone-800 hover:from-amber-600 hover:to-amber-500 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest h-[42px] transition-all duration-300 shadow-lg shadow-stone-900/20 hover:shadow-amber-500/30 hover:-translate-y-0.5 w-full sm:w-auto flex items-center justify-center gap-2 group"
+                    className="bg-stone-900 hover:bg-amber-600 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest h-[42px] transition-colors w-full sm:w-auto flex items-center justify-center gap-2"
                   >
-                    <Filter size={14} className="group-hover:scale-110 transition-transform" /> Filtrar
+                    <Filter size={14} /> Filtrar
                   </button>
                 </form>
 
                 <div className="flex items-center gap-2.5 w-full sm:w-auto h-[42px] mt-auto">
                   <Link
                     href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
-                    className="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-900/10 transition-all hover:scale-105 active:scale-95 whitespace-nowrap h-full"
+                    className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-colors whitespace-nowrap h-full"
                     title="Registrar Nueva Reserva Manual"
                   >
                     <CalendarCheck size={14} /> + Registrar Reserva
@@ -671,7 +614,7 @@ export default async function AdminPage(props: {
             <div className="space-y-10 animate-fade-in-up">
               {/* --- ALERTAS DE LIMPIEZA --- */}
               {cleaningList.length > 0 && (
-                <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-200 p-5 rounded-3xl flex items-center justify-between shadow-sm backdrop-blur-sm">
+                <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-200 p-5 rounded-3xl flex items-center justify-between shadow-sm">
                   <div className="flex items-center gap-4">
                     <div className="bg-gradient-to-br from-amber-500 to-orange-500 text-white p-3 rounded-2xl shadow-lg">
                       <Brush size={20} />
@@ -698,7 +641,7 @@ export default async function AdminPage(props: {
                 {/* Cards KPIs Premium */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   {/* Card Ventas */}
-                  <div className="bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2rem] border border-white/60 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500 ring-1 ring-stone-900/5">
+                  <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500">
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#d97706]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <Wallet size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-[#d97706] opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
                     
@@ -714,7 +657,7 @@ export default async function AdminPage(props: {
                       
                       <div>
                         <p className="text-stone-400 text-[10px] font-bold uppercase tracking-[0.15em] mb-1">Total Ventas</p>
-                        <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-stone-900 to-stone-600 font-serif tracking-tight drop-shadow-sm">
+                        <p className="text-4xl font-bold text-stone-900 font-serif tracking-tight">
                           {formatMoney(totalIncome)}
                         </p>
                         <div className="mt-2">
@@ -741,7 +684,7 @@ export default async function AdminPage(props: {
                   </div>
 
                   {/* Card Llegadas */}
-                  <div className="bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2rem] border border-white/60 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500 ring-1 ring-stone-900/5">
+                  <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500">
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#d97706]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <CalendarCheck size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-[#d97706] opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
                     
@@ -758,7 +701,7 @@ export default async function AdminPage(props: {
                       <div className="mt-auto">
                         <p className="text-stone-400 text-[10px] font-bold uppercase tracking-[0.15em] mb-1">Llegadas Confirmadas</p>
                         <div className="flex items-end gap-3">
-                          <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-stone-900 to-stone-600 font-serif tracking-tight drop-shadow-sm">
+                          <p className="text-4xl font-bold text-stone-900 font-serif tracking-tight">
                             {arrivalsCount}
                           </p>
                           <span className="text-stone-400 text-xs font-bold mb-1.5 uppercase tracking-wider">reservas</span>
@@ -788,7 +731,7 @@ export default async function AdminPage(props: {
                   </div>
 
                   {/* Card Ocupación */}
-                  <div className="bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2rem] border border-white/60 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500 ring-1 ring-stone-900/5 md:col-span-2 lg:col-span-1">
+                  <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500 md:col-span-2 lg:col-span-1">
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#d97706]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <Building size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-[#d97706] opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
                     
@@ -805,7 +748,7 @@ export default async function AdminPage(props: {
                       <div className="mt-auto">
                         <p className="text-stone-400 text-[10px] font-bold uppercase tracking-[0.15em] mb-1">Estado de Ocupación</p>
                         <div className="flex items-end gap-3">
-                          <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-stone-900 to-stone-600 font-serif tracking-tight drop-shadow-sm">
+                          <p className="text-4xl font-bold text-stone-900 font-serif tracking-tight">
                             {occupiedCount}
                           </p>
                           <span className="text-stone-400 text-xs font-bold mb-1.5 uppercase tracking-wider">ocupadas</span>
@@ -851,7 +794,7 @@ export default async function AdminPage(props: {
                   </div>
 
                   {/* Card Salidas */}
-                  <div className="bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2rem] border border-white/60 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500 ring-1 ring-stone-900/5 md:col-span-2 lg:col-span-1">
+                  <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500 md:col-span-2 lg:col-span-1">
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#d97706]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <Brush size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-[#d97706] opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
                     
@@ -868,7 +811,7 @@ export default async function AdminPage(props: {
                       <div className="mt-auto">
                         <p className="text-stone-400 text-[10px] font-bold uppercase tracking-[0.15em] mb-1">Check-outs (Limpieza)</p>
                         <div className="flex items-end gap-3">
-                          <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-stone-900 to-stone-600 font-serif tracking-tight drop-shadow-sm">
+                          <p className="text-4xl font-bold text-stone-900 font-serif tracking-tight">
                             {cleaningList.length}
                           </p>
                           <span className="text-stone-400 text-xs font-bold mb-1.5 uppercase tracking-wider">{cleaningList.length === 1 ? "salida" : "salidas"}</span>
@@ -1328,7 +1271,7 @@ export default async function AdminPage(props: {
                 <h2 className="text-xl font-bold text-stone-900 tracking-tight">Historial de Reservas</h2>
               </div>
 
-              <div className="bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2.5rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] border border-white/60 overflow-hidden ring-1 ring-stone-900/5 backdrop-blur-xl">
+              <div className="bg-white rounded-[2.5rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] border border-stone-100 overflow-hidden">
                 <div className="p-8 border-b border-stone-100 flex justify-between items-center bg-gradient-to-r from-white to-stone-50/30 flex-wrap gap-4">
                   <div>
                     <h3 className="font-bold text-lg text-stone-900">Historial Completo</h3>
@@ -1624,7 +1567,7 @@ export default async function AdminPage(props: {
 
           {/* --- TAB: CALENDARIO (GANTT) / ROOM RACK --- */}
           {activeTab === "calendario" && (
-            <div className="animate-fade-in-up bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2.5rem] p-6 md:p-8 border border-white/60 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] ring-1 ring-stone-900/5 overflow-hidden backdrop-blur-xl">
+            <div className="animate-fade-in-up bg-white rounded-[2.5rem] p-6 md:p-8 border border-stone-100 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] overflow-hidden">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-3">
                   <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
@@ -1793,7 +1736,7 @@ export default async function AdminPage(props: {
                                   return (
                                     <div
                                       key={booking.id}
-                                      className={`absolute top-2 bottom-2 rounded-full flex items-center gap-2 px-1.5 shadow-md overflow-hidden transition-all duration-300 hover:z-30 hover:scale-[1.03] hover:-translate-y-0.5 cursor-pointer border border-white/30 backdrop-blur-sm ${
+                                      className={`absolute top-2 bottom-2 rounded-full flex items-center gap-2 px-1.5 shadow-md overflow-hidden transition-all duration-300 hover:z-30 hover:scale-[1.03] hover:-translate-y-0.5 cursor-pointer border border-white/30 ${
                                         isPaid 
                                           ? "bg-gradient-to-r from-emerald-400 to-emerald-500 text-white shadow-emerald-500/30" 
                                           : booking.status === "parcial"

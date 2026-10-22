@@ -136,7 +136,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-[#FDFBF7] rounded-[2.5rem] border border-white/60 p-8 md:p-12 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] ring-1 ring-stone-900/5 max-w-3xl mx-auto backdrop-blur-xl">
+    <div className="bg-white rounded-[2.5rem] border border-stone-100 p-8 md:p-12 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] max-w-3xl mx-auto">
       <div className="flex items-center gap-4 mb-8">
         <div className="bg-gradient-to-br from-amber-100 to-amber-50 text-[#d97706] p-4 rounded-2xl border border-amber-200 shadow-inner">
           <Calendar size={24} />
@@ -427,7 +427,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
                   placeholder="S/ Total"
                   value={customPrice}
                   onChange={(e) => setCustomPrice(e.target.value)}
-                  className="w-full p-3 pl-8 bg-white/60 backdrop-blur-sm rounded-xl border border-stone-200 text-xs font-bold outline-none focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] transition-all shadow-inner shadow-stone-100/50"
+                  className="w-full p-3 pl-8 bg-white/60 rounded-xl border border-stone-200 text-xs font-bold outline-none focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] transition-all shadow-inner shadow-stone-100/50"
                 />
               </div>
             </div>
@@ -442,7 +442,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
                   min="0"
                   step="0.01"
                   placeholder="S/ Adelanto"
-                  className="w-full p-3 pl-8 bg-white/60 backdrop-blur-sm rounded-xl border border-stone-200 text-xs font-bold outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-emerald-700 transition-all shadow-inner shadow-stone-100/50"
+                  className="w-full p-3 pl-8 bg-white/60 rounded-xl border border-stone-200 text-xs font-bold outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-emerald-700 transition-all shadow-inner shadow-stone-100/50"
                 />
               </div>
               <span className="text-[8px] font-medium text-stone-400 text-center uppercase tracking-wider">Dejar vacío si cobró todo</span>
