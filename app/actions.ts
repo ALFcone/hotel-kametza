@@ -152,14 +152,30 @@ export async function createBooking(formData: FormData) {
   if (!user) return { error: "Debes iniciar sesión para reservar." };
 
   const idHabitacion = Number(formData.get("roomId"));
-  const total = Number(formData.get("price"));
+  const checkIn = formData.get("checkIn") as string;
+  const checkOut = formData.get("checkOut") as string;
   const paymentMethod = formData.get("paymentMethod") as string;
+
+  // El precio se calcula aquí: nunca se confía en el monto que envía el navegador
+  const nights = Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000);
+  if (!checkIn || !checkOut || !Number.isFinite(nights) || nights < 1) {
+    return { error: "La fecha de salida debe ser posterior a la de entrada." };
+  }
+
+  const { data: room } = await supabaseServer
+    .from("rooms")
+    .select("price_per_night")
+    .eq("id", idHabitacion)
+    .maybeSingle();
+  if (!room) return { error: "Habitación no encontrada." };
+
+  const total = nights * Number(room.price_per_night);
 
   // Verificación de disponibilidad
   const { data: isAvailable } = await supabaseServer.rpc("check_availability", {
     room_id_input: idHabitacion,
-    check_in_input: formData.get("checkIn") as string,
-    check_out_input: formData.get("checkOut") as string,
+    check_in_input: checkIn,
+    check_out_input: checkOut,
   });
 
   if (!isAvailable) return { error: "Habitación no disponible en esas fechas." };
@@ -169,12 +185,12 @@ export async function createBooking(formData: FormData) {
 
   // Inserción en Base de Datos - ESQUEMA REAL
   const { data: booking, error } = await supabaseServer
-    .from("bookings") 
+    .from("bookings")
     .insert({
-      user_id: user.id, 
+      user_id: user.id,
       room_id: idHabitacion,
-      check_in: formData.get("checkIn"),
-      check_out: formData.get("checkOut"),
+      check_in: checkIn,
+      check_out: checkOut,
       total_price: total,
       payment_method: paymentMethod, 
       status: "pendiente",
@@ -201,14 +217,31 @@ export async function cancelBooking(bookingId: number) {
 
   if (!user) return { error: "No autorizado." };
 
-  const { error } = await supabaseServer
-    .from("bookings") 
-    .update({ 
-      status: "cancelled", 
-      cancelled_at: new Date().toISOString() 
+  // El personal puede anular cualquier reserva; el huésped solo las suyas y con 24 h de anticipación
+  const { role } = await getUserRole();
+  const isStaff = !!role;
+
+  let lookup = supabaseServer.from("bookings").select("check_in").eq("id", bookingId);
+  if (!isStaff) lookup = lookup.eq("user_id", user.id);
+  const { data: existing } = await lookup.maybeSingle();
+  if (!existing) return { error: "Reserva no encontrada." };
+
+  if (!isStaff) {
+    const hoursToCheckIn = (new Date(`${existing.check_in}T14:00:00`).getTime() - Date.now()) / 3600000;
+    if (hoursToCheckIn < 24) {
+      return { error: "Solo se puede cancelar con 24 horas de anticipación. Contacta a recepción." };
+    }
+  }
+
+  let update = supabaseServer
+    .from("bookings")
+    .update({
+      status: "cancelled",
+      cancelled_at: new Date().toISOString(),
     })
-    .eq("id", bookingId)
-    .eq("user_id", user.id); 
+    .eq("id", bookingId);
+  if (!isStaff) update = update.eq("user_id", user.id);
+  const { error } = await update;
 
   if (error) return { error: "No se pudo cancelar." };
 
@@ -634,29 +667,36 @@ export async function deleteBookingExtra(formData: FormData) {
 // ==============================================================================
 // 9. FUNCIÓN: FETCH RUC DATA SERVER-SIDE
 // ==============================================================================
-export async function fetchRucData(ruc: string) {
+async function fetchPeruDocument(kind: "ruc" | "dni", numero: string, digits: number) {
+  const { role } = await getUserRole();
+  if (!role) return { error: "No autorizado." };
+  if (!new RegExp(`^\\d{${digits}}$`).test(numero)) return { error: "Número de documento inválido." };
+
   try {
-    const res = await fetch(`https://api.apis.net.pe/v1/ruc?numero=${ruc}`);
-    if (!res.ok) return { error: "Failed to fetch RUC" };
-    const data = await res.json();
-    return { data };
-  } catch (error) {
-    return { error: "Network error" };
+    const res = await fetch(`https://api.apis.net.pe/v1/${kind}?numero=${numero}`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${process.env.DNI_API_TOKEN}`,
+      },
+      cache: "no-store",
+    });
+    if (res.status === 429) return { error: "Muchas consultas seguidas. Espera unos segundos e intenta de nuevo." };
+    if (!res.ok) return { error: "No se encontró el documento." };
+    return { data: await res.json() };
+  } catch {
+    return { error: "No se pudo conectar con el servicio de consulta." };
   }
+}
+
+export async function fetchRucData(ruc: string) {
+  return fetchPeruDocument("ruc", ruc, 11);
 }
 
 // ==============================================================================
 // 10. FUNCIÓN: FETCH DNI DATA SERVER-SIDE
 // ==============================================================================
 export async function fetchDniData(dni: string) {
-  try {
-    const res = await fetch(`https://api.apis.net.pe/v1/dni?numero=${dni}`);
-    if (!res.ok) return { error: "Failed to fetch DNI" };
-    const data = await res.json();
-    return { data };
-  } catch (error) {
-    return { error: "Network error" };
-  }
+  return fetchPeruDocument("dni", dni, 8);
 }
 
 // ==============================================================================

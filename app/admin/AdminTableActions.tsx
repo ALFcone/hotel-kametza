@@ -123,7 +123,7 @@ export function AdminTableActions({
         }
         setBillingAddress(""); // Usualmente DNI no devuelve dirección
       } else {
-        alert(`${billingType === "FACTURA" ? "RUC" : "DNI"} no encontrado o inválido.`);
+        alert(result.error || `${billingType === "FACTURA" ? "RUC" : "DNI"} no encontrado o inválido.`);
       }
     } catch (error) {
       console.error(error);
