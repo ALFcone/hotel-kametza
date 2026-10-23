@@ -10,6 +10,7 @@
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import Swal from "sweetalert2";
 import { createBooking } from "./actions";
@@ -487,28 +488,40 @@ function BookingModal({
         <div className="hidden md:flex flex-col w-[40%] bg-stone-100 p-6 relative overflow-hidden">
           {/* Main Photo */}
           <div className="w-full h-[50%] rounded-2xl overflow-hidden mb-4 relative shadow-sm cursor-pointer" onClick={() => { setCurrentGalleryIndex(0); setGalleryOpen(true); }}>
-            <img
-              src={galleryThumbs[0]}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
-              alt={room.name}
-            />
+            {galleryThumbs[0] && (
+              <Image
+                src={galleryThumbs[0]}
+                fill
+                sizes="280px"
+                className="object-cover hover:scale-105 transition-transform duration-700"
+                alt={room.name}
+              />
+            )}
           </div>
           
           {/* Thumbnails Gallery */}
           <div className="grid grid-cols-2 gap-4 h-[25%] mb-4">
-            <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm cursor-pointer" onClick={() => { setCurrentGalleryIndex(1); setGalleryOpen(true); }}>
-              <img
-                src={galleryThumbs[1]}
-                className="w-full h-full object-cover hover:scale-110 transition-transform duration-700 opacity-90"
-                alt="Vista 2"
-              />
+            <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm relative cursor-pointer" onClick={() => { setCurrentGalleryIndex(1); setGalleryOpen(true); }}>
+              {galleryThumbs[1] && (
+                <Image
+                  src={galleryThumbs[1]}
+                  fill
+                  sizes="140px"
+                  className="object-cover hover:scale-110 transition-transform duration-700 opacity-90"
+                  alt="Vista 2"
+                />
+              )}
             </div>
             <div className="w-full h-full rounded-2xl overflow-hidden shadow-sm relative cursor-pointer" onClick={() => { setCurrentGalleryIndex(2); setGalleryOpen(true); }}>
-              <img
-                src={galleryThumbs[2]}
-                className="w-full h-full object-cover hover:scale-110 transition-transform duration-700 opacity-90"
-                alt="Vista 3"
-              />
+              {galleryThumbs[2] && (
+                <Image
+                  src={galleryThumbs[2]}
+                  fill
+                  sizes="140px"
+                  className="object-cover hover:scale-110 transition-transform duration-700 opacity-90"
+                  alt="Vista 3"
+                />
+              )}
               <div className="absolute inset-0 bg-stone-900/40 flex items-center justify-center hover:bg-stone-900/50 transition">
                 <span className="text-white font-bold text-xs uppercase tracking-widest">
                   {roomGallery.length > 3 ? `+${roomGallery.length - 2} Ver Más` : "Ver Más"}
@@ -763,9 +776,12 @@ function BookingModal({
             <ArrowRight size={32} className="rotate-180" />
           </button>
 
-          <img 
-            src={roomGallery[currentGalleryIndex]} 
-            className="max-h-[85vh] max-w-full object-contain"
+          <Image
+            src={roomGallery[currentGalleryIndex]}
+            width={1600}
+            height={1200}
+            sizes="100vw"
+            className="h-auto w-auto max-h-[85vh] max-w-full object-contain"
             alt={`Galería ${currentGalleryIndex + 1}`}
           />
 
@@ -829,11 +845,15 @@ function RoomCard({
       <div className="group bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(227,0,79,0.15)] transition-all duration-500 overflow-hidden border border-stone-100 flex flex-col h-full relative">
         <div className="relative h-72 md:h-96 w-full overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10 opacity-60"></div>
-          <img
-            src={room.image_url}
-            alt={room.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-          />
+          {room.image_url && (
+            <Image
+              src={room.image_url}
+              alt={room.name}
+              fill
+              sizes="(max-width: 420px) 100vw, 420px"
+              className="object-cover group-hover:scale-110 transition-transform duration-1000"
+            />
+          )}
           <div className="absolute bottom-4 right-4 z-20 bg-white/95 backdrop-blur-sm px-5 py-2 rounded-2xl shadow-lg border border-white/50">
             <p className="text-[9px] uppercase font-bold text-stone-400 tracking-widest mb-0.5">
               Por noche
@@ -1242,10 +1262,14 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         className="relative pt-48 pb-32 lg:pt-56 lg:pb-40 overflow-hidden z-10 px-4 text-center min-h-[90vh] flex flex-col justify-center"
       >
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/hero.png"
             alt="Hotel Kametza Exterior"
-            className="w-full h-full object-cover object-center"
+            fill
+            sizes="100vw"
+            loading="eager"
+            fetchPriority="high"
+            className="object-cover object-center"
           />
           {/* OVERLAY OSCURECIDO PARA QUE EL TEXTO BLANCO RESALTE MÁS */}
           <div className="absolute inset-0 bg-[#3a0614]/40 mix-blend-multiply" />
@@ -1474,10 +1498,12 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                     }`}
                   >
                     <div className="relative h-60 w-full overflow-hidden">
-                      <img
+                      <Image
                         src={service.image}
                         alt={service.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        fill
+                        sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                       {service.tag && (
                         <div className={`absolute top-4 left-4 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase shadow-sm ${
@@ -1522,10 +1548,12 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 return (
                   <div key={service.id} className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-12 items-stretch">
                     <div className="h-64 lg:h-auto relative">
-                      <img 
-                        src={service.image} 
-                        alt={service.title} 
-                        className="w-full h-full object-cover"
+                      <Image
+                        src={service.image}
+                        alt={service.title}
+                        fill
+                        sizes="(min-width: 1024px) 50vw, 100vw"
+                        className="object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/20 to-transparent"></div>
                       <div className="absolute bottom-6 left-6 right-6 text-white">
@@ -2034,15 +2062,15 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               <div className="flex gap-4">
                 <a href="https://www.facebook.com/share/1KhmvycDcR/" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:border-[#1877F2] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
                   { }
-                  <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" className="w-4 h-4 transition-all" alt="Facebook" />
+                  <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" className="w-4 h-4 transition-all" alt="Facebook" loading="lazy" decoding="async" />
                 </a>
                 <a href="https://www.instagram.com/kametzahotelayacucho/" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:border-[#E4405F] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
                   { }
-                  <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" className="w-4 h-4 transition-all" alt="Instagram" />
+                  <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" className="w-4 h-4 transition-all" alt="Instagram" loading="lazy" decoding="async" />
                 </a>
                 <a href="https://tiktok.com/@HotelKametza" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:border-black group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
                   { }
-                  <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" className="w-4 h-4 transition-all" alt="TikTok" />
+                  <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" className="w-4 h-4 transition-all" alt="TikTok" loading="lazy" decoding="async" />
                 </a>
               </div>
             </div>

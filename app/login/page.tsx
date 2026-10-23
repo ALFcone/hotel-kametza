@@ -175,13 +175,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen font-sans text-stone-800 relative flex items-center justify-center p-4">
-      {/* Fondo de Retablo Ayacuchano */}
+      {/* Fondo */}
       <div className="fixed inset-0 z-0">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/8/86/Retablo_ayacuchano.jpg"
-          alt="Fondo Retablo Ayacuchano"
-          className="w-full h-full object-cover object-center scale-105"
-        />
         <div className="absolute inset-0 bg-[#FFFDF5]/92 backdrop-blur-[3px]" />
       </div>
 

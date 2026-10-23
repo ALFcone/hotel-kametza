@@ -12,6 +12,7 @@ import { revalidatePath } from "next/cache";
 import { toggleRoomCleanliness, getUserRole, getStaffList } from "../actions";
 import DownloadButton from "./DownloadButton";
 import Link from "next/link";
+import Image from "next/image";
 import WalkInForm from "./WalkInForm";
 import RoomEditForm from "./RoomEditForm";
 import { AdminTableActions } from "./AdminTableActions";
@@ -1542,11 +1543,15 @@ export default async function AdminPage(props: {
                     className="bg-white rounded-[2rem] shadow-xl shadow-stone-200/40 border border-stone-100 overflow-hidden group hover:shadow-2xl hover:shadow-stone-200/60 hover:-translate-y-1.5 transition-all duration-500"
                   >
                     <div className="h-52 overflow-hidden relative">
-                      <img
-                        src={room.image_url}
-                        alt={room.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition duration-1000 ease-in-out"
-                      />
+                      {room.image_url && (
+                        <Image
+                          src={room.image_url}
+                          alt={room.name}
+                          fill
+                          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                          className="object-cover group-hover:scale-110 transition duration-1000 ease-in-out"
+                        />
+                      )}
                       {/* Gradient Overlay for smooth transition */}
                       <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 via-transparent to-transparent opacity-80" />
                       

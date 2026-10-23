@@ -173,11 +173,6 @@ function PaymentContent() {
 
       {/* Fondo */}
       <div className="fixed inset-0 z-0">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/8/86/Retablo_ayacuchano.jpg"
-          alt="Fondo Textura Retablo"
-          className="w-full h-full object-cover object-center opacity-[0.08] scale-105 blur-[3px]"
-        />
         <div className="absolute inset-0 bg-gradient-to-b from-[#FFFDF5]/95 via-[#FFFDF5]/90 to-[#FFFDF5]/95" />
       </div>
 

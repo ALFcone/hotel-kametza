@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import Image from "next/image";
 import { cancelBooking } from "../actions";
 import {
   CalendarDays,
@@ -516,11 +517,6 @@ export default function Dashboard() {
     <div className="min-h-screen font-sans text-stone-800 relative bg-[#FDFBF7]">
       {/* Fondo Decorativo */}
       <div className="fixed inset-0 z-0">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/8/86/Retablo_ayacuchano.jpg"
-          alt="Fondo Textura"
-          className="w-full h-full object-cover object-center opacity-[0.08] scale-105 blur-[3px]"
-        />
         <div className="absolute inset-0 bg-gradient-to-b from-[#FFFDF5]/95 via-[#FFFDF5]/90 to-[#FFFDF5]/95" />
       </div>
 
@@ -746,10 +742,12 @@ export default function Dashboard() {
                         {/* Imagen Habitación */}
                         <div className="w-full md:w-44 h-32 rounded-2xl overflow-hidden shadow-md relative z-10 flex-shrink-0">
                           {booking.rooms?.image_url ? (
-                            <img
+                            <Image
                               src={booking.rooms.image_url}
                               alt={booking.rooms?.name || "Habitación"}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                              fill
+                              sizes="(min-width: 768px) 176px, 100vw"
+                              className="object-cover group-hover:scale-105 transition-transform duration-700"
                             />
                           ) : (
                             <div className="w-full h-full bg-stone-100 flex items-center justify-center">
