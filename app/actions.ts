@@ -12,6 +12,8 @@ import { revalidatePath } from "next/cache";
 import { getSupabaseServer } from "@/lib/supabase-server";
 
 const ROOM_IMAGES_BUCKET = "rooms";
+// Debe coincidir con el tope de la política bookings_insert_huesped (supabase/reservas_pendientes.sql)
+const MAX_RESERVAS_PENDIENTES = 3;
 
 async function uploadRoomImage(supabaseServer: any, file: File): Promise<{ url?: string; error?: string }> {
   const arrayBuffer = await file.arrayBuffer();
@@ -181,6 +183,15 @@ export async function createBooking(formData: FormData) {
   if (!room) return { error: "Habitación no encontrada." };
 
   const total = nights * Number(room.price_per_night);
+
+  // Tope de reservas sin pagar por huésped: evita bloquear habitaciones sin intención de pagar.
+  // La función cuenta las pendientes vigentes (una reserva con Yape sin constancia vence a las 24 h).
+  const { data: pendientes } = await supabaseServer.rpc("reservas_pendientes");
+  if (Number(pendientes ?? 0) >= MAX_RESERVAS_PENDIENTES) {
+    return {
+      error: `Ya tienes ${MAX_RESERVAS_PENDIENTES} reservas pendientes de pago. Cancela alguna o escríbenos por WhatsApp al 966 556 622.`,
+    };
+  }
 
   // Verificación de disponibilidad
   const { data: isAvailable } = await supabaseServer.rpc("check_availability", {

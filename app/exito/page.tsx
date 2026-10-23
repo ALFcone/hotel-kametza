@@ -310,6 +310,10 @@ function PaymentContent() {
                 <p className="text-[10px] text-stone-500 uppercase font-bold px-2 text-center leading-tight">
                   Titular: MARCELINA BERMUDO ESCALANTE DE RUA
                 </p>
+                <p className="text-xs text-stone-600 mt-3 px-2 leading-snug">
+                  Envía la constancia por WhatsApp dentro de las próximas 24 horas. Pasado ese plazo,
+                  la habitación se libera para otros huéspedes.
+                </p>
               </div>
             )}
 
