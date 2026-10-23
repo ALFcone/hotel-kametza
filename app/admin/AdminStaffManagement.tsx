@@ -298,7 +298,7 @@ export default function AdminStaffManagement({
                           <div className="font-bold text-stone-900 flex items-center gap-2">
                             {staff.name || staff.email.split("@")[0]}
                             {isSelf && (
-                              <span className="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-200">
+                              <span className="text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-200">
                                 Tu sesión
                               </span>
                             )}

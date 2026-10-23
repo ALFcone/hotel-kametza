@@ -107,7 +107,7 @@ function ChangeBadge({ pct }: { pct: number }) {
   const rounded = Math.round(Math.abs(pct));
   return (
     <span
-      className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-full ${
+      className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full ${
         isUp ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-600"
       }`}
       title="Comparado con el período anterior de igual duración"
@@ -569,7 +569,7 @@ export default async function AdminPage(props: {
                   <input type="hidden" name="tab" value={activeTab} />
 
                   <div className="flex flex-col gap-1.5 relative">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-stone-500 ml-3">Desde</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-stone-500 ml-3">Desde</span>
                     <input aria-label="Desde"
                       type="date"
                       name="from"
@@ -579,7 +579,7 @@ export default async function AdminPage(props: {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-stone-500 ml-3">Hasta</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-stone-500 ml-3">Hasta</span>
                     <input aria-label="Hasta"
                       type="date"
                       name="to"
@@ -596,10 +596,10 @@ export default async function AdminPage(props: {
                   </button>
                 </form>
 
-                <div className="flex items-center gap-2.5 w-full sm:w-auto h-11 mt-auto">
+                <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto mt-auto">
                   <Link
                     href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
-                    className="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-colors whitespace-nowrap h-full"
+                    className="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-colors whitespace-nowrap min-h-11"
                     title="Registrar Nueva Reserva Manual"
                   >
                     <CalendarCheck size={14} /> + Registrar Reserva
@@ -651,7 +651,7 @@ export default async function AdminPage(props: {
                         <div className="bg-gradient-to-br from-stone-900 to-stone-800 text-[#b45309] p-3 rounded-2xl shadow-lg shadow-stone-900/20 group-hover:scale-110 transition-transform duration-500 ease-out">
                           <Wallet size={22} strokeWidth={2} />
                         </div>
-                        <span className="bg-amber-50 text-amber-700 text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-amber-100/50 shadow-sm">
+                        <span className="bg-amber-50 text-amber-700 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-amber-100/50 shadow-sm">
                           {rangeLabel}
                         </span>
                       </div>
@@ -668,14 +668,14 @@ export default async function AdminPage(props: {
 
                       <div className="flex items-center gap-6 mt-8 pt-5 border-t border-stone-200/50">
                         <div className="group/item">
-                          <p className="text-[9px] text-stone-500 uppercase font-black tracking-widest flex items-center gap-1 group-hover/item:text-stone-600 transition-colors">
+                          <p className="text-[10px] text-stone-500 uppercase font-black tracking-widest flex items-center gap-1 group-hover/item:text-stone-600 transition-colors">
                             <span className="w-1.5 h-1.5 rounded-full bg-stone-300"></span> Efectivo
                           </p>
                           <p className="font-bold text-stone-700 text-sm mt-1">{formatMoney(cashIncome)}</p>
                         </div>
                         <div className="w-[1px] h-8 bg-stone-200/50"></div>
                         <div className="group/item">
-                          <p className="text-[9px] text-[#b45309] uppercase font-black tracking-widest flex items-center gap-1 group-hover/item:text-[#b45309] transition-colors">
+                          <p className="text-[10px] text-[#b45309] uppercase font-black tracking-widest flex items-center gap-1 group-hover/item:text-[#b45309] transition-colors">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#d97706]"></span> Digital
                           </p>
                           <p className="font-bold text-stone-900 text-sm mt-1">{formatMoney(digitalIncome)}</p>
@@ -694,7 +694,7 @@ export default async function AdminPage(props: {
                         <div className="bg-gradient-to-br from-stone-900 to-stone-800 text-amber-300 p-3 rounded-2xl shadow-lg shadow-stone-900/20 group-hover:scale-110 transition-transform duration-500 ease-out">
                           <CalendarCheck size={22} strokeWidth={2} />
                         </div>
-                        <span className="bg-stone-50 text-stone-500 text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-stone-200/50 shadow-sm">
+                        <span className="bg-stone-50 text-stone-500 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-stone-200/50 shadow-sm">
                           {rangeLabel}
                         </span>
                       </div>
@@ -713,12 +713,12 @@ export default async function AdminPage(props: {
                         <div className="mt-6 pt-5 border-t border-stone-200/50 flex items-center gap-2">
                           <div className="flex -space-x-2">
                             {[...Array(Math.min(arrivalsCount, 3))].map((_, i) => (
-                              <div key={i} className="w-6 h-6 rounded-full bg-stone-200 border-2 border-white shadow-sm flex items-center justify-center text-[8px] font-bold text-stone-500">
+                              <div key={i} className="w-6 h-6 rounded-full bg-stone-200 border-2 border-white shadow-sm flex items-center justify-center text-[10px] font-bold text-stone-500">
                                 <User size={10} />
                               </div>
                             ))}
                             {arrivalsCount > 3 && (
-                              <div className="w-6 h-6 rounded-full bg-amber-100 border-2 border-white shadow-sm flex items-center justify-center text-[8px] font-bold text-amber-700">
+                              <div className="w-6 h-6 rounded-full bg-amber-100 border-2 border-white shadow-sm flex items-center justify-center text-[10px] font-bold text-amber-700">
                                 +{arrivalsCount - 3}
                               </div>
                             )}
@@ -741,7 +741,7 @@ export default async function AdminPage(props: {
                         <div className="bg-gradient-to-br from-stone-900 to-stone-800 text-emerald-400 p-3 rounded-2xl shadow-lg shadow-stone-900/20 group-hover:scale-110 transition-transform duration-500 ease-out">
                           <Building size={22} strokeWidth={2} />
                         </div>
-                        <span className="bg-stone-50 text-stone-500 text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-stone-200/50 shadow-sm">
+                        <span className="bg-stone-50 text-stone-500 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-stone-200/50 shadow-sm">
                           Hoy
                         </span>
                       </div>
@@ -804,7 +804,7 @@ export default async function AdminPage(props: {
                         <div className="bg-gradient-to-br from-stone-900 to-stone-800 text-rose-400 p-3 rounded-2xl shadow-lg shadow-stone-900/20 group-hover:scale-110 transition-transform duration-500 ease-out">
                           <Brush size={22} strokeWidth={2} />
                         </div>
-                        <span className="bg-stone-50 text-stone-500 text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-stone-200/50 shadow-sm">
+                        <span className="bg-stone-50 text-stone-500 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-stone-200/50 shadow-sm">
                           {rangeLabel}
                         </span>
                       </div>
@@ -821,12 +821,12 @@ export default async function AdminPage(props: {
                         <div className="mt-6 pt-5 border-t border-stone-200/50">
                            <div className="flex flex-wrap gap-1.5">
                              {cleaningList.slice(0, 4).map((b, i) => (
-                               <span key={i} className="px-2 py-1 bg-rose-50 text-rose-700 text-[9px] font-black border border-rose-100/50 rounded-lg shadow-sm">
+                               <span key={i} className="px-2 py-1 bg-rose-50 text-rose-700 text-[10px] font-black border border-rose-100/50 rounded-lg shadow-sm">
                                  H. {getRoomNumber(b.room_id)}
                                </span>
                              ))}
                              {cleaningList.length > 4 && (
-                               <span className="px-2 py-1 bg-stone-100 text-stone-600 text-[9px] font-black border border-stone-200/50 rounded-lg shadow-sm">
+                               <span className="px-2 py-1 bg-stone-100 text-stone-600 text-[10px] font-black border border-stone-200/50 rounded-lg shadow-sm">
                                  +{cleaningList.length - 4} más
                                </span>
                              )}
@@ -877,7 +877,7 @@ export default async function AdminPage(props: {
                         <span className="w-2 h-2 rounded-full bg-emerald-500" />
                       </div>
                       <p className="text-xl font-black text-stone-900 font-serif">{formatMoney(totalCash)}</p>
-                      <p className="text-[9px] text-stone-500 mt-1 font-medium">Recepción / Mano</p>
+                      <p className="text-[10px] text-stone-500 mt-1 font-medium">Recepción / Mano</p>
                     </div>
 
                     {/* Yape / Plin */}
@@ -889,7 +889,7 @@ export default async function AdminPage(props: {
                         <span className="w-2 h-2 rounded-full bg-purple-500" />
                       </div>
                       <p className="text-xl font-black text-stone-900 font-serif">{formatMoney(totalYape)}</p>
-                      <p className="text-[9px] text-purple-400 mt-1 font-medium">Billeteras QR</p>
+                      <p className="text-[10px] text-purple-400 mt-1 font-medium">Billeteras QR</p>
                     </div>
 
                     {/* Tarjetas / POS */}
@@ -901,7 +901,7 @@ export default async function AdminPage(props: {
                         <span className="w-2 h-2 rounded-full bg-blue-500" />
                       </div>
                       <p className="text-xl font-black text-stone-900 font-serif">{formatMoney(totalCard)}</p>
-                      <p className="text-[9px] text-blue-400 mt-1 font-medium">Izipay / Niubiz</p>
+                      <p className="text-[10px] text-blue-400 mt-1 font-medium">Izipay / Niubiz</p>
                     </div>
 
                     {/* Transferencias */}
@@ -913,7 +913,7 @@ export default async function AdminPage(props: {
                         <span className="w-2 h-2 rounded-full bg-amber-500" />
                       </div>
                       <p className="text-xl font-black text-stone-900 font-serif">{formatMoney(totalTransfer)}</p>
-                      <p className="text-[9px] text-amber-500 mt-1 font-medium">BCP / BBVA / Interbank</p>
+                      <p className="text-[10px] text-amber-500 mt-1 font-medium">BCP / BBVA / Interbank</p>
                     </div>
 
                     {/* Cuentas por Cobrar */}
@@ -925,7 +925,7 @@ export default async function AdminPage(props: {
                         <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                       </div>
                       <p className="text-xl font-black text-rose-600 font-serif">{formatMoney(totalPendingDebt)}</p>
-                      <p className="text-[9px] text-rose-400 mt-1 font-medium">Saldos pendientes</p>
+                      <p className="text-[10px] text-rose-400 mt-1 font-medium">Saldos pendientes</p>
                     </div>
                   </div>
                 </div>
@@ -976,7 +976,7 @@ export default async function AdminPage(props: {
                               </text>
                             )}
                             {(i % trendLabelStep === 0 || i === points.length - 1) && (
-                              <text x={p.x} y="180" textAnchor="middle" className="text-[9px] font-black uppercase tracking-wider fill-stone-400">
+                              <text x={p.x} y="180" textAnchor="middle" className="text-[10px] font-black uppercase tracking-wider fill-stone-400">
                                 {p.dayName}
                               </text>
                             )}
@@ -1014,7 +1014,7 @@ export default async function AdminPage(props: {
                             <span className="text-lg font-black text-stone-900">
                               {Math.round((occupiedCount / (totalRooms || 1)) * 100)}%
                             </span>
-                            <span className="text-[8px] font-bold text-stone-500 uppercase tracking-widest">Ocupado</span>
+                            <span className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Ocupado</span>
                           </div>
                         </div>
                         <div>
@@ -1157,10 +1157,10 @@ export default async function AdminPage(props: {
           {/* --- TAB: ESTADO ACTUAL HABITACIONES --- */}
           {activeTab === "estado" && (
             <div id="estado-actual" className="scroll-mt-24 mb-12 animate-fade-in-up">
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-6">
                 <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
                 <h2 className="text-xl font-bold text-stone-900 tracking-tight">Estado de Habitaciones</h2>
-                <div className="flex items-center gap-4 ml-auto text-[9px] font-bold uppercase tracking-wider">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:ml-auto text-[10px] font-bold uppercase tracking-wider">
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-white border border-stone-300" /> Libre</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#d97706]" /> Ocupada</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-400" /> Salida</span>
@@ -1237,7 +1237,7 @@ export default async function AdminPage(props: {
                       
                       <div className="z-10 mt-4 flex items-center justify-between">
                         <span
-                          className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-sm border ${
+                          className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-sm border ${
                             info.status === "free" && !isDirty
                               ? "bg-white text-stone-500 border-stone-200"
                               : info.status === "free" && isDirty
@@ -1280,7 +1280,7 @@ export default async function AdminPage(props: {
                     <p className="text-stone-500 text-[10px] uppercase font-bold tracking-widest mt-1">
                       Mostrando reservas de <span className="text-[#b45309]">{dateFrom}</span> a <span className="text-[#b45309]">{dateTo}</span>
                       {searchedBookings && (
-                        <span className="ml-2 bg-stone-100 px-2 py-0.5 rounded-full text-stone-600 text-[9px]">
+                        <span className="ml-2 bg-stone-100 px-2 py-0.5 rounded-full text-stone-600 text-[10px]">
                           {searchedBookings.length} registros
                         </span>
                       )}
@@ -1306,7 +1306,7 @@ export default async function AdminPage(props: {
                       {searchParams.q && (
                         <Link
                           href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`}
-                          className="text-[9px] font-black uppercase text-stone-600 hover:text-stone-800 px-2 py-1 bg-stone-100 rounded-lg"
+                          className="text-[10px] font-black uppercase text-stone-600 hover:text-stone-800 px-2 py-1 bg-stone-100 rounded-lg"
                         >
                           Limpiar
                         </Link>
@@ -1370,7 +1370,7 @@ export default async function AdminPage(props: {
                                   {booking.special_requests && (
                                     <span
                                       title={booking.special_requests}
-                                      className="mt-0.5 flex items-center gap-1 text-[9px] font-semibold normal-case text-amber-700 max-w-[120px]"
+                                      className="mt-0.5 flex items-center gap-1 text-[10px] font-semibold normal-case text-amber-700 max-w-[120px]"
                                     >
                                       <StickyNote size={9} className="shrink-0" />
                                       <span className="truncate">{booking.special_requests}</span>
@@ -1381,12 +1381,12 @@ export default async function AdminPage(props: {
                             </td>
                             <td className="py-5 px-4">
                               <div className="flex flex-col items-start gap-0.5">
-                                <span className="bg-stone-100 text-stone-600 px-1 py-0.5 rounded text-[8px] font-black uppercase tracking-wider">{booking.document_type || "DOC"}</span>
+                                <span className="bg-stone-100 text-stone-600 px-1 py-0.5 rounded text-[10px] font-black uppercase tracking-wider">{booking.document_type || "DOC"}</span>
                                 <span className="font-bold text-stone-850 text-[10px] font-mono">{booking.document_number}</span>
                               </div>
                             </td>
                             <td className="py-5 px-4">
-                              <div className="flex flex-col gap-1 text-[9px]">
+                              <div className="flex flex-col gap-1 text-[10px]">
                                 <a href={`mailto:${booking.client_email}`} className="text-stone-500 hover:text-amber-700 flex items-center gap-1 py-2 transition-colors">
                                   <span className="bg-stone-100 p-1 rounded-full"><Mail size={8} /></span> 
                                   <span className="truncate max-w-[100px]">{booking.client_email || "Sin email"}</span>
@@ -1398,7 +1398,7 @@ export default async function AdminPage(props: {
                               </div>
                             </td>
                             <td className="py-5 px-4 text-center">
-                              <span className="bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 px-2 py-1 rounded-lg font-bold text-[9px] border border-indigo-100/50 shadow-sm">
+                              <span className="bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 px-2 py-1 rounded-lg font-bold text-[10px] border border-indigo-100/50 shadow-sm">
                                 {noches} {noches === 1 ? "noche" : "noches"}
                               </span>
                             </td>
@@ -1409,11 +1409,11 @@ export default async function AdminPage(props: {
                             </td>
                             <td className="py-5 px-4">
                               <div className="flex flex-col bg-stone-50 p-1.5 rounded-lg border border-stone-100 gap-1 w-fit">
-                                <span className="text-emerald-700 flex items-center gap-1 font-bold text-[8px] uppercase tracking-wider">
+                                <span className="text-emerald-700 flex items-center gap-1 font-bold text-[10px] uppercase tracking-wider">
                                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
                                   {formatDateShort(booking.check_in)}
                                 </span>
-                                <span className="text-amber-700 flex items-center gap-1 font-bold text-[8px] uppercase tracking-wider">
+                                <span className="text-amber-700 flex items-center gap-1 font-bold text-[10px] uppercase tracking-wider">
                                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_5px_rgba(245,158,11,0.5)]" />
                                   {formatDateShort(booking.check_out)}
                                 </span>
@@ -1422,12 +1422,12 @@ export default async function AdminPage(props: {
                             <td className="py-5 px-4 text-right font-bold text-stone-900">
                               {formatMoney(grandTotal)}
                               {extrasTotal > 0 && (
-                                <div className="text-[8px] text-stone-500 mt-0.5">Incluye {formatMoney(extrasTotal)} extras</div>
+                                <div className="text-[10px] text-stone-500 mt-0.5">Incluye {formatMoney(extrasTotal)} extras</div>
                               )}
                             </td>
                             <td className="py-5 px-4 text-center">
                               {isCancelled ? (
-                                <span className="inline-flex items-center gap-1 bg-red-500/10 text-red-700 px-2.5 py-1 rounded-full text-[9px] font-black uppercase border border-red-200">
+                                <span className="inline-flex items-center gap-1 bg-red-500/10 text-red-700 px-2.5 py-1 rounded-full text-[10px] font-black uppercase border border-red-200">
                                   <XCircle size={10} /> Cancelada
                                 </span>
                               ) : (
@@ -1441,7 +1441,7 @@ export default async function AdminPage(props: {
                                   return (
                                     <div className="flex flex-col items-center gap-1">
                                       <span
-                                        className={`text-[8px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-full ${
+                                        className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1.5 rounded-full ${
                                           effectiveStatus === "pagado"
                                             ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
                                             : effectiveStatus === "parcial"
@@ -1451,7 +1451,7 @@ export default async function AdminPage(props: {
                                       >
                                         {effectiveStatus === "pagado" ? "Pagado" : effectiveStatus === "parcial" ? "Parcial" : "Pendiente"}
                                       </span>
-                                      <span className="text-[9px] font-bold text-stone-500">
+                                      <span className="text-[10px] font-bold text-stone-500">
                                         Pagado: S/ {(effectiveAmountPaid).toFixed(2)}
                                       </span>
                                     </div>
@@ -1625,7 +1625,7 @@ export default async function AdminPage(props: {
                     </Link>
                   </div>
 
-                  <div className="flex gap-4 text-[9px] font-black uppercase tracking-wider bg-white/70 px-4 py-2.5 rounded-xl border border-stone-200/60 shadow-xs">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-black uppercase tracking-wider bg-white/70 px-4 py-2.5 rounded-xl border border-stone-200/60 shadow-xs">
                     <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm" /> Pagado</span>
                     <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 shadow-sm" /> Parcial</span>
                     <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#d97706] shadow-sm" /> Pendiente</span>
@@ -1682,7 +1682,7 @@ export default async function AdminPage(props: {
                             const isToday = d.toDateString() === new Date().toDateString();
                             return (
                               <div key={i} className={`flex flex-col items-center justify-center py-2 border-l border-stone-200 w-[55px] shrink-0 ${isToday ? "bg-blue-50/80 rounded-t-lg border-blue-200" : isWeekend ? "bg-stone-50/80 rounded-t-lg" : ""}`}>
-                                <span className={`text-[9px] font-bold uppercase ${isToday ? "text-blue-600" : isWeekend ? "text-[#b45309]" : "text-stone-500"}`}>
+                                <span className={`text-[10px] font-bold uppercase ${isToday ? "text-blue-600" : isWeekend ? "text-[#b45309]" : "text-stone-500"}`}>
                                   {d.toLocaleDateString("es-PE", { weekday: "short" }).replace(".","")}
                                 </span>
                                 <span className={`text-sm font-black ${isToday ? "text-blue-700 bg-blue-100/50 px-2 rounded-md" : isWeekend ? "text-[#b45309]" : "text-stone-800"}`}>
@@ -1705,7 +1705,7 @@ export default async function AdminPage(props: {
                               <div className="w-52 shrink-0 px-4 font-bold text-xs text-stone-800 border-r border-stone-200 bg-white h-full rounded-l-xl flex items-center justify-between z-30 sticky left-0 shadow-[2px_0_10px_rgba(0,0,0,0.03)] group-hover:bg-stone-50/50 transition-colors">
                                 <div className="truncate">
                                   <span className="truncate block font-bold text-stone-900">{room.name}</span>
-                                  <span className="text-[8px] font-black uppercase tracking-wider text-stone-500">#{room.room_number || room.id}</span>
+                                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-500">#{room.room_number || room.id}</span>
                                 </div>
                                 <span
                                   className={`w-2.5 h-2.5 rounded-full shrink-0 ml-2 ${
@@ -1766,7 +1766,7 @@ export default async function AdminPage(props: {
                                     >
                                       {/* Avatar circular con la inicial */}
                                       <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 shadow-inner">
-                                        <span className="text-[9px] font-black">{booking.client_name ? booking.client_name.charAt(0).toUpperCase() : "?"}</span>
+                                        <span className="text-[10px] font-black">{booking.client_name ? booking.client_name.charAt(0).toUpperCase() : "?"}</span>
                                       </div>
                                       <span className="text-[10px] font-bold tracking-wide truncate drop-shadow-sm leading-none">
                                         {booking.client_name}
@@ -1803,33 +1803,33 @@ export default async function AdminPage(props: {
       </main>
 
       {/* --- MOBILE BOTTOM NAV --- */}
-      <nav aria-label="Navegación del panel" className="lg:hidden fixed bottom-0 left-0 right-0 bg-stone-950 text-white border-t border-stone-800 flex justify-between items-center px-4 py-2.5 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
+      <nav aria-label="Navegación del panel" className="lg:hidden fixed bottom-0 left-0 right-0 bg-stone-950 text-white border-t border-stone-800 flex justify-between items-center px-1.5 min-[360px]:px-4 py-2.5 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
         {isOwner && (
           <Link href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`} aria-current={activeTab === "resumen" ? "page" : undefined} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "resumen" ? "text-amber-500" : "text-stone-400"}`}>
             <TrendingUp size={18} />
-            <span className="text-[8px] font-black uppercase">Caja</span>
+            <span className="text-[10px] font-black uppercase tracking-tight">Caja</span>
           </Link>
         )}
         <Link href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`} aria-current={activeTab === "calendario" ? "page" : undefined} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "calendario" ? "text-amber-500" : "text-stone-400"}`}>
           <CalendarDays size={18} />
-          <span className="text-[8px] font-black uppercase">Rack</span>
+          <span className="text-[10px] font-black uppercase tracking-tight">Rack</span>
         </Link>
         
         {/* Registrar Reserva al centro destacado */}
         <Link
           href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`} aria-current={activeTab === "registrar" ? "page" : undefined}
-          className={`flex flex-col items-center justify-center -mt-6 bg-gradient-to-r from-amber-600 to-amber-500 text-white w-14 h-14 rounded-full shadow-xl shadow-amber-900/60 ring-4 ring-stone-950 transition-all active:scale-95 ${
+          className={`flex flex-col items-center justify-center shrink-0 -mt-7 bg-gradient-to-r from-amber-600 to-amber-500 text-white w-[3.75rem] h-[3.75rem] rounded-full shadow-xl shadow-amber-900/60 ring-4 ring-stone-950 transition-all active:scale-95 ${
             activeTab === "registrar" ? "scale-110 ring-amber-500" : ""
           }`}
           title="Registrar Reserva"
         >
           <CalendarCheck size={22} />
-          <span className="text-[7px] font-black uppercase tracking-tighter">Reservar</span>
+          <span className="text-[10px] font-black uppercase tracking-tighter">Reservar</span>
         </Link>
 
         <Link href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`} aria-current={activeTab === "historial" ? "page" : undefined} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "historial" ? "text-amber-500" : "text-stone-400"}`}>
           <FileText size={18} />
-          <span className="text-[8px] font-black uppercase">Historial</span>
+          <span className="text-[10px] font-black uppercase tracking-tight">Historial</span>
         </Link>
 
         {/* Más: secciones que no caben en la barra (Estado, Inventario, Almacén) */}
@@ -1838,7 +1838,7 @@ export default async function AdminPage(props: {
         {isOwner && (
           <Link href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`} aria-current={activeTab === "personal" ? "page" : undefined} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "personal" ? "text-amber-500" : "text-stone-400"}`}>
             <ShieldCheck size={18} />
-            <span className="text-[8px] font-black uppercase">Personal</span>
+            <span className="text-[10px] font-black uppercase tracking-tight">Personal</span>
           </Link>
         )}
       </nav>

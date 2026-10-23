@@ -31,7 +31,7 @@ export default function MobileMoreMenu({ activeTab, dateFrom, dateTo }: MobileMo
         }`}
       >
         <MoreHorizontal size={18} />
-        <span className="text-[8px] font-black uppercase">Más</span>
+        <span className="text-[10px] font-black uppercase tracking-tight">Más</span>
       </summary>
       <div className="absolute bottom-full right-0 mb-4 w-52 bg-stone-900 border border-stone-800 rounded-2xl shadow-2xl p-2 flex flex-col gap-1 z-50">
         {items.map(({ tab, label, icon: Icon }) => (

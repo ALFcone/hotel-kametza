@@ -551,7 +551,7 @@ function BookingModal({
           <div className="flex-1 flex flex-col justify-end">
             <div className="bg-white/95 backdrop-blur-md p-5 rounded-2xl shadow-lg border border-stone-100 flex justify-between items-center">
               <div>
-                <p className="text-[9px] uppercase font-bold text-stone-500 mb-1 tracking-widest">
+                <p className="text-[10px] uppercase font-bold text-stone-500 mb-1 tracking-widest">
                   Total a Pagar
                 </p>
                 <p className="text-2xl font-black text-[#e3004f]">
@@ -873,7 +873,7 @@ function RoomCard({
             />
           )}
           <div className="absolute bottom-4 right-4 z-20 bg-white/95 backdrop-blur-sm px-5 py-2 rounded-2xl shadow-lg border border-white/50">
-            <p className="text-[9px] uppercase font-bold text-stone-500 tracking-widest mb-0.5">
+            <p className="text-[10px] uppercase font-bold text-stone-500 tracking-widest mb-0.5">
               Por noche
             </p>
             <p className="text-xl font-black text-[#e3004f]">
@@ -1391,7 +1391,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 }
               }}
             >
-              <label htmlFor="hero-checkin" className="text-[9px] font-black text-stone-500 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
+              <label htmlFor="hero-checkin" className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
                 Check-in
               </label>
               <div className="flex items-center w-full">
@@ -1434,7 +1434,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 }
               }}
             >
-              <label htmlFor="hero-checkout" className="text-[9px] font-black text-stone-500 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
+              <label htmlFor="hero-checkout" className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
                 Check-out
               </label>
               <div className="flex items-center w-full">
@@ -1482,7 +1482,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
 
         {/* --- SCROLL DOWN INDICATOR --- */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center animate-bounce">
-          <span className="text-[9px] text-white/60 uppercase tracking-widest mb-2 font-bold">Explorar</span>
+          <span className="text-[10px] text-white/60 uppercase tracking-widest mb-2 font-bold">Explorar</span>
           <a href="#habitaciones" aria-label="Ir a las habitaciones" className="relative before:absolute before:-inset-3 before:content-[''] w-8 h-12 rounded-full border-2 border-white/30 flex justify-center p-1 hover:border-white/60 transition">
             <div className="w-1.5 h-3 bg-white rounded-full"></div>
           </a>

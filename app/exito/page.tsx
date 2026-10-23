@@ -105,7 +105,7 @@ function TimelineStep({
         {isCompleted ? <Check size={18} /> : step}
       </div>
       <span
-        className={`text-[9px] font-bold uppercase tracking-wider text-center ${
+        className={`text-[10px] font-bold uppercase tracking-wider text-center ${
           isCompleted || isActive ? "text-stone-700" : "text-stone-500"
         }`}
       >

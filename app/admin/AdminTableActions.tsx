@@ -373,7 +373,7 @@ export function AdminTableActions({
           >
             <ShoppingCart size={14} className="group-hover:scale-110 transition-transform duration-300" />
             {extras.length > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-purple-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-sm">
+              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-purple-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
                 {extras.length}
               </span>
             )}
@@ -395,7 +395,7 @@ export function AdminTableActions({
             title="Registrar Pago"
           >
             <CheckCircle size={14} className="group-hover:scale-110 transition-transform" />
-            <span className="text-[9px] font-black uppercase tracking-wider">Abonar</span>
+            <span className="text-[10px] font-black uppercase tracking-wider">Abonar</span>
           </button>
         )}
         </div>
@@ -617,7 +617,7 @@ export function AdminTableActions({
                     className="w-full bg-white border border-stone-200 rounded-xl py-3 pl-10 pr-4 text-sm font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                   />
                 </div>
-                <p className="text-[9px] text-stone-500 font-medium mt-1.5 ml-1">
+                <p className="text-[10px] text-stone-500 font-medium mt-1.5 ml-1">
                   Monto ya pagado: S/ {(amountPaid || 0).toFixed(2)}. No puedes cobrar menos que esto.
                 </p>
               </div>

@@ -92,7 +92,7 @@ export default function RoomEditForm({ room }: { room: any }) {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="group/input">
-            <label className="text-[9px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
+            <label className="text-[10px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
               Precio Noche
             </label>
             <div className="relative w-28">
@@ -106,7 +106,7 @@ export default function RoomEditForm({ room }: { room: any }) {
             </div>
           </div>
           <div className="group/input">
-            <label className="text-[9px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
+            <label className="text-[10px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
               Foto de Portada
             </label>
             <input type="hidden" name="oldImage" value={room.image_url || ""} />
@@ -115,13 +115,13 @@ export default function RoomEditForm({ room }: { room: any }) {
               type="file"
               aria-label="Foto de portada"
               accept="image/*"
-              className="w-full min-h-11 bg-stone-50/50 rounded-xl border border-stone-200 text-[10px] file:mr-3 file:py-3 file:px-4 file:border-0 file:text-[9px] file:font-black file:uppercase file:tracking-wider file:bg-stone-200 file:text-stone-700 hover:file:bg-[#d97706] hover:file:text-white file:transition-colors outline-none transition-all shadow-inner shadow-stone-100/50 focus:border-[#d97706] focus:bg-white"
+              className="w-full min-h-11 bg-stone-50/50 rounded-xl border border-stone-200 text-[10px] file:mr-3 file:py-3 file:px-4 file:border-0 file:text-[10px] file:font-black file:uppercase file:tracking-wider file:bg-stone-200 file:text-stone-700 hover:file:bg-[#d97706] hover:file:text-white file:transition-colors outline-none transition-all shadow-inner shadow-stone-100/50 focus:border-[#d97706] focus:bg-white"
             />
           </div>
         </div>
 
         <div className="group/input">
-          <label className="text-[9px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
+          <label className="text-[10px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
             Descripción
           </label>
           <textarea aria-label="Descripción"
@@ -147,10 +147,10 @@ export default function RoomEditForm({ room }: { room: any }) {
       {/* GALERÍA DE FOTOS ADICIONALES */}
       <div className="mt-6 pt-6 border-t border-stone-100">
         <div className="flex items-center justify-between mb-3">
-          <label className="text-[9px] font-black uppercase tracking-wider text-stone-500">
+          <label className="text-[10px] font-black uppercase tracking-wider text-stone-500">
             Galería ({gallery.length} fotos)
           </label>
-          <label className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#b45309] cursor-pointer hover:text-amber-700 transition-colors ${uploadingGallery ? "opacity-50 pointer-events-none" : ""}`}>
+          <label className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[#b45309] cursor-pointer hover:text-amber-700 transition-colors ${uploadingGallery ? "opacity-50 pointer-events-none" : ""}`}>
             <ImagePlus size={13} />
             {uploadingGallery ? "Subiendo..." : "Agregar fotos"}
             <input

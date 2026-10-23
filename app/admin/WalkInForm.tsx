@@ -420,7 +420,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
           
           <div className="flex gap-4 w-full md:w-auto">
             <div className="flex flex-col gap-1.5 flex-1 group/input">
-              <label className="text-[9px] font-black uppercase text-stone-500 ml-1 group-focus-within/input:text-[#b45309] transition-colors">Tarifa Total Fija</label>
+              <label className="text-[10px] font-black uppercase text-stone-500 ml-1 group-focus-within/input:text-[#b45309] transition-colors">Tarifa Total Fija</label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 group-focus-within/input:text-[#b45309] transition-colors" size={14} />
                 <input aria-label="Tarifa total fija"
@@ -434,7 +434,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
             </div>
 
             <div className="flex flex-col gap-1.5 flex-1 group/input">
-              <label className="text-[9px] font-black uppercase text-stone-500 ml-1 group-focus-within/input:text-emerald-500 transition-colors">Monto Cobrado Hoy</label>
+              <label className="text-[10px] font-black uppercase text-stone-500 ml-1 group-focus-within/input:text-emerald-500 transition-colors">Monto Cobrado Hoy</label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 group-focus-within/input:text-emerald-500 transition-colors" size={14} />
                 <input aria-label="Monto cobrado hoy"
@@ -446,7 +446,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
                   className="w-full min-h-11 p-3 pl-8 bg-white/60 rounded-xl border border-stone-200 text-xs font-bold outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-emerald-700 transition-all shadow-inner shadow-stone-100/50"
                 />
               </div>
-              <span className="text-[8px] font-medium text-stone-500 text-center uppercase tracking-wider">Dejar vacío si cobró todo</span>
+              <span className="text-[10px] font-medium text-stone-500 text-center uppercase tracking-wider">Dejar vacío si cobró todo</span>
             </div>
           </div>
         </div>

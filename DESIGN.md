@@ -170,6 +170,8 @@ Paleta cálida de dos registros: rosa sobre crema para el huésped, ámbar sobre
 
 **The Etiqueta Chica Rule.** Etiquetas y botones usan 10 px con mayúsculas y tracking amplio; si un texto necesita más de unas pocas palabras, deja de ser etiqueta y pasa a Body.
 
+**The Piso De 10 Px Rule.** Ningún texto de la interfaz baja de 10 px (`text-[10px]`): ni las etiquetas de la barra inferior móvil, ni las insignias, ni las leyendas. Antes había textos de 7, 8 y 9 px; se subieron todos. La única excepción es el ticket térmico de 80 mm (`ThermalTicket.tsx`), que se imprime y se mide en papel, no en pantalla.
+
 ## Layout
 
 Una columna fluida en móvil que crece a rejillas de dos o tres columnas desde `md`. Las secciones del sitio público ocupan pantalla completa (`min-h-screen`) con contenido centrado y mucho aire vertical (padding vertical de 96 px), alternando fondo crema y blanco. La barra superior es fija y blanca con una línea de 1 px y sombra tenue.
