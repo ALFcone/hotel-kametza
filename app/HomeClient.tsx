@@ -879,7 +879,7 @@ function RoomCard({
                 <Star
                   key={i}
                   size={12}
-                  className="fill-amber-400 text-amber-400"
+                  className="fill-rose-500 text-rose-500"
                 />
               ))}
             </div>
@@ -1507,7 +1507,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                       />
                       {service.tag && (
                         <div className={`absolute top-4 left-4 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[10px] font-black uppercase shadow-sm ${
-                          service.tag === 'Recomendado' ? 'bg-amber-400/90 text-amber-950' : 'bg-white/90 text-stone-800'
+                          service.tag === 'Recomendado' ? 'bg-rose-500 text-white' : 'bg-white/90 text-stone-800'
                         }`}>
                           {service.tag}
                         </div>
@@ -1641,7 +1641,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               <div className="text-5xl font-black text-stone-900 font-serif">4.9</div>
               <div>
                 <div className="flex mb-1">
-                  {[1,2,3,4,5].map(i => <Star key={i} size={16} className="fill-amber-400 text-amber-400" />)}
+                  {[1,2,3,4,5].map(i => <Star key={i} size={16} className="fill-rose-500 text-rose-500" />)}
                 </div>
                 <p className="font-bold text-sm text-stone-800">Excelente</p>
                 <p className="text-[10px] text-stone-500 uppercase tracking-widest font-bold mt-0.5">Basado en reseñas</p>
@@ -1655,7 +1655,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               <div>
                 <div className="flex justify-between items-center mb-6 relative z-10">
                   <div className="flex">
-                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
+                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-rose-500 text-rose-500" />)}
                   </div>
                   <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full">Hace 1 mes</span>
                 </div>
@@ -1664,7 +1664,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 </p>
               </div>
               <div className="flex items-center gap-4 border-t border-stone-100 pt-6 mt-auto">
-                <div className="w-12 h-12 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center font-bold text-xl">M</div>
+                <div className="w-12 h-12 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center font-bold text-xl">M</div>
                 <div>
                   <h4 className="font-bold text-stone-900 text-sm uppercase">María Fernanda</h4>
                   <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
@@ -1673,7 +1673,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <p className="text-[10px] text-stone-500 font-medium flex items-center gap-1"><MapPin size={10} /> Lima, Perú</p>
                 </div>
               </div>
-              <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-amber-50 transition-colors">&quot;</div>
+              <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-rose-50 transition-colors">&quot;</div>
             </div>
 
             {/* Review 2 */}
@@ -1681,7 +1681,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               <div>
                 <div className="flex justify-between items-center mb-6 relative z-10">
                   <div className="flex">
-                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
+                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-rose-500 text-rose-500" />)}
                   </div>
                   <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full">Hace 2 semanas</span>
                 </div>
@@ -1707,7 +1707,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               <div>
                 <div className="flex justify-between items-center mb-6 relative z-10">
                   <div className="flex">
-                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
+                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-rose-500 text-rose-500" />)}
                   </div>
                   <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full">Hace 3 días</span>
                 </div>
@@ -1733,7 +1733,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               <div>
                 <div className="flex justify-between items-center mb-6 relative z-10">
                   <div className="flex">
-                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
+                    {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-rose-500 text-rose-500" />)}
                   </div>
                   <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full">Hace 4 meses</span>
                 </div>
@@ -1799,7 +1799,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <h3 className="text-xs font-black text-stone-500 uppercase tracking-widest mb-4">Distancias clave</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 mb-6">
               <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-100 shadow-sm">
-                <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
                   <MapPin size={16} />
                 </div>
                 <div>
@@ -1925,22 +1925,22 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         <div className="max-w-7xl mx-auto px-4 md:px-8 xl:px-12 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-stone-800">
             <div className="flex flex-col items-center justify-center p-4 group">
-              <ShieldCheck size={32} className="text-amber-400 mb-3 group-hover:scale-110 group-hover:text-amber-300 transition-all" />
+              <ShieldCheck size={32} className="text-rose-400 mb-3 group-hover:scale-110 group-hover:text-rose-300 transition-all" />
               <h4 className="text-white font-bold text-sm mb-1 uppercase tracking-wider">Reserva Segura</h4>
               <p className="text-xs text-stone-400">Garantía de mejor tarifa</p>
             </div>
             <div className="flex flex-col items-center justify-center p-4 group">
-              <CreditCard size={32} className="text-amber-400 mb-3 group-hover:scale-110 group-hover:text-amber-300 transition-all" />
+              <CreditCard size={32} className="text-rose-400 mb-3 group-hover:scale-110 group-hover:text-rose-300 transition-all" />
               <h4 className="text-white font-bold text-sm mb-1 uppercase tracking-wider">Múltiples Pagos</h4>
               <p className="text-xs text-stone-400">Visa, Mastercard, Yape, Plin</p>
             </div>
             <div className="flex flex-col items-center justify-center p-4 group">
-              <Clock size={32} className="text-amber-400 mb-3 group-hover:scale-110 group-hover:text-amber-300 transition-all" />
+              <Clock size={32} className="text-rose-400 mb-3 group-hover:scale-110 group-hover:text-rose-300 transition-all" />
               <h4 className="text-white font-bold text-sm mb-1 uppercase tracking-wider">Recepción 24/7</h4>
               <p className="text-xs text-stone-400">Asistencia en todo momento</p>
             </div>
             <div className="flex flex-col items-center justify-center p-4 group">
-              <Sparkles size={32} className="text-amber-400 mb-3 group-hover:scale-110 group-hover:text-amber-300 transition-all" />
+              <Sparkles size={32} className="text-rose-400 mb-3 group-hover:scale-110 group-hover:text-rose-300 transition-all" />
               <h4 className="text-white font-bold text-sm mb-1 uppercase tracking-wider">Limpieza 100%</h4>
               <p className="text-xs text-stone-400">Estándares de higiene rigurosos</p>
             </div>
@@ -1959,8 +1959,8 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             {/* TEXTO Y MÉTODOS DE CONTACTO */}
             <div className="text-left">
               <div className="flex items-center gap-4 mb-6">
-                <div className="h-[1px] w-12 bg-amber-400"></div>
-                <span className="text-amber-600 font-serif italic text-lg md:text-xl font-medium tracking-wide">
+                <div className="h-[1px] w-12 bg-rose-500"></div>
+                <span className="text-rose-600 font-serif italic text-lg md:text-xl font-medium tracking-wide">
                   Atención 24/7
                 </span>
               </div>
@@ -1976,39 +1976,39 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   href="https://wa.me/51966556622"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/60 transition group border border-transparent hover:border-amber-200"
+                  className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/60 transition group border border-transparent hover:border-rose-200"
                 >
-                  <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition duration-300">
+                  <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-rose-500 group-hover:scale-110 transition duration-300">
                     <MessageSquare size={24} />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-bold text-lg text-stone-900 group-hover:text-amber-600 transition">WhatsApp Directo</h3>
+                    <h3 className="font-bold text-lg text-stone-900 group-hover:text-rose-600 transition">WhatsApp Directo</h3>
                     <p className="text-stone-500 font-medium">966 556 622</p>
                   </div>
                 </a>
 
                 <a
                   href="tel:+51920042099"
-                  className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/60 transition group border border-transparent hover:border-amber-200"
+                  className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/60 transition group border border-transparent hover:border-rose-200"
                 >
-                  <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition duration-300">
+                  <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-rose-500 group-hover:scale-110 transition duration-300">
                     <Phone size={24} />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-bold text-lg text-stone-900 group-hover:text-amber-600 transition">Recepción</h3>
+                    <h3 className="font-bold text-lg text-stone-900 group-hover:text-rose-600 transition">Recepción</h3>
                     <p className="text-stone-500 font-medium">920 042 099</p>
                   </div>
                 </a>
 
                 <a
                   href="mailto:kametzahotelayacucho@gmail.com"
-                  className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/60 transition group border border-transparent hover:border-amber-200"
+                  className="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/60 transition group border border-transparent hover:border-rose-200"
                 >
-                  <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition duration-300">
+                  <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-rose-500 group-hover:scale-110 transition duration-300">
                     <Mail size={24} />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-bold text-lg text-stone-900 group-hover:text-amber-600 transition">Correo Electrónico</h3>
+                    <h3 className="font-bold text-lg text-stone-900 group-hover:text-rose-600 transition">Correo Electrónico</h3>
                     <p className="text-stone-500 font-medium break-words">kametzahotelayacucho@gmail.com</p>
                   </div>
                 </a>
@@ -2024,15 +2024,15 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               <form className="space-y-5 relative z-10" onSubmit={(e) => { e.preventDefault(); alert('Mensaje enviado. ¡Gracias por contactarnos!'); }}>
                 <div>
                   <label htmlFor="contact-name" className="text-[10px] font-bold uppercase tracking-widest text-stone-500 ml-2 block mb-1">Nombre Completo</label>
-                  <input id="contact-name" name="name" autoComplete="name" type="text" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm" placeholder="Ej. Carlos Mendoza" />
+                  <input id="contact-name" name="name" autoComplete="name" type="text" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-sm" placeholder="Ej. Carlos Mendoza" />
                 </div>
                 <div>
                   <label htmlFor="contact-email" className="text-[10px] font-bold uppercase tracking-widest text-stone-500 ml-2 block mb-1">Correo Electrónico</label>
-                  <input id="contact-email" name="email" autoComplete="email" type="email" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm" placeholder="correo@ejemplo.com" />
+                  <input id="contact-email" name="email" autoComplete="email" type="email" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-sm" placeholder="correo@ejemplo.com" />
                 </div>
                 <div>
                   <label htmlFor="contact-message" className="text-[10px] font-bold uppercase tracking-widest text-stone-500 ml-2 block mb-1">Tu Consulta</label>
-                  <textarea id="contact-message" name="message" required rows={4} className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
+                  <textarea id="contact-message" name="message" required rows={4} className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
                 </div>
                 <button type="submit" className="w-full bg-stone-900 text-white font-bold py-4 rounded-2xl hover:bg-[#e3004f] transition-all shadow-lg hover:shadow-rose-900/20 text-sm tracking-widest uppercase mt-4">
                   Enviar Mensaje
@@ -2046,7 +2046,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
       {/* --- FOOTER PREMIUM --- */}
       <footer className="bg-[#FDFBF7] border-t border-stone-200 pt-24 pb-12 text-sm relative z-10 w-full overflow-hidden">
         {/* Elemento decorativo del footer */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-rose-200/30 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#e3004f]/5 rounded-full blur-[100px] pointer-events-none"></div>
 
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 xl:px-12 relative z-10">
@@ -2077,18 +2077,18 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
 
             {/* Links Column */}
             <div>
-              <h4 className="text-amber-600 font-bold tracking-widest text-xs uppercase mb-6">Descubre</h4>
+              <h4 className="text-rose-600 font-bold tracking-widest text-xs uppercase mb-6">Descubre</h4>
               <ul>
-                <li><a href="#inicio" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Inicio</a></li>
-                <li><a href="#habitaciones" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Habitaciones</a></li>
-                <li><a href="#servicios" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Experiencia Kametza</a></li>
-                <li><a href="#ubicacion" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Ubicación</a></li>
+                <li><a href="#inicio" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Inicio</a></li>
+                <li><a href="#habitaciones" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Habitaciones</a></li>
+                <li><a href="#servicios" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Experiencia Kametza</a></li>
+                <li><a href="#ubicacion" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Ubicación</a></li>
               </ul>
             </div>
 
             {/* Dirección Column */}
             <div>
-              <h4 className="text-amber-600 font-bold tracking-widest text-xs uppercase mb-6">Ubicación</h4>
+              <h4 className="text-rose-600 font-bold tracking-widest text-xs uppercase mb-6">Ubicación</h4>
               <div className="flex items-start gap-3 text-stone-700 mb-4 font-medium">
                 <MapPin size={18} className="text-[#e3004f] flex-shrink-0 mt-1" />
                 <p className="leading-relaxed">
@@ -2101,7 +2101,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
 
             {/* Pagos Column */}
             <div>
-              <h4 className="text-amber-600 font-bold tracking-widest text-xs uppercase mb-6">Medios de Pago</h4>
+              <h4 className="text-rose-600 font-bold tracking-widest text-xs uppercase mb-6">Medios de Pago</h4>
               <p className="text-stone-700 font-medium text-sm mb-4">
                 Aceptamos todas las tarjetas de crédito, débito y transferencias.
               </p>

@@ -147,7 +147,7 @@ Paleta cálida de dos registros: rosa sobre crema para el huésped, ámbar sobre
 ### Named Rules
 **The Una Sola Voz Rule.** En el sitio público el rosa Kametza es el único acento. Si una pantalla necesita un segundo color para distinguir algo, usa un neutro de piedra, no ámbar.
 
-**The Ámbar Solo Para Casa Rule.** El ámbar `#d97706` pertenece a `/admin`. No debe aparecer en la landing, el acceso, el panel del huésped ni la confirmación. Deuda conocida: hoy la landing todavía usa `amber-600` y `amber-400` en varios textos y estrellas; es una desviación por migrar al rosa o a un neutro, no un precedente.
+**The Ámbar Solo Para Casa Rule.** El ámbar `#d97706` pertenece a `/admin`. No debe aparecer en la landing, el acceso, el panel del huésped ni la confirmación. La landing ya no usa ámbar: las estrellas de calificación, la etiqueta "Recomendado", los iconos de la franja oscura de confianza, los titulares del pie y los bordes de enfoque van en rosa Kametza. Los estados de pendiente (por ejemplo, el icono de pago pendiente en la confirmación) conservan el ámbar como color de estado.
 
 **The Piedra Cálida Rule.** Todos los grises vienen de la familia `stone`. Un gris frío (`gray`, `slate`, `zinc`) rompe el calor del conjunto.
 
