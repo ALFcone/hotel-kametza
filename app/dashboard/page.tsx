@@ -186,7 +186,7 @@ function getStatusConfig(status: string) {
 /** Skeleton Loader Premium */
 function SkeletonLoader() {
   return (
-    <div className="min-h-screen bg-[#FDFBF7]">
+    <div className="min-h-screen bg-parchment">
       <div className="max-w-6xl mx-auto px-4 py-12 md:py-20">
         {/* Header skeleton */}
         <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-12">
@@ -299,8 +299,8 @@ function FilterTabs({
           onClick={() => onChange(tab.key)}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
             active === tab.key
-              ? "bg-[#e3004f] text-white shadow-lg shadow-rose-900/20"
-              : "bg-white text-stone-500 border border-stone-200 hover:border-stone-300 hover:text-[#e3004f]"
+              ? "bg-rose-500 text-white shadow-lg shadow-rose-900/20"
+              : "bg-white text-stone-500 border border-stone-200 hover:border-stone-300 hover:text-rose-500"
           }`}
         >
           {tab.label}
@@ -347,7 +347,7 @@ function CancelModal({
         <p className="text-stone-500 text-sm mb-1">
           Estás por cancelar tu reserva en:
         </p>
-        <p className="text-[#e3004f] font-bold text-sm mb-6">{roomName}</p>
+        <p className="text-rose-500 font-bold text-sm mb-6">{roomName}</p>
         <p className="text-stone-500 text-xs mb-8">
           Esta acción no se puede deshacer.
         </p>
@@ -382,7 +382,7 @@ function EmptyState() {
 
       <div className="relative z-10">
         <div className="animate-float w-28 h-28 rounded-full bg-gradient-to-br from-rose-100 to-rose-50 flex items-center justify-center mx-auto mb-8 shadow-inner">
-          <BedDouble size={48} className="text-[#e3004f]/40" />
+          <BedDouble size={48} className="text-rose-500/40" />
         </div>
         <h2 className="text-3xl font-serif font-bold text-stone-800 mb-3">
           Tu próxima aventura te espera
@@ -393,7 +393,7 @@ function EmptyState() {
         </p>
         <Link
           href="/#habitaciones"
-          className="btn-shimmer inline-flex items-center gap-3 bg-[#e3004f] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl hover:shadow-rose-900/30 hover:-translate-y-0.5"
+          className="btn-shimmer inline-flex items-center gap-3 bg-rose-500 text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl hover:shadow-rose-900/30 hover:-translate-y-0.5"
         >
           <Sparkles size={16} />
           Explorar Habitaciones
@@ -516,10 +516,10 @@ export default function Dashboard() {
   const stats = getStats(bookings);
 
   return (
-    <main id="contenido" tabIndex={-1} className="outline-none min-h-screen font-sans text-stone-800 relative bg-[#FDFBF7]">
+    <main id="contenido" tabIndex={-1} className="outline-none min-h-screen font-sans text-stone-800 relative bg-parchment">
       {/* Fondo Decorativo */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FFFDF5]/95 via-[#FFFDF5]/90 to-[#FFFDF5]/95" />
+        <div className="absolute inset-0 bg-gradient-to-b from-cream/95 via-cream/90 to-cream/95" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 md:py-16">
@@ -535,15 +535,15 @@ export default function Dashboard() {
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               {/* Logo Hotel Kametza (Estilo Panel Principal) */}
               <div className="flex items-center gap-5 pr-6 md:border-r md:border-white/10 group">
-                <div className="bg-[#e3004f] text-white p-4 rounded-2xl shadow-[0_0_20px_rgba(227,0,79,0.4)] group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(227,0,79,0.6)] transition-all duration-300">
+                <div className="bg-rose-500 text-white p-4 rounded-2xl shadow-[0_0_20px_rgba(227,0,79,0.4)] group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(227,0,79,0.6)] transition-all duration-300">
                   <Building size={32} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h2 className="font-serif font-black text-3xl text-[#e3004f] leading-tight [text-shadow:0_0_20px_rgba(227,0,79,0.5)]">
+                  <h2 className="font-serif font-black text-3xl text-rose-500 leading-tight [text-shadow:0_0_20px_rgba(227,0,79,0.5)]">
                     Kametza
                   </h2>
-                  <span className="text-[10px] text-[#e3004f] uppercase tracking-[0.2em] font-black flex items-center gap-1 mt-0.5">
-                    <Star size={10} className="fill-[#e3004f]" /> Panel Huésped
+                  <span className="text-[10px] text-rose-500 uppercase tracking-[0.2em] font-black flex items-center gap-1 mt-0.5">
+                    <Star size={10} className="fill-rose-500" /> Panel Huésped
                   </span>
                 </div>
               </div>
@@ -570,7 +570,7 @@ export default function Dashboard() {
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex-1 md:flex-none flex justify-center items-center gap-2 bg-[#e3004f] text-white px-6 py-3.5 rounded-full hover:bg-rose-600 font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-lg shadow-rose-900/30"
+                className="flex-1 md:flex-none flex justify-center items-center gap-2 bg-rose-500 text-white px-6 py-3.5 rounded-full hover:bg-rose-600 font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-lg shadow-rose-900/30"
               >
                 <LogOut size={16} /> Salir
               </button>
@@ -587,8 +587,8 @@ export default function Dashboard() {
             label="Total Reservas"
             value={stats.total}
             sub={`${stats.active} activa(s)`}
-            accentBorder="border-t-[#e3004f]"
-            accentText="text-[#e3004f]"
+            accentBorder="border-t-rose-500"
+            accentText="text-rose-500"
             delay={100}
           />
           <StatCard
@@ -635,7 +635,7 @@ export default function Dashboard() {
           <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
             {/* WiFi */}
             <div className="flex items-start gap-3">
-              <Wifi size={20} className="text-[#e3004f] mt-0.5 shrink-0" />
+              <Wifi size={20} className="text-rose-500 mt-0.5 shrink-0" />
               <div>
                 <h4 className="font-bold text-stone-900 text-sm mb-1">Conexión WiFi</h4>
                 <p className="text-xs text-stone-500 font-medium">Red: <span className="font-bold text-stone-800">Kametza_5G</span></p>
@@ -645,7 +645,7 @@ export default function Dashboard() {
 
             {/* Horarios */}
             <div className="flex items-start gap-3 border-t md:border-t-0 md:border-l border-stone-100 pt-4 md:pt-0 md:pl-6">
-              <Clock size={20} className="text-[#e3004f] mt-0.5 shrink-0" />
+              <Clock size={20} className="text-rose-500 mt-0.5 shrink-0" />
               <div>
                 <h4 className="font-bold text-stone-900 text-sm mb-1">Horarios</h4>
                 <p className="text-xs text-stone-500 font-medium">Check-in: <span className="font-bold text-stone-800">14:00</span> / Check-out: <span className="font-bold text-stone-800">12:00</span></p>
@@ -655,7 +655,7 @@ export default function Dashboard() {
 
             {/* Ubicación */}
             <div className="flex items-start gap-3 border-t md:border-t-0 md:border-l border-stone-100 pt-4 md:pt-0 md:pl-6">
-              <MapPin size={20} className="text-[#e3004f] mt-0.5 shrink-0" />
+              <MapPin size={20} className="text-rose-500 mt-0.5 shrink-0" />
               <div>
                 <h4 className="font-bold text-stone-900 text-sm mb-1">Ubicación</h4>
                 <p className="text-xs text-stone-500 font-medium leading-relaxed">Jirón Las Américas #154<br/>Ref. Óvalo Magdalena, Ayacucho</p>
@@ -669,7 +669,7 @@ export default function Dashboard() {
               href="https://www.google.com/maps/search/?api=1&query=KAMETZA+HOTEL+Jr+Las+Americas+154+Ovalo+de+la+Magdalena+Ayacucho"
               target="_blank"
               rel="noreferrer"
-              className="w-full md:w-auto flex items-center justify-center gap-2 bg-[#e3004f] hover:bg-black text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-lg shadow-rose-900/20"
+              className="w-full md:w-auto flex items-center justify-center gap-2 bg-rose-500 hover:bg-black text-white px-6 py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-lg shadow-rose-900/20"
             >
               <MapPin size={16} /> Ver en Maps
             </a>
@@ -725,8 +725,8 @@ export default function Dashboard() {
                       >
                         {/* Cutouts for ticket effect */}
                         <div className="hidden md:block absolute left-[280px] top-0 bottom-0 w-0 border-l-[3px] border-dashed border-stone-200/60" />
-                        <div className="hidden md:block absolute left-[272px] -top-3 w-6 h-6 rounded-full bg-[#FDFBF7] shadow-inner" />
-                        <div className="hidden md:block absolute left-[272px] -bottom-3 w-6 h-6 rounded-full bg-[#FDFBF7] shadow-inner" />
+                        <div className="hidden md:block absolute left-[272px] -top-3 w-6 h-6 rounded-full bg-parchment shadow-inner" />
+                        <div className="hidden md:block absolute left-[272px] -bottom-3 w-6 h-6 rounded-full bg-parchment shadow-inner" />
 
                         {/* Accent line */}
                         <div
@@ -736,7 +736,7 @@ export default function Dashboard() {
                               : effectiveStatus === "parcial"
                               ? "bg-gradient-to-b from-orange-400 to-orange-600"
                               : effectiveStatus === "pendiente"
-                              ? "bg-gradient-to-b from-[#e3004f] to-rose-700"
+                              ? "bg-gradient-to-b from-rose-500 to-rose-700"
                               : "bg-gradient-to-b from-stone-300 to-stone-400"
                           }`}
                         />
@@ -767,7 +767,7 @@ export default function Dashboard() {
                         <div className="flex-1 w-full relative z-10">
                           <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-3">
                             <div>
-                              <h3 className="text-lg md:text-xl font-serif font-bold text-[#e3004f] mb-0.5">
+                              <h3 className="text-lg md:text-xl font-serif font-bold text-rose-500 mb-0.5">
                                 {booking.rooms?.name || "Habitación"}
                               </h3>
                               <p className="text-stone-500 text-[10px] font-bold uppercase tracking-[0.2em]">
@@ -791,7 +791,7 @@ export default function Dashboard() {
                           {/* Info Grid */}
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6 mt-4">
                             <div className="flex items-center gap-3">
-                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-rose-50 group-hover:text-[#e3004f] transition-colors duration-300">
+                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-rose-50 group-hover:text-rose-500 transition-colors duration-300">
                                 <CalendarDays size={16} />
                               </div>
                               <div>
@@ -804,7 +804,7 @@ export default function Dashboard() {
                               </div>
                             </div>
                             <div className="flex items-center gap-3">
-                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-rose-50 group-hover:text-[#e3004f] transition-colors duration-300">
+                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-rose-50 group-hover:text-rose-500 transition-colors duration-300">
                                 <Clock size={16} />
                               </div>
                               <div>
@@ -817,14 +817,14 @@ export default function Dashboard() {
                               </div>
                             </div>
                             <div className="flex items-center gap-3 col-span-2 md:col-span-1">
-                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-rose-50 group-hover:text-[#e3004f] transition-colors duration-300">
+                              <div className="bg-stone-50 p-2 rounded-xl text-stone-400 group-hover:bg-rose-50 group-hover:text-rose-500 transition-colors duration-300">
                                 <CreditCard size={16} />
                               </div>
                               <div>
                                 <p className="text-[10px] text-stone-500 font-bold uppercase">
                                   Total a Pagar
                                 </p>
-                                <p className="text-lg font-black text-[#e3004f]">
+                                <p className="text-lg font-black text-rose-500">
                                   S/ {(booking.total_price + (booking.booking_extras?.reduce((acc: number, e: any) => acc + (e.price * e.quantity), 0) || 0)).toFixed(2)}
                                 </p>
                               </div>
@@ -835,7 +835,7 @@ export default function Dashboard() {
                           {booking.booking_extras && booking.booking_extras.length > 0 && (
                             <div className="mt-4 pt-4 border-t border-stone-100">
                               <h4 className="text-xs font-bold text-stone-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                <Coffee size={14} className="text-[#e3004f]" /> Consumos Extras
+                                <Coffee size={14} className="text-rose-500" /> Consumos Extras
                               </h4>
                               <div className="space-y-2">
                                 {booking.booking_extras.map((extra: any) => (
@@ -843,7 +843,7 @@ export default function Dashboard() {
                                     <span className="text-stone-600 font-medium">
                                       {extra.quantity}x {extra.item_name}
                                     </span>
-                                    <span className="text-[#e3004f] font-bold">
+                                    <span className="text-rose-500 font-bold">
                                       S/ {(extra.price * extra.quantity).toFixed(2)}
                                     </span>
                                   </div>
@@ -925,7 +925,7 @@ export default function Dashboard() {
         href="https://wa.me/51966556622?text=Hola%20Recepci%C3%B3n,%20soy%20hu%C3%A9sped%20y%20necesito%20ayuda"
         target="_blank"
         rel="noreferrer"
-        className="fixed bottom-6 right-6 md:bottom-10 md:right-10 bg-[#25D366] text-white p-4 rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:scale-110 hover:shadow-[0_8px_30px_rgba(37,211,102,0.6)] transition-all duration-300 z-50 group flex items-center justify-center animate-bounce-slow"
+        className="fixed bottom-6 right-6 md:bottom-10 md:right-10 bg-whatsapp text-white p-4 rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:scale-110 hover:shadow-[0_8px_30px_rgba(37,211,102,0.6)] transition-all duration-300 z-50 group flex items-center justify-center animate-bounce-slow"
         aria-label="Contactar Recepción por WhatsApp"
       >
         <MessageCircle size={32} />

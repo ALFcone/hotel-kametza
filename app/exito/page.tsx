@@ -27,6 +27,7 @@ import {
   PartyPopper,
 } from "lucide-react";
 import { Suspense } from "react";
+import { BRAND_COLORS } from "@/lib/brand-colors";
 
 /** Confetti Component */
 function Confetti() {
@@ -36,7 +37,7 @@ function Confetti() {
 
   useEffect(() => {
     const colors = [
-      "#e3004f",
+      BRAND_COLORS.rose,
       "#f43f5e",
       "#fbbf24",
       "#34d399",
@@ -98,7 +99,7 @@ function TimelineStep({
           isCompleted
             ? "bg-emerald-500 text-white shadow-lg shadow-emerald-200"
             : isActive
-            ? "bg-[#e3004f] text-white shadow-lg shadow-rose-200 animate-pulse"
+            ? "bg-rose-500 text-white shadow-lg shadow-rose-200 animate-pulse"
             : "bg-stone-100 text-stone-400"
         }`}
       >
@@ -173,7 +174,7 @@ function PaymentContent() {
 
       {/* Fondo */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FFFDF5]/95 via-[#FFFDF5]/90 to-[#FFFDF5]/95" />
+        <div className="absolute inset-0 bg-gradient-to-b from-cream/95 via-cream/90 to-cream/95" />
       </div>
 
       {/* Ticket */}
@@ -185,7 +186,7 @@ function PaymentContent() {
               ? "bg-gradient-to-br from-emerald-600 to-emerald-700"
               : isFailure
               ? "bg-gradient-to-br from-rose-600 to-rose-700"
-              : "bg-gradient-to-br from-[#e3004f] to-rose-800"
+              : "bg-gradient-to-br from-rose-500 to-rose-800"
           }`}
         >
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_white_1px,_transparent_1px)] [background-size:10px_10px]" />
@@ -267,7 +268,7 @@ function PaymentContent() {
               ) : (
                 <Copy
                   size={14}
-                  className="text-stone-400 group-hover:text-[#e3004f] transition-colors"
+                  className="text-stone-400 group-hover:text-rose-500 transition-colors"
                 />
               )}
             </button>
@@ -283,7 +284,7 @@ function PaymentContent() {
             <span className="text-xs font-bold text-stone-500 uppercase">
               Total a Pagar
             </span>
-            <span className="text-4xl font-serif font-black text-[#e3004f]">
+            <span className="text-4xl font-serif font-black text-rose-500">
               S/ {amount}
             </span>
           </div>
@@ -376,7 +377,7 @@ function PaymentContent() {
               <a
                 href={`https://wa.me/51966556622?text=Hola,%20adjunto%20constancia%20para%20reserva%20${formattedId}%20(Monto:%20S/${amount}).`}
                 target="_blank"
-                className="btn-shimmer w-full bg-[#25D366] text-white font-bold py-4 rounded-xl hover:bg-[#1da851] transition shadow-lg hover:shadow-green-900/20 flex items-center justify-center gap-2"
+                className="btn-shimmer w-full bg-whatsapp text-white font-bold py-4 rounded-xl hover:bg-whatsapp-dark transition shadow-lg hover:shadow-green-900/20 flex items-center justify-center gap-2"
               >
                 Enviar Constancia por WhatsApp
               </a>
@@ -385,7 +386,7 @@ function PaymentContent() {
             {/* Ir al Dashboard */}
             <Link
               href="/dashboard"
-              className="w-full bg-[#e3004f] text-white font-bold py-4 rounded-xl hover:bg-black transition-all shadow-lg hover:shadow-rose-900/20 flex items-center justify-center gap-2 text-xs uppercase tracking-widest"
+              className="w-full bg-rose-500 text-white font-bold py-4 rounded-xl hover:bg-black transition-all shadow-lg hover:shadow-rose-900/20 flex items-center justify-center gap-2 text-xs uppercase tracking-widest"
             >
               <LayoutDashboard size={16} /> Ir a Mis Reservas <ArrowRight size={14} />
             </Link>
@@ -449,7 +450,7 @@ export default function ExitoPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+        <div className="min-h-screen flex items-center justify-center bg-parchment">
           <div className="w-full max-w-lg p-10 space-y-4">
             <div className="h-48 rounded-t-[2.5rem] animate-shimmer" />
             <div className="h-6 w-48 mx-auto rounded-full animate-shimmer" />

@@ -21,6 +21,7 @@ import {
 import Swal from "sweetalert2";
 import { useDialog } from "../useDialog";
 import { addOrUpdateStaff, updateStaffRole, deleteStaffMember } from "../actions";
+import { BRAND_COLORS } from "@/lib/brand-colors";
 
 interface StaffMember {
   email: string;
@@ -74,7 +75,7 @@ export default function AdminStaffManagement({
         title: "¡Personal Autorizado!",
         text: `El usuario ${email} ahora tiene acceso con el rol de ${selectedRole.toUpperCase()}.`,
         icon: "success",
-        confirmButtonColor: "#e3004f",
+        confirmButtonColor: BRAND_COLORS.rose,
       });
       setEmail("");
       setName("");
@@ -91,8 +92,8 @@ export default function AdminStaffManagement({
         text: "Si te quitas el rol de Dueño, perderás acceso a esta sección de administración de roles.",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#e3004f",
-        cancelButtonColor: "#78716c",
+        confirmButtonColor: BRAND_COLORS.rose,
+        cancelButtonColor: BRAND_COLORS.stone,
         confirmButtonText: "Sí, cambiar",
         cancelButtonText: "Cancelar",
       });
@@ -127,8 +128,8 @@ export default function AdminStaffManagement({
       text: `¿Estás seguro de quitar los permisos a ${targetEmail}? Ya no podrá ingresar al panel de administración.`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#e3004f",
-      cancelButtonColor: "#78716c",
+      confirmButtonColor: BRAND_COLORS.rose,
+      cancelButtonColor: BRAND_COLORS.stone,
       confirmButtonText: "Sí, revocar acceso",
       cancelButtonText: "Cancelar",
     });
@@ -179,7 +180,7 @@ export default function AdminStaffManagement({
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* HEADER DE SECCIÓN */}
-      <div className="bg-gradient-to-br from-white via-[#FDFBF7] to-amber-50/70 text-stone-900 p-8 md:p-10 rounded-[2.5rem] shadow-sm relative overflow-hidden border border-amber-200/80">
+      <div className="bg-gradient-to-br from-white via-parchment to-amber-50/70 text-stone-900 p-8 md:p-10 rounded-[2.5rem] shadow-sm relative overflow-hidden border border-amber-200/80">
         <div className="absolute right-0 top-0 w-96 h-96 bg-gradient-to-br from-amber-400/15 to-orange-300/10 blur-3xl pointer-events-none" />
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
           <div>
@@ -370,7 +371,7 @@ export default function AdminStaffManagement({
             </button>
 
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-rose-50 text-[#e3004f] flex items-center justify-center shadow-inner">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center shadow-inner">
                 <UserPlus size={24} />
               </div>
               <div>
@@ -435,7 +436,7 @@ export default function AdminStaffManagement({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-[#e3004f] hover:bg-stone-950 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 shadow-md shadow-rose-950/20 disabled:opacity-50 cursor-pointer"
+                  className="flex-1 bg-rose-500 hover:bg-stone-950 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 shadow-md shadow-rose-950/20 disabled:opacity-50 cursor-pointer"
                 >
                   {loading ? "Guardando..." : "Autorizar y Guardar"}
                 </button>

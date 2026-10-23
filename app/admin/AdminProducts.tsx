@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Edit3, Trash2, Save, X, ShoppingCart, Package } from "lucide-react";
 import { createProduct, updateProduct, deleteProduct } from "../actions";
 import Swal from "sweetalert2";
+import { BRAND_COLORS } from "@/lib/brand-colors";
 
 export default function AdminProducts({ products = [], userRole }: { products: any[], userRole?: string | null }) {
   const [loading, setLoading] = useState(false);
@@ -64,8 +65,8 @@ export default function AdminProducts({ products = [], userRole }: { products: a
       text: "Esta acción no se puede deshacer.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#e3004f",
-      cancelButtonColor: "#a8a29e",
+      confirmButtonColor: BRAND_COLORS.rose,
+      cancelButtonColor: BRAND_COLORS.stoneSoft,
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar"
     });
@@ -89,7 +90,7 @@ export default function AdminProducts({ products = [], userRole }: { products: a
         {!isAdding && (userRole === "admin" || userRole === "dueño") && (
           <button 
             onClick={() => setIsAdding(true)}
-            className="bg-[#b45309] text-white px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-amber-800 transition shadow-lg shadow-amber-500/20"
+            className="bg-amber-700 text-white px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-amber-800 transition shadow-lg shadow-amber-500/20"
           >
             <Plus size={16} /> Nuevo Producto
           </button>

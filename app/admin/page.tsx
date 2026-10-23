@@ -482,7 +482,7 @@ export default async function AdminPage(props: {
   // ==============================================================================
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans flex">
+    <div className="min-h-screen bg-parchment-warm text-stone-800 font-sans flex">
       {/* --- SIDEBAR --- */}
       <aside className="hidden lg:flex flex-col w-72 bg-stone-950 text-white p-6 border-r border-stone-800 shrink-0 sticky top-0 h-screen justify-between z-50">
         <div className="space-y-8">
@@ -635,7 +635,7 @@ export default async function AdminPage(props: {
 
               <div id="resumen" className="scroll-mt-24 mb-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
+                  <div className="h-1.5 w-8 bg-amber-600 rounded-full" />
                   <h2 className="text-xl font-bold text-stone-900 tracking-tight">Resumen General</h2>
                 </div>
                 
@@ -643,12 +643,12 @@ export default async function AdminPage(props: {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   {/* Card Ventas */}
                   <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#d97706]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <Wallet size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-[#b45309] opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-amber-600/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <Wallet size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-amber-700 opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
                     
                     <div className="relative z-10 flex flex-col h-full">
                       <div className="flex justify-between items-start mb-6">
-                        <div className="bg-gradient-to-br from-stone-900 to-stone-800 text-[#b45309] p-3 rounded-2xl shadow-lg shadow-stone-900/20 group-hover:scale-110 transition-transform duration-500 ease-out">
+                        <div className="bg-gradient-to-br from-stone-900 to-stone-800 text-amber-700 p-3 rounded-2xl shadow-lg shadow-stone-900/20 group-hover:scale-110 transition-transform duration-500 ease-out">
                           <Wallet size={22} strokeWidth={2} />
                         </div>
                         <span className="bg-amber-50 text-amber-700 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-amber-100/50 shadow-sm">
@@ -675,8 +675,8 @@ export default async function AdminPage(props: {
                         </div>
                         <div className="w-[1px] h-8 bg-stone-200/50"></div>
                         <div className="group/item">
-                          <p className="text-[10px] text-[#b45309] uppercase font-black tracking-widest flex items-center gap-1 group-hover/item:text-[#b45309] transition-colors">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#d97706]"></span> Digital
+                          <p className="text-[10px] text-amber-700 uppercase font-black tracking-widest flex items-center gap-1 group-hover/item:text-amber-700 transition-colors">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span> Digital
                           </p>
                           <p className="font-bold text-stone-900 text-sm mt-1">{formatMoney(digitalIncome)}</p>
                         </div>
@@ -686,8 +686,8 @@ export default async function AdminPage(props: {
 
                   {/* Card Llegadas */}
                   <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500">
-                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#d97706]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <CalendarCheck size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-[#b45309] opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-amber-600/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <CalendarCheck size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-amber-700 opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
                     
                     <div className="relative z-10 flex flex-col h-full justify-between">
                       <div className="flex justify-between items-start mb-6">
@@ -733,8 +733,8 @@ export default async function AdminPage(props: {
 
                   {/* Card Ocupación */}
                   <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500 md:col-span-2 lg:col-span-1">
-                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#d97706]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <Building size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-[#b45309] opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-amber-600/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <Building size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-amber-700 opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
                     
                     <div className="relative z-10 flex flex-col h-full justify-between">
                       <div className="flex justify-between items-start mb-6">
@@ -776,7 +776,7 @@ export default async function AdminPage(props: {
                                 rs.status === "checkout"
                                   ? "bg-rose-400"
                                   : rs.status === "occupied"
-                                  ? "bg-[#d97706]"
+                                  ? "bg-amber-600"
                                   : "bg-stone-200";
                               return (
                                 <span
@@ -796,8 +796,8 @@ export default async function AdminPage(props: {
 
                   {/* Card Salidas */}
                   <div className="bg-white rounded-[2rem] border border-stone-100 p-8 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] flex flex-col justify-between relative overflow-hidden group hover:shadow-[0_20px_50px_-10px_rgba(217,119,6,0.1)] hover:-translate-y-1.5 transition-all duration-500 md:col-span-2 lg:col-span-1">
-                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-[#d97706]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <Brush size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-[#b45309] opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-amber-600/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <Brush size={160} strokeWidth={0.5} className="absolute -right-10 -bottom-10 text-amber-700 opacity-[0.03] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-700 pointer-events-none" />
                     
                     <div className="relative z-10 flex flex-col h-full justify-between">
                       <div className="flex justify-between items-start mb-6">
@@ -852,7 +852,7 @@ export default async function AdminPage(props: {
                 <div className="bg-white rounded-[2.5rem] border border-stone-200/60 p-8 shadow-sm">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
+                      <div className="h-1.5 w-8 bg-amber-600 rounded-full" />
                       <div>
                         <h3 className="font-bold text-base text-stone-900">Arqueo de Caja y Finanzas</h3>
                         <p className="text-stone-500 text-[10px] uppercase font-bold tracking-wider mt-0.5">
@@ -908,7 +908,7 @@ export default async function AdminPage(props: {
                     <div className="bg-gradient-to-br from-amber-50/40 to-white p-5 rounded-2xl border border-amber-100 hover:border-amber-300 transition-all">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
-                          <Wallet size={14} className="text-[#b45309]" /> Transferencia
+                          <Wallet size={14} className="text-amber-700" /> Transferencia
                         </span>
                         <span className="w-2 h-2 rounded-full bg-amber-500" />
                       </div>
@@ -950,26 +950,26 @@ export default async function AdminPage(props: {
                       <svg viewBox="0 0 600 200" className="w-full h-auto max-h-56" preserveAspectRatio="xMidYMid meet">
                         <defs>
                           <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#d97706" stopOpacity="0.15"/>
-                            <stop offset="100%" stopColor="#d97706" stopOpacity="0.0"/>
+                            <stop offset="0%" stopColor="var(--color-amber-600)" stopOpacity="0.15"/>
+                            <stop offset="100%" stopColor="var(--color-amber-600)" stopOpacity="0.0"/>
                           </linearGradient>
                         </defs>
                         {/* Grid Lines */}
-                        <line x1="40" y1="20" x2="560" y2="20" stroke="#F1F5F9" strokeWidth="2" strokeDasharray="4" />
-                        <line x1="40" y1="90" x2="560" y2="90" stroke="#F1F5F9" strokeWidth="2" strokeDasharray="4" />
-                        <line x1="40" y1="160" x2="560" y2="160" stroke="#E2E8F0" strokeWidth="1" />
+                        <line x1="40" y1="20" x2="560" y2="20" stroke="var(--color-stone-100)" strokeWidth="2" strokeDasharray="4" />
+                        <line x1="40" y1="90" x2="560" y2="90" stroke="var(--color-stone-100)" strokeWidth="2" strokeDasharray="4" />
+                        <line x1="40" y1="160" x2="560" y2="160" stroke="var(--color-stone-200)" strokeWidth="1" />
 
                         {/* Area Fill */}
                         <path d={areaPath} fill="url(#salesGrad)" />
 
                         {/* Line */}
-                        <path d={linePath} fill="none" stroke="#d97706" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d={linePath} fill="none" stroke="var(--color-amber-600)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
                         {/* Points */}
                         {points.map((p, i) => (
                           <g key={i}>
                             <title>{`${p.date}: S/ ${p.total.toFixed(2)}`}</title>
-                            <circle cx={p.x} cy={p.y} r="5" fill="#FFFFFF" stroke="#d97706" strokeWidth="3" />
+                            <circle cx={p.x} cy={p.y} r="5" fill="var(--color-white)" stroke="var(--color-amber-600)" strokeWidth="3" />
                             {showTrendPointLabels && (
                               <text x={p.x} y={p.y - 12} textAnchor="middle" className="text-[10px] font-bold fill-stone-800">
                                 S/ {Math.round(p.total)}
@@ -996,13 +996,13 @@ export default async function AdminPage(props: {
                         <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
                           <svg className="w-full h-full transform -rotate-90">
                             {/* Background Circle */}
-                            <circle cx="48" cy="48" r="38" stroke="#F5F5F4" strokeWidth="8" fill="transparent" />
+                            <circle cx="48" cy="48" r="38" stroke="var(--color-stone-100)" strokeWidth="8" fill="transparent" />
                             {/* Progress Circle */}
                             <circle
                               cx="48"
                               cy="48"
                               r="38"
-                              stroke="#d97706"
+                              stroke="var(--color-amber-600)"
                               strokeWidth="8"
                               fill="transparent"
                               strokeDasharray={2 * Math.PI * 38}
@@ -1056,11 +1056,11 @@ export default async function AdminPage(props: {
                         <div>
                           <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
                             <span className="text-stone-500">💳 Tarjeta / Online</span>
-                            <span className="text-[#b45309]">{formatMoney(totalCard)}</span>
+                            <span className="text-amber-700">{formatMoney(totalCard)}</span>
                           </div>
                           <div className="w-full bg-stone-100 h-2 rounded-full overflow-hidden">
                             <div
-                              className="bg-[#d97706] h-full rounded-full"
+                              className="bg-amber-600 h-full rounded-full"
                               style={{ width: `${totalIncome > 0 ? (totalCard / totalIncome) * 100 : 0}%` }}
                             />
                           </div>
@@ -1117,11 +1117,11 @@ export default async function AdminPage(props: {
                          <div className="relative w-28 h-28 shrink-0">
                            <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
                              {/* Fondo Efectivo (Gris) */}
-                             <circle cx="50" cy="50" r="40" fill="transparent" stroke="#E5E7EB" strokeWidth="20" />
+                             <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--color-stone-200)" strokeWidth="20" />
                              {/* Frente Digital (Naranja) */}
                              <circle
                                cx="50" cy="50" r="40" fill="transparent"
-                               stroke="#d97706" strokeWidth="20"
+                               stroke="var(--color-amber-600)" strokeWidth="20"
                                strokeDasharray={`${(digitalIncome/totalIncome) * 251.2} 251.2`}
                                className="transition-all duration-1000 ease-out"
                              />
@@ -1137,10 +1137,10 @@ export default async function AdminPage(props: {
                            </div>
                            <div className="flex justify-between items-center bg-amber-50/50 p-3 rounded-xl border border-amber-100">
                              <div className="flex items-center gap-2">
-                               <div className="w-3 h-3 rounded-full bg-[#d97706]" />
+                               <div className="w-3 h-3 rounded-full bg-amber-600" />
                                <span className="text-[10px] font-black uppercase text-stone-700">Digital</span>
                              </div>
-                             <span className="text-xs font-bold text-[#b45309]">{Math.round((digitalIncome/totalIncome)*100)}%</span>
+                             <span className="text-xs font-bold text-amber-700">{Math.round((digitalIncome/totalIncome)*100)}%</span>
                            </div>
                          </div>
                        </div>
@@ -1158,11 +1158,11 @@ export default async function AdminPage(props: {
           {activeTab === "estado" && (
             <div id="estado-actual" className="scroll-mt-24 mb-12 animate-fade-in-up">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-6">
-                <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
+                <div className="h-1.5 w-8 bg-amber-600 rounded-full" />
                 <h2 className="text-xl font-bold text-stone-900 tracking-tight">Estado de Habitaciones</h2>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:ml-auto text-[10px] font-bold uppercase tracking-wider">
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-white border border-stone-300" /> Libre</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#d97706]" /> Ocupada</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-600" /> Ocupada</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-400" /> Salida</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-rose-500 border border-rose-600" /> Sucia</span>
                 </div>
@@ -1180,7 +1180,7 @@ export default async function AdminPage(props: {
                       key={room.id}
                       className={`p-5 rounded-[1.5rem] border transition-all duration-500 flex flex-col justify-between h-40 relative overflow-hidden group hover:-translate-y-1 hover:shadow-2xl ${
                         isOccupied
-                          ? "bg-gradient-to-br from-stone-900 to-stone-800 text-white border-stone-800 shadow-[0_8px_30px_rgba(217,119,6,0.15)] ring-1 ring-inset ring-[#d97706]/20"
+                          ? "bg-gradient-to-br from-stone-900 to-stone-800 text-white border-stone-800 shadow-[0_8px_30px_rgba(217,119,6,0.15)] ring-1 ring-inset ring-amber-600/20"
                           : isCheckout
                           ? "bg-gradient-to-br from-amber-50 to-orange-50 text-amber-900 border-amber-200 shadow-lg shadow-amber-100/50"
                           : isDirty
@@ -1199,7 +1199,7 @@ export default async function AdminPage(props: {
                       </span>
                       
                       {/* Top Accent Line for specific states */}
-                      {isOccupied && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#d97706] to-amber-300 opacity-80" />}
+                      {isOccupied && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-600 to-amber-300 opacity-80" />}
                       {isDirty && <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-400 to-rose-600 opacity-80" />}
                       
                       <div className="z-10 flex justify-between items-start w-full gap-2">
@@ -1226,7 +1226,7 @@ export default async function AdminPage(props: {
                               isDirty 
                                 ? "bg-white text-rose-500 border-rose-100 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 hover:shadow-md" 
                                 : isOccupied
-                                ? "bg-white/10 text-stone-300 border-white/5 hover:bg-white hover:text-[#b45309] hover:shadow-md"
+                                ? "bg-white/10 text-stone-300 border-white/5 hover:bg-white hover:text-amber-700 hover:shadow-md"
                                 : "bg-stone-50 text-stone-500 border-stone-100 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 hover:shadow-md"
                             }`}
                           >
@@ -1246,7 +1246,7 @@ export default async function AdminPage(props: {
                               ? "bg-amber-400 text-amber-950 border-amber-500"
                               : info.paid
                               ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 backdrop-blur-sm"
-                              : "bg-[#d97706]/20 text-amber-300 border-[#d97706]/30 backdrop-blur-sm"
+                              : "bg-amber-600/20 text-amber-300 border-amber-600/30 backdrop-blur-sm"
                           }`}
                         >
                           {info.status === "free"
@@ -1269,7 +1269,7 @@ export default async function AdminPage(props: {
           {activeTab === "historial" && (
             <div id="historial" className="scroll-mt-24 mb-12 animate-fade-in-up">
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
+                <div className="h-1.5 w-8 bg-amber-600 rounded-full" />
                 <h2 className="text-xl font-bold text-stone-900 tracking-tight">Historial de Reservas</h2>
               </div>
 
@@ -1278,7 +1278,7 @@ export default async function AdminPage(props: {
                   <div>
                     <h3 className="font-bold text-lg text-stone-900">Historial Completo</h3>
                     <p className="text-stone-500 text-[10px] uppercase font-bold tracking-widest mt-1">
-                      Mostrando reservas de <span className="text-[#b45309]">{dateFrom}</span> a <span className="text-[#b45309]">{dateTo}</span>
+                      Mostrando reservas de <span className="text-amber-700">{dateFrom}</span> a <span className="text-amber-700">{dateTo}</span>
                       {searchedBookings && (
                         <span className="ml-2 bg-stone-100 px-2 py-0.5 rounded-full text-stone-600 text-[10px]">
                           {searchedBookings.length} registros
@@ -1530,7 +1530,7 @@ export default async function AdminPage(props: {
           {activeTab === "inventario" && (
             <div id="inventario" className="scroll-mt-24 mb-12 animate-fade-in-up">
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
+                <div className="h-1.5 w-8 bg-amber-600 rounded-full" />
                 <h2 className="text-xl font-bold text-stone-900 tracking-tight">Gestión de Inventario</h2>
                 <span className="text-[10px] bg-stone-100 text-stone-600 px-3 py-1 rounded-full font-bold">
                   {rooms?.length} habitaciones
@@ -1587,7 +1587,7 @@ export default async function AdminPage(props: {
             <div className="animate-fade-in-up bg-white rounded-[2.5rem] p-6 md:p-8 border border-stone-100 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] overflow-hidden">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-3">
-                  <div className="h-1.5 w-8 bg-[#d97706] rounded-full" />
+                  <div className="h-1.5 w-8 bg-amber-600 rounded-full" />
                   <div>
                     <h2 className="text-xl font-bold text-stone-900 tracking-tight">Room Rack (Calendario Visual)</h2>
                     <p className="text-stone-500 text-[10px] uppercase font-bold tracking-wider mt-0.5">
@@ -1628,7 +1628,7 @@ export default async function AdminPage(props: {
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-black uppercase tracking-wider bg-white/70 px-4 py-2.5 rounded-xl border border-stone-200/60 shadow-xs">
                     <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm" /> Pagado</span>
                     <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 shadow-sm" /> Parcial</span>
-                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#d97706] shadow-sm" /> Pendiente</span>
+                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-600 shadow-sm" /> Pendiente</span>
                     <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-stone-200 shadow-sm" /> Libre (+)</span>
                   </div>
                 </div>
@@ -1682,10 +1682,10 @@ export default async function AdminPage(props: {
                             const isToday = d.toDateString() === new Date().toDateString();
                             return (
                               <div key={i} className={`flex flex-col items-center justify-center py-2 border-l border-stone-200 w-[55px] shrink-0 ${isToday ? "bg-blue-50/80 rounded-t-lg border-blue-200" : isWeekend ? "bg-stone-50/80 rounded-t-lg" : ""}`}>
-                                <span className={`text-[10px] font-bold uppercase ${isToday ? "text-blue-600" : isWeekend ? "text-[#b45309]" : "text-stone-500"}`}>
+                                <span className={`text-[10px] font-bold uppercase ${isToday ? "text-blue-600" : isWeekend ? "text-amber-700" : "text-stone-500"}`}>
                                   {d.toLocaleDateString("es-PE", { weekday: "short" }).replace(".","")}
                                 </span>
-                                <span className={`text-sm font-black ${isToday ? "text-blue-700 bg-blue-100/50 px-2 rounded-md" : isWeekend ? "text-[#b45309]" : "text-stone-800"}`}>
+                                <span className={`text-sm font-black ${isToday ? "text-blue-700 bg-blue-100/50 px-2 rounded-md" : isWeekend ? "text-amber-700" : "text-stone-800"}`}>
                                   {d.getDate()}
                                 </span>
                               </div>
@@ -1759,7 +1759,7 @@ export default async function AdminPage(props: {
                                           ? "bg-gradient-to-r from-emerald-400 to-emerald-500 text-white shadow-emerald-500/30" 
                                           : booking.status === "parcial"
                                           ? "bg-gradient-to-r from-blue-400 to-blue-500 text-white shadow-blue-500/30"
-                                          : "bg-gradient-to-r from-[#d97706] to-amber-500 text-white shadow-amber-500/30"
+                                          : "bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-amber-500/30"
                                       }`}
                                       style={{ left: `calc(${leftPx}px + 6px)`, width: `calc(${widthPx}px - 12px)` }}
                                       title={`Huésped: ${booking.client_name} | Ingreso: ${booking.check_in} | Salida: ${booking.check_out}${booking.special_requests ? ` | Nota: ${booking.special_requests}` : ""}`}

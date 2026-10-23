@@ -153,7 +153,7 @@ export default function LoginPage() {
   // Skeleton loader premium
   if (checkingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+      <div className="min-h-screen flex items-center justify-center bg-parchment">
         <div className="w-full max-w-md p-10">
           {/* Skeleton card */}
           <div className="space-y-6">
@@ -177,14 +177,14 @@ export default function LoginPage() {
     <main id="contenido" tabIndex={-1} className="outline-none min-h-screen font-sans text-stone-800 relative flex items-center justify-center p-4">
       {/* Fondo */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-[#FFFDF5]/92 backdrop-blur-[3px]" />
+        <div className="absolute inset-0 bg-cream/92 backdrop-blur-[3px]" />
       </div>
 
       <div className="animate-scale-in relative z-10 w-full max-w-md bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 md:p-10 shadow-2xl border border-stone-100/50">
         {/* Botón de Regresar */}
         <Link
           href="/"
-          className="animate-fade-in-up inline-flex items-center gap-1.5 text-xs font-bold text-stone-500 hover:text-[#e3004f] transition mb-6 group"
+          className="animate-fade-in-up inline-flex items-center gap-1.5 text-xs font-bold text-stone-500 hover:text-rose-500 transition mb-6 group"
         >
           <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Volver al Inicio
@@ -265,7 +265,7 @@ export default function LoginPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
-                className="w-full p-3.5 pl-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-[#e3004f]/10 focus:border-[#e3004f] transition text-sm"
+                className="w-full p-3.5 pl-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500/10 focus:border-rose-500 transition text-sm"
               />
             </div>
           )}
@@ -281,7 +281,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-3.5 pl-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-[#e3004f]/10 focus:border-[#e3004f] transition text-sm"
+              className="w-full p-3.5 pl-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500/10 focus:border-rose-500 transition text-sm"
             />
           </div>
 
@@ -296,7 +296,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-3.5 pl-11 pr-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-[#e3004f]/10 focus:border-[#e3004f] transition text-sm"
+              className="w-full p-3.5 pl-11 pr-11 bg-white border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500/10 focus:border-rose-500 transition text-sm"
             />
             <button
               type="button"
@@ -311,7 +311,7 @@ export default function LoginPage() {
 
           <button
             disabled={loading}
-            className="animate-fade-in-up btn-shimmer w-full bg-[#e3004f] hover:bg-black text-white font-bold py-4 rounded-xl transition shadow-lg hover:shadow-rose-950/20 disabled:opacity-50 text-xs tracking-wider uppercase flex items-center justify-center gap-2 mt-2 cursor-pointer"
+            className="animate-fade-in-up btn-shimmer w-full bg-rose-500 hover:bg-black text-white font-bold py-4 rounded-xl transition shadow-lg hover:shadow-rose-950/20 disabled:opacity-50 text-xs tracking-wider uppercase flex items-center justify-center gap-2 mt-2 cursor-pointer"
             style={{ animationDelay: "250ms" }}
           >
             {loading ? (
@@ -329,7 +329,7 @@ export default function LoginPage() {
           {isLogin ? "¿No tienes cuenta? " : "¿Ya tienes cuenta? "}
           <button
             onClick={toggleMode}
-            className="font-bold text-[#e3004f] hover:underline"
+            className="font-bold text-rose-500 hover:underline"
           >
             {isLogin ? "Regístrate aquí" : "Inicia sesión aquí"}
           </button>

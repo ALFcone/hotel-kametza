@@ -151,6 +151,8 @@ Paleta cálida de dos registros: rosa sobre crema para el huésped, ámbar sobre
 
 **The Piedra Cálida Rule.** Todos los grises vienen de la familia `stone`. Un gris frío (`gray`, `slate`, `zinc`) rompe el calor del conjunto.
 
+**The Sin Hex En Clases Rule.** Ningún color de Kametza se escribe como hex dentro de una clase (`bg-[#e3004f]`). Cada uno tiene nombre en `@theme` de `app/globals.css`: `rose-500` (rosa de marca) con su escala, `amber-600` y `amber-700` (los dos ámbares del panel, fijados en `#d97706` y `#b45309` porque Tailwind v4 trae versiones más vivas), `parchment` (`#fdfbf7`, lienzo público), `parchment-warm` (`#faf6f0`, lienzo del panel), `cream` (`#fffdf5`, velo sobre fondos) y `whatsapp` / `whatsapp-dark`. El código que no puede usar clases (botones de SweetAlert2, confeti) toma los valores de `lib/brand-colors.ts`. Quedan como hex solo los colores de marcas ajenas (Google, Visa, Mastercard, Instagram, Facebook), la paleta del confeti y el tinte `#3a0614` del hero.
+
 ## Typography
 
 **Display / Headline Font:** Playfair Display (con Georgia, serif)

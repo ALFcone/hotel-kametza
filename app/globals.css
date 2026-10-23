@@ -24,6 +24,17 @@
   --color-rose-800: #8a0030;
   --color-rose-900: #730029;
   --color-rose-950: #4a001a;
+  /* Los dos ambares del panel /admin tal como los documenta DESIGN.md. Tailwind v4
+     trae amber-600 y amber-700 mas vivos (#e17100, #bb4d00), asi que se fijan aqui. */
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  /* Lienzos calidos del sitio y del panel (DESIGN.md: crema) */
+  --color-parchment: #fdfbf7;
+  --color-parchment-warm: #faf6f0;
+  --color-cream: #fffdf5;
+  /* Verde de marca de WhatsApp para los botones de contacto */
+  --color-whatsapp: #25d366;
+  --color-whatsapp-dark: #1da851;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -109,7 +120,7 @@ body {
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, #f5f5f4 25%, #e7e5e4 37%, #f5f5f4 63%);
+  background: linear-gradient(90deg, var(--color-stone-100) 25%, var(--color-stone-200) 37%, var(--color-stone-100) 63%);
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
@@ -186,12 +197,12 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #d6d3d1;
+  background: var(--color-stone-300);
   border-radius: 999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #a8a29e;
+  background: var(--color-stone-400);
 }
 
 /* Smooth scrolling */
@@ -255,7 +266,7 @@ html {
 }
 
 .password-toggle:hover {
-  color: #e3004f;
+  color: var(--color-rose-500);
 }
 /* Thermal Printer CSS */
 @page {
@@ -330,7 +341,7 @@ html {
   /* Esqueletos de carga: bloque quieto, sin barrido */
   .animate-shimmer {
     animation: none;
-    background: #e7e5e4;
+    background: var(--color-stone-200);
   }
 
   /* Sin parallax con fondo fijo */

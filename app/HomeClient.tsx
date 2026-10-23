@@ -554,7 +554,7 @@ function BookingModal({
                 <p className="text-[10px] uppercase font-bold text-stone-500 mb-1 tracking-widest">
                   Total a Pagar
                 </p>
-                <p className="text-2xl font-black text-[#e3004f]">
+                <p className="text-2xl font-black text-rose-500">
                   S/ {totalPrice}
                 </p>
               </div>
@@ -755,13 +755,13 @@ function BookingModal({
 
             <div className="md:hidden flex justify-between items-center text-xs font-bold text-stone-500 border-t pt-2">
               <span>Total ({nights} noches):</span>
-              <span className="text-lg text-[#e3004f]">S/ {totalPrice}</span>
+              <span className="text-lg text-rose-500">S/ {totalPrice}</span>
             </div>
 
             <button
               disabled={isSubmitting}
               type="submit"
-              className="w-full bg-[#e3004f] text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50 mt-2"
+              className="w-full bg-rose-500 text-white font-black py-4 rounded-xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50 mt-2"
             >
               {isSubmitting ? (
                 "Procesando..."
@@ -818,7 +818,7 @@ function BookingModal({
                 onClick={() => setCurrentGalleryIndex(idx)}
                 aria-label={`Ver foto ${idx + 1}`}
                 aria-current={idx === currentGalleryIndex}
-                className={`relative before:absolute before:-inset-2 before:content-[''] w-3 h-3 rounded-full transition-all ${idx === currentGalleryIndex ? 'bg-[#e3004f] scale-125' : 'bg-white/50 hover:bg-white'}`}
+                className={`relative before:absolute before:-inset-2 before:content-[''] w-3 h-3 rounded-full transition-all ${idx === currentGalleryIndex ? 'bg-rose-500 scale-125' : 'bg-white/50 hover:bg-white'}`}
               />
             ))}
           </div>
@@ -876,12 +876,12 @@ function RoomCard({
             <p className="text-[10px] uppercase font-bold text-stone-500 tracking-widest mb-0.5">
               Por noche
             </p>
-            <p className="text-xl font-black text-[#e3004f]">
+            <p className="text-xl font-black text-rose-500">
               S/ {room.price_per_night}
             </p>
           </div>
           <div className="absolute top-4 left-4 z-20">
-            <span className="bg-[#e3004f] text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] shadow-lg">
+            <span className="bg-rose-500 text-white text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] shadow-lg">
               Exclusivo
             </span>
           </div>
@@ -903,29 +903,29 @@ function RoomCard({
             </div>
           </div>
 
-          <p className="text-stone-600 text-[15px] mb-7 leading-relaxed line-clamp-3 relative pl-4 border-l-[3px] border-[#e3004f] bg-gradient-to-r from-rose-50/50 to-transparent py-1 pr-2 rounded-r-lg">
+          <p className="text-stone-600 text-[15px] mb-7 leading-relaxed line-clamp-3 relative pl-4 border-l-[3px] border-rose-500 bg-gradient-to-r from-rose-50/50 to-transparent py-1 pr-2 rounded-r-lg">
             {simpleDesc}
           </p>
 
           <div className="grid grid-cols-2 gap-2.5 mb-8">
             <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
-              <Wifi size={16} className="text-[#e3004f]" />
+              <Wifi size={16} className="text-rose-500" />
               <span className="text-[10px] font-black uppercase tracking-wider">
                 WiFi Fibra Óptica
               </span>
             </div>
             <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
-              <Clock size={16} className="text-[#e3004f]" />
+              <Clock size={16} className="text-rose-500" />
               <span className="text-[10px] font-black uppercase tracking-wider">
                 Agua Caliente 24h
               </span>
             </div>
             <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
-              <Tv size={16} className="text-[#e3004f]" />
+              <Tv size={16} className="text-rose-500" />
               <span className="text-[10px] font-black uppercase tracking-wider">Smart TV</span>
             </div>
             <div className="flex items-center gap-2.5 text-rose-950 bg-rose-50/80 p-3 rounded-xl border border-rose-100/50 hover:bg-rose-100/50 transition">
-              <Users size={16} className="text-[#e3004f]" />
+              <Users size={16} className="text-rose-500" />
               <span className="text-[10px] font-black uppercase tracking-wider">
                 Baño Privado
               </span>
@@ -935,7 +935,7 @@ function RoomCard({
           <div className="mt-auto pt-4 border-t border-stone-100">
             <button
               onClick={() => setShowModal(true)}
-              className="w-full bg-gradient-to-r from-[#e3004f] to-[#b3003e] text-white font-bold py-4 rounded-xl hover:shadow-[0_10px_20px_rgba(227,0,79,0.3)] hover:-translate-y-1 transition-all flex items-center justify-between px-6 group/btn"
+              className="w-full bg-gradient-to-r from-rose-500 to-rose-700 text-white font-bold py-4 rounded-xl hover:shadow-[0_10px_20px_rgba(227,0,79,0.3)] hover:-translate-y-1 transition-all flex items-center justify-between px-6 group/btn"
             >
               <span className="text-xs uppercase tracking-[0.2em]">
                 Ver Disponibilidad
@@ -1117,7 +1117,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
   const isStaff = !!userRole;
 
   return (
-    <div className="min-h-screen font-sans text-stone-800 selection:bg-rose-200 selection:text-rose-900 relative bg-[#FDFBF7]">
+    <div className="min-h-screen font-sans text-stone-800 selection:bg-rose-200 selection:text-rose-900 relative bg-parchment">
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
@@ -1149,14 +1149,14 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-600 hover:text-[#e3004f] transition-colors duration-300"
+                  className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-600 hover:text-rose-500 transition-colors duration-300"
                 >
                   <item.icon
                     size={16}
-                    className="text-[#e3004f] group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 drop-shadow-sm"
+                    className="text-rose-500 group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 drop-shadow-sm"
                   />
                   {item.name}
-                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-[#e3004f] -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
+                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-rose-500 -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
                 </a>
               ))}
             </div>
@@ -1175,9 +1175,9 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   {/* BOTÓN DE USUARIO MINIMALISTA */}
                   <a
                     href={isStaff ? "/admin" : "/dashboard"}
-                    className="group flex items-center gap-2 text-stone-600 hover:text-[#e3004f] transition-colors duration-300"
+                    className="group flex items-center gap-2 text-stone-600 hover:text-rose-500 transition-colors duration-300"
                   >
-                    <div className="p-1.5 rounded-full border border-stone-200 group-hover:border-[#e3004f] transition-colors">
+                    <div className="p-1.5 rounded-full border border-stone-200 group-hover:border-rose-500 transition-colors">
                       <User size={16} strokeWidth={1.5} />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-widest">
@@ -1197,17 +1197,17 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 /* BOTÓN ACCEDER ESTILO CÁPSULA */
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="group flex items-center gap-2 bg-stone-50 border border-stone-200 hover:border-[#e3004f]/30 hover:bg-rose-50 text-stone-600 hover:text-[#e3004f] px-5 py-2.5 rounded-full transition-all duration-300 text-[11px] font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
+                  className="group flex items-center gap-2 bg-stone-50 border border-stone-200 hover:border-rose-500/30 hover:bg-rose-50 text-stone-600 hover:text-rose-500 px-5 py-2.5 rounded-full transition-all duration-300 text-[11px] font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
                 >
                   <div className="bg-white p-1 rounded-full group-hover:scale-110 transition-transform">
-                    <LogIn size={14} className="text-[#e3004f]" />
+                    <LogIn size={14} className="text-rose-500" />
                   </div>
                   Acceder
                 </button>
               )}
               <a
                 href="#habitaciones"
-                className="btn-shimmer bg-[#e3004f] text-white px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-rose-900/40 transform hover:-translate-y-0.5"
+                className="btn-shimmer bg-rose-500 text-white px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-rose-900/40 transform hover:-translate-y-0.5"
               >
                 Reservar
               </a>
@@ -1270,7 +1270,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             {currentUser ? (
               <div className="flex flex-col items-center gap-6 animate-in slide-in-from-bottom-4 duration-500">
                 <div className="flex flex-col items-center gap-2">
-                  <div className="p-3 rounded-full border-2 border-[#e3004f]/20 bg-rose-50 text-[#e3004f]">
+                  <div className="p-3 rounded-full border-2 border-rose-500/20 bg-rose-50 text-rose-500">
                     <User size={24} strokeWidth={1.5} />
                   </div>
                   <span className="text-sm font-bold uppercase tracking-widest text-stone-800">
@@ -1281,7 +1281,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 <a
                   href={isStaff ? "/admin" : "/dashboard"}
                   onClick={closeMenu}
-                  className="py-3.5 text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-[#e3004f] transition-colors"
+                  className="py-3.5 text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-rose-500 transition-colors"
                 >
                   Ir al Panel
                 </a>
@@ -1336,7 +1336,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
           />
           {/* OVERLAY OSCURECIDO PARA QUE EL TEXTO BLANCO RESALTE MÁS */}
           <div className="absolute inset-0 bg-[#3a0614]/40 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-900/40 to-[#FDFBF7]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-900/40 to-parchment" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -1351,15 +1351,15 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             </div>
             
             {/* NOMBRE DEL HOTEL: COLOR SOLIDO IGUAL AL LOGO (muestreado de logoo.png) */}
-            <h1 className="text-[clamp(2.5rem,14vw,3.75rem)] md:text-8xl lg:text-[9rem] font-serif font-black text-[#C4023E] tracking-[0.15em] leading-none uppercase py-2 [text-shadow:0_0_35px_rgba(255,255,255,0.35),0_0_12px_rgba(255,255,255,0.25),0_8px_15px_rgba(0,0,0,0.9)]">
+            <h1 className="text-[clamp(2.5rem,14vw,3.75rem)] md:text-8xl lg:text-[9rem] font-serif font-black text-rose-600 tracking-[0.15em] leading-none uppercase py-2 [text-shadow:0_0_35px_rgba(255,255,255,0.35),0_0_12px_rgba(255,255,255,0.25),0_8px_15px_rgba(0,0,0,0.9)]">
               Kametza
             </h1>
             
             {/* SUBTÍTULO CLÁSICO CON ACENTO DEL LOGO */}
             <h2 className="text-2xl md:text-4xl font-serif italic text-white font-bold tracking-wider drop-shadow-lg flex items-center gap-4">
-              <span className="h-px w-10 md:w-16 bg-gradient-to-r from-transparent to-[#e3004f]/80"></span>
+              <span className="h-px w-10 md:w-16 bg-gradient-to-r from-transparent to-rose-500/80"></span>
               Hotel & Suites
-              <span className="h-px w-10 md:w-16 bg-gradient-to-l from-transparent to-[#e3004f]/80"></span>
+              <span className="h-px w-10 md:w-16 bg-gradient-to-l from-transparent to-rose-500/80"></span>
             </h2>
           </div>
           
@@ -1369,7 +1369,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
 
           <div className="flex justify-center mb-8">
             <div className="inline-flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#C4023E] animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
               <span className="text-[10px] md:text-xs text-stone-800 font-bold tracking-widest uppercase">
                 Mejor Tarifa Garantizada Reservando Aquí
               </span>
@@ -1391,13 +1391,13 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 }
               }}
             >
-              <label htmlFor="hero-checkin" className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
+              <label htmlFor="hero-checkin" className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1 group-hover:text-rose-500 transition cursor-pointer">
                 Check-in
               </label>
               <div className="flex items-center w-full">
                 <CalendarDays
                   size={18}
-                  className="text-stone-300 mr-3 group-hover:text-[#e3004f] transition"
+                  className="text-stone-300 mr-3 group-hover:text-rose-500 transition"
                 />
                 <input
                   id="hero-checkin"
@@ -1434,13 +1434,13 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 }
               }}
             >
-              <label htmlFor="hero-checkout" className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
+              <label htmlFor="hero-checkout" className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1 group-hover:text-rose-500 transition cursor-pointer">
                 Check-out
               </label>
               <div className="flex items-center w-full">
                 <CalendarDays
                   size={18}
-                  className="text-stone-300 mr-3 group-hover:text-[#e3004f] transition"
+                  className="text-stone-300 mr-3 group-hover:text-rose-500 transition"
                 />
                 <input
                   id="hero-checkout"
@@ -1466,7 +1466,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <div className="p-2 w-full md:w-auto">
               <a
                 href="#habitaciones"
-                className="bg-gradient-to-r from-[#e3004f] to-[#b3003e] text-white px-8 py-4 rounded-xl md:rounded-full shadow-[0_10px_20px_rgba(227,0,79,0.3)] hover:shadow-[0_15px_30px_rgba(227,0,79,0.4)] hover:-translate-y-1 transition-all w-full flex items-center justify-center gap-2 group"
+                className="bg-gradient-to-r from-rose-500 to-rose-700 text-white px-8 py-4 rounded-xl md:rounded-full shadow-[0_10px_20px_rgba(227,0,79,0.3)] hover:shadow-[0_15px_30px_rgba(227,0,79,0.4)] hover:-translate-y-1 transition-all w-full flex items-center justify-center gap-2 group"
               >
                 <Search
                   size={20}
@@ -1525,7 +1525,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
           <div className="text-center mb-20">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
-              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+              <span className="text-rose-500 font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                 Experiencia Kametza
               </span>
               <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
@@ -1626,7 +1626,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
 
                     <div className="p-8 md:p-12 flex flex-col justify-center">
                       <div className="flex items-center gap-4 mb-4">
-                        <span className="text-[#e3004f] font-serif italic text-lg md:text-xl font-medium tracking-wide flex items-center gap-2">
+                        <span className="text-rose-500 font-serif italic text-lg md:text-xl font-medium tracking-wide flex items-center gap-2">
                           <Icon size={20} /> Detalle del Servicio
                         </span>
                         <div className="h-[1px] flex-1 bg-rose-200"></div>
@@ -1663,7 +1663,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                           href={`https://wa.me/51966556622?text=${encodeURIComponent(service.waMsg)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center w-full sm:w-auto gap-2 bg-[#25D366] text-white rounded-full py-3 px-8 text-xs md:text-sm font-black tracking-widest shadow-lg hover:bg-green-600 hover:shadow-xl hover:-translate-y-1 transition-all"
+                          className="inline-flex items-center justify-center w-full sm:w-auto gap-2 bg-whatsapp text-white rounded-full py-3 px-8 text-xs md:text-sm font-black tracking-widest shadow-lg hover:bg-green-600 hover:shadow-xl hover:-translate-y-1 transition-all"
                         >
                           SOLICITAR <ArrowRight size={16} />
                         </a>
@@ -1687,7 +1687,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <div className="text-left max-w-2xl">
               <div className="flex items-center gap-4 mb-4">
                 <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
-                <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+                <span className="text-rose-500 font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                   Opiniones de huéspedes
                 </span>
               </div>
@@ -1760,7 +1760,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             
             <div className="flex items-center gap-4 mb-4 relative z-10">
               <div className="h-[1px] w-12 md:w-20 bg-rose-300"></div>
-              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+              <span className="text-rose-500 font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                 Ubicación Estratégica
               </span>
             </div>
@@ -1851,7 +1851,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="h-[1px] w-12 md:w-20 bg-rose-200"></div>
-              <span className="text-[#e3004f] font-serif italic text-lg md:text-2xl font-medium tracking-wide">
+              <span className="text-rose-500 font-serif italic text-lg md:text-2xl font-medium tracking-wide">
                 Preguntas Frecuentes
               </span>
               <div className="h-[1px] w-12 md:w-20 bg-rose-200"></div>
@@ -1947,7 +1947,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         id="contacto"
         className="min-h-screen flex flex-col justify-center py-24 relative overflow-hidden z-10 w-full bg-[url('/bg_contacto.png')] bg-cover bg-center bg-fixed border-t border-stone-200"
       >
-        <div className="absolute inset-0 bg-[#FDFBF7]/95 backdrop-blur-md"></div>
+        <div className="absolute inset-0 bg-parchment/95 backdrop-blur-md"></div>
         <div className="w-full px-4 md:px-8 xl:px-12 relative z-10 max-w-7xl mx-auto">
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -2029,7 +2029,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <label htmlFor="contact-message" className="text-[10px] font-bold uppercase tracking-widest text-stone-500 ml-2 block mb-1">Tu Consulta</label>
                   <textarea id="contact-message" name="message" required rows={4} className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
                 </div>
-                <button type="submit" className="w-full bg-stone-900 text-white font-bold py-4 rounded-2xl hover:bg-[#e3004f] transition-all shadow-lg hover:shadow-rose-900/20 text-sm tracking-widest uppercase mt-4">
+                <button type="submit" className="w-full bg-stone-900 text-white font-bold py-4 rounded-2xl hover:bg-rose-500 transition-all shadow-lg hover:shadow-rose-900/20 text-sm tracking-widest uppercase mt-4">
                   Enviar Mensaje
                 </button>
               </form>
@@ -2041,10 +2041,10 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
       </main>
 
       {/* --- FOOTER PREMIUM --- */}
-      <footer className="bg-[#FDFBF7] border-t border-stone-200 pt-24 pb-12 text-sm relative z-10 w-full overflow-hidden">
+      <footer className="bg-parchment border-t border-stone-200 pt-24 pb-12 text-sm relative z-10 w-full overflow-hidden">
         {/* Elemento decorativo del footer */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-rose-200/30 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#e3004f]/5 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-rose-500/5 rounded-full blur-[100px] pointer-events-none"></div>
 
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 xl:px-12 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-12 xl:gap-8 mb-20">
@@ -2076,10 +2076,10 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <div>
               <h4 className="text-rose-600 font-bold tracking-widest text-xs uppercase mb-6">Descubre</h4>
               <ul>
-                <li><a href="#inicio" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Inicio</a></li>
-                <li><a href="#habitaciones" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Habitaciones</a></li>
-                <li><a href="#servicios" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Experiencia Kametza</a></li>
-                <li><a href="#ubicacion" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Ubicación</a></li>
+                <li><a href="#inicio" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-rose-500" /> Inicio</a></li>
+                <li><a href="#habitaciones" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-rose-500" /> Habitaciones</a></li>
+                <li><a href="#servicios" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-rose-500" /> Experiencia Kametza</a></li>
+                <li><a href="#ubicacion" className="text-stone-700 font-medium hover:text-rose-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-rose-500" /> Ubicación</a></li>
               </ul>
             </div>
 
@@ -2087,7 +2087,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <div>
               <h4 className="text-rose-600 font-bold tracking-widest text-xs uppercase mb-6">Ubicación</h4>
               <div className="flex items-start gap-3 text-stone-700 mb-4 font-medium">
-                <MapPin size={18} className="text-[#e3004f] flex-shrink-0 mt-1" />
+                <MapPin size={18} className="text-rose-500 flex-shrink-0 mt-1" />
                 <p className="leading-relaxed">
                   Jirón Las Américas #154<br />
                   Ref. Óvalo Magdalena<br />
@@ -2133,7 +2133,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         href="https://wa.me/51966556622?text=Hola%20Hotel%20Kametza,%20deseo%20hacer%20una%20consulta."
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-[100] bg-[#25D366] text-white p-4 rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:scale-110 hover:shadow-[0_6px_25px_rgba(37,211,102,0.6)] transition-all duration-300 flex items-center justify-center group"
+        className="fixed bottom-6 right-6 z-[100] bg-whatsapp text-white p-4 rounded-full shadow-[0_4px_20px_rgba(37,211,102,0.4)] hover:scale-110 hover:shadow-[0_6px_25px_rgba(37,211,102,0.6)] transition-all duration-300 flex items-center justify-center group"
         aria-label="Contactar por WhatsApp"
       >
         <span className="absolute -top-10 bg-white text-stone-800 text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">

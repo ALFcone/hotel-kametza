@@ -13,6 +13,7 @@ import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, Mess
 import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, fetchRucData, fetchDniData, cancelBooking } from "@/app/actions";
 import ThermalTicket from "./ThermalTicket";
 import Swal from "sweetalert2";
+import { BRAND_COLORS } from "@/lib/brand-colors";
 
 interface AdminTableActionsProps {
   bookingId: number;
@@ -256,8 +257,8 @@ export function AdminTableActions({
       text: "Se generará una Nota de Crédito y la habitación quedará libre. Esta acción no se puede deshacer.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#e3004f", // Kametza red
-      cancelButtonColor: "#a8a29e",
+      confirmButtonColor: BRAND_COLORS.rose, // Kametza red
+      cancelButtonColor: BRAND_COLORS.stoneSoft,
       confirmButtonText: "Sí, anular reserva",
       cancelButtonText: "No, mantener"
     });

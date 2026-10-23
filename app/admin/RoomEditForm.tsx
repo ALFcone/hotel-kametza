@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { updateRoom, addRoomGalleryImages, removeRoomGalleryImage } from "../actions";
 import { X, ImagePlus } from "lucide-react";
 import Swal from "sweetalert2";
+import { BRAND_COLORS } from "@/lib/brand-colors";
 
 export default function RoomEditForm({ room }: { room: any }) {
   const [saving, setSaving] = useState(false);
@@ -69,8 +70,8 @@ export default function RoomEditForm({ room }: { room: any }) {
       title: "¿Quitar esta foto de la galería?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#e3004f",
-      cancelButtonColor: "#a8a29e",
+      confirmButtonColor: BRAND_COLORS.rose,
+      cancelButtonColor: BRAND_COLORS.stoneSoft,
       confirmButtonText: "Sí, quitar",
       cancelButtonText: "Cancelar",
     });
@@ -92,7 +93,7 @@ export default function RoomEditForm({ room }: { room: any }) {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="group/input">
-            <label className="text-[10px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
+            <label className="text-[10px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-amber-700 transition-colors">
               Precio Noche
             </label>
             <div className="relative w-28">
@@ -101,12 +102,12 @@ export default function RoomEditForm({ room }: { room: any }) {
                 name="price"
                 defaultValue={room.price_per_night}
                 type="number"
-                className="w-full pl-7 pr-2 min-h-11 bg-stone-50/50 rounded-lg border border-stone-200 font-bold text-stone-700 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] outline-none transition-all text-xs shadow-inner shadow-stone-100/50"
+                className="w-full pl-7 pr-2 min-h-11 bg-stone-50/50 rounded-lg border border-stone-200 font-bold text-stone-700 focus:bg-white focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600 outline-none transition-all text-xs shadow-inner shadow-stone-100/50"
               />
             </div>
           </div>
           <div className="group/input">
-            <label className="text-[10px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
+            <label className="text-[10px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-amber-700 transition-colors">
               Foto de Portada
             </label>
             <input type="hidden" name="oldImage" value={room.image_url || ""} />
@@ -115,19 +116,19 @@ export default function RoomEditForm({ room }: { room: any }) {
               type="file"
               aria-label="Foto de portada"
               accept="image/*"
-              className="w-full min-h-11 bg-stone-50/50 rounded-xl border border-stone-200 text-[10px] file:mr-3 file:py-3 file:px-4 file:border-0 file:text-[10px] file:font-black file:uppercase file:tracking-wider file:bg-stone-200 file:text-stone-700 hover:file:bg-[#d97706] hover:file:text-white file:transition-colors outline-none transition-all shadow-inner shadow-stone-100/50 focus:border-[#d97706] focus:bg-white"
+              className="w-full min-h-11 bg-stone-50/50 rounded-xl border border-stone-200 text-[10px] file:mr-3 file:py-3 file:px-4 file:border-0 file:text-[10px] file:font-black file:uppercase file:tracking-wider file:bg-stone-200 file:text-stone-700 hover:file:bg-amber-600 hover:file:text-white file:transition-colors outline-none transition-all shadow-inner shadow-stone-100/50 focus:border-amber-600 focus:bg-white"
             />
           </div>
         </div>
 
         <div className="group/input">
-          <label className="text-[10px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
+          <label className="text-[10px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-amber-700 transition-colors">
             Descripción
           </label>
           <textarea aria-label="Descripción"
             name="description"
             defaultValue={room.description}
-            className="w-full p-3.5 bg-stone-50/50 rounded-xl border border-stone-200 text-xs h-20 resize-none font-medium text-stone-600 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] outline-none transition-all shadow-inner shadow-stone-100/50"
+            className="w-full p-3.5 bg-stone-50/50 rounded-xl border border-stone-200 text-xs h-20 resize-none font-medium text-stone-600 focus:bg-white focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600 outline-none transition-all shadow-inner shadow-stone-100/50"
             placeholder="Descripción de la habitación..."
           />
         </div>
@@ -135,7 +136,7 @@ export default function RoomEditForm({ room }: { room: any }) {
         <button
           type="submit"
           disabled={saving}
-          className="relative overflow-hidden w-full bg-stone-900 text-amber-500 font-black min-h-11 py-3.5 rounded-xl transition-all duration-300 text-[10px] uppercase tracking-widest shadow-lg hover:shadow-[#d97706]/20 hover:-translate-y-0.5 group/btn disabled:opacity-60 disabled:cursor-not-allowed"
+          className="relative overflow-hidden w-full bg-stone-900 text-amber-500 font-black min-h-11 py-3.5 rounded-xl transition-all duration-300 text-[10px] uppercase tracking-widest shadow-lg hover:shadow-amber-600/20 hover:-translate-y-0.5 group/btn disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <span className="relative z-10 flex items-center justify-center gap-2">
             {saving ? "Guardando..." : "Guardar Cambios"}
@@ -150,7 +151,7 @@ export default function RoomEditForm({ room }: { room: any }) {
           <label className="text-[10px] font-black uppercase tracking-wider text-stone-500">
             Galería ({gallery.length} fotos)
           </label>
-          <label className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[#b45309] cursor-pointer hover:text-amber-700 transition-colors ${uploadingGallery ? "opacity-50 pointer-events-none" : ""}`}>
+          <label className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-amber-700 cursor-pointer hover:text-amber-700 transition-colors ${uploadingGallery ? "opacity-50 pointer-events-none" : ""}`}>
             <ImagePlus size={13} />
             {uploadingGallery ? "Subiendo..." : "Agregar fotos"}
             <input
