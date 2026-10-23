@@ -58,12 +58,23 @@ export async function getUserRole() {
   };
 }
 
+// El personal de limpieza solo cambia el estado de las habitaciones; el resto del panel es de recepción.
+// Se excluye "limpieza" en lugar de listar los roles de recepción porque en la base hay filas
+// escritas como "receptionist" y "recepcionista".
+function canOperate(role: string | null | undefined) {
+  return !!role && role !== "limpieza";
+}
+
 // ==============================================================================
 // 2. FUNCIÓN: BUSCAR HUÉSPED FRECUENTE POR DNI + API RENIEC
 // ==============================================================================
 export async function searchGuestByDocument(documentNumber: string) {
+  // Sin esta comprobación cualquiera podía consultar nombres por DNI y gastar la cuota de la API
+  const { role } = await getUserRole();
+  if (!canOperate(role)) return null;
+
   const supabaseServer = await getSupabaseServer();
-  
+
   const { data, error } = await supabaseServer
     .from("clients")
     .select("id, name, email, country, phone, document_type, document_number")
@@ -219,7 +230,7 @@ export async function cancelBooking(bookingId: number) {
 
   // El personal puede anular cualquier reserva; el huésped solo las suyas y con 24 h de anticipación
   const { role } = await getUserRole();
-  const isStaff = !!role;
+  const isStaff = canOperate(role);
 
   let lookup = supabaseServer.from("bookings").select("check_in").eq("id", bookingId);
   if (!isStaff) lookup = lookup.eq("user_id", user.id);
@@ -379,7 +390,7 @@ export async function removeRoomGalleryImage(roomId: number, imageUrl: string) {
 
 export async function checkRoomAvailability(roomId: number, checkIn: string, checkOut: string) {
   const { role } = await getUserRole();
-  if (!role) return { available: false };
+  if (!canOperate(role)) return { available: false };
 
   const supabaseServer = await getSupabaseServer();
   const { data: isAvailable } = await supabaseServer.rpc("check_availability", {
@@ -394,7 +405,7 @@ export async function checkRoomAvailability(roomId: number, checkIn: string, che
 export async function adminCreateBooking(formData: FormData) {
   const { user, role } = await getUserRole();
 
-  if (!user || !role) {
+  if (!user || !canOperate(role)) {
     return { error: "No autorizado." };
   }
   const supabaseServer = await getSupabaseServer();
@@ -448,7 +459,7 @@ export async function adminCreateBooking(formData: FormData) {
 export async function adminRegisterPayment(bookingId: number, amount: number) {
   const { role } = await getUserRole();
 
-  if (!role) {
+  if (!canOperate(role)) {
     return { error: "No autorizado." };
   }
   const supabaseServer = await getSupabaseServer();
@@ -512,7 +523,7 @@ export async function toggleRoomCleanliness(formData: FormData) {
 export async function adminUpdateBookingDates(bookingId: number, newCheckOut: string, newTotal: number) {
   const { role } = await getUserRole();
 
-  if (!role) {
+  if (!canOperate(role)) {
     return { error: "No autorizado." };
   }
   const supabaseServer = await getSupabaseServer();
@@ -539,7 +550,7 @@ export async function adminUpdateBookingDates(bookingId: number, newCheckOut: st
 export async function addBookingExtra(formData: FormData) {
   const { role } = await getUserRole();
 
-  if (!role) {
+  if (!canOperate(role)) {
     return { error: "No autorizado." };
   }
   const supabaseServer = await getSupabaseServer();
@@ -620,7 +631,7 @@ export async function addBookingExtra(formData: FormData) {
 export async function deleteBookingExtra(formData: FormData) {
   const { role } = await getUserRole();
 
-  if (!role) {
+  if (!canOperate(role)) {
     return { error: "No autorizado." };
   }
   const supabaseServer = await getSupabaseServer();
@@ -669,7 +680,7 @@ export async function deleteBookingExtra(formData: FormData) {
 // ==============================================================================
 async function fetchPeruDocument(kind: "ruc" | "dni", numero: string, digits: number) {
   const { role } = await getUserRole();
-  if (!role) return { error: "No autorizado." };
+  if (!canOperate(role)) return { error: "No autorizado." };
   if (!new RegExp(`^\\d{${digits}}$`).test(numero)) return { error: "Número de documento inválido." };
 
   try {
