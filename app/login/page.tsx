@@ -174,7 +174,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen font-sans text-stone-800 relative flex items-center justify-center p-4">
+    <main id="contenido" tabIndex={-1} className="outline-none min-h-screen font-sans text-stone-800 relative flex items-center justify-center p-4">
       {/* Fondo */}
       <div className="fixed inset-0 z-0">
         <div className="absolute inset-0 bg-[#FFFDF5]/92 backdrop-blur-[3px]" />
@@ -335,6 +335,6 @@ export default function LoginPage() {
           </button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

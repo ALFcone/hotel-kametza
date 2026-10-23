@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import Image from "next/image";
 import { cancelBooking } from "../actions";
+import { useDialog } from "../useDialog";
 import {
   CalendarDays,
   CreditCard,
@@ -332,14 +333,15 @@ function CancelModal({
   roomName: string;
   isProcessing: boolean;
 }) {
+  const dialogRef = useDialog(isOpen, onClose, !isProcessing);
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 modal-overlay">
+    <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="cancel-title" className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 modal-overlay outline-none">
       <div className="modal-content bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl border border-stone-100 text-center">
         <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center mx-auto mb-5">
           <AlertTriangle size={28} className="text-rose-600" />
         </div>
-        <h3 className="text-xl font-serif font-bold text-stone-900 mb-2">
+        <h3 id="cancel-title" className="text-xl font-serif font-bold text-stone-900 mb-2">
           ¿Cancelar reserva?
         </h3>
         <p className="text-stone-500 text-sm mb-1">
@@ -514,7 +516,7 @@ export default function Dashboard() {
   const stats = getStats(bookings);
 
   return (
-    <div className="min-h-screen font-sans text-stone-800 relative bg-[#FDFBF7]">
+    <main id="contenido" tabIndex={-1} className="outline-none min-h-screen font-sans text-stone-800 relative bg-[#FDFBF7]">
       {/* Fondo Decorativo */}
       <div className="fixed inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#FFFDF5]/95 via-[#FFFDF5]/90 to-[#FFFDF5]/95" />
@@ -931,6 +933,6 @@ export default function Dashboard() {
           Recepción / Room Service
         </span>
       </a>
-    </div>
+    </main>
   );
 }

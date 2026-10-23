@@ -498,7 +498,7 @@ export default async function AdminPage(props: {
           </div>
 
           {/* Menú de Navegación */}
-          <nav className="flex flex-col gap-1">
+          <nav aria-label="Secciones del panel" className="flex flex-col gap-1">
             {[
               { tab: "resumen", label: "Caja y Ventas", Icon: TrendingUp, ownerOnly: true },
               { tab: "personal", label: "Personal / Dueño", Icon: ShieldCheck, ownerOnly: true },
@@ -516,6 +516,7 @@ export default async function AdminPage(props: {
                   <Link
                     key={tab}
                     href={`/admin?tab=${tab}&from=${dateFrom}&to=${dateTo}`}
+                    aria-current={isActive ? "page" : undefined}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg border-l-2 text-xs font-bold uppercase tracking-wider transition-colors ${
                       isActive
                         ? "bg-white/10 text-white border-amber-500"
@@ -537,7 +538,7 @@ export default async function AdminPage(props: {
         </div>
       </aside>
       {/* --- CONTENIDO PRINCIPAL --- */}
-      <main className="flex-1 p-6 md:p-12 pb-24 lg:pb-12 overflow-y-auto w-full relative">
+      <main id="contenido" tabIndex={-1} className="flex-1 p-6 md:p-12 pb-24 lg:pb-12 overflow-y-auto w-full relative outline-none">
         <div className="w-full">
           {/* TOP BAR / FILTROS PREMIUM */}
           <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-10 gap-6 pb-8 relative">
@@ -1802,21 +1803,21 @@ export default async function AdminPage(props: {
       </main>
 
       {/* --- MOBILE BOTTOM NAV --- */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-stone-950 text-white border-t border-stone-800 flex justify-between items-center px-4 py-2.5 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
+      <nav aria-label="Navegación del panel" className="lg:hidden fixed bottom-0 left-0 right-0 bg-stone-950 text-white border-t border-stone-800 flex justify-between items-center px-4 py-2.5 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
         {isOwner && (
-          <Link href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "resumen" ? "text-amber-500" : "text-stone-400"}`}>
+          <Link href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`} aria-current={activeTab === "resumen" ? "page" : undefined} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "resumen" ? "text-amber-500" : "text-stone-400"}`}>
             <TrendingUp size={18} />
             <span className="text-[8px] font-black uppercase">Caja</span>
           </Link>
         )}
-        <Link href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "calendario" ? "text-amber-500" : "text-stone-400"}`}>
+        <Link href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`} aria-current={activeTab === "calendario" ? "page" : undefined} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "calendario" ? "text-amber-500" : "text-stone-400"}`}>
           <CalendarDays size={18} />
           <span className="text-[8px] font-black uppercase">Rack</span>
         </Link>
         
         {/* Registrar Reserva al centro destacado */}
         <Link
-          href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
+          href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`} aria-current={activeTab === "registrar" ? "page" : undefined}
           className={`flex flex-col items-center justify-center -mt-6 bg-gradient-to-r from-amber-600 to-amber-500 text-white w-14 h-14 rounded-full shadow-xl shadow-amber-900/60 ring-4 ring-stone-950 transition-all active:scale-95 ${
             activeTab === "registrar" ? "scale-110 ring-amber-500" : ""
           }`}
@@ -1826,7 +1827,7 @@ export default async function AdminPage(props: {
           <span className="text-[7px] font-black uppercase tracking-tighter">Reservar</span>
         </Link>
 
-        <Link href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "historial" ? "text-amber-500" : "text-stone-400"}`}>
+        <Link href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`} aria-current={activeTab === "historial" ? "page" : undefined} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "historial" ? "text-amber-500" : "text-stone-400"}`}>
           <FileText size={18} />
           <span className="text-[8px] font-black uppercase">Historial</span>
         </Link>
@@ -1835,7 +1836,7 @@ export default async function AdminPage(props: {
         <MobileMoreMenu activeTab={activeTab} dateFrom={dateFrom} dateTo={dateTo} />
 
         {isOwner && (
-          <Link href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "personal" ? "text-amber-500" : "text-stone-400"}`}>
+          <Link href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`} aria-current={activeTab === "personal" ? "page" : undefined} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "personal" ? "text-amber-500" : "text-stone-400"}`}>
             <ShieldCheck size={18} />
             <span className="text-[8px] font-black uppercase">Personal</span>
           </Link>

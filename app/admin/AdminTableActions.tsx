@@ -8,6 +8,7 @@
  */
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useDialog } from "../useDialog";
 import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle, Printer, FileWarning } from "lucide-react";
 import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, fetchRucData, fetchDniData, cancelBooking } from "@/app/actions";
 import ThermalTicket from "./ThermalTicket";
@@ -82,6 +83,10 @@ export function AdminTableActions({
   const [isFetchingRuc, setIsFetchingRuc] = useState(false);
   const [billingPaymentMethod, setBillingPaymentMethod] = useState("Efectivo");
   const [billingAmountPaid, setBillingAmountPaid] = useState("0");
+  const paymentDialogRef = useDialog(isPaymentModalOpen, () => setIsPaymentModalOpen(false), !loading);
+  const editDialogRef = useDialog(isEditModalOpen, () => setIsEditModalOpen(false), !loading);
+  const extrasDialogRef = useDialog(isExtrasModalOpen, () => setIsExtrasModalOpen(false), !loading);
+  const billingDialogRef = useDialog(isBillingModalOpen, () => setIsBillingModalOpen(false));
 
   const handleFetchDocument = async () => {
     if (billingType === "FACTURA" && billingDocument.length !== 11) {
@@ -436,10 +441,11 @@ export function AdminTableActions({
 
       {/* Modal de Pago */}
       {mounted && isPaymentModalOpen && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
+        <div ref={paymentDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Registrar pago" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in outline-none">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
             <button 
               onClick={() => setIsPaymentModalOpen(false)}
+              aria-label="Cerrar"
               className="absolute top-4 right-4 text-stone-500 hover:text-stone-700"
             >
               <X size={20} />
@@ -525,10 +531,11 @@ export function AdminTableActions({
 
       {/* Modal de Editar Reserva */}
       {mounted && isEditModalOpen && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
+        <div ref={editDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Editar reserva" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in outline-none">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
             <button 
               onClick={() => setIsEditModalOpen(false)}
+              aria-label="Cerrar"
               className="absolute top-4 right-4 text-stone-500 hover:text-stone-700"
             >
               <X size={20} />
@@ -630,10 +637,11 @@ export function AdminTableActions({
 
       {/* Modal de Consumos Extras */}
       {mounted && isExtrasModalOpen && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
+        <div ref={extrasDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Consumos extras" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in outline-none">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button 
               onClick={() => setIsExtrasModalOpen(false)}
+              aria-label="Cerrar"
               className="absolute top-4 right-4 text-stone-500 hover:text-stone-700"
             >
               <X size={20} />
@@ -770,10 +778,11 @@ export function AdminTableActions({
 
       {/* Modal de Facturación / Boleta */}
       {mounted && isBillingModalOpen && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in">
+        <div ref={billingDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Emitir comprobante" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in outline-none">
           <div className="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[90vh] flex flex-col shadow-2xl relative">
             <button 
               onClick={() => setIsBillingModalOpen(false)}
+              aria-label="Cerrar"
               className="absolute top-4 right-4 text-stone-500 hover:text-stone-700"
             >
               <X size={20} />

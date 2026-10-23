@@ -9,6 +9,7 @@
  */
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useDialog } from "./useDialog";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
@@ -179,6 +180,8 @@ function AuthModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const dialogRef = useDialog(isOpen, onClose, !loading);
+
   if (!isOpen) return null;
 
   const handleGoogleLogin = async () => {
@@ -226,7 +229,7 @@ function AuthModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div ref={dialogRef} tabIndex={-1} className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300 outline-none" role="dialog" aria-modal="true" aria-labelledby="auth-title">
       <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative border border-stone-100">
         <button
           onClick={onClose}
@@ -420,6 +423,21 @@ function BookingModal({
     }
   }, [checkIn, checkOut, room.price_per_night]);
 
+  const dialogRef = useDialog(isOpen && mounted, onClose, !isSubmitting);
+  const galleryRef = useDialog(galleryOpen, () => setGalleryOpen(false));
+
+  // Flechas del teclado en la galeria a pantalla completa
+  const galleryCount = roomGallery.length;
+  useEffect(() => {
+    if (!galleryOpen || galleryCount < 2) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") setCurrentGalleryIndex((prev) => (prev < galleryCount - 1 ? prev + 1 : 0));
+      if (e.key === "ArrowLeft") setCurrentGalleryIndex((prev) => (prev > 0 ? prev - 1 : galleryCount - 1));
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [galleryOpen, galleryCount]);
+
   if (!isOpen || !mounted) return null;
 
   const executeBooking = async (formData: FormData) => {
@@ -482,7 +500,7 @@ function BookingModal({
   const simpleDesc = getSimpleDescription(room.name, room.description);
 
   return createPortal(
-    <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200" role="dialog" aria-modal="true" aria-labelledby="booking-title">
+    <div ref={dialogRef} tabIndex={-1} className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200 outline-none" role="dialog" aria-modal="true" aria-labelledby="booking-title">
       <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
         {/* --- GALERÍA DE FOTOS (Panel Izquierdo) --- */}
         <div className="hidden md:flex flex-col w-[40%] bg-stone-100 p-6 relative overflow-hidden">
@@ -583,7 +601,7 @@ function BookingModal({
                   min={today}
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
-                  className="w-full min-h-11 bg-transparent text-sm font-bold text-stone-800 outline-none"
+                  className="w-full min-h-11 bg-transparent text-sm font-bold text-stone-800 rounded-md"
                 />
               </div>
               <div className="border-l border-stone-200 pl-3">
@@ -598,7 +616,7 @@ function BookingModal({
                   min={checkIn || today}
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
-                  className="w-full min-h-11 bg-transparent text-sm font-bold text-stone-800 outline-none"
+                  className="w-full min-h-11 bg-transparent text-sm font-bold text-stone-800 rounded-md"
                 />
               </div>
             </div>
@@ -609,7 +627,7 @@ function BookingModal({
                   name="documentType"
                   aria-label="Tipo de documento"
                   onChange={(e) => setDocType(e.target.value)}
-                  className="w-full min-h-11 p-3 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none"
+                  className="w-full min-h-11 p-3 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
                 >
                   <option value="DNI">DNI</option>
                   <option value="CE">C.E.</option>
@@ -681,7 +699,7 @@ function BookingModal({
                 <select
                   name="country"
                   aria-label="País"
-                  className="w-full min-h-11 p-3 pl-9 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none appearance-none"
+                  className="w-full min-h-11 p-3 pl-9 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 appearance-none"
                   required
                 >
                   <option value="Perú">Perú</option>
@@ -718,7 +736,7 @@ function BookingModal({
                 aria-label="Método de pago"
                 required
                 defaultValue=""
-                className="w-full p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs font-bold text-rose-900 outline-none appearance-none cursor-pointer"
+                className="w-full p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs font-bold text-rose-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 appearance-none cursor-pointer"
               >
                 <option value="" disabled>
                   Seleccione método de pago
@@ -759,7 +777,7 @@ function BookingModal({
 
       {/* OVERLAY DE GALERÍA FULLSCREEN */}
       {galleryOpen && (
-        <div className="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center p-4">
+        <div ref={galleryRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Galería de fotos" className="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center p-4 outline-none">
           <button
             onClick={() => setGalleryOpen(false)}
             aria-label="Cerrar galería"
@@ -1066,6 +1084,15 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
   };
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isMenuOpen]);
    
   const roomTypes: any = {};
   rooms.forEach((room) => {
@@ -1097,7 +1124,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         onSuccess={handleLoginSuccess}
       />
 
-      <nav className="fixed top-0 w-full bg-white z-[100] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-b border-stone-100 transition-all">
+      <nav aria-label="Principal" className="fixed top-0 w-full bg-white z-[100] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-b border-stone-100 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24 md:h-32">
             <div className="flex-shrink-0 z-[110]">
@@ -1292,6 +1319,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         </div>
       </nav>
 
+      <main id="contenido" tabIndex={-1} className="outline-none">
       <section
         id="inicio"
         className="relative pt-48 pb-32 lg:pt-56 lg:pb-40 overflow-hidden z-10 px-4 text-center min-h-[90vh] flex flex-col justify-center"
@@ -1387,7 +1415,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                       }
                     }
                   }}
-                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer placeholder-stone-300 relative z-10"
+                  className="bg-transparent rounded-md text-sm font-bold w-full text-stone-700 cursor-pointer placeholder-stone-300 relative z-10"
                   placeholder="Agrega fechas"
                 />
               </div>
@@ -1430,7 +1458,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                       }
                     }
                   }}
-                  className="bg-transparent outline-none text-sm font-bold w-full text-stone-700 cursor-pointer relative z-10"
+                  className="bg-transparent rounded-md text-sm font-bold w-full text-stone-700 cursor-pointer relative z-10"
                 />
               </div>
             </div>
@@ -2009,6 +2037,8 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
           </div>
         </div>
       </section>
+
+      </main>
 
       {/* --- FOOTER PREMIUM --- */}
       <footer className="bg-[#FDFBF7] border-t border-stone-200 pt-24 pb-12 text-sm relative z-10 w-full overflow-hidden">

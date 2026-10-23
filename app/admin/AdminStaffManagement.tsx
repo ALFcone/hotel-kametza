@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import Swal from "sweetalert2";
+import { useDialog } from "../useDialog";
 import { addOrUpdateStaff, updateStaffRole, deleteStaffMember } from "../actions";
 
 interface StaffMember {
@@ -39,6 +40,7 @@ export default function AdminStaffManagement({
 }: AdminStaffManagementProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const dialogRef = useDialog(isModalOpen, () => setIsModalOpen(false), !loading);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [selectedRole, setSelectedRole] = useState("recepcionista");
@@ -357,10 +359,11 @@ export default function AdminStaffManagement({
 
       {/* MODAL: AUTORIZAR NUEVO PERSONAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+        <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="staff-modal-title" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in outline-none">
           <div className="bg-white rounded-[2.5rem] p-6 md:p-8 w-full max-w-lg shadow-2xl relative border border-stone-100">
             <button
               onClick={() => setIsModalOpen(false)}
+              aria-label="Cerrar"
               className="absolute top-6 right-6 text-stone-500 hover:text-stone-700 bg-stone-100 hover:bg-stone-200 p-2 rounded-full transition"
             >
               <X size={18} />
@@ -371,7 +374,7 @@ export default function AdminStaffManagement({
                 <UserPlus size={24} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-stone-900">Autorizar Personal</h3>
+                <h3 id="staff-modal-title" className="text-xl font-bold text-stone-900">Autorizar Personal</h3>
                 <p className="text-xs text-stone-500">Asigna permisos y rol en el sistema</p>
               </div>
             </div>

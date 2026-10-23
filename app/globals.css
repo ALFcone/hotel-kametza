@@ -343,3 +343,38 @@ html {
     scale: none !important;
   }
 }
+
+/* ============================================
+   Foco por teclado
+   El anillo de marca va en @layer base: lo usa todo elemento sin foco propio,
+   y las utilidades de Tailwind (focus:ring, outline-none) lo siguen anulando.
+   ============================================ */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-rose-500);
+    outline-offset: 2px;
+  }
+}
+
+/* Enlace para saltar la navegacion: solo aparece al recibir foco */
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 400;
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
+  background: var(--color-rose-500);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--color-rose-500);
+}

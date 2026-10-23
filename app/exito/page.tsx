@@ -167,7 +167,7 @@ function PaymentContent() {
   };
 
   return (
-    <div className="min-h-screen font-sans text-stone-800 relative flex items-center justify-center p-4">
+    <main id="contenido" tabIndex={-1} className="outline-none min-h-screen font-sans text-stone-800 relative flex items-center justify-center p-4">
       {/* Confetti for approved payments */}
       {isApproved && <Confetti />}
 
@@ -407,7 +407,7 @@ function PaymentContent() {
           </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

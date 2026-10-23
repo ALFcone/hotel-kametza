@@ -39,6 +39,7 @@ export default function MobileMoreMenu({ activeTab, dateFrom, dateTo }: MobileMo
             key={tab}
             href={`/admin?tab=${tab}&from=${dateFrom}&to=${dateTo}`}
             onClick={closeMenu}
+            aria-current={activeTab === tab ? "page" : undefined}
             className={`flex items-center gap-3 px-3 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider ${
               activeTab === tab ? "bg-amber-500/10 text-amber-400" : "text-stone-300 hover:bg-white/5"
             }`}

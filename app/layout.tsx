@@ -62,6 +62,9 @@ export default function RootLayout({
       <body
         className={`${montserrat.variable} ${playfair.variable} antialiased`}
       >
+        <a href="#contenido" className="skip-link">
+          Saltar al contenido
+        </a>
         {children}
       </body>
     </html>
