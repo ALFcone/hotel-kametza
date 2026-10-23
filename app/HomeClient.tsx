@@ -231,7 +231,7 @@ function AuthModal({
         <button
           onClick={onClose}
           aria-label="Cerrar"
-          className="absolute top-4 right-4 text-stone-400 hover:text-stone-800"
+          className="absolute top-4 right-4 text-stone-500 hover:text-stone-800"
         >
           <X size={24} />
         </button>
@@ -272,7 +272,7 @@ function AuthModal({
 
         <div className="flex items-center gap-4 mb-6">
           <div className="h-px bg-stone-100 flex-1"></div>
-          <span className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
+          <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
             O con correo
           </span>
           <div className="h-px bg-stone-100 flex-1"></div>
@@ -541,7 +541,7 @@ function BookingModal({
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
+                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
                   {nights} Noche(s)
                 </p>
               </div>
@@ -572,7 +572,7 @@ function BookingModal({
 
             <div className="grid grid-cols-2 gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-100">
               <div>
-                <label htmlFor="booking-checkin" className="text-[10px] font-bold text-stone-400 uppercase ml-1">
+                <label htmlFor="booking-checkin" className="text-[10px] font-bold text-stone-500 uppercase ml-1">
                   Llegada
                 </label>
                 <input
@@ -587,7 +587,7 @@ function BookingModal({
                 />
               </div>
               <div className="border-l border-stone-200 pl-3">
-                <label htmlFor="booking-checkout" className="text-[10px] font-bold text-stone-400 uppercase ml-1">
+                <label htmlFor="booking-checkout" className="text-[10px] font-bold text-stone-500 uppercase ml-1">
                   Salida
                 </label>
                 <input
@@ -855,7 +855,7 @@ function RoomCard({
             />
           )}
           <div className="absolute bottom-4 right-4 z-20 bg-white/95 backdrop-blur-sm px-5 py-2 rounded-2xl shadow-lg border border-white/50">
-            <p className="text-[9px] uppercase font-bold text-stone-400 tracking-widest mb-0.5">
+            <p className="text-[9px] uppercase font-bold text-stone-500 tracking-widest mb-0.5">
               Por noche
             </p>
             <p className="text-xl font-black text-[#e3004f]">
@@ -1229,7 +1229,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                     handleLogout();
                     closeMenu();
                   }}
-                  className="flex items-center gap-2 text-stone-400 hover:text-red-600 transition-colors text-xs font-bold uppercase tracking-widest mt-2"
+                  className="flex items-center gap-2 text-stone-500 hover:text-red-600 transition-colors text-xs font-bold uppercase tracking-widest mt-2"
                 >
                   <LogOut size={16} /> Cerrar Sesión
                 </button>
@@ -1328,7 +1328,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 }
               }}
             >
-              <label htmlFor="hero-checkin" className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
+              <label htmlFor="hero-checkin" className="text-[9px] font-black text-stone-500 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
                 Check-in
               </label>
               <div className="flex items-center w-full">
@@ -1371,7 +1371,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 }
               }}
             >
-              <label htmlFor="hero-checkout" className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
+              <label htmlFor="hero-checkout" className="text-[9px] font-black text-stone-500 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
                 Check-out
               </label>
               <div className="flex items-center w-full">
@@ -1631,7 +1631,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6">
                 Lo que dicen nuestros huéspedes
               </h2>
-              <p className="text-stone-500 text-sm md:text-base leading-relaxed">
+              <p className="text-stone-600 text-sm md:text-base leading-relaxed">
                 La satisfacción de quienes nos visitan es nuestro mejor respaldo. Conoce por qué Hotel Kametza es la opción favorita en Ayacucho.
               </p>
             </div>
@@ -1657,7 +1657,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <div className="flex">
                     {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
                   </div>
-                  <span className="text-[10px] font-bold text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">Hace 1 mes</span>
+                  <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full">Hace 1 mes</span>
                 </div>
                 <p className="text-stone-700 text-sm leading-relaxed italic relative z-10 mb-8 font-medium">
                   &quot;Excelente atención y comodidad. El personal fue muy amable y el desayuno ayacuchano estuvo delicioso. Muy cerca del centro, el agua caliente funcionó perfecto. Recomendado 100%.&quot;
@@ -1670,7 +1670,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
                     <Check size={10} className="text-emerald-500" /> Huésped Verificado
                   </p>
-                  <p className="text-[10px] text-stone-400 font-medium flex items-center gap-1"><MapPin size={10} /> Lima, Perú</p>
+                  <p className="text-[10px] text-stone-500 font-medium flex items-center gap-1"><MapPin size={10} /> Lima, Perú</p>
                 </div>
               </div>
               <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-amber-50 transition-colors">&quot;</div>
@@ -1683,7 +1683,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <div className="flex">
                     {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
                   </div>
-                  <span className="text-[10px] font-bold text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">Hace 2 semanas</span>
+                  <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full">Hace 2 semanas</span>
                 </div>
                 <p className="text-stone-700 text-sm leading-relaxed italic relative z-10 mb-8 font-medium">
                   &quot;Un hotel muy acogedor. Las habitaciones siempre impecables, limpieza diaria, y buena señal de WiFi para trabajar sin problemas. Excelente relación calidad-precio en Ayacucho.&quot;
@@ -1696,7 +1696,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
                     <Check size={10} className="text-emerald-500" /> Huésped Verificado
                   </p>
-                  <p className="text-[10px] text-stone-400 font-medium flex items-center gap-1"><MapPin size={10} /> Bogotá, Colombia</p>
+                  <p className="text-[10px] text-stone-500 font-medium flex items-center gap-1"><MapPin size={10} /> Bogotá, Colombia</p>
                 </div>
               </div>
               <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-rose-50 transition-colors">&quot;</div>
@@ -1709,7 +1709,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <div className="flex">
                     {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
                   </div>
-                  <span className="text-[10px] font-bold text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">Hace 3 días</span>
+                  <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full">Hace 3 días</span>
                 </div>
                 <p className="text-stone-700 text-sm leading-relaxed italic relative z-10 mb-8 font-medium">
                   &quot;Me encantó la estadía, es un lugar muy seguro y tranquilo. Nos encantó que tengan cochera privada. El trato del personal superó mis expectativas. Volveremos sin duda en familia.&quot;
@@ -1722,7 +1722,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
                     <Check size={10} className="text-emerald-500" /> Huésped Verificado
                   </p>
-                  <p className="text-[10px] text-stone-400 font-medium flex items-center gap-1"><MapPin size={10} /> Arequipa, Perú</p>
+                  <p className="text-[10px] text-stone-500 font-medium flex items-center gap-1"><MapPin size={10} /> Arequipa, Perú</p>
                 </div>
               </div>
               <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-stone-100 transition-colors">&quot;</div>
@@ -1735,7 +1735,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <div className="flex">
                     {[1,2,3,4,5].map(i => <Star key={i} size={14} className="fill-amber-400 text-amber-400" />)}
                   </div>
-                  <span className="text-[10px] font-bold text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">Hace 4 meses</span>
+                  <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2.5 py-1 rounded-full">Hace 4 meses</span>
                 </div>
                 <p className="text-stone-700 text-sm leading-relaxed italic relative z-10 mb-8 font-medium">
                   &quot;Fui con mi grupo de amigos por turismo. Las habitaciones son súper amplias y las camas maravillosas para descansar después de los tours. Lo mejor de Ayacucho.&quot;
@@ -1748,7 +1748,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest flex items-center gap-1 mb-0.5">
                     <Check size={10} className="text-emerald-500" /> Huésped Verificado
                   </p>
-                  <p className="text-[10px] text-stone-400 font-medium flex items-center gap-1"><MapPin size={10} /> Huancayo, Perú</p>
+                  <p className="text-[10px] text-stone-500 font-medium flex items-center gap-1"><MapPin size={10} /> Huancayo, Perú</p>
                 </div>
               </div>
               <div className="absolute text-8xl text-stone-50 font-serif top-4 right-6 pointer-events-none group-hover:text-emerald-50 transition-colors">&quot;</div>
@@ -1779,7 +1779,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <MapPin size={28} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-stone-400 uppercase font-bold tracking-widest mb-0.5">
+                  <p className="text-[10px] text-stone-500 uppercase font-bold tracking-widest mb-0.5">
                     Dirección Exacta
                   </p>
                   <p className="text-xl font-bold text-stone-800 font-serif">
@@ -1796,7 +1796,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               Vive lo mejor de Ayacucho desde un punto privilegiado. Te ofrecemos la <strong>tranquilidad absoluta</strong> que necesitas para un verdadero descanso, manteniéndote a un paso del centro histórico.
             </p>
 
-            <h3 className="text-xs font-black text-stone-400 uppercase tracking-widest mb-4">Distancias clave</h3>
+            <h3 className="text-xs font-black text-stone-500 uppercase tracking-widest mb-4">Distancias clave</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 mb-6">
               <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-100 shadow-sm">
                 <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
@@ -1804,7 +1804,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 </div>
                 <div>
                   <span className="text-stone-700 font-bold text-sm block">Plaza de Armas</span>
-                  <span className="text-[10px] text-stone-400 uppercase font-bold">5 min en auto</span>
+                  <span className="text-[10px] text-stone-500 uppercase font-bold">5 min en auto</span>
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-100 shadow-sm">
@@ -1813,7 +1813,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 </div>
                 <div>
                   <span className="text-stone-700 font-bold text-sm block">Aeropuerto</span>
-                  <span className="text-[10px] text-stone-400 uppercase font-bold">10 min en auto</span>
+                  <span className="text-[10px] text-stone-500 uppercase font-bold">10 min en auto</span>
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-100 shadow-sm">
@@ -1822,7 +1822,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 </div>
                 <div>
                   <span className="text-stone-700 font-bold text-sm block">Terminal Terrestre</span>
-                  <span className="text-[10px] text-stone-400 uppercase font-bold">15 min en auto</span>
+                  <span className="text-[10px] text-stone-500 uppercase font-bold">15 min en auto</span>
                 </div>
               </div>
               <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-stone-100 shadow-sm">
@@ -1831,7 +1831,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 </div>
                 <div>
                   <span className="text-stone-700 font-bold text-sm block">Zona Segura</span>
-                  <span className="text-[10px] text-stone-400 uppercase font-bold">Seguridad 24h</span>
+                  <span className="text-[10px] text-stone-500 uppercase font-bold">Seguridad 24h</span>
                 </div>
               </div>
             </div>
@@ -2023,15 +2023,15 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               
               <form className="space-y-5 relative z-10" onSubmit={(e) => { e.preventDefault(); alert('Mensaje enviado. ¡Gracias por contactarnos!'); }}>
                 <div>
-                  <label htmlFor="contact-name" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Nombre Completo</label>
+                  <label htmlFor="contact-name" className="text-[10px] font-bold uppercase tracking-widest text-stone-500 ml-2 block mb-1">Nombre Completo</label>
                   <input id="contact-name" name="name" autoComplete="name" type="text" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm" placeholder="Ej. Carlos Mendoza" />
                 </div>
                 <div>
-                  <label htmlFor="contact-email" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Correo Electrónico</label>
+                  <label htmlFor="contact-email" className="text-[10px] font-bold uppercase tracking-widest text-stone-500 ml-2 block mb-1">Correo Electrónico</label>
                   <input id="contact-email" name="email" autoComplete="email" type="email" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm" placeholder="correo@ejemplo.com" />
                 </div>
                 <div>
-                  <label htmlFor="contact-message" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Tu Consulta</label>
+                  <label htmlFor="contact-message" className="text-[10px] font-bold uppercase tracking-widest text-stone-500 ml-2 block mb-1">Tu Consulta</label>
                   <textarea id="contact-message" name="message" required rows={4} className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
                 </div>
                 <button type="submit" className="w-full bg-stone-900 text-white font-bold py-4 rounded-2xl hover:bg-[#e3004f] transition-all shadow-lg hover:shadow-rose-900/20 text-sm tracking-widest uppercase mt-4">

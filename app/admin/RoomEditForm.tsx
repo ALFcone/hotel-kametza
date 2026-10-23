@@ -92,11 +92,11 @@ export default function RoomEditForm({ room }: { room: any }) {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="group/input">
-            <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-1.5 group-focus-within/input:text-[#d97706] transition-colors">
+            <label className="text-[9px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
               Precio Noche
             </label>
             <div className="relative w-28">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 font-bold text-[10px]">S/</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold text-[10px]">S/</span>
               <input aria-label="Precio por noche"
                 name="price"
                 defaultValue={room.price_per_night}
@@ -106,7 +106,7 @@ export default function RoomEditForm({ room }: { room: any }) {
             </div>
           </div>
           <div className="group/input">
-            <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-1.5 group-focus-within/input:text-[#d97706] transition-colors">
+            <label className="text-[9px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
               Foto de Portada
             </label>
             <input type="hidden" name="oldImage" value={room.image_url || ""} />
@@ -121,7 +121,7 @@ export default function RoomEditForm({ room }: { room: any }) {
         </div>
 
         <div className="group/input">
-          <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-1.5 group-focus-within/input:text-[#d97706] transition-colors">
+          <label className="text-[9px] font-black uppercase tracking-wider text-stone-500 block mb-1.5 group-focus-within/input:text-[#b45309] transition-colors">
             Descripción
           </label>
           <textarea aria-label="Descripción"
@@ -147,10 +147,10 @@ export default function RoomEditForm({ room }: { room: any }) {
       {/* GALERÍA DE FOTOS ADICIONALES */}
       <div className="mt-6 pt-6 border-t border-stone-100">
         <div className="flex items-center justify-between mb-3">
-          <label className="text-[9px] font-black uppercase tracking-wider text-stone-400">
+          <label className="text-[9px] font-black uppercase tracking-wider text-stone-500">
             Galería ({gallery.length} fotos)
           </label>
-          <label className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#d97706] cursor-pointer hover:text-amber-700 transition-colors ${uploadingGallery ? "opacity-50 pointer-events-none" : ""}`}>
+          <label className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#b45309] cursor-pointer hover:text-amber-700 transition-colors ${uploadingGallery ? "opacity-50 pointer-events-none" : ""}`}>
             <ImagePlus size={13} />
             {uploadingGallery ? "Subiendo..." : "Agregar fotos"}
             <input
@@ -166,7 +166,7 @@ export default function RoomEditForm({ room }: { room: any }) {
         </div>
 
         {gallery.length === 0 ? (
-          <p className="text-[10px] text-stone-400 italic">
+          <p className="text-[10px] text-stone-500 italic">
             Sin fotos adicionales. Se mostrará solo la portada en la galería de reserva.
           </p>
         ) : (

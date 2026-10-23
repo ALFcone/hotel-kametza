@@ -235,7 +235,7 @@ export default function LoginPage() {
 
         <div className="flex items-center gap-4 mb-6">
           <div className="h-px bg-stone-200/60 flex-1" />
-          <span className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">
+          <span className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">
             O con correo
           </span>
           <div className="h-px bg-stone-200/60 flex-1" />

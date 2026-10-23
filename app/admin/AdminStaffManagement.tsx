@@ -182,7 +182,7 @@ export default function AdminStaffManagement({
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
           <div>
             <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.25em] text-amber-800 bg-amber-100/80 px-4 py-1.5 rounded-full border border-amber-300/60 mb-3 shadow-xs">
-              <ShieldCheck size={14} className="text-amber-600" /> Portal Exclusivo del Dueño
+              <ShieldCheck size={14} className="text-amber-700" /> Portal Exclusivo del Dueño
             </span>
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 tracking-tight">
               Gestión de Personal y Roles
@@ -224,7 +224,7 @@ export default function AdminStaffManagement({
       {/* GUÍA DE ROLES & PERMISOS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm relative overflow-hidden group hover:border-amber-200 transition-all">
-          <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 font-black">
+          <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mb-4 font-black">
             <Crown size={20} />
           </div>
           <h3 className="font-bold text-stone-900 text-sm">Dueño / Admin</h3>
@@ -244,7 +244,7 @@ export default function AdminStaffManagement({
         </div>
 
         <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm relative overflow-hidden group hover:border-emerald-200 transition-all">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 font-black">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-4 font-black">
             <Brush size={20} />
           </div>
           <h3 className="font-bold text-stone-900 text-sm">Personal de Limpieza</h3>
@@ -259,7 +259,7 @@ export default function AdminStaffManagement({
         <div className="p-6 md:p-8 border-b border-stone-100 flex justify-between items-center flex-wrap gap-4">
           <div>
             <h3 className="text-xl font-bold text-stone-900">Personal Autorizado ({staffList.length})</h3>
-            <p className="text-xs text-stone-400 mt-0.5">
+            <p className="text-xs text-stone-500 mt-0.5">
               Cualquier usuario con estos correos podrá iniciar sesión en la web y acceder al panel según su rol.
             </p>
           </div>
@@ -268,7 +268,7 @@ export default function AdminStaffManagement({
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-stone-50/70 border-b border-stone-100 text-[10px] font-black uppercase tracking-wider text-stone-400">
+              <tr className="bg-stone-50/70 border-b border-stone-100 text-[10px] font-black uppercase tracking-wider text-stone-500">
                 <th className="py-4 px-6">Colaborador / Correo</th>
                 <th className="py-4 px-6">Rol Asignado</th>
                 <th className="py-4 px-6">Cambiar Rol Rápido</th>
@@ -301,7 +301,7 @@ export default function AdminStaffManagement({
                               </span>
                             )}
                           </div>
-                          <div className="text-[11px] text-stone-400 flex items-center gap-1 font-mono mt-0.5">
+                          <div className="text-[11px] text-stone-500 flex items-center gap-1 font-mono mt-0.5">
                             <Mail size={12} /> {staff.email}
                           </div>
                         </div>
@@ -325,7 +325,7 @@ export default function AdminStaffManagement({
 
                     <td className="py-4 px-6 text-center">
                       {isSelf ? (
-                        <span className="text-[10px] text-stone-400 font-bold italic">
+                        <span className="text-[10px] text-stone-500 font-bold italic">
                           Protegido
                         </span>
                       ) : (
@@ -345,7 +345,7 @@ export default function AdminStaffManagement({
 
               {staffList.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="py-12 text-center text-stone-400 italic">
+                  <td colSpan={4} className="py-12 text-center text-stone-500 italic">
                     No se encontró personal registrado en la tabla hotel_staff.
                   </td>
                 </tr>
@@ -361,7 +361,7 @@ export default function AdminStaffManagement({
           <div className="bg-white rounded-[2.5rem] p-6 md:p-8 w-full max-w-lg shadow-2xl relative border border-stone-100">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 text-stone-400 hover:text-stone-700 bg-stone-100 hover:bg-stone-200 p-2 rounded-full transition"
+              className="absolute top-6 right-6 text-stone-500 hover:text-stone-700 bg-stone-100 hover:bg-stone-200 p-2 rounded-full transition"
             >
               <X size={18} />
             </button>
@@ -372,7 +372,7 @@ export default function AdminStaffManagement({
               </div>
               <div>
                 <h3 className="text-xl font-bold text-stone-900">Autorizar Personal</h3>
-                <p className="text-xs text-stone-400">Asigna permisos y rol en el sistema</p>
+                <p className="text-xs text-stone-500">Asigna permisos y rol en el sistema</p>
               </div>
             </div>
 
@@ -382,7 +382,7 @@ export default function AdminStaffManagement({
                   Correo Electrónico (Gmail o usuario de acceso) *
                 </label>
                 <div className="relative mt-1">
-                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500" />
                   <input aria-label="Correo electrónico"
                     type="email"
                     required
@@ -392,7 +392,7 @@ export default function AdminStaffManagement({
                     className="w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-bold text-stone-800 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
                   />
                 </div>
-                <p className="text-[10px] text-stone-400 mt-1 ml-1">
+                <p className="text-[10px] text-stone-500 mt-1 ml-1">
                   El colaborador debe usar este mismo correo para iniciar sesión en la web.
                 </p>
               </div>
@@ -402,7 +402,7 @@ export default function AdminStaffManagement({
                   Nombre o Referencia (Opcional)
                 </label>
                 <div className="relative mt-1">
-                  <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+                  <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500" />
                   <input aria-label="Nombre o referencia (opcional)"
                     type="text"
                     placeholder="Ej: Carmen Huamán (Recepción Turno Noche)"

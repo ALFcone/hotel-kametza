@@ -440,13 +440,13 @@ export function AdminTableActions({
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
             <button 
               onClick={() => setIsPaymentModalOpen(false)}
-              className="absolute top-4 right-4 text-stone-400 hover:text-stone-700"
+              className="absolute top-4 right-4 text-stone-500 hover:text-stone-700"
             >
               <X size={20} />
             </button>
             
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
                 <DollarSign size={20} />
               </div>
               <div>
@@ -472,7 +472,7 @@ export function AdminTableActions({
               </div>
               <div className="flex justify-between text-xs mb-2">
                 <span className="text-stone-500 font-medium">Pagado hasta ahora:</span>
-                <span className="font-bold text-emerald-600">- S/ {(amountPaid || 0).toFixed(2)}</span>
+                <span className="font-bold text-emerald-700">- S/ {(amountPaid || 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm pt-2 border-t border-stone-200">
                 <span className="text-stone-900 font-bold">Saldo Pendiente:</span>
@@ -482,11 +482,11 @@ export function AdminTableActions({
 
             <form onSubmit={handleRegisterPayment}>
               <div className="mb-6">
-                <label className="block text-[10px] font-black uppercase text-stone-400 mb-2">
+                <label className="block text-[10px] font-black uppercase text-stone-500 mb-2">
                   Monto a Pagar (S/)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 font-bold">S/</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 font-bold">S/</span>
                   <input aria-label="Monto a pagar (S/)"
                     type="number"
                     step="0.01"
@@ -503,7 +503,7 @@ export function AdminTableActions({
                   <button
                     type="button"
                     onClick={() => setPaymentAmount(balance.toString())}
-                    className="text-[10px] text-emerald-600 font-bold hover:underline"
+                    className="text-[10px] text-emerald-700 font-bold hover:underline"
                   >
                     Saldar deuda completa
                   </button>
@@ -529,7 +529,7 @@ export function AdminTableActions({
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
             <button 
               onClick={() => setIsEditModalOpen(false)}
-              className="absolute top-4 right-4 text-stone-400 hover:text-stone-700"
+              className="absolute top-4 right-4 text-stone-500 hover:text-stone-700"
             >
               <X size={20} />
             </button>
@@ -546,11 +546,11 @@ export function AdminTableActions({
 
             <form onSubmit={handleEditBooking}>
               <div className="mb-4">
-                <label className="block text-[10px] font-black uppercase text-stone-400 mb-2">
+                <label className="block text-[10px] font-black uppercase text-stone-500 mb-2">
                   Fecha de Entrada (Fija)
                 </label>
                 <div className="relative">
-                  <Calendar size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+                  <Calendar size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500" />
                   <input aria-label="Fecha de entrada"
                     type="date"
                     value={checkIn}
@@ -561,7 +561,7 @@ export function AdminTableActions({
               </div>
 
               <div className="mb-4">
-                <label className="block text-[10px] font-black uppercase text-stone-400 mb-2">
+                <label className="block text-[10px] font-black uppercase text-stone-500 mb-2">
                   Nueva Fecha de Salida
                 </label>
                 <div className="relative">
@@ -595,11 +595,11 @@ export function AdminTableActions({
               </div>
 
               <div className="mb-6">
-                <label className="block text-[10px] font-black uppercase text-stone-400 mb-2">
+                <label className="block text-[10px] font-black uppercase text-stone-500 mb-2">
                   Nuevo Precio Total (S/)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 font-bold">S/</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-500 font-bold">S/</span>
                   <input aria-label="Nuevo precio total (S/)"
                     type="number"
                     step="0.01"
@@ -634,7 +634,7 @@ export function AdminTableActions({
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button 
               onClick={() => setIsExtrasModalOpen(false)}
-              className="absolute top-4 right-4 text-stone-400 hover:text-stone-700"
+              className="absolute top-4 right-4 text-stone-500 hover:text-stone-700"
             >
               <X size={20} />
             </button>
@@ -651,7 +651,7 @@ export function AdminTableActions({
 
             {/* Formulario para añadir */}
             <form onSubmit={handleAddExtra} className="bg-stone-50 border border-stone-200 rounded-2xl p-4 mb-6">
-              <h4 className="text-[10px] font-black uppercase text-stone-400 mb-3">Añadir Nuevo Consumo</h4>
+              <h4 className="text-[10px] font-black uppercase text-stone-500 mb-3">Añadir Nuevo Consumo</h4>
               <div className="space-y-3">
                 <select aria-label="Producto o consumo"
                   className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm font-bold bg-white"
@@ -692,7 +692,7 @@ export function AdminTableActions({
                 
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">S/</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">S/</span>
                     <input aria-label="Precio (S/)"
                       type="number"
                       step="0.01"
@@ -705,7 +705,7 @@ export function AdminTableActions({
                     />
                   </div>
                   <div className="relative w-24">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">Cant:</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">Cant:</span>
                     <input aria-label="Cantidad"
                       type="number"
                       min="1"
@@ -729,12 +729,12 @@ export function AdminTableActions({
             {/* Lista de consumos */}
             <div>
               <div className="flex justify-between items-end mb-3">
-                <h4 className="text-[10px] font-black uppercase text-stone-400">Detalle de Consumos</h4>
+                <h4 className="text-[10px] font-black uppercase text-stone-500">Detalle de Consumos</h4>
                 <span className="text-[10px] font-black text-purple-600 bg-purple-50 px-2 py-1 rounded">Total: S/ {extrasTotal.toFixed(2)}</span>
               </div>
               
               {extras.length === 0 ? (
-                <div className="text-center py-6 text-stone-400 text-xs italic">
+                <div className="text-center py-6 text-stone-500 text-xs italic">
                   No hay consumos registrados aún.
                 </div>
               ) : (
@@ -774,7 +774,7 @@ export function AdminTableActions({
           <div className="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[90vh] flex flex-col shadow-2xl relative">
             <button 
               onClick={() => setIsBillingModalOpen(false)}
-              className="absolute top-4 right-4 text-stone-400 hover:text-stone-700"
+              className="absolute top-4 right-4 text-stone-500 hover:text-stone-700"
             >
               <X size={20} />
             </button>
@@ -791,7 +791,7 @@ export function AdminTableActions({
 
             <div className="overflow-y-auto pr-1 -mr-1 flex-1">
               <div className="bg-stone-50 p-3 rounded-2xl mb-3">
-                <h3 className="text-[10px] font-black uppercase text-stone-400 mb-2 tracking-wider">
+                <h3 className="text-[10px] font-black uppercase text-stone-500 mb-2 tracking-wider">
                   Tipo de Comprobante
                 </h3>
               
@@ -829,7 +829,7 @@ export function AdminTableActions({
 
             <div className="space-y-3 mb-2">
               <div>
-                <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
+                <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
                   {billingType === "FACTURA" ? "RUC (11 dígitos)" : "DNI / Documento"}
                 </label>
                 <div className="flex gap-2">
@@ -851,7 +851,7 @@ export function AdminTableActions({
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
+                <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
                   {billingType === "FACTURA" ? "Razón Social" : "Nombre del Cliente"}
                 </label>
                 <input aria-label={billingType === "FACTURA" ? "Razón social" : "Nombre del cliente"}
@@ -863,7 +863,7 @@ export function AdminTableActions({
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
+                <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
                   Dirección (Opcional)
                 </label>
                 <input aria-label="Dirección (opcional)"
@@ -877,7 +877,7 @@ export function AdminTableActions({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
+                  <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
                     Forma de Pago
                   </label>
                   <select aria-label="Forma de pago"
@@ -892,7 +892,7 @@ export function AdminTableActions({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase text-stone-400 mb-1">
+                  <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
                     Monto Pagado (S/)
                   </label>
                   <input aria-label="Monto pagado (S/)"
@@ -907,7 +907,7 @@ export function AdminTableActions({
                 </div>
               </div>
               <p className={`text-[10px] font-bold uppercase tracking-wide -mt-1 ${
-                (grandTotal - Number(billingAmountPaid || 0)) > 0.009 ? "text-rose-600" : "text-emerald-600"
+                (grandTotal - Number(billingAmountPaid || 0)) > 0.009 ? "text-rose-600" : "text-emerald-700"
               }`}>
                 {(grandTotal - Number(billingAmountPaid || 0)) > 0.009
                   ? `Saldo pendiente en el comprobante: S/ ${(grandTotal - Number(billingAmountPaid || 0)).toFixed(2)}`

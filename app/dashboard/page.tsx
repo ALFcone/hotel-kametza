@@ -261,14 +261,14 @@ function StatCard({
     >
       <div className="flex items-center gap-2 mb-4">
         <Icon size={16} className={accentText} />
-        <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+        <p className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">
           {label}
         </p>
       </div>
       <p className="text-2xl md:text-3xl font-serif font-bold text-stone-900">
         {value}
       </p>
-      {sub && <p className="text-xs text-stone-400 mt-1">{sub}</p>}
+      {sub && <p className="text-xs text-stone-500 mt-1">{sub}</p>}
     </div>
   );
 }
@@ -346,7 +346,7 @@ function CancelModal({
           Estás por cancelar tu reserva en:
         </p>
         <p className="text-[#e3004f] font-bold text-sm mb-6">{roomName}</p>
-        <p className="text-stone-400 text-xs mb-8">
+        <p className="text-stone-500 text-xs mb-8">
           Esta acción no se puede deshacer.
         </p>
         <div className="flex gap-3">
@@ -385,7 +385,7 @@ function EmptyState() {
         <h2 className="text-3xl font-serif font-bold text-stone-800 mb-3">
           Tu próxima aventura te espera
         </h2>
-        <p className="text-stone-400 text-sm mb-8 max-w-sm mx-auto leading-relaxed">
+        <p className="text-stone-500 text-sm mb-8 max-w-sm mx-auto leading-relaxed">
           Aún no tienes reservas. Explora nuestras habitaciones y vive la
           experiencia Kametza en el corazón de Ayacucho.
         </p>
@@ -768,7 +768,7 @@ export default function Dashboard() {
                               <h3 className="text-lg md:text-xl font-serif font-bold text-[#e3004f] mb-0.5">
                                 {booking.rooms?.name || "Habitación"}
                               </h3>
-                              <p className="text-stone-400 text-[10px] font-bold uppercase tracking-[0.2em]">
+                              <p className="text-stone-500 text-[10px] font-bold uppercase tracking-[0.2em]">
                                 TICKET: RES-
                                 {(booking.id + 100)
                                   .toString()
@@ -793,7 +793,7 @@ export default function Dashboard() {
                                 <CalendarDays size={16} />
                               </div>
                               <div>
-                                <p className="text-[10px] text-stone-400 font-bold uppercase">
+                                <p className="text-[10px] text-stone-500 font-bold uppercase">
                                   Llegada
                                 </p>
                                 <p className="text-sm font-bold text-stone-700">
@@ -806,7 +806,7 @@ export default function Dashboard() {
                                 <Clock size={16} />
                               </div>
                               <div>
-                                <p className="text-[10px] text-stone-400 font-bold uppercase">
+                                <p className="text-[10px] text-stone-500 font-bold uppercase">
                                   Salida
                                 </p>
                                 <p className="text-sm font-bold text-stone-700">
@@ -819,7 +819,7 @@ export default function Dashboard() {
                                 <CreditCard size={16} />
                               </div>
                               <div>
-                                <p className="text-[10px] text-stone-400 font-bold uppercase">
+                                <p className="text-[10px] text-stone-500 font-bold uppercase">
                                   Total a Pagar
                                 </p>
                                 <p className="text-lg font-black text-[#e3004f]">

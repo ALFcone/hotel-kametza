@@ -106,7 +106,7 @@ function TimelineStep({
       </div>
       <span
         className={`text-[9px] font-bold uppercase tracking-wider text-center ${
-          isCompleted || isActive ? "text-stone-700" : "text-stone-400"
+          isCompleted || isActive ? "text-stone-700" : "text-stone-500"
         }`}
       >
         {label}
@@ -252,7 +252,7 @@ function PaymentContent() {
 
           {/* Código de Reserva */}
           <div className="animate-fade-in-up flex justify-between items-center pb-6 border-b border-dashed border-stone-200 mb-6" style={{ animationDelay: "500ms" }}>
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+            <span className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">
               Código de Reserva
             </span>
             <button
@@ -280,7 +280,7 @@ function PaymentContent() {
 
           {/* Monto Total */}
           <div className="animate-fade-in-up flex justify-between items-end mb-8" style={{ animationDelay: "600ms" }}>
-            <span className="text-xs font-bold text-stone-400 uppercase">
+            <span className="text-xs font-bold text-stone-500 uppercase">
               Total a Pagar
             </span>
             <span className="text-4xl font-serif font-black text-[#e3004f]">
@@ -306,7 +306,7 @@ function PaymentContent() {
                 <p className="text-lg font-black text-stone-800 mb-1">
                   966 556 622
                 </p>
-                <p className="text-[10px] text-stone-400 uppercase font-bold px-2 text-center leading-tight">
+                <p className="text-[10px] text-stone-500 uppercase font-bold px-2 text-center leading-tight">
                   Titular: MARCELINA BERMUDO ESCALANTE DE RUA
                 </p>
               </div>
@@ -401,7 +401,7 @@ function PaymentContent() {
 
         {/* Footer */}
         <div className="bg-stone-50 p-4 text-center border-t border-stone-100">
-          <p className="text-[10px] text-stone-400 font-medium">
+          <p className="text-[10px] text-stone-500 font-medium">
             ¿Dudas? Llámanos al{" "}
             <span className="text-stone-600 font-bold">+51 966 556 622</span>
           </p>
@@ -421,7 +421,7 @@ function BankInfo({ bankName, color, account, cci }: any) {
       </div>
       <div className="space-y-3">
         <div>
-          <p className="text-[10px] uppercase font-bold text-stone-400 mb-0.5">
+          <p className="text-[10px] uppercase font-bold text-stone-500 mb-0.5">
             Nº Cuenta
           </p>
           <div className="flex items-center justify-between">
@@ -435,7 +435,7 @@ function BankInfo({ bankName, color, account, cci }: any) {
           </div>
         </div>
         <div>
-          <p className="text-[10px] uppercase font-bold text-stone-400 mb-0.5">
+          <p className="text-[10px] uppercase font-bold text-stone-500 mb-0.5">
             CCI
           </p>
           <p className="font-mono font-bold text-stone-700 text-sm">{cci}</p>

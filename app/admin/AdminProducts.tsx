@@ -89,7 +89,7 @@ export default function AdminProducts({ products = [], userRole }: { products: a
         {!isAdding && (userRole === "admin" || userRole === "dueño") && (
           <button 
             onClick={() => setIsAdding(true)}
-            className="bg-[#d97706] text-white px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-amber-600 transition shadow-lg shadow-amber-500/20"
+            className="bg-[#b45309] text-white px-5 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-amber-800 transition shadow-lg shadow-amber-500/20"
           >
             <Plus size={16} /> Nuevo Producto
           </button>
@@ -128,11 +128,11 @@ export default function AdminProducts({ products = [], userRole }: { products: a
                 <input aria-label="Nombre del producto" type="text" required value={editName} onChange={e => setEditName(e.target.value)} className="w-full border border-amber-300 rounded-lg px-3 py-1.5 text-sm font-bold" />
                 <div className="flex gap-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">S/</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-xs font-bold">S/</span>
                     <input aria-label="Precio (S/)" type="number" step="0.01" min="0" required value={editPrice} onChange={e => setEditPrice(e.target.value)} className="w-full border border-amber-300 rounded-lg pl-8 pr-2 py-1.5 text-sm font-bold" />
                   </div>
                   <div className="relative w-20">
-                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] font-bold">Stock</span>
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-500 text-[10px] font-bold">Stock</span>
                     <input aria-label="Stock" type="number" min="0" required value={editStock} onChange={e => setEditStock(e.target.value)} className="w-full border border-amber-300 rounded-lg pl-10 pr-2 py-1.5 text-sm font-bold" />
                   </div>
                 </div>
@@ -149,7 +149,7 @@ export default function AdminProducts({ products = [], userRole }: { products: a
                   </div>
                   {(userRole === "admin" || userRole === "dueño") && (
                     <div className="flex gap-1 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:focus-within:opacity-100">
-                      <button onClick={() => handleEdit(product)} aria-label={`Editar ${product.name}`} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-amber-600 hover:border-amber-300 transition-colors"><Edit3 size={14} /></button>
+                      <button onClick={() => handleEdit(product)} aria-label={`Editar ${product.name}`} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-amber-700 hover:border-amber-300 transition-colors"><Edit3 size={14} /></button>
                       <button onClick={() => handleDelete(product.id)} aria-label={`Eliminar ${product.name}`} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-200 transition-colors"><Trash2 size={14} /></button>
                     </div>
                   )}
@@ -157,12 +157,12 @@ export default function AdminProducts({ products = [], userRole }: { products: a
                 <h4 className="font-bold text-stone-900 leading-tight mb-2 line-clamp-2" title={product.name}>{product.name}</h4>
                 <div className="flex justify-between items-end mt-4 pt-4 border-t border-stone-200/60">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-stone-400 block mb-0.5">Precio</span>
-                    <span className="font-black text-amber-600">S/ {product.price.toFixed(2)}</span>
+                    <span className="text-[10px] uppercase font-bold text-stone-500 block mb-0.5">Precio</span>
+                    <span className="font-black text-amber-700">S/ {product.price.toFixed(2)}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] uppercase font-bold text-stone-400 block mb-0.5">Stock</span>
-                    <span className={`font-black text-lg ${product.stock <= 5 ? 'text-red-500' : 'text-stone-900'}`}>{product.stock}</span>
+                    <span className="text-[10px] uppercase font-bold text-stone-500 block mb-0.5">Stock</span>
+                    <span className={`font-black text-lg ${product.stock <= 5 ? 'text-red-600' : 'text-stone-900'}`}>{product.stock}</span>
                   </div>
                 </div>
               </>
@@ -170,7 +170,7 @@ export default function AdminProducts({ products = [], userRole }: { products: a
           </div>
         ))}
         {products.length === 0 && !isAdding && (
-          <div className="col-span-full py-12 text-center border-2 border-dashed border-stone-200 rounded-3xl text-stone-400">
+          <div className="col-span-full py-12 text-center border-2 border-dashed border-stone-200 rounded-3xl text-stone-500">
             <Package size={40} className="mx-auto mb-3 opacity-30" />
             <p className="font-bold">No hay productos registrados.</p>
           </div>
