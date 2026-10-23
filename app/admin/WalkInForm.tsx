@@ -337,7 +337,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
                   type="button"
                   onClick={handleSearchDni}
                   disabled={isSearchingDni}
-                  className="absolute right-2 p-2 bg-[#d97706]/10 text-[#b45309] rounded-xl hover:bg-[#d97706] hover:text-white transition-colors disabled:opacity-50"
+                  className="absolute right-2 p-2 w-11 h-11 md:w-auto md:h-auto flex items-center justify-center bg-[#d97706]/10 text-[#b45309] rounded-xl hover:bg-[#d97706] hover:text-white transition-colors disabled:opacity-50"
                   title="Buscar historial del huésped"
                   aria-label="Buscar historial del huésped"
                 >
@@ -428,7 +428,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
                   placeholder="S/ Total"
                   value={customPrice}
                   onChange={(e) => setCustomPrice(e.target.value)}
-                  className="w-full p-3 pl-8 bg-white/60 rounded-xl border border-stone-200 text-xs font-bold outline-none focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] transition-all shadow-inner shadow-stone-100/50"
+                  className="w-full min-h-11 p-3 pl-8 bg-white/60 rounded-xl border border-stone-200 text-xs font-bold outline-none focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] transition-all shadow-inner shadow-stone-100/50"
                 />
               </div>
             </div>
@@ -443,7 +443,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
                   min="0"
                   step="0.01"
                   placeholder="S/ Adelanto"
-                  className="w-full p-3 pl-8 bg-white/60 rounded-xl border border-stone-200 text-xs font-bold outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-emerald-700 transition-all shadow-inner shadow-stone-100/50"
+                  className="w-full min-h-11 p-3 pl-8 bg-white/60 rounded-xl border border-stone-200 text-xs font-bold outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-emerald-700 transition-all shadow-inner shadow-stone-100/50"
                 />
               </div>
               <span className="text-[8px] font-medium text-stone-500 text-center uppercase tracking-wider">Dejar vacío si cobró todo</span>

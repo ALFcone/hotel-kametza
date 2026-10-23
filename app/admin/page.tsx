@@ -573,7 +573,7 @@ export default async function AdminPage(props: {
                       type="date"
                       name="from"
                       defaultValue={dateFrom}
-                      className="bg-white border border-stone-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all w-full sm:w-[140px]"
+                      className="bg-white border border-stone-200 rounded-2xl px-4 min-h-11 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all w-full sm:w-[140px]"
                     />
                   </div>
 
@@ -583,19 +583,19 @@ export default async function AdminPage(props: {
                       type="date"
                       name="to"
                       defaultValue={dateTo}
-                      className="bg-white border border-stone-200 rounded-2xl px-4 py-2.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all w-full sm:w-[140px]"
+                      className="bg-white border border-stone-200 rounded-2xl px-4 min-h-11 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all w-full sm:w-[140px]"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="bg-stone-900 hover:bg-amber-700 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest h-[42px] transition-colors w-full sm:w-auto flex items-center justify-center gap-2"
+                    className="bg-stone-900 hover:bg-amber-700 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest h-11 transition-colors w-full sm:w-auto flex items-center justify-center gap-2"
                   >
                     <Filter size={14} /> Filtrar
                   </button>
                 </form>
 
-                <div className="flex items-center gap-2.5 w-full sm:w-auto h-[42px] mt-auto">
+                <div className="flex items-center gap-2.5 w-full sm:w-auto h-11 mt-auto">
                   <Link
                     href={`/admin?tab=registrar&from=${dateFrom}&to=${dateTo}`}
                     className="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-colors whitespace-nowrap h-full"
@@ -1221,7 +1221,7 @@ export default async function AdminPage(props: {
                             type="submit"
                             title={isDirty ? "Marcar como Limpia" : "Marcar como Sucia"}
                             aria-label={isDirty ? "Marcar como Limpia" : "Marcar como Sucia"}
-                            className={`p-2.5 rounded-full transition-all duration-300 shadow-sm border ${
+                            className={`p-3.5 rounded-full transition-all duration-300 shadow-sm border ${
                               isDirty 
                                 ? "bg-white text-rose-500 border-rose-100 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 hover:shadow-md" 
                                 : isOccupied
@@ -1299,7 +1299,7 @@ export default async function AdminPage(props: {
                           name="q"
                           defaultValue={searchParams.q || ""}
                           placeholder="Buscar por huésped, DNI..."
-                          className="pl-9 pr-4 py-2 bg-white/80 border border-stone-200/80 rounded-2xl text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 shadow-sm w-44 sm:w-60"
+                          className="pl-9 pr-4 min-h-11 bg-white/80 border border-stone-200/80 rounded-2xl text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 shadow-sm w-44 sm:w-60"
                         />
                       </div>
                       {searchParams.q && (
@@ -1386,11 +1386,11 @@ export default async function AdminPage(props: {
                             </td>
                             <td className="py-5 px-4">
                               <div className="flex flex-col gap-1 text-[9px]">
-                                <a href={`mailto:${booking.client_email}`} className="text-stone-500 hover:text-amber-700 flex items-center gap-1 transition-colors">
+                                <a href={`mailto:${booking.client_email}`} className="text-stone-500 hover:text-amber-700 flex items-center gap-1 py-2 transition-colors">
                                   <span className="bg-stone-100 p-1 rounded-full"><Mail size={8} /></span> 
                                   <span className="truncate max-w-[100px]">{booking.client_email || "Sin email"}</span>
                                 </a>
-                                <a href={`tel:${booking.client_phone}`} className="text-emerald-700 font-bold flex items-center gap-1 transition-colors">
+                                <a href={`tel:${booking.client_phone}`} className="text-emerald-700 font-bold flex items-center gap-1 py-2 transition-colors">
                                   <span className="bg-emerald-50 p-1 rounded-full"><Phone size={8} /></span> 
                                   {booking.client_phone || "Sin teléfono"}
                                 </a>
@@ -1600,14 +1600,14 @@ export default async function AdminPage(props: {
                   <div className="inline-flex rounded-xl border border-stone-200 bg-white p-1 shadow-xs">
                     <Link
                       href={`/admin?tab=calendario&from=${shiftDate(dateFrom, -7)}&to=${shiftDate(dateTo, -7)}`}
-                      className="px-3 py-1.5 text-xs text-stone-600 hover:text-stone-900 hover:bg-amber-50 rounded-lg transition font-bold flex items-center gap-1"
+                      className="px-3 py-3.5 md:py-1.5 text-xs text-stone-600 hover:text-stone-900 hover:bg-amber-50 rounded-lg transition font-bold flex items-center gap-1"
                       title="Retroceder 7 días"
                     >
                       <ChevronLeft size={14} /> -7d
                     </Link>
                     <Link
                       href={`/admin?tab=calendario&from=${today}&to=${shiftDate(today, 14)}`}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-lg transition ${
+                      className={`px-3 py-3.5 md:py-1.5 text-xs font-bold rounded-lg transition ${
                         dateFrom === today
                           ? "bg-stone-900 text-white shadow-sm"
                           : "text-stone-700 hover:bg-stone-100"
@@ -1617,7 +1617,7 @@ export default async function AdminPage(props: {
                     </Link>
                     <Link
                       href={`/admin?tab=calendario&from=${shiftDate(dateFrom, 7)}&to=${shiftDate(dateTo, 7)}`}
-                      className="px-3 py-1.5 text-xs text-stone-600 hover:text-stone-900 hover:bg-amber-50 rounded-lg transition font-bold flex items-center gap-1"
+                      className="px-3 py-3.5 md:py-1.5 text-xs text-stone-600 hover:text-stone-900 hover:bg-amber-50 rounded-lg transition font-bold flex items-center gap-1"
                       title="Avanzar 7 días"
                     >
                       +7d <ChevronRight size={14} />
@@ -1804,12 +1804,12 @@ export default async function AdminPage(props: {
       {/* --- MOBILE BOTTOM NAV --- */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-stone-950 text-white border-t border-stone-800 flex justify-between items-center px-4 py-2.5 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
         {isOwner && (
-          <Link href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "resumen" ? "text-amber-500" : "text-stone-400"}`}>
+          <Link href={`/admin?tab=resumen&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "resumen" ? "text-amber-500" : "text-stone-400"}`}>
             <TrendingUp size={18} />
             <span className="text-[8px] font-black uppercase">Caja</span>
           </Link>
         )}
-        <Link href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "calendario" ? "text-amber-500" : "text-stone-400"}`}>
+        <Link href={`/admin?tab=calendario&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "calendario" ? "text-amber-500" : "text-stone-400"}`}>
           <CalendarDays size={18} />
           <span className="text-[8px] font-black uppercase">Rack</span>
         </Link>
@@ -1826,7 +1826,7 @@ export default async function AdminPage(props: {
           <span className="text-[7px] font-black uppercase tracking-tighter">Reservar</span>
         </Link>
 
-        <Link href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "historial" ? "text-amber-500" : "text-stone-400"}`}>
+        <Link href={`/admin?tab=historial&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "historial" ? "text-amber-500" : "text-stone-400"}`}>
           <FileText size={18} />
           <span className="text-[8px] font-black uppercase">Historial</span>
         </Link>
@@ -1835,7 +1835,7 @@ export default async function AdminPage(props: {
         <MobileMoreMenu activeTab={activeTab} dateFrom={dateFrom} dateTo={dateTo} />
 
         {isOwner && (
-          <Link href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center gap-1 ${activeTab === "personal" ? "text-amber-500" : "text-stone-400"}`}>
+          <Link href={`/admin?tab=personal&from=${dateFrom}&to=${dateTo}`} className={`flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 ${activeTab === "personal" ? "text-amber-500" : "text-stone-400"}`}>
             <ShieldCheck size={18} />
             <span className="text-[8px] font-black uppercase">Personal</span>
           </Link>

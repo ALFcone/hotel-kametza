@@ -338,7 +338,7 @@ export function AdminTableActions({
         <div className="flex items-center gap-1.5 bg-white p-1.5 rounded-2xl border border-stone-200 shadow-sm">
           <button
             onClick={handleOpenBilling}
-            className={`group relative flex items-center justify-center w-8 h-8 rounded-xl transition-all hover:-translate-y-0.5 ${
+            className={`group relative flex items-center justify-center w-11 h-11 md:w-8 md:h-8 rounded-xl transition-all hover:-translate-y-0.5 ${
               isCancelled 
                 ? "bg-rose-50 text-rose-500 hover:bg-rose-100 hover:text-rose-700" 
                 : "bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200"
@@ -351,7 +351,7 @@ export function AdminTableActions({
         {!isCancelled && (
           <button
             onClick={handleShareWhatsApp}
-            className="group relative flex items-center justify-center w-8 h-8 bg-green-50 text-green-600 rounded-xl hover:text-green-700 hover:bg-green-100 transition-all hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center w-11 h-11 md:w-8 md:h-8 bg-green-50 text-green-600 rounded-xl hover:text-green-700 hover:bg-green-100 transition-all hover:-translate-y-0.5"
             title="Compartir Comprobante por WhatsApp"
             aria-label="Compartir Comprobante por WhatsApp"
           >
@@ -363,7 +363,7 @@ export function AdminTableActions({
         {!isCancelled && (
           <button
             onClick={() => setIsExtrasModalOpen(true)}
-            className="group relative flex items-center justify-center w-8 h-8 bg-purple-50 text-purple-600 rounded-xl hover:text-purple-700 hover:bg-purple-100 transition-all hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center w-11 h-11 md:w-8 md:h-8 bg-purple-50 text-purple-600 rounded-xl hover:text-purple-700 hover:bg-purple-100 transition-all hover:-translate-y-0.5"
             title="Añadir Consumos / Extras"
           >
             <ShoppingCart size={14} className="group-hover:scale-110 transition-transform duration-300" />
@@ -377,7 +377,7 @@ export function AdminTableActions({
         {!isCancelled && (
           <button
             onClick={() => setIsEditModalOpen(true)}
-            className="group relative flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-xl hover:text-blue-700 hover:bg-blue-100 transition-all hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center w-11 h-11 md:w-8 md:h-8 bg-blue-50 text-blue-600 rounded-xl hover:text-blue-700 hover:bg-blue-100 transition-all hover:-translate-y-0.5"
             title="Editar Reserva"
           >
             <Edit3 size={14} className="group-hover:scale-110 transition-transform duration-300" />
@@ -400,7 +400,7 @@ export function AdminTableActions({
         {!isCancelled && (
           <button
             onClick={handleCancelBooking}
-            className="group relative flex items-center justify-center w-8 h-8 bg-orange-100 text-orange-600 rounded-xl hover:text-orange-700 hover:bg-orange-200 transition-all hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center w-11 h-11 md:w-8 md:h-8 bg-orange-100 text-orange-600 rounded-xl hover:text-orange-700 hover:bg-orange-200 transition-all hover:-translate-y-0.5"
             title="Anular y Emitir Nota de Crédito"
             aria-label="Anular y Emitir Nota de Crédito"
           >
@@ -425,7 +425,7 @@ export function AdminTableActions({
                 onDelete(formData);
               }
             }}
-            className="group relative flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-xl hover:text-red-700 hover:bg-red-200 transition-all hover:-translate-y-0.5"
+            className="group relative flex items-center justify-center w-11 h-11 md:w-8 md:h-8 bg-red-100 text-red-600 rounded-xl hover:text-red-700 hover:bg-red-200 transition-all hover:-translate-y-0.5"
             title="Eliminar Reserva"
           >
             <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />

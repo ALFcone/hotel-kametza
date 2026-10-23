@@ -553,7 +553,7 @@ function BookingModal({
           <button
             onClick={onClose}
             aria-label="Cerrar reserva"
-            className="absolute top-6 right-6 p-2 bg-stone-100 rounded-full hover:bg-stone-200 transition text-stone-500"
+            className="absolute top-6 right-6 p-3 bg-stone-100 rounded-full hover:bg-stone-200 transition text-stone-500"
           >
             <X size={20} />
           </button>
@@ -583,7 +583,7 @@ function BookingModal({
                   min={today}
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
-                  className="w-full bg-transparent text-sm font-bold text-stone-800 outline-none mt-1"
+                  className="w-full min-h-11 bg-transparent text-sm font-bold text-stone-800 outline-none"
                 />
               </div>
               <div className="border-l border-stone-200 pl-3">
@@ -598,7 +598,7 @@ function BookingModal({
                   min={checkIn || today}
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
-                  className="w-full bg-transparent text-sm font-bold text-stone-800 outline-none mt-1"
+                  className="w-full min-h-11 bg-transparent text-sm font-bold text-stone-800 outline-none"
                 />
               </div>
             </div>
@@ -609,7 +609,7 @@ function BookingModal({
                   name="documentType"
                   aria-label="Tipo de documento"
                   onChange={(e) => setDocType(e.target.value)}
-                  className="w-full p-3 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none"
+                  className="w-full min-h-11 p-3 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none"
                 >
                   <option value="DNI">DNI</option>
                   <option value="CE">C.E.</option>
@@ -681,7 +681,7 @@ function BookingModal({
                 <select
                   name="country"
                   aria-label="País"
-                  className="w-full p-3 pl-9 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none appearance-none"
+                  className="w-full min-h-11 p-3 pl-9 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none appearance-none"
                   required
                 >
                   <option value="Perú">Perú</option>
@@ -800,7 +800,7 @@ function BookingModal({
                 onClick={() => setCurrentGalleryIndex(idx)}
                 aria-label={`Ver foto ${idx + 1}`}
                 aria-current={idx === currentGalleryIndex}
-                className={`w-3 h-3 rounded-full transition-all ${idx === currentGalleryIndex ? 'bg-[#e3004f] scale-125' : 'bg-white/50 hover:bg-white'}`}
+                className={`relative before:absolute before:-inset-2 before:content-[''] w-3 h-3 rounded-full transition-all ${idx === currentGalleryIndex ? 'bg-[#e3004f] scale-125' : 'bg-white/50 hover:bg-white'}`}
               />
             ))}
           </div>
@@ -1170,35 +1170,35 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <a
               href="#inicio"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
+              className="py-2 text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Inicio
             </a>
             <a
               href="#habitaciones"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
+              className="py-2 text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Habitaciones
             </a>
             <a
               href="#servicios"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
+              className="py-2 text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Servicios
             </a>
             <a
               href="#ubicacion"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
+              className="py-2 text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Ubicación
             </a>
             <a
               href="#contacto"
               onClick={closeMenu}
-              className="text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
+              className="py-2 text-2xl font-bold uppercase text-stone-800 hover:text-rose-900 transition"
             >
               Contacto
             </a>
@@ -1219,7 +1219,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 <a
                   href={isStaff ? "/admin" : "/dashboard"}
                   onClick={closeMenu}
-                  className="text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-[#e3004f] transition-colors"
+                  className="py-3.5 text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-[#e3004f] transition-colors"
                 >
                   Ir al Panel
                 </a>
@@ -1229,7 +1229,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                     handleLogout();
                     closeMenu();
                   }}
-                  className="flex items-center gap-2 text-stone-500 hover:text-red-600 transition-colors text-xs font-bold uppercase tracking-widest mt-2"
+                  className="flex items-center gap-2 py-3.5 text-stone-500 hover:text-red-600 transition-colors text-xs font-bold uppercase tracking-widest"
                 >
                   <LogOut size={16} /> Cerrar Sesión
                 </button>
@@ -1420,7 +1420,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         {/* --- SCROLL DOWN INDICATOR --- */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center animate-bounce">
           <span className="text-[9px] text-white/60 uppercase tracking-widest mb-2 font-bold">Explorar</span>
-          <a href="#habitaciones" aria-label="Ir a las habitaciones" className="w-8 h-12 rounded-full border-2 border-white/30 flex justify-center p-1 hover:border-white/60 transition">
+          <a href="#habitaciones" aria-label="Ir a las habitaciones" className="relative before:absolute before:-inset-3 before:content-[''] w-8 h-12 rounded-full border-2 border-white/30 flex justify-center p-1 hover:border-white/60 transition">
             <div className="w-1.5 h-3 bg-white rounded-full"></div>
           </a>
         </div>
@@ -2060,15 +2060,15 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 Un refugio exclusivo donde la historia colonial se encuentra con el confort contemporáneo en el corazón de Ayacucho.
               </p>
               <div className="flex gap-4">
-                <a href="https://www.facebook.com/share/1KhmvycDcR/" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:border-[#1877F2] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                <a href="https://www.facebook.com/share/1KhmvycDcR/" target="_blank" className="w-11 h-11 bg-white shadow-sm border border-stone-200 hover:border-[#1877F2] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
                   { }
                   <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" className="w-4 h-4 transition-all" alt="Facebook" loading="lazy" decoding="async" />
                 </a>
-                <a href="https://www.instagram.com/kametzahotelayacucho/" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:border-[#E4405F] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                <a href="https://www.instagram.com/kametzahotelayacucho/" target="_blank" className="w-11 h-11 bg-white shadow-sm border border-stone-200 hover:border-[#E4405F] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
                   { }
                   <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" className="w-4 h-4 transition-all" alt="Instagram" loading="lazy" decoding="async" />
                 </a>
-                <a href="https://tiktok.com/@HotelKametza" target="_blank" className="w-10 h-10 bg-white shadow-sm border border-stone-200 hover:border-black group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                <a href="https://tiktok.com/@HotelKametza" target="_blank" className="w-11 h-11 bg-white shadow-sm border border-stone-200 hover:border-black group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
                   { }
                   <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" className="w-4 h-4 transition-all" alt="TikTok" loading="lazy" decoding="async" />
                 </a>
@@ -2078,11 +2078,11 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             {/* Links Column */}
             <div>
               <h4 className="text-amber-600 font-bold tracking-widest text-xs uppercase mb-6">Descubre</h4>
-              <ul className="space-y-4">
-                <li><a href="#inicio" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Inicio</a></li>
-                <li><a href="#habitaciones" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Habitaciones</a></li>
-                <li><a href="#servicios" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Experiencia Kametza</a></li>
-                <li><a href="#ubicacion" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2"><ArrowRight size={14} className="text-[#e3004f]" /> Ubicación</a></li>
+              <ul>
+                <li><a href="#inicio" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Inicio</a></li>
+                <li><a href="#habitaciones" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Habitaciones</a></li>
+                <li><a href="#servicios" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Experiencia Kametza</a></li>
+                <li><a href="#ubicacion" className="text-stone-700 font-medium hover:text-amber-600 transition-colors flex items-center gap-2 py-3"><ArrowRight size={14} className="text-[#e3004f]" /> Ubicación</a></li>
               </ul>
             </div>
 

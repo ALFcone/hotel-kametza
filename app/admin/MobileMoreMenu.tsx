@@ -26,7 +26,7 @@ export default function MobileMoreMenu({ activeTab, dateFrom, dateTo }: MobileMo
   return (
     <details ref={detailsRef} className="group relative flex flex-col items-center">
       <summary
-        className={`list-none [&::-webkit-details-marker]:hidden flex flex-col items-center gap-1 cursor-pointer ${
+        className={`list-none [&::-webkit-details-marker]:hidden flex flex-col items-center justify-center gap-1 min-h-11 min-w-11 cursor-pointer ${
           items.some((item) => item.tab === activeTab) ? "text-amber-500" : "text-stone-400"
         }`}
       >
@@ -39,7 +39,7 @@ export default function MobileMoreMenu({ activeTab, dateFrom, dateTo }: MobileMo
             key={tab}
             href={`/admin?tab=${tab}&from=${dateFrom}&to=${dateTo}`}
             onClick={closeMenu}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider ${
+            className={`flex items-center gap-3 px-3 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider ${
               activeTab === tab ? "bg-amber-500/10 text-amber-400" : "text-stone-300 hover:bg-white/5"
             }`}
           >

@@ -315,7 +315,7 @@ export default function AdminStaffManagement({
                         value={staff.role}
                         onChange={(e) => handleRoleChange(staff.email, e.target.value)}
                         disabled={loading}
-                        className="bg-white border border-stone-200 rounded-xl px-3 py-1.5 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition cursor-pointer"
+                        className="bg-white border border-stone-200 rounded-xl px-3 min-h-11 text-xs font-bold text-stone-700 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition cursor-pointer"
                       >
                         <option value="dueño">Dueño / Admin</option>
                         <option value="recepcionista">Recepcionista</option>
@@ -332,7 +332,7 @@ export default function AdminStaffManagement({
                         <button
                           onClick={() => handleDelete(staff.email)}
                           disabled={loading}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 p-2 rounded-xl transition cursor-pointer"
+                          className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 px-3 min-h-11 rounded-xl transition cursor-pointer"
                           title="Revocar acceso"
                         >
                           <Trash2 size={14} /> Revocar

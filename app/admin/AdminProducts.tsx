@@ -149,8 +149,8 @@ export default function AdminProducts({ products = [], userRole }: { products: a
                   </div>
                   {(userRole === "admin" || userRole === "dueño") && (
                     <div className="flex gap-1 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:focus-within:opacity-100">
-                      <button onClick={() => handleEdit(product)} aria-label={`Editar ${product.name}`} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-amber-700 hover:border-amber-300 transition-colors"><Edit3 size={14} /></button>
-                      <button onClick={() => handleDelete(product.id)} aria-label={`Eliminar ${product.name}`} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-200 transition-colors"><Trash2 size={14} /></button>
+                      <button onClick={() => handleEdit(product)} aria-label={`Editar ${product.name}`} className="w-11 h-11 md:w-8 md:h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-amber-700 hover:border-amber-300 transition-colors"><Edit3 size={14} /></button>
+                      <button onClick={() => handleDelete(product.id)} aria-label={`Eliminar ${product.name}`} className="w-11 h-11 md:w-8 md:h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-200 transition-colors"><Trash2 size={14} /></button>
                     </div>
                   )}
                 </div>

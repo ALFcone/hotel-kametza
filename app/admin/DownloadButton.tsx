@@ -87,7 +87,7 @@ export default function DownloadButton({ data, extrasData }: { data: any[], extr
   return (
     <button
       onClick={downloadReport}
-      className="flex items-center gap-2 bg-stone-800 text-white px-4 py-2 rounded-lg hover:bg-black transition shadow-md font-bold text-xs"
+      className="flex items-center gap-2 bg-stone-800 text-white px-4 min-h-11 rounded-lg hover:bg-black transition shadow-md font-bold text-xs"
     >
       <Download size={16} /> Descargar Reporte Excel
     </button>

@@ -101,7 +101,7 @@ export default function RoomEditForm({ room }: { room: any }) {
                 name="price"
                 defaultValue={room.price_per_night}
                 type="number"
-                className="w-full pl-7 pr-2 py-2 bg-stone-50/50 rounded-lg border border-stone-200 font-bold text-stone-700 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] outline-none transition-all text-xs shadow-inner shadow-stone-100/50"
+                className="w-full pl-7 pr-2 min-h-11 bg-stone-50/50 rounded-lg border border-stone-200 font-bold text-stone-700 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] outline-none transition-all text-xs shadow-inner shadow-stone-100/50"
               />
             </div>
           </div>
@@ -115,7 +115,7 @@ export default function RoomEditForm({ room }: { room: any }) {
               type="file"
               aria-label="Foto de portada"
               accept="image/*"
-              className="w-full bg-stone-50/50 rounded-xl border border-stone-200 text-[10px] file:mr-3 file:py-3 file:px-4 file:border-0 file:text-[9px] file:font-black file:uppercase file:tracking-wider file:bg-stone-200 file:text-stone-700 hover:file:bg-[#d97706] hover:file:text-white file:transition-colors outline-none transition-all shadow-inner shadow-stone-100/50 focus:border-[#d97706] focus:bg-white"
+              className="w-full min-h-11 bg-stone-50/50 rounded-xl border border-stone-200 text-[10px] file:mr-3 file:py-3 file:px-4 file:border-0 file:text-[9px] file:font-black file:uppercase file:tracking-wider file:bg-stone-200 file:text-stone-700 hover:file:bg-[#d97706] hover:file:text-white file:transition-colors outline-none transition-all shadow-inner shadow-stone-100/50 focus:border-[#d97706] focus:bg-white"
             />
           </div>
         </div>
@@ -135,7 +135,7 @@ export default function RoomEditForm({ room }: { room: any }) {
         <button
           type="submit"
           disabled={saving}
-          className="relative overflow-hidden w-full bg-stone-900 text-amber-500 font-black py-3.5 rounded-xl transition-all duration-300 text-[10px] uppercase tracking-widest shadow-lg hover:shadow-[#d97706]/20 hover:-translate-y-0.5 group/btn disabled:opacity-60 disabled:cursor-not-allowed"
+          className="relative overflow-hidden w-full bg-stone-900 text-amber-500 font-black min-h-11 py-3.5 rounded-xl transition-all duration-300 text-[10px] uppercase tracking-widest shadow-lg hover:shadow-[#d97706]/20 hover:-translate-y-0.5 group/btn disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <span className="relative z-10 flex items-center justify-center gap-2">
             {saving ? "Guardando..." : "Guardar Cambios"}
