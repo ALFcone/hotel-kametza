@@ -283,3 +283,63 @@ html {
     break-inside: avoid-page;
   }
 }
+
+/* ============================================
+   Movimiento reducido
+   Se conserva el cambio de estado (aparece, cambia, carga) con un fundido corto;
+   se quitan desplazamientos, escalas, bucles decorativos y el confeti.
+   ============================================ */
+@keyframes fadeOnly {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Entradas: solo fundido, sin escalonado */
+  .animate-fade-in-up,
+  .animate-slide-in-right,
+  .animate-scale-in,
+  .modal-overlay,
+  .modal-content {
+    animation: fadeOnly 0.2s ease-out both;
+    animation-delay: 0ms !important;
+  }
+
+  .scroll-reveal {
+    transform: none;
+    transition: opacity 0.3s ease-out;
+    transition-delay: 0ms !important;
+  }
+
+  /* Decoración en bucle: fuera */
+  .animate-float,
+  .animate-bounce,
+  .animate-pulse {
+    animation: none;
+  }
+
+  .btn-shimmer::after,
+  .confetti-piece {
+    display: none;
+  }
+
+  /* Esqueletos de carga: bloque quieto, sin barrido */
+  .animate-shimmer {
+    animation: none;
+    background: #e7e5e4;
+  }
+
+  /* Sin parallax con fondo fijo */
+  .bg-fixed {
+    background-attachment: scroll;
+  }
+
+  /* Zoom al pasar el cursor: sin escala */
+  [class*="hover:scale"] {
+    scale: none !important;
+  }
+}

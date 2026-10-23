@@ -1489,7 +1489,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                       } else {
                         setActiveServiceId(service.id);
                         setTimeout(() => {
-                          document.getElementById('service-detail')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          document.getElementById('service-detail')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
                         }, 150);
                       }
                     }}
