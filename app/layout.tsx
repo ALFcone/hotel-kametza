@@ -25,7 +25,7 @@ const title = "Hotel Kametza | Ayacucho";
 const description = "Un refugio donde la historia colonial se encuentra con el confort contemporáneo.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://hotel-kametza.vercel.app"),
+  metadataBase: new URL("https://kametzahotel.vercel.app"),
   title,
   description,
   openGraph: {
