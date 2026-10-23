@@ -311,7 +311,7 @@ export default function AdminStaffManagement({
                     <td className="py-4 px-6">{getRoleBadge(staff.role)}</td>
 
                     <td className="py-4 px-6">
-                      <select
+                      <select aria-label={`Rol de ${staff.email}`}
                         value={staff.role}
                         onChange={(e) => handleRoleChange(staff.email, e.target.value)}
                         disabled={loading}
@@ -383,7 +383,7 @@ export default function AdminStaffManagement({
                 </label>
                 <div className="relative mt-1">
                   <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-                  <input
+                  <input aria-label="Correo electrónico"
                     type="email"
                     required
                     placeholder="ejemplo@gmail.com"
@@ -403,7 +403,7 @@ export default function AdminStaffManagement({
                 </label>
                 <div className="relative mt-1">
                   <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-                  <input
+                  <input aria-label="Nombre o referencia (opcional)"
                     type="text"
                     placeholder="Ej: Carmen Huamán (Recepción Turno Noche)"
                     value={name}
@@ -417,7 +417,7 @@ export default function AdminStaffManagement({
                 <label className="text-[11px] font-bold uppercase tracking-wider text-stone-500 ml-1">
                   Rol a Asignar *
                 </label>
-                <select
+                <select aria-label="Rol a asignar"
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value)}
                   className="w-full mt-1 p-3 bg-stone-50 border border-stone-200 rounded-xl text-xs font-bold text-stone-800 outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition cursor-pointer"

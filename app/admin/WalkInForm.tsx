@@ -168,7 +168,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
             <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Habitación</label>
             <div className="relative">
               <Bed className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#d97706] transition-colors" size={16} />
-              <select
+              <select aria-label="Habitación"
                 value={selectedRoomId}
                 onChange={(e) => {
                   setSelectedRoomId(Number(e.target.value));
@@ -189,7 +189,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
           {/* Método de Pago */}
           <div className="flex flex-col gap-1.5 group/input">
             <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Método de Pago</label>
-            <select
+            <select aria-label="Método de pago"
               name="paymentMethod"
               required
               className="w-full p-4 bg-stone-50/50 rounded-2xl border border-stone-200 text-xs font-bold outline-none text-stone-750 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] transition-all shadow-inner shadow-stone-100/50"
@@ -204,7 +204,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
           {/* Fecha de Entrada */}
           <div className="flex flex-col gap-1.5 group/input">
             <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Entrada (Check-in)</label>
-            <input
+            <input aria-label="Entrada (check-in)"
               type="date"
               name="checkIn"
               required
@@ -221,7 +221,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
           {/* Fecha de Salida */}
           <div className="flex flex-col gap-1.5 group/input">
             <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Salida (Check-out)</label>
-            <input
+            <input aria-label="Salida (check-out)"
               type="date"
               name="checkOut"
               required
@@ -274,7 +274,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Nombre Completo</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#d97706] transition-colors" size={16} />
-                <input
+                <input aria-label="Nombre completo"
                   ref={nameRef}
                   type="text"
                   name="name"
@@ -289,7 +289,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Celular</label>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#d97706] transition-colors" size={16} />
-                <input
+                <input aria-label="Celular"
                   ref={phoneRef}
                   type="tel"
                   name="phone"
@@ -304,7 +304,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
           <div className="grid grid-cols-3 gap-5">
             <div className="col-span-1 flex flex-col gap-1.5 group/input">
               <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Tipo Doc</label>
-              <select
+              <select aria-label="Tipo de documento"
                 ref={docTypeRef}
                 name="documentType"
                 className="w-full p-4 bg-stone-50/50 rounded-2xl border border-stone-200 text-xs font-bold outline-none text-stone-750 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] transition-all shadow-inner shadow-stone-100/50"
@@ -319,7 +319,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Número de Documento</label>
               <div className="relative flex items-center">
                 <FileText className="absolute left-4 text-stone-400 group-focus-within/input:text-[#d97706] transition-colors z-10 pointer-events-none" size={16} />
-                <input
+                <input aria-label="Número de documento"
                   ref={docNumRef}
                   type="text"
                   name="documentNumber"
@@ -339,6 +339,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
                   disabled={isSearchingDni}
                   className="absolute right-2 p-2 bg-[#d97706]/10 text-[#d97706] rounded-xl hover:bg-[#d97706] hover:text-white transition-colors disabled:opacity-50"
                   title="Buscar historial del huésped"
+                  aria-label="Buscar historial del huésped"
                 >
                   {isSearchingDni ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
                 </button>
@@ -351,7 +352,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">País de Origen</label>
               <div className="relative">
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#d97706] transition-colors" size={16} />
-                <input
+                <input aria-label="País de origen"
                   ref={countryRef}
                   type="text"
                   name="country"
@@ -381,7 +382,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
 
             <div className="flex flex-col gap-1.5 group/input">
               <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Correo (Opcional)</label>
-              <input
+              <input aria-label="Correo (opcional)"
                 ref={emailRef}
                 type="email"
                 name="email"
@@ -395,7 +396,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
             <label className="text-[10px] font-black uppercase text-stone-400 ml-2 group-focus-within/input:text-[#d97706] transition-colors">Notas / Pedidos Especiales (Opcional)</label>
             <div className="relative">
               <StickyNote className="absolute left-4 top-4 text-stone-400 group-focus-within/input:text-[#d97706] transition-colors" size={16} />
-              <textarea
+              <textarea aria-label="Notas o pedidos especiales"
                 name="notes"
                 rows={2}
                 placeholder="Ej: cuna adicional, alergia, llegada tardía..."
@@ -422,7 +423,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               <label className="text-[9px] font-black uppercase text-stone-400 ml-1 group-focus-within/input:text-[#d97706] transition-colors">Tarifa Total Fija</label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-[#d97706] transition-colors" size={14} />
-                <input
+                <input aria-label="Tarifa total fija"
                   type="number"
                   placeholder="S/ Total"
                   value={customPrice}
@@ -436,7 +437,7 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               <label className="text-[9px] font-black uppercase text-stone-400 ml-1 group-focus-within/input:text-emerald-500 transition-colors">Monto Cobrado Hoy</label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within/input:text-emerald-500 transition-colors" size={14} />
-                <input
+                <input aria-label="Monto cobrado hoy"
                   type="number"
                   name="amountPaid"
                   min="0"

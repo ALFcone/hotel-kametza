@@ -18,6 +18,7 @@ const montserrat = Montserrat({
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
+  style: ["normal", "italic"],
 });
 
 const title = "Hotel Kametza | Ayacucho";

@@ -225,16 +225,17 @@ function AuthModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300" role="dialog" aria-modal="true" aria-labelledby="auth-title">
       <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative border border-stone-100">
         <button
           onClick={onClose}
+          aria-label="Cerrar"
           className="absolute top-4 right-4 text-stone-400 hover:text-stone-800"
         >
           <X size={24} />
         </button>
 
-        <h2 className="text-2xl font-serif font-bold text-rose-950 mb-2 text-center">
+        <h2 id="auth-title" className="text-2xl font-serif font-bold text-rose-950 mb-2 text-center">
           {isLogin ? "Inicia Sesión" : "Regístrate"}
         </h2>
         <p className="text-stone-500 text-xs text-center mb-6">
@@ -277,7 +278,7 @@ function AuthModal({
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 text-xs p-3 rounded-xl mb-4 text-center font-bold">
+          <div role="alert" className="bg-red-50 text-red-600 text-xs p-3 rounded-xl mb-4 text-center font-bold">
             {error}
           </div>
         )}
@@ -286,6 +287,9 @@ function AuthModal({
           {!isLogin && (
             <input
               type="text"
+              name="name"
+              autoComplete="name"
+              aria-label="Tu nombre"
               placeholder="Tu Nombre"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -296,6 +300,9 @@ function AuthModal({
 
           <input
             type="email"
+            name="email"
+            autoComplete="email"
+            aria-label="Correo electrónico"
             placeholder="Correo electrónico"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -304,6 +311,9 @@ function AuthModal({
           />
           <input
             type="password"
+            name="password"
+            autoComplete={isLogin ? "current-password" : "new-password"}
+            aria-label="Contraseña"
             placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -471,7 +481,7 @@ function BookingModal({
   const simpleDesc = getSimpleDescription(room.name, room.description);
 
   return createPortal(
-    <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200" role="dialog" aria-modal="true" aria-labelledby="booking-title">
       <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
         {/* --- GALERÍA DE FOTOS (Panel Izquierdo) --- */}
         <div className="hidden md:flex flex-col w-[40%] bg-stone-100 p-6 relative overflow-hidden">
@@ -529,12 +539,13 @@ function BookingModal({
         <div className="flex-1 p-8 md:p-10 overflow-y-auto relative">
           <button
             onClick={onClose}
+            aria-label="Cerrar reserva"
             className="absolute top-6 right-6 p-2 bg-stone-100 rounded-full hover:bg-stone-200 transition text-stone-500"
           >
             <X size={20} />
           </button>
 
-          <h2 className="text-xl font-bold text-stone-800 mb-6 flex items-center gap-2">
+          <h2 id="booking-title" className="text-xl font-bold text-stone-800 mb-6 flex items-center gap-2">
             <Calendar className="text-rose-600" size={20} />
             Completa tu Reserva
           </h2>
@@ -548,10 +559,11 @@ function BookingModal({
 
             <div className="grid grid-cols-2 gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-100">
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase ml-1">
+                <label htmlFor="booking-checkin" className="text-[10px] font-bold text-stone-400 uppercase ml-1">
                   Llegada
                 </label>
                 <input
+                  id="booking-checkin"
                   type="date"
                   name="checkIn"
                   required
@@ -562,10 +574,11 @@ function BookingModal({
                 />
               </div>
               <div className="border-l border-stone-200 pl-3">
-                <label className="text-[10px] font-bold text-stone-400 uppercase ml-1">
+                <label htmlFor="booking-checkout" className="text-[10px] font-bold text-stone-400 uppercase ml-1">
                   Salida
                 </label>
                 <input
+                  id="booking-checkout"
                   type="date"
                   name="checkOut"
                   required
@@ -581,6 +594,7 @@ function BookingModal({
               <div className="col-span-1">
                 <select
                   name="documentType"
+                  aria-label="Tipo de documento"
                   onChange={(e) => setDocType(e.target.value)}
                   className="w-full p-3 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none"
                 >
@@ -593,6 +607,8 @@ function BookingModal({
                 <input
                   type="text"
                   name="documentNumber"
+                  aria-label="Número de documento"
+                  inputMode={docType === "DNI" ? "numeric" : "text"}
                   placeholder="Número de Documento"
                   required
                   value={docNumber}
@@ -606,6 +622,8 @@ function BookingModal({
             <input
               type="text"
               name="name"
+              autoComplete="name"
+              aria-label="Nombre completo"
               placeholder="Nombre completo"
               required
               value={customerName}
@@ -618,6 +636,8 @@ function BookingModal({
               <input
                 type="email"
                 name="email"
+                autoComplete="email"
+                aria-label="Correo electrónico"
                 placeholder="Correo electrónico"
                 required
                 // Si hay usuario, poner su email y bloquear el campo
@@ -647,6 +667,7 @@ function BookingModal({
                 />
                 <select
                   name="country"
+                  aria-label="País"
                   className="w-full p-3 pl-9 bg-stone-50 rounded-xl text-xs font-bold border border-stone-200 outline-none appearance-none"
                   required
                 >
@@ -669,6 +690,8 @@ function BookingModal({
                 <input
                   type="tel"
                   name="phone"
+                  autoComplete="tel"
+                  aria-label="Celular o WhatsApp"
                   placeholder="Celular / WhatsApp"
                   required
                   className="w-full p-3 pl-9 bg-stone-50 rounded-xl text-sm border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10"
@@ -679,6 +702,7 @@ function BookingModal({
             <div className="relative">
               <select
                 name="paymentMethod"
+                aria-label="Método de pago"
                 required
                 defaultValue=""
                 className="w-full p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs font-bold text-rose-900 outline-none appearance-none cursor-pointer"
@@ -725,6 +749,7 @@ function BookingModal({
         <div className="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center p-4">
           <button
             onClick={() => setGalleryOpen(false)}
+            aria-label="Cerrar galería"
             className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition z-10"
           >
             <X size={24} />
@@ -732,6 +757,7 @@ function BookingModal({
           
           <button 
             onClick={() => setCurrentGalleryIndex((prev) => (prev > 0 ? prev - 1 : roomGallery.length - 1))}
+            aria-label="Foto anterior"
             className="absolute left-4 md:left-12 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition z-10"
           >
             <ArrowRight size={32} className="rotate-180" />
@@ -745,6 +771,7 @@ function BookingModal({
 
           <button 
             onClick={() => setCurrentGalleryIndex((prev) => (prev < roomGallery.length - 1 ? prev + 1 : 0))}
+            aria-label="Foto siguiente"
             className="absolute right-4 md:right-12 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition z-10"
           >
             <ArrowRight size={32} />
@@ -755,6 +782,8 @@ function BookingModal({
               <button 
                 key={idx}
                 onClick={() => setCurrentGalleryIndex(idx)}
+                aria-label={`Ver foto ${idx + 1}`}
+                aria-current={idx === currentGalleryIndex}
                 className={`w-3 h-3 rounded-full transition-all ${idx === currentGalleryIndex ? 'bg-[#e3004f] scale-125' : 'bg-white/50 hover:bg-white'}`}
               />
             ))}
@@ -1076,6 +1105,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <button
                     onClick={handleLogout}
                     title="Cerrar Sesión"
+                    aria-label="Cerrar sesión"
                     className="text-stone-300 hover:text-rose-600 transition-colors"
                   >
                     <LogOut size={18} strokeWidth={1.5} />
@@ -1102,6 +1132,8 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             </div>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={isMenuOpen}
               className="md:hidden z-[110] p-2 text-rose-900"
             >
               {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
@@ -1272,7 +1304,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 }
               }}
             >
-              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
+              <label htmlFor="hero-checkin" className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
                 Check-in
               </label>
               <div className="flex items-center w-full">
@@ -1315,7 +1347,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 }
               }}
             >
-              <label className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
+              <label htmlFor="hero-checkout" className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1 group-hover:text-[#e3004f] transition cursor-pointer">
                 Check-out
               </label>
               <div className="flex items-center w-full">
@@ -1364,7 +1396,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         {/* --- SCROLL DOWN INDICATOR --- */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center animate-bounce">
           <span className="text-[9px] text-white/60 uppercase tracking-widest mb-2 font-bold">Explorar</span>
-          <a href="#habitaciones" className="w-8 h-12 rounded-full border-2 border-white/30 flex justify-center p-1 hover:border-white/60 transition">
+          <a href="#habitaciones" aria-label="Ir a las habitaciones" className="w-8 h-12 rounded-full border-2 border-white/30 flex justify-center p-1 hover:border-white/60 transition">
             <div className="w-1.5 h-3 bg-white rounded-full"></div>
           </a>
         </div>
@@ -1963,16 +1995,16 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               
               <form className="space-y-5 relative z-10" onSubmit={(e) => { e.preventDefault(); alert('Mensaje enviado. ¡Gracias por contactarnos!'); }}>
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Nombre Completo</label>
-                  <input type="text" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm" placeholder="Ej. Carlos Mendoza" />
+                  <label htmlFor="contact-name" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Nombre Completo</label>
+                  <input id="contact-name" name="name" autoComplete="name" type="text" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm" placeholder="Ej. Carlos Mendoza" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Correo Electrónico</label>
-                  <input type="email" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm" placeholder="correo@ejemplo.com" />
+                  <label htmlFor="contact-email" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Correo Electrónico</label>
+                  <input id="contact-email" name="email" autoComplete="email" type="email" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm" placeholder="correo@ejemplo.com" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Tu Consulta</label>
-                  <textarea required rows={4} className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
+                  <label htmlFor="contact-message" className="text-[10px] font-bold uppercase tracking-widest text-stone-400 ml-2 block mb-1">Tu Consulta</label>
+                  <textarea id="contact-message" name="message" required rows={4} className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
                 </div>
                 <button type="submit" className="w-full bg-stone-900 text-white font-bold py-4 rounded-2xl hover:bg-[#e3004f] transition-all shadow-lg hover:shadow-rose-900/20 text-sm tracking-widest uppercase mt-4">
                   Enviar Mensaje

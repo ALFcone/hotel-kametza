@@ -248,7 +248,7 @@ export default function LoginPage() {
 
         {/* Mensaje de Error */}
         {error && (
-          <div className="animate-fade-in-up bg-rose-50 text-rose-800 text-xs p-4 rounded-2xl mb-4 border border-rose-100 font-medium">
+          <div role="alert" className="animate-fade-in-up bg-rose-50 text-rose-800 text-xs p-4 rounded-2xl mb-4 border border-rose-100 font-medium">
             {error}
           </div>
         )}
@@ -263,6 +263,9 @@ export default function LoginPage() {
               <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
               <input
                 type="text"
+                name="name"
+                autoComplete="name"
+                aria-label="Nombre completo"
                 placeholder="Nombre completo"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -276,6 +279,9 @@ export default function LoginPage() {
             <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
             <input
               type="email"
+              name="email"
+              autoComplete="email"
+              aria-label="Correo electrónico"
               placeholder="Correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -288,6 +294,9 @@ export default function LoginPage() {
             <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
             <input
               type={showPassword ? "text" : "password"}
+              name="password"
+              autoComplete={isLogin ? "current-password" : "new-password"}
+              aria-label="Contraseña"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -298,7 +307,8 @@ export default function LoginPage() {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 password-toggle"
-              tabIndex={-1}
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              aria-pressed={showPassword}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>

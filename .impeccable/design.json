@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-23T00:00:00.000Z",
+  "title": "Design System: Hotel Kametza",
+  "extensions": {
+    "colorMeta": {
+      "kametza-rose": { "role": "primary", "displayName": "Rosa Kametza", "canonical": "#e3004f", "tonalRamp": ["#4a001a", "#730029", "#a30038", "#c90045", "#e3004f", "#ea70a1", "#f6cadd", "#fdf2f5"] },
+      "kametza-rose-deep": { "role": "primary", "displayName": "Rosa Profundo", "canonical": "#b3003e", "tonalRamp": ["#4a001a", "#730029", "#8a0030", "#a30038", "#b3003e", "#c90045", "#e3004f", "#ea70a1"] },
+      "rose-ink": { "role": "primary", "displayName": "Rosa Tinta", "canonical": "#4a001a", "tonalRamp": ["#4a001a", "#730029", "#8a0030", "#a30038", "#c90045", "#e3004f", "#ea70a1", "#fbe5ec"] },
+      "admin-amber": { "role": "secondary", "displayName": "Ámbar de Panel", "canonical": "#d97706", "tonalRamp": ["#451a03", "#78350f", "#92400e", "#b45309", "#d97706", "#f59e0b", "#fbbf24", "#fef3c7"] },
+      "parchment": { "role": "neutral", "displayName": "Pergamino", "canonical": "#FDFBF7", "tonalRamp": ["#1c1917", "#44403c", "#78716c", "#a8a29e", "#e7e5e4", "#f5f5f4", "#fafaf9", "#FDFBF7"] },
+      "night-panel": { "role": "neutral", "displayName": "Panel Nocturno", "canonical": "#0c0a09", "tonalRamp": ["#0c0a09", "#1c1917", "#292524", "#44403c", "#78716c", "#a8a29e", "#d6d3d1", "#e7e5e4"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Solo el título KAMETZA del hero." },
+      "headline": { "displayName": "Headline", "purpose": "Encabezados de sección del sitio público." },
+      "title": { "displayName": "Title", "purpose": "Modales, tarjetas destacadas y paneles." },
+      "body": { "displayName": "Body", "purpose": "Texto corrido y valores de campos." },
+      "label": { "displayName": "Label", "purpose": "Etiquetas de campo, botones, insignias y pestañas del panel." }
+    },
+    "shadows": [
+      { "name": "card-rest", "value": "0 8px 30px rgb(0 0 0 / 0.04)", "purpose": "Tarjetas de habitación y servicio en reposo." },
+      { "name": "card-hover-rose", "value": "0 20px 40px rgba(227,0,79,0.15)", "purpose": "Elevación rosada de tarjetas en hover." },
+      { "name": "cta-brand", "value": "0 10px 20px rgba(227,0,79,0.3)", "purpose": "Botón de llamada principal del hero." },
+      { "name": "cta-brand-hover", "value": "0 15px 30px rgba(227,0,79,0.4)", "purpose": "Botón principal en hover, junto con translateY(-4px)." },
+      { "name": "navbar", "value": "0 4px 20px rgba(0,0,0,0.05)", "purpose": "Barra superior fija." },
+      { "name": "mobile-dock", "value": "0 -10px 40px rgba(0,0,0,0.3)", "purpose": "Barra inferior móvil del panel." }
+    ],
+    "motion": [
+      { "name": "ease-card", "value": "all 500ms ease", "purpose": "Elevación de tarjetas." },
+      { "name": "image-zoom", "value": "transform 1000ms ease", "purpose": "Zoom lento de la foto de la tarjeta." },
+      { "name": "scroll-reveal", "value": "opacity 700ms ease-out, transform 700ms ease-out", "purpose": "Entrada de secciones al hacer scroll (desplazamiento de 30px)." },
+      { "name": "fade-in-up", "value": "600ms ease-out both", "purpose": "Entrada escalonada de elementos del panel del huésped (retrasos de 80ms)." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón principal (hero)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Llamada a la acción con degradado rosa y sombra tintada; se eleva en hover.",
+      "html": "<button class=\"ds-btn-hero\">BUSCAR HABITACIÓN</button>",
+      "css": ".ds-btn-hero { background: linear-gradient(90deg, #e3004f, #b3003e); color: #fff; padding: 16px 32px; border: none; border-radius: 9999px; font-family: Montserrat, Arial, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; box-shadow: 0 10px 20px rgba(227,0,79,0.3); cursor: pointer; transition: transform .3s, box-shadow .3s; } .ds-btn-hero:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(227,0,79,0.4); } .ds-btn-hero:focus-visible { outline: 2px solid #e3004f; outline-offset: 3px; }"
+    },
+    {
+      "name": "Botón confirmar",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción de confirmación en formularios; rosa sólido que se vuelve negro en hover.",
+      "html": "<button class=\"ds-btn-confirm\">CONFIRMAR RESERVA</button>",
+      "css": ".ds-btn-confirm { width: 100%; background: #e3004f; color: #fff; padding: 16px; border: none; border-radius: 12px; font-family: Montserrat, Arial, sans-serif; font-size: 12px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); cursor: pointer; transition: background .3s; } .ds-btn-confirm:hover { background: #000; } .ds-btn-confirm:focus-visible { outline: 2px solid #e3004f; outline-offset: 3px; } .ds-btn-confirm:disabled { opacity: .5; }"
+    },
+    {
+      "name": "Botón cápsula (Acceder)",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción secundaria de cabecera; fondo neutro que se tiñe de rosa en hover.",
+      "html": "<button class=\"ds-btn-pill\">ACCEDER</button>",
+      "css": ".ds-btn-pill { background: #fafaf9; color: #57534e; border: 1px solid #e7e5e4; padding: 10px 20px; border-radius: 9999px; font-family: Montserrat, Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all .3s; } .ds-btn-pill:hover { background: #fdf2f5; border-color: rgba(227,0,79,0.3); color: #e3004f; } .ds-btn-pill:focus-visible { outline: 2px solid #e3004f; outline-offset: 2px; }"
+    },
+    {
+      "name": "Campo de formulario",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Campo sobre stone-50 con borde fino y anillo suave en foco.",
+      "html": "<input class=\"ds-input\" placeholder=\"Tu nombre\" />",
+      "css": ".ds-input { width: 100%; box-sizing: border-box; padding: 12px; background: #fafaf9; border: 1px solid #e7e5e4; border-radius: 12px; font-family: Montserrat, Arial, sans-serif; font-size: 14px; color: #292524; outline: none; } .ds-input:focus { box-shadow: 0 0 0 2px rgba(138,0,48,0.1); border-color: #e3004f; }"
+    },
+    {
+      "name": "Tarjeta de habitación",
+      "kind": "card",
+      "refersTo": "card-room",
+      "description": "Tarjeta blanca de 24px con foto superior y elevación rosada en hover.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-photo\"></div><div class=\"ds-card-body\"><h3>Habitación Matrimonial</h3><p>Ideal para parejas. Baño privado y agua caliente 24 h.</p><strong>S/ 120 por noche</strong></div></article>",
+      "css": ".ds-card { background: #fff; border: 1px solid #f5f5f4; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 30px rgb(0 0 0 / 0.04); transition: box-shadow .5s; max-width: 320px; font-family: Montserrat, Arial, sans-serif; } .ds-card:hover { box-shadow: 0 20px 40px rgba(227,0,79,0.15); } .ds-card-photo { height: 160px; background: linear-gradient(to top, rgba(0,0,0,.5), transparent), #d6d3d1; } .ds-card-body { padding: 24px; } .ds-card h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 20px; margin: 0 0 8px; color: #1c1917; } .ds-card p { font-size: 14px; color: #78716c; margin: 0 0 12px; } .ds-card strong { color: #e3004f; }"
+    },
+    {
+      "name": "Navegación del panel",
+      "kind": "nav",
+      "refersTo": "admin-nav-item",
+      "description": "Ítems de la barra lateral de /admin sobre fondo casi negro; activo con borde e icono ámbar.",
+      "html": "<nav class=\"ds-admin-nav\"><a class=\"ds-admin-item is-active\">ROOM RACK</a><a class=\"ds-admin-item\">HISTORIAL DE RESERVAS</a></nav>",
+      "css": ".ds-admin-nav { background: #0c0a09; padding: 16px; display: flex; flex-direction: column; gap: 4px; width: 260px; font-family: Montserrat, Arial, sans-serif; } .ds-admin-item { display: block; padding: 12px 16px; border-left: 2px solid transparent; border-radius: 8px; color: #a8a29e; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all .2s; } .ds-admin-item:hover { color: #fff; background: rgba(255,255,255,.05); } .ds-admin-item.is-active { color: #fff; background: rgba(255,255,255,.1); border-left-color: #f59e0b; } .ds-admin-item:focus-visible { outline: 2px solid #f59e0b; outline-offset: 2px; }"
+    },
+    {
+      "name": "Insignia de estado",
+      "kind": "chip",
+      "refersTo": "label",
+      "description": "Punto con halo y etiqueta mínima para el Room Rack.",
+      "html": "<span class=\"ds-status\"><i></i>LIMPIA</span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; gap: 6px; font-family: Montserrat, Arial, sans-serif; font-size: 10px; font-weight: 900; letter-spacing: 0.1em; color: #44403c; } .ds-status i { width: 8px; height: 8px; border-radius: 9999px; background: #10b981; box-shadow: 0 0 5px rgba(16,185,129,.5); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El Anfitrión Ayacuchano",
+    "overview": "Kametza se presenta como una casa que recibe, no como un portal de reservas. El sitio público habla con voz de anfitrión: titulares serif grandes y con carácter sobre un fondo crema cálido, un rosa de marca que aparece como sello y como llamada a la acción, y un texto de apoyo claro y directo. El carácter es pulido y premium sin ser frío; el panel de recepción cambia de registro a propósito, con barra lateral casi negra y acento ámbar, porque ahí el personal trabaja rápido y a menudo desde el móvil.",
+    "keyCharacteristics": [
+      "Crema #FDFBF7 como lienzo del sitio público; blanco solo para superficies elevadas.",
+      "Rosa Kametza como único acento de marca en el público; ámbar exclusivo del personal.",
+      "Serif (Playfair) para voz y títulos; sans (Montserrat) para todo lo que se lee, se llena o se cobra.",
+      "Esquinas amplias (12 a 24 px) y cápsulas.",
+      "Sombras suaves y tintadas; el resplandor rosado señala interacción."
+    ],
+    "rules": [
+      { "name": "The Una Sola Voz Rule", "body": "En el sitio público el rosa Kametza es el único acento. Si una pantalla necesita un segundo color para distinguir algo, usa un neutro de piedra, no ámbar.", "section": "colors" },
+      { "name": "The Ámbar Solo Para Casa Rule", "body": "El ámbar #d97706 pertenece a /admin. No aparece en la landing, el acceso, el panel del huésped ni la confirmación.", "section": "colors" },
+      { "name": "The Piedra Cálida Rule", "body": "Todos los grises vienen de la familia stone. Un gris frío rompe el calor del conjunto.", "section": "colors" },
+      { "name": "The Serif Es La Voz Rule", "body": "Playfair solo para titulares y momentos de hospitalidad. Nunca para precios, fechas, tablas ni campos.", "section": "typography" },
+      { "name": "The Etiqueta Chica Rule", "body": "Etiquetas y botones usan 10 px con mayúsculas y tracking amplio; si un texto necesita más de unas pocas palabras, pasa a Body.", "section": "typography" },
+      { "name": "The Sombra Con Tinte Rule", "body": "Las sombras de elevación significativa llevan el tono de su acento; una sombra gris pura queda para reposo.", "section": "elevation" },
+      { "name": "The Hover Que Eleva Rule", "body": "El estado hover sube la pieza; el estado en reposo es plano.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar el rosa Kametza (#e3004f) para la acción principal de cada pantalla pública y nada más como acento.",
+      "Do poner titulares y momentos de hospitalidad en Playfair, y precios, fechas y campos en Montserrat.",
+      "Do teñir las sombras de elevación con el acento (rosa en público) y elevar al hacer hover.",
+      "Do mantener todos los grises en la familia stone y el fondo público en crema #FDFBF7.",
+      "Do mantener el ámbar #d97706 y la barra lateral #0c0a09 exclusivamente en /admin.",
+      "Do dejar visibles el precio total y los datos de contacto (WhatsApp) en el flujo de reserva.",
+      "Do dimensionar los controles del panel para uso táctil en turno, aunque la etiqueta sea de 10 px."
+    ],
+    "donts": [
+      "Don't introducir un segundo color de acento en el sitio público (ni ámbar, ni azul, ni verde decorativo).",
+      "Don't usar grises fríos ni negro puro de fondo grande; el oscuro del panel es #0c0a09.",
+      "Don't usar Playfair en tablas, formularios, precios o etiquetas funcionales.",
+      "Don't usar esquinas rectas duras ni bordes gruesos de color; la forma es redondeada.",
+      "Don't aplicar degradados o brillos animados fuera de las acciones de marca y los estados de carga.",
+      "Don't mezclar el lenguaje del ticket térmico (sin color, monoespaciado) con el resto de la interfaz."
+    ]
+  }
+}

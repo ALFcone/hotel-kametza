@@ -97,7 +97,7 @@ export default function RoomEditForm({ room }: { room: any }) {
             </label>
             <div className="relative w-28">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 font-bold text-[10px]">S/</span>
-              <input
+              <input aria-label="Precio por noche"
                 name="price"
                 defaultValue={room.price_per_night}
                 type="number"
@@ -113,6 +113,7 @@ export default function RoomEditForm({ room }: { room: any }) {
             <input
               name="image"
               type="file"
+              aria-label="Foto de portada"
               accept="image/*"
               className="w-full bg-stone-50/50 rounded-xl border border-stone-200 text-[10px] file:mr-3 file:py-3 file:px-4 file:border-0 file:text-[9px] file:font-black file:uppercase file:tracking-wider file:bg-stone-200 file:text-stone-700 hover:file:bg-[#d97706] hover:file:text-white file:transition-colors outline-none transition-all shadow-inner shadow-stone-100/50 focus:border-[#d97706] focus:bg-white"
             />
@@ -123,7 +124,7 @@ export default function RoomEditForm({ room }: { room: any }) {
           <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-1.5 group-focus-within/input:text-[#d97706] transition-colors">
             Descripción
           </label>
-          <textarea
+          <textarea aria-label="Descripción"
             name="description"
             defaultValue={room.description}
             className="w-full p-3.5 bg-stone-50/50 rounded-xl border border-stone-200 text-xs h-20 resize-none font-medium text-stone-600 focus:bg-white focus:ring-2 focus:ring-[#d97706]/20 focus:border-[#d97706] outline-none transition-all shadow-inner shadow-stone-100/50"
@@ -177,7 +178,8 @@ export default function RoomEditForm({ room }: { room: any }) {
                   type="button"
                   onClick={() => handleRemoveGalleryImage(url)}
                   disabled={removingUrl === url}
-                  className="absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center text-white disabled:opacity-70"
+                  aria-label="Quitar foto de la galería"
+                  className="absolute inset-0 bg-black/50 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/thumb:opacity-100 [@media(hover:hover)]:focus-visible:opacity-100 transition-opacity flex items-center justify-center text-white disabled:opacity-70"
                 >
                   <X size={16} />
                 </button>

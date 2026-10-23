@@ -102,15 +102,15 @@ export default function AdminProducts({ products = [], userRole }: { products: a
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="text-xs font-bold text-stone-500 uppercase">Nombre del Producto</label>
-              <input type="text" required value={newName} onChange={e => setNewName(e.target.value)} placeholder="Ej: Agua Mineral" className="w-full mt-1 border border-amber-200 bg-white rounded-xl px-4 py-2 text-sm font-bold" />
+              <input aria-label="Nombre del producto" type="text" required value={newName} onChange={e => setNewName(e.target.value)} placeholder="Ej: Agua Mineral" className="w-full mt-1 border border-amber-200 bg-white rounded-xl px-4 py-2 text-sm font-bold" />
             </div>
             <div>
               <label className="text-xs font-bold text-stone-500 uppercase">Precio (S/)</label>
-              <input type="number" step="0.01" min="0" required value={newPrice} onChange={e => setNewPrice(e.target.value)} className="w-full mt-1 border border-amber-200 bg-white rounded-xl px-4 py-2 text-sm font-bold" />
+              <input aria-label="Precio (S/)" type="number" step="0.01" min="0" required value={newPrice} onChange={e => setNewPrice(e.target.value)} className="w-full mt-1 border border-amber-200 bg-white rounded-xl px-4 py-2 text-sm font-bold" />
             </div>
             <div>
               <label className="text-xs font-bold text-stone-500 uppercase">Stock Inicial</label>
-              <input type="number" min="0" required value={newStock} onChange={e => setNewStock(e.target.value)} className="w-full mt-1 border border-amber-200 bg-white rounded-xl px-4 py-2 text-sm font-bold" />
+              <input aria-label="Stock inicial" type="number" min="0" required value={newStock} onChange={e => setNewStock(e.target.value)} className="w-full mt-1 border border-amber-200 bg-white rounded-xl px-4 py-2 text-sm font-bold" />
             </div>
           </div>
           <div className="flex gap-3 mt-6">
@@ -125,20 +125,20 @@ export default function AdminProducts({ products = [], userRole }: { products: a
           <div key={product.id} className="bg-white border border-stone-100 rounded-[1.5rem] p-5 hover:border-amber-200 hover:shadow-[0_10px_30px_-5px_rgba(217,119,6,0.15)] transition-all duration-300 group hover:-translate-y-1 relative">
             {editingId === product.id ? (
               <form onSubmit={handleSaveEdit} className="space-y-3">
-                <input type="text" required value={editName} onChange={e => setEditName(e.target.value)} className="w-full border border-amber-300 rounded-lg px-3 py-1.5 text-sm font-bold" />
+                <input aria-label="Nombre del producto" type="text" required value={editName} onChange={e => setEditName(e.target.value)} className="w-full border border-amber-300 rounded-lg px-3 py-1.5 text-sm font-bold" />
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">S/</span>
-                    <input type="number" step="0.01" min="0" required value={editPrice} onChange={e => setEditPrice(e.target.value)} className="w-full border border-amber-300 rounded-lg pl-8 pr-2 py-1.5 text-sm font-bold" />
+                    <input aria-label="Precio (S/)" type="number" step="0.01" min="0" required value={editPrice} onChange={e => setEditPrice(e.target.value)} className="w-full border border-amber-300 rounded-lg pl-8 pr-2 py-1.5 text-sm font-bold" />
                   </div>
                   <div className="relative w-20">
                     <span className="absolute left-2 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] font-bold">Stock</span>
-                    <input type="number" min="0" required value={editStock} onChange={e => setEditStock(e.target.value)} className="w-full border border-amber-300 rounded-lg pl-10 pr-2 py-1.5 text-sm font-bold" />
+                    <input aria-label="Stock" type="number" min="0" required value={editStock} onChange={e => setEditStock(e.target.value)} className="w-full border border-amber-300 rounded-lg pl-10 pr-2 py-1.5 text-sm font-bold" />
                   </div>
                 </div>
                 <div className="flex gap-2 pt-2">
-                  <button type="submit" disabled={loading} className="flex-1 bg-amber-500 text-white py-2 rounded-lg text-xs font-bold uppercase hover:bg-amber-600 flex justify-center"><Save size={16} /></button>
-                  <button type="button" disabled={loading} onClick={() => setEditingId(null)} className="flex-1 bg-stone-200 text-stone-700 py-2 rounded-lg text-xs font-bold uppercase hover:bg-stone-300 flex justify-center"><X size={16} /></button>
+                  <button type="submit" disabled={loading} aria-label="Guardar cambios" className="flex-1 bg-amber-500 text-white py-2 rounded-lg text-xs font-bold uppercase hover:bg-amber-600 flex justify-center"><Save size={16} /></button>
+                  <button type="button" disabled={loading} onClick={() => setEditingId(null)} aria-label="Cancelar edición" className="flex-1 bg-stone-200 text-stone-700 py-2 rounded-lg text-xs font-bold uppercase hover:bg-stone-300 flex justify-center"><X size={16} /></button>
                 </div>
               </form>
             ) : (
@@ -148,9 +148,9 @@ export default function AdminProducts({ products = [], userRole }: { products: a
                     <Package size={20} />
                   </div>
                   {(userRole === "admin" || userRole === "dueño") && (
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => handleEdit(product)} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-amber-600 hover:border-amber-300 transition-colors"><Edit3 size={14} /></button>
-                      <button onClick={() => handleDelete(product.id)} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-200 transition-colors"><Trash2 size={14} /></button>
+                    <div className="flex gap-1 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:focus-within:opacity-100">
+                      <button onClick={() => handleEdit(product)} aria-label={`Editar ${product.name}`} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-amber-600 hover:border-amber-300 transition-colors"><Edit3 size={14} /></button>
+                      <button onClick={() => handleDelete(product.id)} aria-label={`Eliminar ${product.name}`} className="w-8 h-8 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:text-red-500 hover:border-red-200 transition-colors"><Trash2 size={14} /></button>
                     </div>
                   )}
                 </div>

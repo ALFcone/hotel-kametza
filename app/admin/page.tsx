@@ -554,7 +554,7 @@ export default async function AdminPage(props: {
                   {todayFormatted}
                 </p>
               </div>
-              <Link href="/" className="lg:hidden flex items-center justify-center bg-stone-900 text-amber-400 w-12 h-12 rounded-2xl hover:bg-stone-800 transition-colors">
+              <Link href="/" aria-label="Ir al sitio del hotel" className="lg:hidden flex items-center justify-center bg-stone-900 text-amber-400 w-12 h-12 rounded-2xl hover:bg-stone-800 transition-colors">
                 <Globe size={20} />
               </Link>
             </div>
@@ -568,7 +568,7 @@ export default async function AdminPage(props: {
 
                   <div className="flex flex-col gap-1.5 relative">
                     <span className="text-[9px] font-black uppercase tracking-widest text-stone-400 ml-3">Desde</span>
-                    <input
+                    <input aria-label="Desde"
                       type="date"
                       name="from"
                       defaultValue={dateFrom}
@@ -578,7 +578,7 @@ export default async function AdminPage(props: {
 
                   <div className="flex flex-col gap-1.5">
                     <span className="text-[9px] font-black uppercase tracking-widest text-stone-400 ml-3">Hasta</span>
-                    <input
+                    <input aria-label="Hasta"
                       type="date"
                       name="to"
                       defaultValue={dateTo}
@@ -1219,6 +1219,7 @@ export default async function AdminPage(props: {
                           <button
                             type="submit"
                             title={isDirty ? "Marcar como Limpia" : "Marcar como Sucia"}
+                            aria-label={isDirty ? "Marcar como Limpia" : "Marcar como Sucia"}
                             className={`p-2.5 rounded-full transition-all duration-300 shadow-sm border ${
                               isDirty 
                                 ? "bg-white text-rose-500 border-rose-100 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 hover:shadow-md" 
@@ -1292,7 +1293,7 @@ export default async function AdminPage(props: {
                       <input type="hidden" name="to" value={dateTo} />
                       <div className="relative">
                         <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-                        <input
+                        <input aria-label="Buscar por huésped o documento"
                           type="text"
                           name="q"
                           defaultValue={searchParams.q || ""}
@@ -1723,6 +1724,7 @@ export default async function AdminPage(props: {
                                         href={`/admin?tab=registrar&roomId=${room.id}&checkIn=${dayDateStr}`}
                                         className="w-full h-full flex items-center justify-center text-stone-200 hover:text-amber-600 transition"
                                         title={`Disponible. Clic para reservar Hab #${room.room_number || room.id} el ${dayDateStr}`}
+                                        aria-label={`Reservar Hab #${room.room_number || room.id} el ${dayDateStr}`}
                                       >
                                         <Plus size={10} className="opacity-0 group-hover/slot:opacity-100 transition-opacity" />
                                       </Link>
