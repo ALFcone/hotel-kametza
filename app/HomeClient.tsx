@@ -1288,7 +1288,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             </div>
             
             {/* NOMBRE DEL HOTEL: COLOR SOLIDO IGUAL AL LOGO (muestreado de logoo.png) */}
-            <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-serif font-black text-[#C4023E] tracking-[0.15em] leading-none uppercase py-2 [text-shadow:0_0_35px_rgba(255,255,255,0.35),0_0_12px_rgba(255,255,255,0.25),0_8px_15px_rgba(0,0,0,0.9)]">
+            <h1 className="text-[clamp(2.5rem,14vw,3.75rem)] md:text-8xl lg:text-[9rem] font-serif font-black text-[#C4023E] tracking-[0.15em] leading-none uppercase py-2 [text-shadow:0_0_35px_rgba(255,255,255,0.35),0_0_12px_rgba(255,255,255,0.25),0_8px_15px_rgba(0,0,0,0.9)]">
               Kametza
             </h1>
             
@@ -1955,7 +1955,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         <div className="absolute inset-0 bg-[#FDFBF7]/95 backdrop-blur-md"></div>
         <div className="w-full px-4 md:px-8 xl:px-12 relative z-10 max-w-7xl mx-auto">
           
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* TEXTO Y MÉTODOS DE CONTACTO */}
             <div className="text-left">
               <div className="flex items-center gap-4 mb-6">
@@ -1981,7 +1981,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition duration-300">
                     <MessageSquare size={24} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-bold text-lg text-stone-900 group-hover:text-amber-600 transition">WhatsApp Directo</h3>
                     <p className="text-stone-500 font-medium">966 556 622</p>
                   </div>
@@ -1994,7 +1994,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition duration-300">
                     <Phone size={24} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-bold text-lg text-stone-900 group-hover:text-amber-600 transition">Recepción</h3>
                     <p className="text-stone-500 font-medium">920 042 099</p>
                   </div>
@@ -2007,9 +2007,9 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <div className="w-14 h-14 bg-white shadow-sm rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition duration-300">
                     <Mail size={24} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-bold text-lg text-stone-900 group-hover:text-amber-600 transition">Correo Electrónico</h3>
-                    <p className="text-stone-500 font-medium">kametzahotelayacucho@gmail.com</p>
+                    <p className="text-stone-500 font-medium break-words">kametzahotelayacucho@gmail.com</p>
                   </div>
                 </a>
               </div>
