@@ -517,10 +517,10 @@ export default async function AdminPage(props: {
                     key={tab}
                     href={`/admin?tab=${tab}&from=${dateFrom}&to=${dateTo}`}
                     aria-current={isActive ? "page" : undefined}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border-l-2 text-xs font-bold uppercase tracking-wider transition-colors ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
                       isActive
-                        ? "bg-white/10 text-white border-amber-500"
-                        : "text-stone-400 border-transparent hover:text-white hover:bg-white/5"
+                        ? "bg-white/10 text-white"
+                        : "text-stone-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
                     <Icon size={16} className={isActive ? "text-amber-400" : ""} /> {label}
@@ -1398,7 +1398,7 @@ export default async function AdminPage(props: {
                               </div>
                             </td>
                             <td className="py-5 px-4 text-center">
-                              <span className="bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 px-2 py-1 rounded-lg font-bold text-[10px] border border-indigo-100/50 shadow-sm">
+                              <span className="bg-stone-100 text-stone-700 px-2 py-1 rounded-lg font-bold text-[10px] border border-stone-200/60">
                                 {noches} {noches === 1 ? "noche" : "noches"}
                               </span>
                             </td>

@@ -229,7 +229,7 @@ function AuthModal({
   };
 
   return (
-    <div ref={dialogRef} tabIndex={-1} className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300 outline-none" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div ref={dialogRef} tabIndex={-1} className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 outline-none" role="dialog" aria-modal="true" aria-labelledby="auth-title">
       <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative border border-stone-100">
         <button
           onClick={onClose}
@@ -298,7 +298,7 @@ function AuthModal({
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm animate-in slide-in-from-top-2"
+              className="w-full p-3 bg-stone-50 rounded-xl border border-stone-200 outline-none focus:ring-2 focus:ring-rose-900/10 text-sm"
             />
           )}
 
@@ -500,7 +500,7 @@ function BookingModal({
   const simpleDesc = getSimpleDescription(room.name, room.description);
 
   return createPortal(
-    <div ref={dialogRef} tabIndex={-1} className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 animate-in fade-in zoom-in-95 duration-200 outline-none" role="dialog" aria-modal="true" aria-labelledby="booking-title">
+    <div ref={dialogRef} tabIndex={-1} className="fixed inset-0 z-[150] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm p-4 outline-none" role="dialog" aria-modal="true" aria-labelledby="booking-title">
       <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
         {/* --- GALERÍA DE FOTOS (Panel Izquierdo) --- */}
         <div className="hidden md:flex flex-col w-[40%] bg-stone-100 p-6 relative overflow-hidden">
@@ -1268,7 +1268,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <div className="w-16 h-px bg-stone-200 my-4"></div>
 
             {currentUser ? (
-              <div className="flex flex-col items-center gap-6 animate-in slide-in-from-bottom-4 duration-500">
+              <div className="flex flex-col items-center gap-6">
                 <div className="flex flex-col items-center gap-2">
                   <div className="p-3 rounded-full border-2 border-rose-500/20 bg-rose-50 text-rose-500">
                     <User size={24} strokeWidth={1.5} />
@@ -1339,7 +1339,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
           <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-900/40 to-parchment" />
         </div>
 
-        <div className="max-w-7xl mx-auto relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div className="max-w-7xl mx-auto relative z-10 w-full">
           <div className="flex flex-col items-center justify-center space-y-4 md:space-y-6">
             {/* ETIQUETA MINIMALISTA */}
             <div className="flex items-center justify-center gap-6 mb-2 opacity-100">
@@ -1598,7 +1598,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
 
           {/* DESPLIEGUE DINÁMICO DE DETALLES DEL SERVICIO */}
           {activeServiceId && (
-            <div id="service-detail" className="mt-16 relative w-full bg-white rounded-[2.5rem] overflow-hidden border border-stone-200 shadow-2xl animate-in fade-in slide-in-from-top-8 duration-500">
+            <div id="service-detail" className="mt-16 relative w-full bg-white rounded-[2.5rem] overflow-hidden border border-stone-200 shadow-2xl">
               <button 
                 onClick={() => setActiveServiceId(null)}
                 className="absolute top-4 md:top-8 right-4 md:right-8 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-stone-500 shadow-md border border-stone-100 hover:bg-rose-50 hover:text-rose-600 transition-colors z-20"
@@ -2121,7 +2121,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
           {/* Bottom Footer */}
           <div className="border-t border-stone-200 pt-8 flex flex-col md:flex-row justify-center md:justify-start items-center gap-4 text-center md:text-left">
             <div>
-              <p className="font-bold text-stone-800 text-xs">© 2025 Hotel Kametza. Todos los derechos reservados.</p>
+              <p className="font-bold text-stone-800 text-xs">© {new Date().getFullYear()} Hotel Kametza. Todos los derechos reservados.</p>
               <p className="text-[10px] text-stone-700 mt-1">RUC: 10282984984</p>
             </div>
           </div>

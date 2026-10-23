@@ -360,7 +360,7 @@ export default function AdminStaffManagement({
 
       {/* MODAL: AUTORIZAR NUEVO PERSONAL */}
       {isModalOpen && (
-        <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="staff-modal-title" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in outline-none">
+        <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="staff-modal-title" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm outline-none">
           <div className="bg-white rounded-[2.5rem] p-6 md:p-8 w-full max-w-lg shadow-2xl relative border border-stone-100">
             <button
               onClick={() => setIsModalOpen(false)}

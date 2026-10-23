@@ -442,7 +442,7 @@ export function AdminTableActions({
 
       {/* Modal de Pago */}
       {mounted && isPaymentModalOpen && createPortal(
-        <div ref={paymentDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Registrar pago" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in outline-none">
+        <div ref={paymentDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Registrar pago" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm outline-none">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
             <button 
               onClick={() => setIsPaymentModalOpen(false)}
@@ -532,7 +532,7 @@ export function AdminTableActions({
 
       {/* Modal de Editar Reserva */}
       {mounted && isEditModalOpen && createPortal(
-        <div ref={editDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Editar reserva" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in outline-none">
+        <div ref={editDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Editar reserva" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm outline-none">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
             <button 
               onClick={() => setIsEditModalOpen(false)}
@@ -638,7 +638,7 @@ export function AdminTableActions({
 
       {/* Modal de Consumos Extras */}
       {mounted && isExtrasModalOpen && createPortal(
-        <div ref={extrasDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Consumos extras" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in outline-none">
+        <div ref={extrasDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Consumos extras" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm outline-none">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button 
               onClick={() => setIsExtrasModalOpen(false)}
@@ -779,7 +779,7 @@ export function AdminTableActions({
 
       {/* Modal de Facturación / Boleta */}
       {mounted && isBillingModalOpen && createPortal(
-        <div ref={billingDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Emitir comprobante" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm animate-fade-in outline-none">
+        <div ref={billingDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Emitir comprobante" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm outline-none">
           <div className="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[90vh] flex flex-col shadow-2xl relative">
             <button 
               onClick={() => setIsBillingModalOpen(false)}
