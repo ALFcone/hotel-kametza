@@ -41,6 +41,7 @@ import {
   Phone,
   MapPin,
   Mail,
+  StickyNote,
   FileText,
   Globe,
   XCircle,
@@ -1359,9 +1360,20 @@ export default async function AdminPage(props: {
                                 <div className="w-6 h-6 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 font-bold text-[10px] uppercase shadow-inner shrink-0">
                                   {booking.client_name ? booking.client_name.charAt(0) : "?"}
                                 </div>
-                                <span className="font-bold text-stone-900 uppercase text-[10px] truncate max-w-[120px]">
-                                  {booking.client_name || "Sin Nombre"}
-                                </span>
+                                <div className="min-w-0">
+                                  <span className="block font-bold text-stone-900 uppercase text-[10px] truncate max-w-[120px]">
+                                    {booking.client_name || "Sin Nombre"}
+                                  </span>
+                                  {booking.special_requests && (
+                                    <span
+                                      title={booking.special_requests}
+                                      className="mt-0.5 flex items-center gap-1 text-[9px] font-semibold normal-case text-amber-700 max-w-[120px]"
+                                    >
+                                      <StickyNote size={9} className="shrink-0" />
+                                      <span className="truncate">{booking.special_requests}</span>
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </td>
                             <td className="py-5 px-4">
@@ -1742,7 +1754,7 @@ export default async function AdminPage(props: {
                                           : "bg-gradient-to-r from-[#d97706] to-amber-500 text-white shadow-amber-500/30"
                                       }`}
                                       style={{ left: `calc(${leftPx}px + 6px)`, width: `calc(${widthPx}px - 12px)` }}
-                                      title={`Huésped: ${booking.client_name} | Ingreso: ${booking.check_in} | Salida: ${booking.check_out}`}
+                                      title={`Huésped: ${booking.client_name} | Ingreso: ${booking.check_in} | Salida: ${booking.check_out}${booking.special_requests ? ` | Nota: ${booking.special_requests}` : ""}`}
                                     >
                                       {/* Avatar circular con la inicial */}
                                       <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0 shadow-inner">
