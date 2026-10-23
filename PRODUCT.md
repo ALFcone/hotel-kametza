@@ -43,7 +43,7 @@ El logo actual, el rosa #e3004f y las tipografías Playfair Display y Montserrat
 
 ## Evidence on Hand
 
-Fotos reales en `public/` (portada, hero, logo, habitaciones en `public/rooms/`, y una foto por servicio: cochera, desayuno, room service, lavandería, traslado, tours). La landing (`app/HomeClient.tsx`) muestra una calificación fija de 4.9 "Basado en reseñas" y cuatro tarjetas de reseñas escritas directamente en el código. Su origen no está confirmado: tratarlas como contenido pendiente de verificar y no ampliarlas ni inventar más. No hay premios ni otras cifras verificadas en el repositorio.
+Fotos reales en `public/` (portada, hero, logo, habitaciones en `public/rooms/`, y una foto por servicio: cochera, desayuno, room service, lavandería, traslado, tours). La landing (`app/HomeClient.tsx`) muestra la calificación de Google tal como la publica la ficha del hotel (4.4 con 90 opiniones, consultada el 2026-10-23) y enlaza a ella. Debajo hay cuatro opiniones reales copiadas de esa ficha (`GOOGLE_REVIEWS` en `HomeClient.tsx`, con la fecha de consulta visible). Las reseñas escritas a mano que había antes eran inventadas y se quitaron: no volver a añadir testimonios, procedencias, cifras ni sellos de verificación que no vengan de una fuente real; si la calificación de Google cambia, actualizarla y volver a copiar las opiniones. No hay premios ni otras cifras verificadas en el repositorio.
 
 ## Product Principles
 
