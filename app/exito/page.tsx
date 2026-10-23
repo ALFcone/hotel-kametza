@@ -314,13 +314,21 @@ function PaymentContent() {
             )}
 
             {/* CASO: BCP */}
-            {method === "bcp" && (
+            {method === "bcp" && BCP.account && BCP.cci && (
               <BankInfo
                 bankName="BCP"
                 color="text-orange-600"
-                account="450-XXXXXXX-0-01"
-                cci="002-450-XXXXXXX-99"
+                account={BCP.account}
+                cci={BCP.cci}
               />
+            )}
+            {method === "bcp" && !(BCP.account && BCP.cci) && (
+              <div className="text-center py-2">
+                <p className="font-bold text-stone-700">Transferencia BCP no disponible</p>
+                <p className="text-xs text-stone-500 mt-1">
+                  Paga con Yape o en recepción, o escríbenos por WhatsApp al 966 556 622.
+                </p>
+              </div>
             )}
 
             {/* CASO: RECEPCIÓN */}
@@ -413,6 +421,12 @@ function PaymentContent() {
 }
 
 // Componente para Info Bancaria
+/**
+ * Cuenta BCP para pagos por transferencia. Mientras estén vacíos, la opción no
+ * muestra datos: completar con la cuenta y el CCI reales para activarla.
+ */
+const BCP = { account: "", cci: "" };
+
 function BankInfo({ bankName, color, account, cci }: any) {
   return (
     <div className="text-left bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
