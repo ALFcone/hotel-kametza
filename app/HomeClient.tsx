@@ -1510,19 +1510,22 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         </div>
       </section>
       {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
-      <section id="habitaciones" className="min-h-screen flex flex-col justify-center py-24 relative z-10 w-full overflow-hidden">
-        {/* Fondo suave: la Plaza Mayor con poco contraste, fundida con el crema de arriba y abajo */}
-        {/* Franja de una pantalla de alto (no toda la sección) para que la foto no se agrande hasta mostrar solo cielo */}
-        <div className="absolute inset-x-0 top-0 h-screen -z-10" aria-hidden="true">
-          <Image
-            src="/plaza-ayacucho.jpg"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover object-[center_45%] opacity-60 saturate-[0.85]"
-          />
-          {/* Velo claro detrás del título y fundido abajo hacia el fondo de la sección */}
-          <div className="absolute inset-0 bg-gradient-to-b from-parchment/75 via-parchment/20 via-35% to-parchment" />
+      <section id="habitaciones" className="min-h-screen flex flex-col justify-center py-24 relative z-10 w-full overflow-clip">
+        {/* Fondo: la Plaza Mayor cubre toda la sección. La foto mide una pantalla y se queda fija (sticky)
+            mientras se recorre la sección, así no se agranda hasta mostrar solo cielo.
+            overflow-clip (no hidden) en la sección: hidden rompería el sticky. */}
+        <div className="absolute inset-0 -z-10" aria-hidden="true">
+          <div className="sticky top-0 h-screen">
+            <Image
+              src="/plaza-ayacucho.jpg"
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover object-[center_45%] saturate-[0.85]"
+            />
+            {/* Velo crema parejo para que títulos y tarjetas se lean sobre la foto */}
+            <div className="absolute inset-0 bg-parchment/55" />
+          </div>
         </div>
         <p className="absolute bottom-2 right-3 text-[10px] text-stone-500">
           Foto:{" "}
