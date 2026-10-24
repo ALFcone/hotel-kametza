@@ -13,8 +13,8 @@ import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, Mess
 import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, cancelBooking } from "@/app/actions";
 import ThermalTicket from "./ThermalTicket";
 import Link from "next/link";
-import { type Comprobante, NOMBRE_COMPROBANTE, numeroComprobante } from "@/lib/cpe";
-import { codigoReserva, formaDePago } from "@/lib/reserva";
+import { type ComprobanteImpreso, NOMBRE_COMPROBANTE, numeroComprobante } from "@/lib/cpe";
+import { codigoReserva } from "@/lib/reserva";
 import Swal from "sweetalert2";
 import { BRAND_COLORS } from "@/lib/brand-colors";
 
@@ -30,12 +30,11 @@ interface AdminTableActionsProps {
   guestName: string;
   roomName: string;
   guestPhone?: string;
-  paymentMethod?: string;
   onDelete: (formData: FormData) => void;
   products?: any[];
   userRole?: string | null;
   // Boletas, facturas o notas de SUNAT registradas (XML) para esta reserva
-  comprobantes?: Comprobante[];
+  comprobantes?: ComprobanteImpreso[];
 }
 
 export function AdminTableActions({
@@ -50,7 +49,6 @@ export function AdminTableActions({
   guestName,
   roomName,
   guestPhone,
-  paymentMethod,
   onDelete,
   products = [],
   userRole,
@@ -78,7 +76,7 @@ export function AdminTableActions({
   // Facturación States
   const [isPrinting, setIsPrinting] = useState(false);
   // Boleta o factura de SUNAT que se está imprimiendo
-  const [ticketComprobante, setTicketComprobante] = useState<Comprobante | null>(null);
+  const [ticketComprobante, setTicketComprobante] = useState<ComprobanteImpreso | null>(null);
   const paymentDialogRef = useDialog(isPaymentModalOpen, () => setIsPaymentModalOpen(false), !loading);
   const editDialogRef = useDialog(isEditModalOpen, () => setIsEditModalOpen(false), !loading);
   const extrasDialogRef = useDialog(isExtrasModalOpen, () => setIsExtrasModalOpen(false), !loading);
@@ -240,21 +238,10 @@ export function AdminTableActions({
     window.open(url, '_blank');
   };
 
-  // Datos de la reserva que la boleta no trae en su XML
-  const bookingForTicket = {
-    check_in: checkIn,
-    check_out: checkOut,
-    payment_method: formaDePago(paymentMethod),
-  };
-
   return (
     <>
       {mounted && isPrinting && ticketComprobante && createPortal(
-        <ThermalTicket
-          booking={bookingForTicket}
-          bookingId={bookingId}
-          comprobante={ticketComprobante}
-        />,
+        <ThermalTicket comprobante={ticketComprobante} />,
         document.body
       )}
       
@@ -733,9 +720,14 @@ export function AdminTableActions({
                           <p className="text-[10px] text-stone-500 uppercase truncate">
                             {NOMBRE_COMPROBANTE[c.tipo]} · S/ {Number(c.total).toFixed(2)}
                           </p>
-                          {Math.abs(Number(c.total) - grandTotal) >= 0.01 && (
+                          {c.reservas.length > 1 && (
+                            <p className="text-[10px] text-stone-500 leading-snug mt-0.5">
+                              Cubre {c.reservas.map(codigoReserva).join(", ")} (hab. {c.habitaciones.join(", ")})
+                            </p>
+                          )}
+                          {Math.abs(Number(c.total) - c.totalReservas) >= 0.01 && (
                             <p className="text-[10px] font-bold text-amber-700 leading-snug mt-0.5">
-                              No coincide con el total de la reserva (S/ {grandTotal.toFixed(2)})
+                              No coincide con el total de {c.reservas.length > 1 ? "las reservas" : "la reserva"} (S/ {c.totalReservas.toFixed(2)})
                             </p>
                           )}
                         </div>

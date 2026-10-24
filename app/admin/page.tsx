@@ -18,10 +18,10 @@ import RoomEditForm from "./RoomEditForm";
 import { AdminTableActions } from "./AdminTableActions";
 import AdminProducts from "./AdminProducts";
 import AdminStaffManagement from "./AdminStaffManagement";
-import AdminComprobantes, { type ComprobanteListado } from "./AdminComprobantes";
+import AdminComprobantes from "./AdminComprobantes";
 import MobileMoreMenu from "./MobileMoreMenu";
-import { type Comprobante, COLUMNAS_COMPROBANTE } from "@/lib/cpe";
-import { ZONA_PERU, fechaPeru, hoyPeru } from "@/lib/fecha-peru";
+import { type ComprobanteImpreso, COLUMNAS_COMPROBANTE, aComprobante } from "@/lib/cpe";
+import { ZONA_PERU, fechaCorta, fechaPeru, hoyPeru } from "@/lib/fecha-peru";
 import { codigoReserva, formaDePago } from "@/lib/reserva";
 import {
   Calendar,
@@ -194,12 +194,7 @@ export default async function AdminPage(props: {
   const allExtras = extrasRes.data;
   const products = productsRes.data;
   const staffList: any[] = staffRes.data || [];
-  const comprobantes = (comprobantesRes.data || []) as unknown as Comprobante[];
-  const comprobantesPorReserva = new Map<number, Comprobante[]>();
-  for (const c of comprobantes) {
-    if (c.booking_id === null) continue;
-    comprobantesPorReserva.set(c.booking_id, [...(comprobantesPorReserva.get(c.booking_id) || []), c]);
-  }
+  const comprobantes = (comprobantesRes.data || []).map(aComprobante);
 
   // Mapear la nueva estructura relacional a la estructura plana original
   // para no romper la compatibilidad con el resto del panel y componentes.
@@ -221,6 +216,30 @@ export default async function AdminPage(props: {
     const list = extrasByBooking.get(extra.booking_id);
     if (list) list.push(extra);
     else extrasByBooking.set(extra.booking_id, [extra]);
+  }
+
+  // Boletas y facturas con los datos de sus reservas: el ticket sale igual desde el historial
+  // y desde Comprobantes SUNAT, aunque una boleta cubra varias habitaciones.
+  const comprobantesImpresos: ComprobanteImpreso[] = comprobantes.map((c) => {
+    const reservas = c.reservas
+      .map((id) => allBookings.find((b: any) => b.id === id))
+      .filter((b): b is any => !!b);
+    return {
+      ...c,
+      habitaciones: reservas.map((b) => String(rooms?.find((r) => r.id === b.room_id)?.room_number ?? b.room_id)),
+      formaPago: reservas[0] ? formaDePago(reservas[0].payment_method) : "",
+      estancias: [...new Set(reservas.map((b) => `Del ${fechaCorta(b.check_in)} al ${fechaCorta(b.check_out)}`))],
+      totalReservas: reservas.reduce(
+        (suma, b) =>
+          suma + Number(b.total_price || 0) +
+          (extrasByBooking.get(b.id) || []).reduce((s, e) => s + e.price * e.quantity, 0),
+        0,
+      ),
+    };
+  });
+  const comprobantesPorReserva = new Map<number, ComprobanteImpreso[]>();
+  for (const c of comprobantesImpresos) {
+    for (const id of c.reservas) comprobantesPorReserva.set(id, [...(comprobantesPorReserva.get(id) || []), c]);
   }
 
   // C. FILTRADO (Reservas creadas o que inician en el rango de fechas)
@@ -1482,7 +1501,6 @@ export default async function AdminPage(props: {
                                 guestName={booking.client_name || "Huésped"}
                                 roomName={getRoomNumber(booking.room_id).toString()}
                                 guestPhone={booking.client_phone || undefined}
-                                paymentMethod={booking.payment_method || undefined}
                                 onDelete={deleteBooking}
                                 products={products || []}
                                 userRole={role}
@@ -1807,16 +1825,7 @@ export default async function AdminPage(props: {
             <div id="comprobantes" className="scroll-mt-24 mb-12 animate-fade-in-up">
               <AdminComprobantes
                 userRole={role}
-                comprobantes={comprobantes.map((c): ComprobanteListado => {
-                  const reserva = c.booking_id ? allBookings.find((b: any) => b.id === c.booking_id) : null;
-                  return {
-                    ...c,
-                    habitacion: reserva ? String(getRoomNumber(reserva.room_id)) : "",
-                    formaPago: reserva ? formaDePago(reserva.payment_method) : "",
-                    checkIn: reserva?.check_in ?? "",
-                    checkOut: reserva?.check_out ?? "",
-                  };
-                })}
+                comprobantes={comprobantesImpresos}
               />
             </div>
           )}

@@ -907,6 +907,60 @@ export async function deleteStaffMember(targetEmail: string) {
 // el ticket con la serie, el número y el QR oficiales, y para enlazarla con la reserva.
 
 const ERROR_TABLA_COMPROBANTES = "Falta crear la tabla de comprobantes en Supabase (supabase/comprobantes.sql).";
+const ERROR_TABLA_ENLACES = "Falta crear la tabla de enlaces en Supabase (supabase/comprobante_reservas.sql).";
+
+// 42P01/PGRST205: la tabla no existe; PGRST200: no existe la relación comprobantes → comprobante_reservas
+const faltaTabla = (code?: string) => code === "42P01" || code === "PGRST205" || code === "PGRST200";
+
+type SupabaseServer = Awaited<ReturnType<typeof getSupabaseServer>>;
+
+// Reservas que se ofrecen para enlazar: las ya enlazadas, luego las que coinciden con el
+// documento del cliente o con el total, y después las más recientes.
+async function reservasParaEnlazar(
+  supabaseServer: SupabaseServer,
+  clienteNumDoc: string | null,
+  total: number,
+  enlazadas: number[] = [],
+) {
+  const columnas = "id, check_in, total_price, status, rooms(room_number), clients(name, document_number), booking_extras(price, quantity)";
+  const [recientes, yaEnlazadas] = await Promise.all([
+    supabaseServer.from("bookings").select(columnas).order("check_in", { ascending: false }).limit(60),
+    enlazadas.length
+      ? supabaseServer.from("bookings").select(columnas).in("id", enlazadas)
+      : Promise.resolve({ data: [] as any[] }),
+  ]);
+
+  const unicas = new Map<number, any>();
+  for (const b of [...(yaEnlazadas.data || []), ...(recientes.data || [])] as any[]) unicas.set(b.id, b);
+
+  return [...unicas.values()]
+    .map((b: any) => {
+      const extras = (b.booking_extras || []).reduce((s: number, e: any) => s + Number(e.price) * Number(e.quantity), 0);
+      const totalReserva = Number(b.total_price || 0) + extras;
+      return {
+        id: b.id as number,
+        huesped: (b.clients?.name as string) || "Huésped",
+        habitacion: b.rooms?.room_number ? String(b.rooms.room_number) : "",
+        checkIn: b.check_in as string,
+        total: totalReserva,
+        cancelada: b.status === "cancelled" || b.status === "cancelada",
+        enlazada: enlazadas.includes(b.id),
+        coincide:
+          (!!clienteNumDoc && b.clients?.document_number === clienteNumDoc) ||
+          Math.abs(totalReserva - total) < 0.01,
+      };
+    })
+    .sort((x, y) => Number(y.enlazada) - Number(x.enlazada) || Number(y.coincide) - Number(x.coincide));
+}
+
+// Quita repetidos y comprueba que todas las reservas existan.
+async function validarReservas(supabaseServer: SupabaseServer, bookingIds: number[]) {
+  const ids = [...new Set((bookingIds || []).filter((id) => Number.isInteger(id) && id > 0))];
+  if (ids.length === 0) return { ids };
+  const { data } = await supabaseServer.from("bookings").select("id").in("id", ids);
+  if ((data || []).length !== ids.length) return { ids, error: "Alguna de las reservas elegidas no existe." };
+  return { ids };
+}
 
 export async function leerComprobanteXml(xml: string) {
   const { role } = await getUserRole();
@@ -927,46 +981,27 @@ export async function leerComprobanteXml(xml: string) {
   const supabaseServer = await getSupabaseServer();
   const { data: existente, error: errorTabla } = await supabaseServer
     .from("comprobantes")
-    .select("booking_id")
+    .select("id, comprobante_reservas(booking_id)")
     .eq("tipo", datos.tipo)
     .eq("serie", datos.serie)
     .eq("numero", datos.numero)
     .maybeSingle();
-  if (errorTabla?.code === "42P01" || errorTabla?.code === "PGRST205") return { error: ERROR_TABLA_COMPROBANTES };
+  if (faltaTabla(errorTabla?.code)) {
+    return { error: errorTabla?.code === "PGRST200" ? ERROR_TABLA_ENLACES : ERROR_TABLA_COMPROBANTES };
+  }
   if (existente) {
-    avisos.push(`Este comprobante ya está registrado${existente.booking_id ? ` en la reserva ${codigoReserva(existente.booking_id)}` : ""}.`);
+    const codigos = ((existente as any).comprobante_reservas || []).map((r: any) => codigoReserva(r.booking_id));
+    avisos.push(
+      `Este comprobante ya está registrado${codigos.length ? ` en ${codigos.join(", ")}` : ""}. ` +
+        "Para cambiar sus reservas usa «Reservas» en la lista de comprobantes registrados.",
+    );
   }
 
-  // Reservas para enlazar: las más recientes, primero las que coinciden con el documento o el total del XML.
-  const { data: reservas } = await supabaseServer
-    .from("bookings")
-    .select("id, check_in, total_price, status, rooms(room_number), clients(name, document_number), booking_extras(price, quantity)")
-    .order("check_in", { ascending: false })
-    .limit(60);
-
-  const candidatas = (reservas || [])
-    .map((b: any) => {
-      const extras = (b.booking_extras || []).reduce((s: number, e: any) => s + Number(e.price) * Number(e.quantity), 0);
-      const total = Number(b.total_price || 0) + extras;
-      const coincide =
-        (!!datos.clienteNumDoc && b.clients?.document_number === datos.clienteNumDoc) ||
-        Math.abs(total - datos.total) < 0.01;
-      return {
-        id: b.id as number,
-        huesped: (b.clients?.name as string) || "Huésped",
-        habitacion: b.rooms?.room_number ? String(b.rooms.room_number) : "",
-        checkIn: b.check_in as string,
-        total,
-        cancelada: b.status === "cancelled" || b.status === "cancelada",
-        coincide,
-      };
-    })
-    .sort((a, b) => Number(b.coincide) - Number(a.coincide));
-
+  const candidatas = await reservasParaEnlazar(supabaseServer, datos.clienteNumDoc, datos.total);
   return { data: datos, avisos, candidatas };
 }
 
-export async function guardarComprobante(xml: string, bookingId: number | null) {
+export async function guardarComprobante(xml: string, bookingIds: number[]) {
   const { user, role } = await getUserRole();
   if (!user || !canOperate(role)) return { error: "No autorizado." };
 
@@ -977,36 +1012,102 @@ export async function guardarComprobante(xml: string, bookingId: number | null) 
   if (d.emisorRuc !== HOTEL_RUC) return { error: "El comprobante no es del RUC del hotel." };
 
   const supabaseServer = await getSupabaseServer();
+  const reservas = await validarReservas(supabaseServer, bookingIds);
+  if (reservas.error) return { error: reservas.error };
 
-  if (bookingId !== null) {
-    const { data: reserva } = await supabaseServer.from("bookings").select("id").eq("id", bookingId).maybeSingle();
-    if (!reserva) return { error: "La reserva elegida no existe." };
+  const { data: creado, error } = await supabaseServer
+    .from("comprobantes")
+    .insert({
+      tipo: d.tipo,
+      serie: d.serie,
+      numero: d.numero,
+      fecha_emision: d.fechaEmision,
+      emisor_ruc: d.emisorRuc,
+      cliente_tipo_doc: d.clienteTipoDoc,
+      cliente_num_doc: d.clienteNumDoc,
+      cliente_nombre: d.clienteNombre,
+      moneda: d.moneda,
+      total_gravado: d.totalGravado,
+      igv: d.igv,
+      total: d.total,
+      hash: d.hash,
+      items: d.items,
+      xml,
+    })
+    .select("id")
+    .single();
+
+  if (error || !creado) {
+    if (error?.code === "23505") return { error: "Este comprobante ya está registrado." };
+    if (faltaTabla(error?.code)) return { error: ERROR_TABLA_COMPROBANTES };
+    console.error("Error guardando comprobante:", error?.message);
+    return { error: "No se pudo guardar el comprobante." };
   }
 
-  const { error } = await supabaseServer.from("comprobantes").insert({
-    booking_id: bookingId,
-    tipo: d.tipo,
-    serie: d.serie,
-    numero: d.numero,
-    fecha_emision: d.fechaEmision,
-    emisor_ruc: d.emisorRuc,
-    cliente_tipo_doc: d.clienteTipoDoc,
-    cliente_num_doc: d.clienteNumDoc,
-    cliente_nombre: d.clienteNombre,
-    moneda: d.moneda,
-    total_gravado: d.totalGravado,
-    igv: d.igv,
-    total: d.total,
-    hash: d.hash,
-    items: d.items,
-    xml,
-  });
+  if (reservas.ids.length) {
+    const { error: errorEnlace } = await supabaseServer
+      .from("comprobante_reservas")
+      .insert(reservas.ids.map((booking_id) => ({ comprobante_id: creado.id, booking_id })));
+    if (errorEnlace) {
+      console.error("Error enlazando comprobante:", errorEnlace.message);
+      revalidatePath("/admin");
+      return {
+        error: faltaTabla(errorEnlace.code)
+          ? `El comprobante se guardó sin reservas. ${ERROR_TABLA_ENLACES}`
+          : "El comprobante se guardó, pero no se pudo enlazar con las reservas. Enlázalo con «Reservas» en la lista.",
+      };
+    }
+  }
 
-  if (error) {
-    if (error.code === "23505") return { error: "Este comprobante ya está registrado." };
-    if (error.code === "42P01" || error.code === "PGRST205") return { error: ERROR_TABLA_COMPROBANTES };
-    console.error("Error guardando comprobante:", error.message);
-    return { error: "No se pudo guardar el comprobante." };
+  revalidatePath("/admin");
+  return { success: true };
+}
+
+// Reservas que se pueden enlazar a un comprobante ya registrado (marcadas las que ya tiene).
+export async function reservasDeComprobante(id: number) {
+  const { role } = await getUserRole();
+  if (!canOperate(role)) return { error: "No autorizado." };
+
+  const supabaseServer = await getSupabaseServer();
+  const { data: c, error } = await supabaseServer
+    .from("comprobantes")
+    .select("cliente_num_doc, total, comprobante_reservas(booking_id)")
+    .eq("id", id)
+    .maybeSingle();
+  if (faltaTabla(error?.code)) return { error: ERROR_TABLA_ENLACES };
+  if (!c) return { error: "El comprobante no existe." };
+
+  const enlazadas = ((c as any).comprobante_reservas || []).map((r: any) => r.booking_id as number);
+  const candidatas = await reservasParaEnlazar(supabaseServer, c.cliente_num_doc, Number(c.total), enlazadas);
+  return { candidatas };
+}
+
+// Reemplaza las reservas enlazadas a un comprobante.
+export async function enlazarComprobante(id: number, bookingIds: number[]) {
+  const { role } = await getUserRole();
+  if (!canOperate(role)) return { error: "No autorizado." };
+
+  const supabaseServer = await getSupabaseServer();
+  const reservas = await validarReservas(supabaseServer, bookingIds);
+  if (reservas.error) return { error: reservas.error };
+
+  const { data: c } = await supabaseServer.from("comprobantes").select("id").eq("id", id).maybeSingle();
+  if (!c) return { error: "El comprobante no existe." };
+
+  const { error: errorBorrar } = await supabaseServer.from("comprobante_reservas").delete().eq("comprobante_id", id);
+  if (errorBorrar) {
+    return { error: faltaTabla(errorBorrar.code) ? ERROR_TABLA_ENLACES : "No se pudieron cambiar las reservas." };
+  }
+
+  if (reservas.ids.length) {
+    const { error } = await supabaseServer
+      .from("comprobante_reservas")
+      .insert(reservas.ids.map((booking_id) => ({ comprobante_id: id, booking_id })));
+    if (error) {
+      console.error("Error enlazando comprobante:", error.message);
+      revalidatePath("/admin");
+      return { error: "No se pudieron guardar las reservas; el comprobante quedó sin enlazar." };
+    }
   }
 
   revalidatePath("/admin");

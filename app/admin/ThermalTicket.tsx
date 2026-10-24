@@ -2,8 +2,9 @@ import React from "react";
 import QRCode from "react-qr-code";
 import { HOTEL_RUC } from "@/lib/site";
 import { codigoReserva } from "@/lib/reserva";
+import { fechaCorta } from "@/lib/fecha-peru";
 import {
-  type Comprobante,
+  type ComprobanteImpreso,
   NOMBRE_COMPROBANTE,
   NOMBRE_DOC_IDENTIDAD,
   numeroComprobante,
@@ -12,18 +13,8 @@ import {
 
 // Representación impresa de una boleta o factura de SUNAT registrada con su XML.
 // Solo se imprime este documento: el hotel no entrega tickets internos.
-interface ThermalTicketProps {
-  booking: any; // datos de la reserva que no trae el XML (forma de pago, estancia, dirección)
-  bookingId: number;
-  comprobante: Comprobante;
-}
-
-const fechaPeru = (iso: string) => {
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
-};
-
-export default function ThermalTicket({ booking, bookingId, comprobante }: ThermalTicketProps) {
+// Lleva además los datos de las reservas que cubre (forma de pago, estancias), que el XML no trae.
+export default function ThermalTicket({ comprobante }: { comprobante: ComprobanteImpreso }) {
 
   return (
     <div id="print-section" className="thermal-ticket hidden print:block text-black bg-white p-4 font-mono text-[11px] w-[302px] mx-auto absolute top-0 left-0 z-[99999] h-screen">
@@ -37,21 +28,18 @@ export default function ThermalTicket({ booking, bookingId, comprobante }: Therm
         <p>Jr. Las Américas #154, Ayacucho</p>
       </div>
 
-      <TicketOficial booking={booking} bookingId={bookingId} comprobante={comprobante} />
+      <TicketOficial comprobante={comprobante} />
     </div>
   );
 }
 
 // Los datos fiscales (cliente, ítems, IGV, total) salen del XML de SUNAT.
-function TicketOficial({ booking, bookingId, comprobante: c }: { booking: any; bookingId: number; comprobante: Comprobante }) {
+function TicketOficial({ comprobante: c }: { comprobante: ComprobanteImpreso }) {
   const nombre = NOMBRE_COMPROBANTE[c.tipo];
   const etiquetaDoc = (c.cliente_tipo_doc && NOMBRE_DOC_IDENTIDAD[c.cliente_tipo_doc]) || "DOC.";
   const moneda = c.moneda === "PEN" ? "S/" : c.moneda;
 
-  // Las fechas de la estancia van bajo el ítem de hospedaje
-  const estancia = booking.check_in && booking.check_out
-    ? `Del ${fechaPeru(booking.check_in)} al ${fechaPeru(booking.check_out)}`
-    : null;
+  // Las fechas de la estancia (una por cada fecha distinta) van bajo el ítem de hospedaje
   const itemEstancia = Math.max(0, c.items.findIndex((i) => /hosped|aloja|habitac/i.test(i.descripcion)));
 
   return (
@@ -59,16 +47,19 @@ function TicketOficial({ booking, bookingId, comprobante: c }: { booking: any; b
       <div className="border-t border-b border-dashed border-black py-2 mb-4 text-center">
         <h2 className="font-bold text-base">{nombre}</h2>
         <p className="text-sm font-bold tracking-widest mt-1">{numeroComprobante(c)}</p>
-        {bookingId > 0 && <p className="text-[10px] mt-1">RESERVA {codigoReserva(bookingId)}</p>}
+        {c.reservas.length > 0 && (
+          <p className="text-[10px] mt-1">
+            {c.reservas.length > 1 ? "RESERVAS" : "RESERVA"} {c.reservas.map(codigoReserva).join(", ")}
+          </p>
+        )}
       </div>
 
       <div className="mb-4 space-y-1">
-        <p><strong>FECHA:</strong> {fechaPeru(c.fecha_emision)}</p>
+        <p><strong>FECHA:</strong> {fechaCorta(c.fecha_emision)}</p>
         <p><strong>CLIENTE:</strong> {c.cliente_nombre || "CLIENTE VARIOS"}</p>
         {c.cliente_num_doc && <p><strong>{etiquetaDoc}:</strong> {c.cliente_num_doc}</p>}
-        {booking.customer_address && <p><strong>DIRECCIÓN:</strong> {booking.customer_address}</p>}
         {/* Sin línea de habitación: el número ya viene en la descripción del XML */}
-        {booking.payment_method && <p><strong>FORMA DE PAGO:</strong> {booking.payment_method}</p>}
+        {c.formaPago && <p><strong>FORMA DE PAGO:</strong> {c.formaPago}</p>}
       </div>
 
       <table className="w-full mb-4 text-[11px] table-fixed break-words">
@@ -86,9 +77,9 @@ function TicketOficial({ booking, bookingId, comprobante: c }: { booking: any; b
               <td className="py-2 align-top font-bold">{item.cantidad}</td>
               <td className="py-2">
                 <span className="font-bold uppercase">{item.descripcion}</span>
-                {index === itemEstancia && estancia && (
-                  <div className="text-[10px] mt-0.5 opacity-90 leading-tight">{estancia}</div>
-                )}
+                {index === itemEstancia && c.estancias.map((estancia) => (
+                  <div key={estancia} className="text-[10px] mt-0.5 opacity-90 leading-tight">{estancia}</div>
+                ))}
               </td>
               <td className="text-right py-2 align-top">{item.precioUnitario.toFixed(2)}</td>
               <td className="text-right py-2 align-top font-bold">{item.total.toFixed(2)}</td>

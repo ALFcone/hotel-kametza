@@ -26,10 +26,11 @@ export interface ItemComprobante {
   total: number; // con IGV
 }
 
-// Una fila de la tabla public.comprobantes (sin el XML, que no hace falta para imprimir).
+// Una fila de la tabla public.comprobantes (sin el XML, que no hace falta para imprimir),
+// con las reservas que cubre (una boleta puede pagar varias habitaciones).
 export interface Comprobante {
   id: number;
-  booking_id: number | null;
+  reservas: number[];
   tipo: TipoComprobante;
   serie: string;
   numero: number;
@@ -48,7 +49,21 @@ export interface Comprobante {
 }
 
 export const COLUMNAS_COMPROBANTE =
-  "id, booking_id, tipo, serie, numero, fecha_emision, emisor_ruc, cliente_tipo_doc, cliente_num_doc, cliente_nombre, moneda, total_gravado, igv, total, hash, items, created_at";
+  "id, tipo, serie, numero, fecha_emision, emisor_ruc, cliente_tipo_doc, cliente_num_doc, cliente_nombre, moneda, total_gravado, igv, total, hash, items, created_at, comprobante_reservas(booking_id)";
+
+// Convierte una fila leída con COLUMNAS_COMPROBANTE al tipo Comprobante.
+export function aComprobante({ comprobante_reservas, ...fila }: any): Comprobante {
+  const reservas = (comprobante_reservas || []).map((r: { booking_id: number }) => r.booking_id);
+  return { ...fila, reservas: reservas.sort((a: number, b: number) => a - b) };
+}
+
+// Lo que se imprime en el ticket además del XML: datos de las reservas enlazadas.
+export interface ComprobanteImpreso extends Comprobante {
+  habitaciones: string[];
+  formaPago: string; // vacío si no está enlazado a ninguna reserva
+  estancias: string[]; // "Del 23/10/2026 al 26/10/2026", sin repetir
+  totalReservas: number; // suma de las reservas enlazadas (habitación + consumos)
+}
 
 export function numeroComprobante(c: Pick<Comprobante, "serie" | "numero">) {
   return `${c.serie}-${String(c.numero).padStart(8, "0")}`;

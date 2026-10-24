@@ -2,36 +2,92 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ExternalLink, FileUp, Printer, Trash2, Receipt, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
+import { ExternalLink, FileUp, Printer, Trash2, Receipt, AlertTriangle, CheckCircle2, XCircle, Link2 } from "lucide-react";
 import Swal from "sweetalert2";
-import { leerComprobanteXml, guardarComprobante, eliminarComprobante } from "../actions";
-import { type Comprobante, NOMBRE_COMPROBANTE, NOMBRE_DOC_IDENTIDAD, numeroComprobante } from "@/lib/cpe";
+import { leerComprobanteXml, guardarComprobante, eliminarComprobante, reservasDeComprobante, enlazarComprobante } from "../actions";
+import { type ComprobanteImpreso, NOMBRE_COMPROBANTE, NOMBRE_DOC_IDENTIDAD, numeroComprobante } from "@/lib/cpe";
 import { BRAND_COLORS } from "@/lib/brand-colors";
+import { fechaCorta } from "@/lib/fecha-peru";
 import { codigoReserva } from "@/lib/reserva";
 import ThermalTicket from "./ThermalTicket";
 
 // SUNAT Operaciones en Línea (pide la Clave SOL en su propia página; nunca pasa por este sistema)
 const SUNAT_SOL_URL = "https://e-menu.sunat.gob.pe/cl-ti-itmenu/MenuInternet.htm";
 
-export interface ComprobanteListado extends Comprobante {
-  habitacion: string;
-  // Datos de la reserva enlazada (vacíos si no tiene)
-  formaPago: string;
-  checkIn: string;
-  checkOut: string;
-}
-
 type Lectura = Awaited<ReturnType<typeof leerComprobanteXml>>;
 type LecturaOk = Extract<Lectura, { data: unknown }>;
+type Candidata = LecturaOk["candidatas"][number];
 
-const fechaPeru = (iso: string) => iso.split("-").reverse().join("/");
 const soles = (n: number) => `S/ ${Number(n).toFixed(2)}`;
+
+// Casillas para elegir una o varias reservas (una boleta puede cubrir varias habitaciones).
+function ListaReservas({
+  id,
+  candidatas,
+  elegidas,
+  onChange,
+}: {
+  id: string;
+  candidatas: Candidata[];
+  elegidas: number[];
+  onChange: (ids: number[]) => void;
+}) {
+  const alternar = (reserva: number) =>
+    onChange(elegidas.includes(reserva) ? elegidas.filter((r) => r !== reserva) : [...elegidas, reserva]);
+
+  if (candidatas.length === 0) return <p className="text-sm text-stone-500">No hay reservas para enlazar.</p>;
+
+  return (
+    <fieldset aria-describedby={`${id}-ayuda`}>
+      <legend className="block text-[10px] font-black uppercase text-stone-500 mb-1 tracking-wider">
+        Enlazar con las reservas
+      </legend>
+      <ul className="max-h-72 overflow-y-auto border border-stone-200 rounded-xl divide-y divide-stone-100 bg-white">
+        {candidatas.map((c) => (
+          <li key={c.id}>
+            <label className="flex items-start gap-3 px-3 py-2.5 min-h-11 cursor-pointer hover:bg-stone-50">
+              <input
+                type="checkbox"
+                checked={elegidas.includes(c.id)}
+                onChange={() => alternar(c.id)}
+                className="mt-0.5 w-4 h-4 shrink-0 accent-amber-600"
+              />
+              <span className="text-sm text-stone-800 leading-snug">
+                <strong>{codigoReserva(c.id)}</strong> · {c.huesped}
+                {c.habitacion ? ` · Hab. ${c.habitacion}` : ""} · {fechaCorta(c.checkIn)} · {soles(c.total)}
+                {c.cancelada ? " · anulada" : ""}
+                {c.coincide && <span className="ml-1 text-emerald-700 font-bold">✓</span>}
+              </span>
+            </label>
+          </li>
+        ))}
+      </ul>
+      <p id={`${id}-ayuda`} className="text-xs text-stone-500 mt-1">
+        Marca todas las reservas que paga este comprobante. Con ✓ las que coinciden con el documento del cliente o con el total.
+      </p>
+    </fieldset>
+  );
+}
+
+// Aviso cuando el total del comprobante no es la suma de las reservas marcadas.
+function AvisoTotal({ total, candidatas, elegidas }: { total: number; candidatas: Candidata[]; elegidas: number[] }) {
+  if (elegidas.length === 0) return null;
+  const suma = candidatas.filter((c) => elegidas.includes(c.id)).reduce((s, c) => s + c.total, 0);
+  if (Math.abs(suma - total) < 0.01) return null;
+  return (
+    <p className="flex items-start gap-2 mt-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 text-sm">
+      <AlertTriangle size={18} className="shrink-0 mt-0.5" aria-hidden="true" />
+      El comprobante es por {soles(total)} y {elegidas.length > 1 ? "las reservas marcadas suman" : "la reserva suma"} {soles(suma)}.
+      Revisa que estén todas las habitaciones que se pagaron.
+    </p>
+  );
+}
 
 export default function AdminComprobantes({
   comprobantes,
   userRole,
 }: {
-  comprobantes: ComprobanteListado[];
+  comprobantes: ComprobanteImpreso[];
   userRole?: string | null;
 }) {
   const puedeQuitar = userRole === "admin" || userRole === "dueño";
@@ -42,17 +98,21 @@ export default function AdminComprobantes({
   const [lectura, setLectura] = useState<LecturaOk | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [exito, setExito] = useState<string | null>(null);
-  const [reservaId, setReservaId] = useState<string>("");
+  const [reservas, setReservas] = useState<number[]>([]);
   const [cargando, setCargando] = useState(false);
 
+  // Cambiar las reservas de un comprobante ya registrado
+  const [editando, setEditando] = useState<{ id: number; candidatas: Candidata[]; elegidas: number[] } | null>(null);
+  const [guardandoEnlace, setGuardandoEnlace] = useState(false);
+
   const [mounted, setMounted] = useState(false);
-  const [imprimiendo, setImprimiendo] = useState<ComprobanteListado | null>(null);
+  const [imprimiendo, setImprimiendo] = useState<ComprobanteImpreso | null>(null);
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!imprimiendo) return;
-    // Mismo retardo que el ticket de reservas: deja cargar el logo y el QR antes de imprimir
+    // Mismo retardo que el ticket del historial: deja cargar el logo y el QR antes de imprimir
     const t = setTimeout(() => {
       window.print();
       setTimeout(() => setImprimiendo(null), 500);
@@ -64,7 +124,7 @@ export default function AdminComprobantes({
     setXml(null);
     setNombreArchivo("");
     setLectura(null);
-    setReservaId("");
+    setReservas([]);
     if (inputRef.current) inputRef.current.value = "";
   };
 
@@ -86,7 +146,7 @@ export default function AdminComprobantes({
         setNombreArchivo(file.name);
         setLectura(res);
         const sugerida = res.candidatas.find((c) => c.coincide);
-        setReservaId(sugerida ? String(sugerida.id) : "");
+        setReservas(sugerida ? [sugerida.id] : []);
       }
     } catch {
       setError("No se pudo leer el archivo.");
@@ -98,17 +158,49 @@ export default function AdminComprobantes({
     if (!xml || !lectura) return;
     setCargando(true);
     setError(null);
-    const res = await guardarComprobante(xml, reservaId ? Number(reservaId) : null);
+    const res = await guardarComprobante(xml, reservas);
     setCargando(false);
     if ("error" in res && res.error) {
       setError(res.error);
       return;
     }
-    setExito(`${numeroComprobante(lectura.data)} registrado${reservaId ? ` en la reserva ${codigoReserva(Number(reservaId))}` : ""}.`);
+    setExito(
+      `${numeroComprobante(lectura.data)} registrado${reservas.length ? ` en ${reservas.map(codigoReserva).join(", ")}` : ""}.`,
+    );
     limpiar();
   };
 
-  const handleQuitar = async (c: ComprobanteListado) => {
+  const handleEditar = async (c: ComprobanteImpreso) => {
+    setError(null);
+    setExito(null);
+    setGuardandoEnlace(true);
+    const res = await reservasDeComprobante(c.id);
+    setGuardandoEnlace(false);
+    if ("error" in res) {
+      setError(res.error ?? "No se pudieron cargar las reservas.");
+      return;
+    }
+    setEditando({ id: c.id, candidatas: res.candidatas, elegidas: c.reservas });
+  };
+
+  const handleGuardarEnlace = async (c: ComprobanteImpreso) => {
+    if (!editando) return;
+    setGuardandoEnlace(true);
+    const res = await enlazarComprobante(c.id, editando.elegidas);
+    setGuardandoEnlace(false);
+    if ("error" in res && res.error) {
+      setError(res.error);
+      return;
+    }
+    setExito(
+      editando.elegidas.length
+        ? `${numeroComprobante(c)} quedó en ${editando.elegidas.map(codigoReserva).join(", ")}.`
+        : `${numeroComprobante(c)} quedó sin reservas.`,
+    );
+    setEditando(null);
+  };
+
+  const handleQuitar = async (c: ComprobanteImpreso) => {
     const confirmacion = await Swal.fire({
       title: `¿Quitar ${numeroComprobante(c)}?`,
       text: "Solo se borra del sistema del hotel. En SUNAT el comprobante sigue emitido; para anularlo hay que hacerlo en SUNAT.",
@@ -125,19 +217,10 @@ export default function AdminComprobantes({
   };
 
   const datos = lectura?.data;
-  const reservaElegida = lectura?.candidatas.find((c) => String(c.id) === reservaId);
-  const totalNoCoincide = !!(datos && reservaElegida && Math.abs(reservaElegida.total - datos.total) >= 0.01);
 
   return (
     <div className="space-y-6">
-      {mounted && imprimiendo && createPortal(
-        <ThermalTicket
-          booking={{ payment_method: imprimiendo.formaPago, check_in: imprimiendo.checkIn, check_out: imprimiendo.checkOut }}
-          bookingId={imprimiendo.booking_id ?? 0}
-          comprobante={imprimiendo}
-        />,
-        document.body
-      )}
+      {mounted && imprimiendo && createPortal(<ThermalTicket comprobante={imprimiendo} />, document.body)}
 
       {/* Paso a paso + acceso a SUNAT */}
       <section className="bg-white rounded-[2.5rem] p-6 lg:p-10 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)]">
@@ -150,7 +233,7 @@ export default function AdminComprobantes({
             <ol className="mt-5 space-y-2 text-sm text-stone-700 list-decimal list-inside">
               <li>Abre SUNAT con tu RUC y Clave SOL, y emite la boleta o factura.</li>
               <li>Descarga el <strong>XML</strong> del comprobante emitido.</li>
-              <li>Súbelo abajo, elige la reserva y guárdalo.</li>
+              <li>Súbelo abajo, marca la reserva (o las reservas, si paga varias habitaciones) y guárdalo.</li>
             </ol>
           </div>
           <a
@@ -208,7 +291,7 @@ export default function AdminComprobantes({
               <p className="text-[10px] font-black uppercase tracking-wider text-stone-500">{NOMBRE_COMPROBANTE[datos.tipo]}</p>
               <p className="text-xl font-bold text-stone-900 mt-1">{numeroComprobante(datos)}</p>
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 mt-4 text-sm">
-                <div><dt className="text-stone-500 text-xs">Fecha de emisión</dt><dd className="font-bold text-stone-800">{fechaPeru(datos.fechaEmision)}</dd></div>
+                <div><dt className="text-stone-500 text-xs">Fecha de emisión</dt><dd className="font-bold text-stone-800">{fechaCorta(datos.fechaEmision)}</dd></div>
                 <div><dt className="text-stone-500 text-xs">Cliente</dt><dd className="font-bold text-stone-800">{datos.clienteNombre || "Cliente varios"}</dd></div>
                 {datos.clienteNumDoc && (
                   <div>
@@ -229,29 +312,8 @@ export default function AdminComprobantes({
             ))}
 
             <div>
-              <label htmlFor="reserva-comprobante" className="block text-[10px] font-black uppercase text-stone-500 mb-1 tracking-wider">
-                Enlazar con la reserva
-              </label>
-              <select
-                id="reserva-comprobante"
-                value={reservaId}
-                onChange={(e) => setReservaId(e.target.value)}
-                className="w-full min-h-11 border border-stone-200 rounded-xl px-3 py-2 text-sm font-bold bg-white"
-              >
-                <option value="">Sin enlazar a una reserva</option>
-                {lectura.candidatas.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.coincide ? "✓ " : ""}{codigoReserva(c.id)} ·{c.huesped}{c.habitacion ? ` · Hab. ${c.habitacion}` : ""} · {fechaPeru(c.checkIn)} · {soles(c.total)}{c.cancelada ? " · anulada" : ""}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-stone-500 mt-1">Con ✓ las que coinciden con el documento del cliente o con el total.</p>
-              {totalNoCoincide && reservaElegida && (
-                <p className="flex items-start gap-2 mt-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 text-sm">
-                  <AlertTriangle size={18} className="shrink-0 mt-0.5" aria-hidden="true" />
-                  El comprobante es por {soles(datos.total)} y la reserva suma {soles(reservaElegida.total)}. Revisa que sea la reserva correcta.
-                </p>
-              )}
+              <ListaReservas id="reservas-nuevo" candidatas={lectura.candidatas} elegidas={reservas} onChange={setReservas} />
+              <AvisoTotal total={datos.total} candidatas={lectura.candidatas} elegidas={reservas} />
             </div>
 
             <div className="flex flex-wrap gap-3">
@@ -286,37 +348,83 @@ export default function AdminComprobantes({
         ) : (
           <ul className="mt-4 divide-y divide-stone-100">
             {comprobantes.map((c) => (
-              <li key={c.id} className="py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-stone-900">{numeroComprobante(c)}</p>
-                  <p className="text-xs text-stone-500 uppercase">
-                    {NOMBRE_COMPROBANTE[c.tipo]} · {fechaPeru(c.fecha_emision)}
-                  </p>
-                  <p className="text-sm text-stone-700 mt-1 truncate">
-                    {c.cliente_nombre || "Cliente varios"}
-                    {c.booking_id ? ` · Reserva ${codigoReserva(c.booking_id)}` : " · Sin reserva"}
-                    {c.habitacion ? ` · Hab. ${c.habitacion}` : ""}
-                  </p>
-                </div>
-                <p className="font-bold text-stone-900 sm:text-right">{soles(c.total)}</p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setImprimiendo(c)}
-                    aria-label={`Imprimir ${numeroComprobante(c)}`}
-                    className="inline-flex items-center gap-2 min-h-11 px-4 bg-stone-900 text-white rounded-xl text-xs font-bold hover:bg-stone-800"
-                  >
-                    <Printer size={16} aria-hidden="true" /> Imprimir
-                  </button>
-                  {puedeQuitar && (
+              <li key={c.id} className="py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-stone-900">{numeroComprobante(c)}</p>
+                    <p className="text-xs text-stone-500 uppercase">
+                      {NOMBRE_COMPROBANTE[c.tipo]} · {fechaCorta(c.fecha_emision)}
+                    </p>
+                    <p className="text-sm text-stone-700 mt-1">
+                      {c.cliente_nombre || "Cliente varios"}
+                      {c.reservas.length
+                        ? ` · ${c.reservas.length > 1 ? "Reservas" : "Reserva"} ${c.reservas.map(codigoReserva).join(", ")}`
+                        : " · Sin reserva"}
+                      {c.habitaciones.length ? ` · Hab. ${c.habitaciones.join(", ")}` : ""}
+                    </p>
+                    {c.reservas.length > 0 && Math.abs(Number(c.total) - c.totalReservas) >= 0.01 && (
+                      <p className="text-xs font-bold text-amber-700 mt-1">
+                        No coincide con {c.reservas.length > 1 ? "las reservas" : "la reserva"} ({soles(c.totalReservas)})
+                      </p>
+                    )}
+                  </div>
+                  <p className="font-bold text-stone-900 sm:text-right">{soles(c.total)}</p>
+                  <div className="flex flex-wrap gap-2">
                     <button
-                      onClick={() => handleQuitar(c)}
-                      aria-label={`Quitar ${numeroComprobante(c)}`}
-                      className="inline-flex items-center justify-center min-h-11 min-w-11 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100"
+                      onClick={() => setImprimiendo(c)}
+                      aria-label={`Imprimir ${numeroComprobante(c)}`}
+                      className="inline-flex items-center gap-2 min-h-11 px-4 bg-stone-900 text-white rounded-xl text-xs font-bold hover:bg-stone-800"
                     >
-                      <Trash2 size={16} aria-hidden="true" />
+                      <Printer size={16} aria-hidden="true" /> Imprimir
                     </button>
-                  )}
+                    <button
+                      onClick={() => (editando?.id === c.id ? setEditando(null) : handleEditar(c))}
+                      disabled={guardandoEnlace}
+                      aria-expanded={editando?.id === c.id}
+                      aria-label={`Cambiar las reservas de ${numeroComprobante(c)}`}
+                      className="inline-flex items-center gap-2 min-h-11 px-4 bg-stone-100 text-stone-700 rounded-xl text-xs font-bold hover:bg-stone-200 disabled:opacity-50"
+                    >
+                      <Link2 size={16} aria-hidden="true" /> Reservas
+                    </button>
+                    {puedeQuitar && (
+                      <button
+                        onClick={() => handleQuitar(c)}
+                        aria-label={`Quitar ${numeroComprobante(c)}`}
+                        className="inline-flex items-center justify-center min-h-11 min-w-11 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100"
+                      >
+                        <Trash2 size={16} aria-hidden="true" />
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {editando?.id === c.id && (
+                  <div className="mt-4 bg-stone-50 rounded-2xl p-4 space-y-3">
+                    <ListaReservas
+                      id={`reservas-${c.id}`}
+                      candidatas={editando.candidatas}
+                      elegidas={editando.elegidas}
+                      onChange={(elegidas) => setEditando({ ...editando, elegidas })}
+                    />
+                    <AvisoTotal total={Number(c.total)} candidatas={editando.candidatas} elegidas={editando.elegidas} />
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        onClick={() => handleGuardarEnlace(c)}
+                        disabled={guardandoEnlace}
+                        className="min-h-11 px-5 bg-amber-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-amber-700 disabled:opacity-50"
+                      >
+                        {guardandoEnlace ? "Guardando…" : "Guardar reservas"}
+                      </button>
+                      <button
+                        onClick={() => setEditando(null)}
+                        disabled={guardandoEnlace}
+                        className="min-h-11 px-5 bg-white border border-stone-200 text-stone-700 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-stone-100"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
