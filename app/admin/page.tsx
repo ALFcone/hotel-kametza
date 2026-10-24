@@ -18,7 +18,9 @@ import RoomEditForm from "./RoomEditForm";
 import { AdminTableActions } from "./AdminTableActions";
 import AdminProducts from "./AdminProducts";
 import AdminStaffManagement from "./AdminStaffManagement";
+import AdminComprobantes, { type ComprobanteListado } from "./AdminComprobantes";
 import MobileMoreMenu from "./MobileMoreMenu";
+import { type Comprobante, COLUMNAS_COMPROBANTE } from "@/lib/cpe";
 import {
   Calendar,
   CheckCircle,
@@ -172,8 +174,9 @@ export default async function AdminPage(props: {
   // B. CONSULTAS (en paralelo; productos y personal solo en las pestañas que los usan)
   const needsProducts = activeTab === "historial" || activeTab === "almacen";
   const needsStaff = isOwner && activeTab === "personal";
+  const needsComprobantes = activeTab === "historial" || activeTab === "comprobantes";
 
-  const [roomsRes, bookingsRes, extrasRes, productsRes, staffRes] = await Promise.all([
+  const [roomsRes, bookingsRes, extrasRes, productsRes, staffRes, comprobantesRes] = await Promise.all([
     supabaseServer.from("rooms").select("*").order("id"),
     supabaseServer.from("bookings").select("*, clients(*)").order("created_at", { ascending: false }),
     supabaseServer.from("booking_extras").select("*").order("created_at", { ascending: false }),
@@ -181,6 +184,10 @@ export default async function AdminPage(props: {
       ? supabaseServer.from("products").select("*").order("name", { ascending: true })
       : Promise.resolve({ data: null }),
     needsStaff ? getStaffList() : Promise.resolve({ data: [] as any[] }),
+    // Si la tabla aún no existe en Supabase, la consulta falla y simplemente no hay comprobantes
+    needsComprobantes
+      ? supabaseServer.from("comprobantes").select(COLUMNAS_COMPROBANTE).order("created_at", { ascending: false })
+      : Promise.resolve({ data: null }),
   ]);
 
   const rooms = roomsRes.data;
@@ -188,6 +195,12 @@ export default async function AdminPage(props: {
   const allExtras = extrasRes.data;
   const products = productsRes.data;
   const staffList: any[] = staffRes.data || [];
+  const comprobantes = (comprobantesRes.data || []) as unknown as Comprobante[];
+  const comprobantesPorReserva = new Map<number, Comprobante[]>();
+  for (const c of comprobantes) {
+    if (c.booking_id === null) continue;
+    comprobantesPorReserva.set(c.booking_id, [...(comprobantesPorReserva.get(c.booking_id) || []), c]);
+  }
 
   // Mapear la nueva estructura relacional a la estructura plana original
   // para no romper la compatibilidad con el resto del panel y componentes.
@@ -508,6 +521,7 @@ export default async function AdminPage(props: {
               { tab: "historial", label: "Historial de Reservas", Icon: FileText, ownerOnly: false },
               { tab: "inventario", label: "Inventario", Icon: BedDouble, ownerOnly: false },
               { tab: "almacen", label: "Almacén / Minibar", Icon: ShoppingCart, ownerOnly: false },
+              { tab: "comprobantes", label: "Comprobantes SUNAT", Icon: Receipt, ownerOnly: false },
             ]
               .filter((item) => !item.ownerOnly || isOwner)
               .map(({ tab, label, Icon }) => {
@@ -1478,6 +1492,7 @@ export default async function AdminPage(props: {
                                 onDelete={deleteBooking}
                                 products={products || []}
                                 userRole={role}
+                                comprobantes={comprobantesPorReserva.get(booking.id) || []}
                               />
                             </td>
                           </tr>
@@ -1790,6 +1805,19 @@ export default async function AdminPage(props: {
           {activeTab === "almacen" && (
             <div id="almacen" className="scroll-mt-24 mb-12 animate-fade-in-up">
               <AdminProducts products={products || []} userRole={role} />
+            </div>
+          )}
+
+          {/* --- TAB: COMPROBANTES SUNAT (XML del portal SEE-SOL) --- */}
+          {activeTab === "comprobantes" && (
+            <div id="comprobantes" className="scroll-mt-24 mb-12 animate-fade-in-up">
+              <AdminComprobantes
+                userRole={role}
+                comprobantes={comprobantes.map((c): ComprobanteListado => {
+                  const reserva = c.booking_id ? allBookings.find((b: any) => b.id === c.booking_id) : null;
+                  return { ...c, habitacion: reserva ? String(getRoomNumber(reserva.room_id)) : "" };
+                })}
+              />
             </div>
           )}
 

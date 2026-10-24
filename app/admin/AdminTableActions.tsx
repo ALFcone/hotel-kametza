@@ -12,6 +12,8 @@ import { useDialog } from "../useDialog";
 import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle, Printer, FileWarning } from "lucide-react";
 import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, fetchRucData, fetchDniData, cancelBooking } from "@/app/actions";
 import ThermalTicket from "./ThermalTicket";
+import Link from "next/link";
+import { type Comprobante, NOMBRE_COMPROBANTE, numeroComprobante } from "@/lib/cpe";
 import Swal from "sweetalert2";
 import { BRAND_COLORS } from "@/lib/brand-colors";
 
@@ -33,7 +35,8 @@ interface AdminTableActionsProps {
   onDelete: (formData: FormData) => void;
   products?: any[];
   userRole?: string | null;
-  // added customer_document if it exists in parent, otherwise we'll pass guestName as is
+  // Boletas, facturas o notas de SUNAT registradas (XML) para esta reserva
+  comprobantes?: Comprobante[];
 }
 
 export function AdminTableActions({
@@ -54,6 +57,7 @@ export function AdminTableActions({
   onDelete,
   products = [],
   userRole,
+  comprobantes = [],
 }: AdminTableActionsProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -76,7 +80,8 @@ export function AdminTableActions({
   
   // Facturación States
   const [isPrinting, setIsPrinting] = useState(false);
-  const [billingType, setBillingType] = useState<"BOLETA" | "FACTURA" | "NOTA DE CRÉDITO">("BOLETA");
+  // null = ticket interno; con un comprobante = representación impresa del XML de SUNAT
+  const [ticketComprobante, setTicketComprobante] = useState<Comprobante | null>(null);
   const [billingDocument, setBillingDocument] = useState("");
   const [billingName, setBillingName] = useState("");
   const [billingAddress, setBillingAddress] = useState("");
@@ -90,22 +95,19 @@ export function AdminTableActions({
   const billingDialogRef = useDialog(isBillingModalOpen, () => setIsBillingModalOpen(false));
 
   const handleFetchDocument = async () => {
-    if (billingType === "FACTURA" && billingDocument.length !== 11) {
-      alert("El RUC debe tener 11 dígitos");
+    const esRuc = billingDocument.length === 11;
+    if (!esRuc && billingDocument.length !== 8) {
+      alert("Ingresa un DNI de 8 dígitos o un RUC de 11");
       return;
     }
-    if (billingType === "BOLETA" && billingDocument.length !== 8) {
-      alert("El DNI debe tener 8 dígitos");
-      return;
-    }
-    
+
     setIsFetchingRuc(true);
     try {
-      const result = billingType === "FACTURA" 
+      const result = esRuc
         ? await fetchRucData(billingDocument)
         : await fetchDniData(billingDocument);
-        
-      if (billingType === "FACTURA" && result.data && result.data.nombre) {
+
+      if (esRuc && result.data && result.data.nombre) {
         setBillingName(result.data.nombre);
         if (result.data.direccion) {
           const fullAddress = [
@@ -118,7 +120,7 @@ export function AdminTableActions({
         } else {
           setBillingAddress("");
         }
-      } else if (billingType === "BOLETA" && result.data) {
+      } else if (!esRuc && result.data) {
         // Algunas APIs devuelven "nombre", otras devuelven "nombres", "apellidoPaterno", etc.
         if (result.data.nombre) {
           setBillingName(result.data.nombre);
@@ -129,7 +131,7 @@ export function AdminTableActions({
         }
         setBillingAddress(""); // Usualmente DNI no devuelve dirección
       } else {
-        alert(result.error || `${billingType === "FACTURA" ? "RUC" : "DNI"} no encontrado o inválido.`);
+        alert(result.error || `${esRuc ? "RUC" : "DNI"} no encontrado o inválido.`);
       }
     } catch (error) {
       console.error(error);
@@ -320,7 +322,6 @@ export function AdminTableActions({
 
   const handleOpenBilling = () => {
     // Valores por defecto al abrir (todos editables antes de imprimir)
-    setBillingType(isCancelled ? "NOTA DE CRÉDITO" : "BOLETA");
     setBillingDocument(guestDocument || "");
     setBillingName(guestName);
     setBillingPaymentMethod(paymentMethodLabel(paymentMethod));
@@ -333,8 +334,9 @@ export function AdminTableActions({
       {mounted && isPrinting && createPortal(
         <ThermalTicket
           booking={mockBookingForTicket}
-          type={billingType}
-          correlative={`${billingType === "FACTURA" ? "F001" : "B001"}-${bookingId.toString().padStart(6, '0')}`}
+          bookingId={bookingId}
+          isCancelled={isCancelled}
+          comprobante={ticketComprobante}
         />,
         document.body
       )}
@@ -349,8 +351,8 @@ export function AdminTableActions({
                 ? "bg-rose-50 text-rose-500 hover:bg-rose-100 hover:text-rose-700" 
                 : "bg-zinc-100 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200"
             }`}
-            title={isCancelled ? "Imprimir Nota de Crédito" : "Emitir Comprobante (Boleta/Factura)"}
-            aria-label={isCancelled ? "Imprimir Nota de Crédito" : "Emitir Comprobante (Boleta/Factura)"}
+            title="Imprimir comprobante"
+            aria-label="Imprimir comprobante"
           >
             <Printer size={14} className="group-hover:scale-110 transition-transform duration-300" />
           </button>
@@ -779,7 +781,7 @@ export function AdminTableActions({
 
       {/* Modal de Facturación / Boleta */}
       {mounted && isBillingModalOpen && createPortal(
-        <div ref={billingDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Emitir comprobante" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm outline-none">
+        <div ref={billingDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Imprimir comprobante" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-sm outline-none">
           <div className="bg-white rounded-3xl p-5 w-full max-w-sm max-h-[90vh] flex flex-col shadow-2xl relative">
             <button 
               onClick={() => setIsBillingModalOpen(false)}
@@ -794,66 +796,72 @@ export function AdminTableActions({
                 <Printer size={20} />
               </div>
               <div>
-                <h3 className="font-bold text-stone-900">Emitir Comprobante</h3>
+                <h3 className="font-bold text-stone-900">Imprimir comprobante</h3>
                 <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva #{bookingId}</p>
               </div>
             </div>
 
             <div className="overflow-y-auto pr-1 -mr-1 flex-1">
+              {/* Boletas / facturas oficiales: se emiten en SUNAT y se registran subiendo su XML */}
               <div className="bg-stone-50 p-3 rounded-2xl mb-3">
                 <h3 className="text-[10px] font-black uppercase text-stone-500 mb-2 tracking-wider">
-                  Tipo de Comprobante
+                  Boleta o factura de SUNAT
                 </h3>
-              
-              {isCancelled ? (
-                <div className="flex bg-stone-200 p-1 rounded-xl">
-                  <button className="flex-1 py-1.5 text-xs font-bold rounded-lg bg-rose-500 text-white shadow-sm cursor-default">
-                    NOTA DE CRÉDITO
-                  </button>
-                </div>
-              ) : (
-                <div className="flex bg-stone-200 p-1 rounded-xl">
-                  <button
-                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${billingType === 'BOLETA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
-                    onClick={() => {
-                      setBillingType('BOLETA');
-                      setBillingDocument(guestDocument || "");
-                      setBillingName(guestName);
-                    }}
-                  >
-                    BOLETA
-                  </button>
-                  <button
-                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${billingType === 'FACTURA' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-500 hover:text-stone-700'}`}
-                    onClick={() => {
-                      setBillingType('FACTURA');
-                      setBillingDocument("");
-                      setBillingName("");
-                    }}
-                  >
-                    FACTURA
-                  </button>
-                </div>
-              )}
-            </div>
+                {comprobantes.length > 0 ? (
+                  <ul className="space-y-2">
+                    {comprobantes.map((c) => (
+                      <li key={c.id} className="flex items-center justify-between gap-2 bg-white rounded-xl border border-stone-200 px-3 py-2">
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-stone-900">{numeroComprobante(c)}</p>
+                          <p className="text-[10px] text-stone-500 uppercase truncate">
+                            {NOMBRE_COMPROBANTE[c.tipo]} · S/ {Number(c.total).toFixed(2)}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setTicketComprobante(c);
+                            setIsBillingModalOpen(false);
+                            setIsPrinting(true);
+                          }}
+                          className="shrink-0 min-h-11 px-3 bg-stone-900 text-white rounded-lg text-xs font-bold hover:bg-stone-800"
+                        >
+                          Imprimir
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-stone-600 leading-snug">
+                    Esta reserva aún no tiene boleta ni factura. Emítela en SUNAT y sube el XML en{" "}
+                    <Link href="/admin?tab=comprobantes" className="font-bold text-amber-700 underline underline-offset-2">
+                      Comprobantes SUNAT
+                    </Link>
+                    .
+                  </p>
+                )}
+              </div>
 
+            <h3 className="text-[10px] font-black uppercase text-stone-500 mb-2 tracking-wider">
+              Ticket interno (no es boleta ni factura)
+            </h3>
             <div className="space-y-3 mb-2">
               <div>
                 <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
-                  {billingType === "FACTURA" ? "RUC (11 dígitos)" : "DNI / Documento"}
+                  DNI o RUC del cliente
                 </label>
                 <div className="flex gap-2">
-                  <input aria-label={billingType === "FACTURA" ? "RUC" : "DNI o documento"}
+                  <input aria-label="DNI o RUC del cliente"
                     type="text"
+                    inputMode="numeric"
                     value={billingDocument}
                     onChange={(e) => setBillingDocument(e.target.value.replace(/\D/g, ''))}
-                    maxLength={billingType === "FACTURA" ? 11 : 8}
-                    placeholder={billingType === "FACTURA" ? "Ej. 20123456789" : "Ej. 70123456"}
+                    maxLength={11}
+                    placeholder="DNI (8) o RUC (11)"
                     className="flex-1 border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold"
                   />
                   <button
                     onClick={handleFetchDocument}
-                    disabled={isFetchingRuc || (billingType === "FACTURA" ? billingDocument.length !== 11 : billingDocument.length !== 8)}
+                    disabled={isFetchingRuc || (billingDocument.length !== 8 && billingDocument.length !== 11)}
                     className="px-3 bg-zinc-800 text-white rounded-lg text-xs font-bold disabled:opacity-50"
                   >
                     {isFetchingRuc ? "..." : "Buscar"}
@@ -862,9 +870,9 @@ export function AdminTableActions({
               </div>
               <div>
                 <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
-                  {billingType === "FACTURA" ? "Razón Social" : "Nombre del Cliente"}
+                  Nombre o razón social
                 </label>
-                <input aria-label={billingType === "FACTURA" ? "Razón social" : "Nombre del cliente"}
+                <input aria-label="Nombre o razón social"
                   type="text"
                   value={billingName}
                   onChange={(e) => setBillingName(e.target.value.toUpperCase())}
@@ -942,16 +950,13 @@ export function AdminTableActions({
             <div className="pt-2 shrink-0 mt-2 border-t border-stone-100">
               <button
                 onClick={() => {
-                  if (!billingDocument || !billingName) {
-                    alert("Complete los datos del cliente");
-                    return;
-                  }
+                  setTicketComprobante(null);
                   setIsBillingModalOpen(false);
                   setIsPrinting(true);
                 }}
                 className="w-full py-2.5 bg-stone-900 text-white rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-stone-800 transition shadow-lg shadow-stone-900/20"
               >
-                Generar {billingType} e Imprimir
+                Imprimir ticket interno
               </button>
             </div>
           </div>

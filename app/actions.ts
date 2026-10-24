@@ -10,6 +10,8 @@
 
 import { revalidatePath } from "next/cache";
 import { getSupabaseServer } from "@/lib/supabase-server";
+import { leerXmlComprobante } from "@/lib/cpe-xml";
+import { HOTEL_RUC } from "@/lib/site";
 
 const ROOM_IMAGES_BUCKET = "rooms";
 // Debe coincidir con el tope de la política bookings_insert_huesped (supabase/reservas_pendientes.sql)
@@ -892,6 +894,130 @@ export async function deleteStaffMember(targetEmail: string) {
     console.error("Error deleting staff member:", error.message);
     return { error: error.message };
   }
+
+  revalidatePath("/admin");
+  return { success: true };
+}
+// ==============================================================================
+// 13. COMPROBANTES SUNAT (XML descargado del portal SEE-SOL)
+// ==============================================================================
+// La boleta o factura se emite en SUNAT; aquí solo se registra su XML para imprimir
+// el ticket con la serie, el número y el QR oficiales, y para enlazarla con la reserva.
+
+const ERROR_TABLA_COMPROBANTES = "Falta crear la tabla de comprobantes en Supabase (supabase/comprobantes.sql).";
+
+export async function leerComprobanteXml(xml: string) {
+  const { role } = await getUserRole();
+  if (!canOperate(role)) return { error: "No autorizado." };
+
+  const leido = leerXmlComprobante(xml);
+  if ("error" in leido) return { error: leido.error };
+  const datos = leido.data;
+
+  if (datos.emisorRuc !== HOTEL_RUC) {
+    return { error: `Este comprobante lo emitió el RUC ${datos.emisorRuc}, no el del hotel (${HOTEL_RUC}).` };
+  }
+
+  const avisos: string[] = [];
+  if (datos.moneda !== "PEN") avisos.push(`El comprobante está en ${datos.moneda}, no en soles.`);
+  if (!datos.hash) avisos.push("El XML no trae el código hash de la firma: el QR del ticket saldrá incompleto.");
+
+  const supabaseServer = await getSupabaseServer();
+  const { data: existente, error: errorTabla } = await supabaseServer
+    .from("comprobantes")
+    .select("booking_id")
+    .eq("tipo", datos.tipo)
+    .eq("serie", datos.serie)
+    .eq("numero", datos.numero)
+    .maybeSingle();
+  if (errorTabla?.code === "42P01" || errorTabla?.code === "PGRST205") return { error: ERROR_TABLA_COMPROBANTES };
+  if (existente) {
+    avisos.push(`Este comprobante ya está registrado${existente.booking_id ? ` en la reserva #${existente.booking_id}` : ""}.`);
+  }
+
+  // Reservas para enlazar: las más recientes, primero las que coinciden con el documento o el total del XML.
+  const { data: reservas } = await supabaseServer
+    .from("bookings")
+    .select("id, check_in, total_price, status, rooms(room_number), clients(name, document_number), booking_extras(price, quantity)")
+    .order("check_in", { ascending: false })
+    .limit(60);
+
+  const candidatas = (reservas || [])
+    .map((b: any) => {
+      const extras = (b.booking_extras || []).reduce((s: number, e: any) => s + Number(e.price) * Number(e.quantity), 0);
+      const total = Number(b.total_price || 0) + extras;
+      const coincide =
+        (!!datos.clienteNumDoc && b.clients?.document_number === datos.clienteNumDoc) ||
+        Math.abs(total - datos.total) < 0.01;
+      return {
+        id: b.id as number,
+        huesped: (b.clients?.name as string) || "Huésped",
+        habitacion: b.rooms?.room_number ? String(b.rooms.room_number) : "",
+        checkIn: b.check_in as string,
+        total,
+        cancelada: b.status === "cancelled" || b.status === "cancelada",
+        coincide,
+      };
+    })
+    .sort((a, b) => Number(b.coincide) - Number(a.coincide));
+
+  return { data: datos, avisos, candidatas };
+}
+
+export async function guardarComprobante(xml: string, bookingId: number | null) {
+  const { user, role } = await getUserRole();
+  if (!user || !canOperate(role)) return { error: "No autorizado." };
+
+  // Se vuelve a leer en el servidor: no se confía en lo que mostró el navegador.
+  const leido = leerXmlComprobante(xml);
+  if ("error" in leido) return { error: leido.error };
+  const d = leido.data;
+  if (d.emisorRuc !== HOTEL_RUC) return { error: "El comprobante no es del RUC del hotel." };
+
+  const supabaseServer = await getSupabaseServer();
+
+  if (bookingId !== null) {
+    const { data: reserva } = await supabaseServer.from("bookings").select("id").eq("id", bookingId).maybeSingle();
+    if (!reserva) return { error: "La reserva elegida no existe." };
+  }
+
+  const { error } = await supabaseServer.from("comprobantes").insert({
+    booking_id: bookingId,
+    tipo: d.tipo,
+    serie: d.serie,
+    numero: d.numero,
+    fecha_emision: d.fechaEmision,
+    emisor_ruc: d.emisorRuc,
+    cliente_tipo_doc: d.clienteTipoDoc,
+    cliente_num_doc: d.clienteNumDoc,
+    cliente_nombre: d.clienteNombre,
+    moneda: d.moneda,
+    total_gravado: d.totalGravado,
+    igv: d.igv,
+    total: d.total,
+    hash: d.hash,
+    items: d.items,
+    xml,
+  });
+
+  if (error) {
+    if (error.code === "23505") return { error: "Este comprobante ya está registrado." };
+    if (error.code === "42P01" || error.code === "PGRST205") return { error: ERROR_TABLA_COMPROBANTES };
+    console.error("Error guardando comprobante:", error.message);
+    return { error: "No se pudo guardar el comprobante." };
+  }
+
+  revalidatePath("/admin");
+  return { success: true };
+}
+
+export async function eliminarComprobante(id: number) {
+  const { role } = await getUserRole();
+  if (role !== "admin" && role !== "dueño") return { error: "Solo el dueño o un administrador puede quitar un comprobante." };
+
+  const supabaseServer = await getSupabaseServer();
+  const { error } = await supabaseServer.from("comprobantes").delete().eq("id", id);
+  if (error) return { error: "No se pudo quitar el comprobante." };
 
   revalidatePath("/admin");
   return { success: true };
