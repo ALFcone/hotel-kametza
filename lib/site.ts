@@ -6,3 +6,9 @@ export const SITE_URL = "https://kametzahotel.vercel.app";
 
 // RUC del hotel: se imprime en el ticket y se exige como emisor en los XML de SUNAT que se suben.
 export const HOTEL_RUC = "10282984984";
+
+// Titular del RUC, dirección y contacto: van en el ticket y en el Libro de Reclamaciones.
+export const HOTEL_TITULAR = "MARCELINA BERMUDO ESCALANTE DE RUA";
+export const HOTEL_DIRECCION = "Jr. Las Américas #154, Ayacucho";
+export const HOTEL_EMAIL = "kametzahotelayacucho@gmail.com";
+export const HOTEL_TELEFONO = "920 042 099";

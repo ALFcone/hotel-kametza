@@ -293,6 +293,22 @@ html {
     page-break-inside: avoid;
     break-inside: avoid-page;
   }
+
+  /* Hoja del Libro de Reclamaciones: se imprime sola, en A4 */
+  .hoja-reclamo, .hoja-reclamo * {
+    visibility: visible;
+  }
+  .hoja-reclamo {
+    page: hoja-a4;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+@page hoja-a4 {
+  size: A4;
+  margin: 15mm;
 }
 
 /* ============================================

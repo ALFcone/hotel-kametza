@@ -42,6 +42,7 @@ import {
   Bed,
   Sparkles,
   MapPin,
+  BookOpen,
   Check,
   Phone,
   MessageSquare,
@@ -2120,11 +2121,19 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
           </div>
 
           {/* Bottom Footer */}
-          <div className="border-t border-stone-200 pt-8 flex flex-col md:flex-row justify-center md:justify-start items-center gap-4 text-center md:text-left">
+          <div className="border-t border-stone-200 pt-8 flex flex-col md:flex-row justify-center md:justify-between items-center gap-6 text-center md:text-left">
             <div>
               <p className="font-bold text-stone-800 text-xs">© {new Date().getFullYear()} Hotel Kametza. Todos los derechos reservados.</p>
               <p className="text-[10px] text-stone-700 mt-1">RUC: 10282984984</p>
             </div>
+            {/* Aviso del Libro de Reclamaciones (Indecopi): libro abierto + la frase, enlazado a la hoja virtual */}
+            <a
+              href="/libro-de-reclamaciones"
+              className="inline-flex items-center gap-3 min-h-11 px-4 py-2 bg-white border-2 border-stone-800 rounded-lg text-stone-900 hover:border-rose-600 hover:text-rose-700 transition-colors"
+            >
+              <BookOpen size={28} aria-hidden="true" />
+              <span className="font-black text-sm uppercase tracking-wide leading-tight">Libro de{" "}<br />Reclamaciones</span>
+            </a>
           </div>
         </div>
       </footer>

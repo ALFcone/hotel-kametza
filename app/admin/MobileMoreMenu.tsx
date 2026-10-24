@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import { LayoutDashboard, BedDouble, ShoppingCart, Receipt, MoreHorizontal } from "lucide-react";
+import { LayoutDashboard, BedDouble, ShoppingCart, Receipt, BookOpen, MoreHorizontal } from "lucide-react";
 
 interface MobileMoreMenuProps {
   activeTab: string;
@@ -22,6 +22,7 @@ export default function MobileMoreMenu({ activeTab, dateFrom, dateTo }: MobileMo
     { tab: "inventario", label: "Inventario", icon: BedDouble },
     { tab: "almacen", label: "Almacén / Minibar", icon: ShoppingCart },
     { tab: "comprobantes", label: "Comprobantes SUNAT", icon: Receipt },
+    { tab: "reclamaciones", label: "Libro de Reclamaciones", icon: BookOpen },
   ];
 
   return (

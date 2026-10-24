@@ -1125,3 +1125,117 @@ export async function eliminarComprobante(id: number) {
   revalidatePath("/admin");
   return { success: true };
 }
+
+// ==============================================================================
+// 14. LIBRO DE RECLAMACIONES VIRTUAL
+// ==============================================================================
+// El público registra su hoja mediante la función registrar_reclamacion() de Supabase
+// (supabase/reclamaciones.sql); el personal la ve y anota la respuesta en el panel.
+
+const ERROR_TABLA_RECLAMACIONES = "Falta crear el Libro de Reclamaciones en Supabase (supabase/reclamaciones.sql).";
+
+export interface DatosReclamacion {
+  tipo: string;
+  consumidor_nombre: string;
+  consumidor_tipo_doc: string;
+  consumidor_num_doc: string;
+  consumidor_domicilio: string;
+  consumidor_telefono: string;
+  consumidor_email: string;
+  menor_de_edad: boolean;
+  apoderado_nombre: string;
+  bien_tipo: string;
+  bien_descripcion: string;
+  monto: string;
+  codigo_reserva: string;
+  detalle: string;
+  pedido: string;
+  sitio_web?: string; // campo trampa: lo llenan los robots, no las personas
+}
+
+const FORMATO_DOCUMENTO: Record<string, RegExp> = {
+  DNI: /^\d{8}$/,
+  RUC: /^\d{11}$/,
+  CE: /^[A-Z0-9]{6,12}$/,
+  PASAPORTE: /^[A-Z0-9]{6,12}$/,
+};
+
+export async function registrarReclamacion(datos: DatosReclamacion) {
+  // Un robot llenó el campo oculto: se responde como si nada para no darle pistas
+  if (datos.sitio_web) return { error: "No se pudo registrar la hoja. Inténtalo de nuevo." };
+
+  const texto = (v: string | undefined) => (v || "").trim();
+  const doc = texto(datos.consumidor_num_doc).toUpperCase();
+  const email = texto(datos.consumidor_email).toLowerCase();
+  const monto = texto(datos.monto);
+
+  if (datos.tipo !== "reclamo" && datos.tipo !== "queja") return { error: "Elige si es un reclamo o una queja." };
+  if (texto(datos.consumidor_nombre).length < 3) return { error: "Escribe tu nombre completo." };
+  if (!FORMATO_DOCUMENTO[datos.consumidor_tipo_doc]?.test(doc)) return { error: "Revisa el número de documento." };
+  if (texto(datos.consumidor_domicilio).length < 5) return { error: "Escribe tu domicilio." };
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Revisa el correo electrónico." };
+  if (datos.menor_de_edad && texto(datos.apoderado_nombre).length < 3) {
+    return { error: "Si eres menor de edad, escribe el nombre de tu padre o madre." };
+  }
+  if (datos.bien_tipo !== "producto" && datos.bien_tipo !== "servicio") return { error: "Elige producto o servicio." };
+  if (texto(datos.bien_descripcion).length < 3) return { error: "Describe el producto o servicio contratado." };
+  if (monto && !(Number(monto) >= 0)) return { error: "Revisa el monto reclamado." };
+  if (texto(datos.detalle).length < 10) return { error: "Cuéntanos con más detalle qué pasó." };
+  if (texto(datos.pedido).length < 3) return { error: "Escribe qué pides al hotel." };
+
+  const supabaseServer = await getSupabaseServer();
+  const { data, error } = await supabaseServer.rpc("registrar_reclamacion", {
+    datos: {
+      tipo: datos.tipo,
+      consumidor_nombre: texto(datos.consumidor_nombre),
+      consumidor_tipo_doc: datos.consumidor_tipo_doc,
+      consumidor_num_doc: doc,
+      consumidor_domicilio: texto(datos.consumidor_domicilio),
+      consumidor_telefono: texto(datos.consumidor_telefono),
+      consumidor_email: email,
+      menor_de_edad: !!datos.menor_de_edad,
+      apoderado_nombre: datos.menor_de_edad ? texto(datos.apoderado_nombre) : "",
+      bien_tipo: datos.bien_tipo,
+      bien_descripcion: texto(datos.bien_descripcion),
+      monto: monto ? Number(monto).toFixed(2) : "",
+      codigo_reserva: texto(datos.codigo_reserva),
+      detalle: texto(datos.detalle),
+      pedido: texto(datos.pedido),
+    },
+  });
+
+  const fila = Array.isArray(data) ? data[0] : data;
+  if (error || !fila) {
+    if (error?.code === "PGRST202" || error?.code === "42883") return { error: ERROR_TABLA_RECLAMACIONES };
+    if (error?.message?.includes("Demasiadas hojas")) return { error: error.message };
+    console.error("Error registrando reclamación:", error?.message);
+    return { error: "No se pudo registrar la hoja. Inténtalo de nuevo o escríbenos al correo del hotel." };
+  }
+
+  revalidatePath("/admin");
+  return { id: fila.id as number, created_at: fila.created_at as string };
+}
+
+export async function responderReclamacion(id: number, respuesta: string, fecha: string) {
+  const { user, role } = await getUserRole();
+  if (!user || !canOperate(role)) return { error: "No autorizado." };
+
+  const texto = respuesta.trim();
+  if (texto.length < 5) return { error: "Escribe la respuesta que se dio al consumidor." };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { error: "Elige la fecha en que se comunicó la respuesta." };
+
+  const supabaseServer = await getSupabaseServer();
+  const { data, error } = await supabaseServer
+    .from("reclamaciones")
+    .update({ respuesta: texto, fecha_respuesta: fecha, respondido_por: user.id })
+    .eq("id", id)
+    .select("id");
+
+  if (error || !data?.length) {
+    console.error("Error respondiendo reclamación:", error?.message);
+    return { error: "No se pudo guardar la respuesta." };
+  }
+
+  revalidatePath("/admin");
+  return { success: true };
+}

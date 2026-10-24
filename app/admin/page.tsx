@@ -19,10 +19,12 @@ import { AdminTableActions } from "./AdminTableActions";
 import AdminProducts from "./AdminProducts";
 import AdminStaffManagement from "./AdminStaffManagement";
 import AdminComprobantes from "./AdminComprobantes";
+import AdminReclamaciones from "./AdminReclamaciones";
 import MobileMoreMenu from "./MobileMoreMenu";
 import { type ComprobanteImpreso, COLUMNAS_COMPROBANTE, aComprobante } from "@/lib/cpe";
 import { ZONA_PERU, fechaCorta, fechaPeru, hoyPeru } from "@/lib/fecha-peru";
 import { codigoReserva, formaDePago } from "@/lib/reserva";
+import type { Reclamacion } from "@/lib/reclamaciones";
 import {
   Calendar,
   CheckCircle,
@@ -63,6 +65,7 @@ import {
   ChevronRight,
   Smartphone,
   Receipt,
+  BookOpen,
   Plus,
 } from "lucide-react";
 
@@ -174,8 +177,9 @@ export default async function AdminPage(props: {
   const needsProducts = activeTab === "historial" || activeTab === "almacen";
   const needsStaff = isOwner && activeTab === "personal";
   const needsComprobantes = activeTab === "historial" || activeTab === "comprobantes";
+  const needsReclamaciones = activeTab === "reclamaciones";
 
-  const [roomsRes, bookingsRes, extrasRes, productsRes, staffRes, comprobantesRes] = await Promise.all([
+  const [roomsRes, bookingsRes, extrasRes, productsRes, staffRes, comprobantesRes, reclamacionesRes] = await Promise.all([
     supabaseServer.from("rooms").select("*").order("id"),
     supabaseServer.from("bookings").select("*, clients(*)").order("created_at", { ascending: false }),
     supabaseServer.from("booking_extras").select("*").order("created_at", { ascending: false }),
@@ -187,6 +191,10 @@ export default async function AdminPage(props: {
     needsComprobantes
       ? supabaseServer.from("comprobantes").select(COLUMNAS_COMPROBANTE).order("created_at", { ascending: false })
       : Promise.resolve({ data: null }),
+    // Igual: sin la tabla (supabase/reclamaciones.sql) la lista sale vacía
+    needsReclamaciones
+      ? supabaseServer.from("reclamaciones").select("*").order("created_at", { ascending: false })
+      : Promise.resolve({ data: null }),
   ]);
 
   const rooms = roomsRes.data;
@@ -195,6 +203,7 @@ export default async function AdminPage(props: {
   const products = productsRes.data;
   const staffList: any[] = staffRes.data || [];
   const comprobantes = (comprobantesRes.data || []).map(aComprobante);
+  const reclamaciones = (reclamacionesRes.data || []) as Reclamacion[];
 
   // Mapear la nueva estructura relacional a la estructura plana original
   // para no romper la compatibilidad con el resto del panel y componentes.
@@ -543,6 +552,7 @@ export default async function AdminPage(props: {
               { tab: "inventario", label: "Inventario", Icon: BedDouble, ownerOnly: false },
               { tab: "almacen", label: "Almacén / Minibar", Icon: ShoppingCart, ownerOnly: false },
               { tab: "comprobantes", label: "Comprobantes SUNAT", Icon: Receipt, ownerOnly: false },
+              { tab: "reclamaciones", label: "Libro de Reclamaciones", Icon: BookOpen, ownerOnly: false },
             ]
               .filter((item) => !item.ownerOnly || isOwner)
               .map(({ tab, label, Icon }) => {
@@ -1833,6 +1843,13 @@ export default async function AdminPage(props: {
                 userRole={role}
                 comprobantes={comprobantesImpresos}
               />
+            </div>
+          )}
+
+          {/* --- TAB: LIBRO DE RECLAMACIONES (Indecopi) --- */}
+          {activeTab === "reclamaciones" && (
+            <div id="reclamaciones" className="scroll-mt-24 mb-12 animate-fade-in-up">
+              <AdminReclamaciones reclamaciones={reclamaciones} />
             </div>
           )}
 
