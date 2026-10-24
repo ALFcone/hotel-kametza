@@ -2076,7 +2076,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
       </main>
 
       {/* --- FOOTER PREMIUM --- */}
-      <footer className="bg-parchment border-t border-stone-200 pt-24 pb-12 text-sm relative z-10 w-full overflow-hidden">
+      <footer className="bg-parchment border-t border-stone-200 pt-24 pb-28 md:pb-12 text-sm relative z-10 w-full overflow-hidden">
         {/* Elemento decorativo del footer */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-rose-200/30 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-rose-500/5 rounded-full blur-[100px] pointer-events-none"></div>
@@ -2158,18 +2158,21 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <div>
               <p className="font-bold text-stone-800 text-xs">© {new Date().getFullYear()} Hotel Kametza. Todos los derechos reservados.</p>
               <p className="text-[10px] text-stone-700 mt-1">RUC: 10282984984</p>
-              <a href="/privacidad" className="inline-block mt-2 py-1 text-xs font-bold text-stone-700 underline underline-offset-2 hover:text-rose-600">
+            </div>
+            {/* md:pr-24 deja libre la esquina del botón flotante de WhatsApp */}
+            <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-x-4 gap-y-2 md:pr-24 shrink-0">
+              <a href="/privacidad" className="py-1 text-[11px] font-bold text-stone-600 underline underline-offset-2 hover:text-rose-600 whitespace-nowrap">
                 Política de privacidad
               </a>
+              {/* Aviso del Libro de Reclamaciones (Indecopi): libro abierto + la frase, enlazado a la hoja virtual */}
+              <a
+                href="/libro-de-reclamaciones"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-stone-700 rounded-md text-stone-800 hover:border-rose-600 hover:text-rose-700 transition-colors"
+              >
+                <BookOpen size={16} aria-hidden="true" />
+                <span className="font-black text-[10px] uppercase tracking-wide whitespace-nowrap">Libro de Reclamaciones</span>
+              </a>
             </div>
-            {/* Aviso del Libro de Reclamaciones (Indecopi): libro abierto + la frase, enlazado a la hoja virtual */}
-            <a
-              href="/libro-de-reclamaciones"
-              className="inline-flex items-center gap-3 min-h-11 px-4 py-2 bg-white border-2 border-stone-800 rounded-lg text-stone-900 hover:border-rose-600 hover:text-rose-700 transition-colors"
-            >
-              <BookOpen size={28} aria-hidden="true" />
-              <span className="font-black text-sm uppercase tracking-wide leading-tight">Libro de{" "}<br />Reclamaciones</span>
-            </a>
           </div>
         </div>
       </footer>
