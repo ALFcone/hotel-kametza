@@ -304,7 +304,7 @@ export function AdminTableActions({
     base_price: totalPrice, // Precio solo del alojamiento
     extras: extras, // Array de consumos adicionales
     customer_name: billingName || guestName,
-    customer_document: billingDocument || "No Registrado",
+    customer_document: billingDocument || undefined,
     customer_address: billingAddress || undefined,
     room_id: roomName,
     room_type: includeRoomType ? roomType : undefined,

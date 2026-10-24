@@ -151,6 +151,10 @@ function TicketInterno({ booking, bookingId, isCancelled, now }: { booking: any;
   const amountPaid = booking.amount_paid ?? total;
   const pendingBalance = Math.max(0, total - amountPaid);
 
+  // Mismo rótulo que la boleta: DNI (8 dígitos), RUC (11) u otro documento
+  const documento: string = booking.customer_document || "";
+  const etiquetaDoc = documento.length === 8 ? "DNI" : documento.length === 11 ? "RUC" : "DOC.";
+
   return (
     <>
       <div className="border-t border-b border-dashed border-black py-2 mb-4 text-center">
@@ -160,14 +164,13 @@ function TicketInterno({ booking, bookingId, isCancelled, now }: { booking: any;
         {isCancelled && <p className="font-bold mt-1">RESERVA ANULADA</p>}
       </div>
 
+      {/* Mismos datos y textos que la boleta de SUNAT */}
       <div className="mb-4 space-y-1">
         <p><strong>FECHA:</strong> {now.split(",")[0]}</p>
-        <p><strong>HORA:</strong> {now.split(",")[1] || ""}</p>
-        <p><strong>CLIENTE:</strong> {booking.customer_name || "CLIENTE GENERAL"}</p>
-        {booking.customer_document && <p><strong>DOC.:</strong> {booking.customer_document}</p>}
+        <p><strong>CLIENTE:</strong> {(booking.customer_name || "CLIENTE VARIOS").toUpperCase()}</p>
+        {documento && <p><strong>{etiquetaDoc}:</strong> {documento}</p>}
         {booking.customer_address && <p><strong>DIRECCIÓN:</strong> {booking.customer_address}</p>}
-        <p><strong>FORMA DE PAGO:</strong> {booking.payment_method || "CONTADO"}</p>
-        <p><strong>HABITACIÓN:</strong> {booking.room_id} {booking.room_type ? `(${booking.room_type})` : ""}</p>
+        <p><strong>FORMA DE PAGO:</strong> {booking.payment_method || "Efectivo"}</p>
       </div>
 
       <table className="w-full mb-4 text-[11px] table-fixed break-words">
@@ -183,7 +186,10 @@ function TicketInterno({ booking, bookingId, isCancelled, now }: { booking: any;
           <tr>
             <td className="py-2 align-top font-bold">{nights}</td>
             <td className="py-2">
-              <span className="font-bold uppercase">Servicio de Alojamiento</span>
+              <span className="font-bold uppercase">
+                Por servicio de hospedaje habitacion-{booking.room_id}
+                {booking.room_type ? ` (${booking.room_type})` : ""}
+              </span>
               <div className="text-[10px] mt-0.5 opacity-90 leading-tight">
                 {/* check_in/check_out son fechas sin hora (medianoche UTC): se muestran en UTC para no restar un día */}
                 Del {checkIn.toLocaleDateString("es-PE", { timeZone: "UTC" })} al {checkOut.toLocaleDateString("es-PE", { timeZone: "UTC" })}
@@ -194,10 +200,10 @@ function TicketInterno({ booking, bookingId, isCancelled, now }: { booking: any;
           </tr>
           {booking.extras?.map((extra: any, index: number) => (
             <tr key={`extra-${index}`}>
-              <td className="py-1 align-top">{extra.quantity}</td>
-              <td className="py-1">{extra.item_name}</td>
-              <td className="text-right py-1 align-top">{Number(extra.price).toFixed(2)}</td>
-              <td className="text-right py-1 align-top">{(extra.price * extra.quantity).toFixed(2)}</td>
+              <td className="py-2 align-top font-bold">{extra.quantity}</td>
+              <td className="py-2 font-bold uppercase">{extra.item_name}</td>
+              <td className="text-right py-2 align-top">{Number(extra.price).toFixed(2)}</td>
+              <td className="text-right py-2 align-top font-bold">{(extra.price * extra.quantity).toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
