@@ -1357,7 +1357,8 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
           <VideoFondo src="/video/huamanga.mp4" className="absolute inset-0 w-full h-full object-cover" />
           {/* OVERLAY OSCURECIDO PARA QUE EL TEXTO BLANCO RESALTE MÁS */}
           <div className="absolute inset-0 bg-[#3a0614]/40 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-900/40 to-parchment" />
+          {/* Termina oscuro, sin lavarse a crema: el corte con Habitaciones queda limpio */}
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-900/40 to-stone-950/75" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 w-full">
@@ -1508,9 +1509,23 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <div className="w-1.5 h-3 bg-white rounded-full"></div>
           </a>
         </div>
-
-        {/* Crédito que exige la licencia CC BY-SA 4.0 de la foto de fondo */}
-        <p className="absolute bottom-2 right-3 z-20 text-[10px] text-stone-500">
+      </section>
+      {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
+      <section id="habitaciones" className="min-h-screen flex flex-col justify-center py-24 relative z-10 w-full overflow-hidden">
+        {/* Fondo suave: la Plaza Mayor con poco contraste, fundida con el crema de arriba y abajo */}
+        {/* Franja de una pantalla de alto (no toda la sección) para que la foto no se agrande hasta mostrar solo cielo */}
+        <div className="absolute inset-x-0 top-0 h-screen -z-10" aria-hidden="true">
+          <Image
+            src="/plaza-ayacucho.jpg"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover object-[center_45%] opacity-60 saturate-[0.85]"
+          />
+          {/* Velo claro detrás del título y fundido abajo hacia el fondo de la sección */}
+          <div className="absolute inset-0 bg-gradient-to-b from-parchment/75 via-parchment/20 via-35% to-parchment" />
+        </div>
+        <p className="absolute bottom-2 right-3 text-[10px] text-stone-500">
           Foto:{" "}
           <a href="https://commons.wikimedia.org/wiki/File:PLAZA_MAYOR_DE_AYACUCHO.jpg" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">
             Pollinhhsano
@@ -1520,15 +1535,12 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             CC BY-SA 4.0
           </a>
         </p>
-      </section>
-      {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
-      <section id="habitaciones" className="min-h-screen flex flex-col justify-center py-24 relative z-10 w-full">
         <div className="w-full px-4 md:px-8 xl:px-12">
           <div className="text-center mb-16 scroll-reveal">
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-rose-950">
               Nuestras Habitaciones
             </h2>
-            <p className="text-stone-500 mt-4 text-lg">
+            <p className="text-stone-700 font-medium mt-4 text-lg">
               Espacios diseñados para tu máximo descanso
             </p>
           </div>
