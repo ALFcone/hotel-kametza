@@ -1,7 +1,6 @@
 import React from "react";
 import QRCode from "react-qr-code";
 import { HOTEL_RUC } from "@/lib/site";
-import { ZONA_PERU } from "@/lib/fecha-peru";
 import { codigoReserva } from "@/lib/reserva";
 import {
   type Comprobante,
@@ -11,13 +10,12 @@ import {
   qrComprobante,
 } from "@/lib/cpe";
 
+// Representación impresa de una boleta o factura de SUNAT registrada con su XML.
+// Solo se imprime este documento: el hotel no entrega tickets internos.
 interface ThermalTicketProps {
-  booking: any;
+  booking: any; // datos de la reserva que no trae el XML (forma de pago, estancia, dirección)
   bookingId: number;
-  isCancelled?: boolean;
-  // Con un comprobante registrado (XML de SUNAT) se imprime su representación impresa;
-  // sin él, un comprobante interno que no se presenta como boleta ni factura.
-  comprobante?: Comprobante | null;
+  comprobante: Comprobante;
 }
 
 const fechaPeru = (iso: string) => {
@@ -25,10 +23,7 @@ const fechaPeru = (iso: string) => {
   return `${d}/${m}/${y}`;
 };
 
-export default function ThermalTicket({ booking, bookingId, isCancelled = false, comprobante }: ThermalTicketProps) {
-  if (!booking) return null;
-
-  const now = new Date().toLocaleString("es-PE", { timeZone: ZONA_PERU });
+export default function ThermalTicket({ booking, bookingId, comprobante }: ThermalTicketProps) {
 
   return (
     <div id="print-section" className="thermal-ticket hidden print:block text-black bg-white p-4 font-mono text-[11px] w-[302px] mx-auto absolute top-0 left-0 z-[99999] h-screen">
@@ -42,22 +37,18 @@ export default function ThermalTicket({ booking, bookingId, isCancelled = false,
         <p>Jr. Las Américas #154, Ayacucho</p>
       </div>
 
-      {comprobante ? (
-        <TicketOficial booking={booking} bookingId={bookingId} comprobante={comprobante} />
-      ) : (
-        <TicketInterno booking={booking} bookingId={bookingId} isCancelled={isCancelled} now={now} />
-      )}
+      <TicketOficial booking={booking} bookingId={bookingId} comprobante={comprobante} />
     </div>
   );
 }
 
-// Misma estructura que el ticket interno; los datos fiscales (cliente, ítems, IGV, total) salen del XML de SUNAT.
+// Los datos fiscales (cliente, ítems, IGV, total) salen del XML de SUNAT.
 function TicketOficial({ booking, bookingId, comprobante: c }: { booking: any; bookingId: number; comprobante: Comprobante }) {
   const nombre = NOMBRE_COMPROBANTE[c.tipo];
   const etiquetaDoc = (c.cliente_tipo_doc && NOMBRE_DOC_IDENTIDAD[c.cliente_tipo_doc]) || "DOC.";
   const moneda = c.moneda === "PEN" ? "S/" : c.moneda;
 
-  // Las fechas de la estancia van bajo el ítem de hospedaje, como en el ticket interno
+  // Las fechas de la estancia van bajo el ítem de hospedaje
   const estancia = booking.check_in && booking.check_out
     ? `Del ${fechaPeru(booking.check_in)} al ${fechaPeru(booking.check_out)}`
     : null;
@@ -136,99 +127,6 @@ function TicketOficial({ booking, bookingId, comprobante: c }: { booking: any; b
           Representación impresa de la {nombre.toLowerCase()}.<br />
           Consulte su validez en www.sunat.gob.pe
         </p>
-      </div>
-    </>
-  );
-}
-
-function TicketInterno({ booking, bookingId, isCancelled, now }: { booking: any; bookingId: number; isCancelled: boolean; now: string }) {
-  const checkIn = new Date(booking.check_in);
-  const checkOut = new Date(booking.check_out);
-  const nights = Math.ceil(Math.abs(checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)) || 1;
-
-  const total = booking.total_price || 0;
-  const roomTotal = booking.base_price ?? total;
-  const amountPaid = booking.amount_paid ?? total;
-  const pendingBalance = Math.max(0, total - amountPaid);
-
-  // Mismo rótulo que la boleta: DNI (8 dígitos), RUC (11) u otro documento
-  const documento: string = booking.customer_document || "";
-  const etiquetaDoc = documento.length === 8 ? "DNI" : documento.length === 11 ? "RUC" : "DOC.";
-
-  return (
-    <>
-      <div className="border-t border-b border-dashed border-black py-2 mb-4 text-center">
-        <h2 className="font-bold text-base">COMPROBANTE INTERNO DE PAGO</h2>
-        <p className="text-[10px] mt-1">NO VÁLIDO COMO BOLETA NI FACTURA</p>
-        <p className="text-sm font-bold tracking-widest mt-1">RESERVA {codigoReserva(bookingId)}</p>
-        {isCancelled && <p className="font-bold mt-1">RESERVA ANULADA</p>}
-      </div>
-
-      {/* Mismos datos y textos que la boleta de SUNAT */}
-      <div className="mb-4 space-y-1">
-        <p><strong>FECHA:</strong> {now.split(",")[0]}</p>
-        <p><strong>CLIENTE:</strong> {(booking.customer_name || "CLIENTE VARIOS").toUpperCase()}</p>
-        {documento && <p><strong>{etiquetaDoc}:</strong> {documento}</p>}
-        {booking.customer_address && <p><strong>DIRECCIÓN:</strong> {booking.customer_address}</p>}
-        <p><strong>FORMA DE PAGO:</strong> {booking.payment_method || "Efectivo"}</p>
-      </div>
-
-      <table className="w-full mb-4 text-[11px] table-fixed break-words">
-        <thead>
-          <tr className="border-b border-dashed border-black">
-            <th className="text-left py-1 w-8">CANT</th>
-            <th className="text-left py-1 w-auto">DESCRIPCIÓN</th>
-            <th className="text-right py-1 w-12">P.UNIT</th>
-            <th className="text-right py-1 w-12">TOTAL</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="py-2 align-top font-bold">{nights}</td>
-            <td className="py-2">
-              <span className="font-bold uppercase">
-                Por servicio de hospedaje habitacion-{booking.room_id}
-                {booking.room_type ? ` (${booking.room_type})` : ""}
-              </span>
-              <div className="text-[10px] mt-0.5 opacity-90 leading-tight">
-                {/* check_in/check_out son fechas sin hora (medianoche UTC): se muestran en UTC para no restar un día */}
-                Del {checkIn.toLocaleDateString("es-PE", { timeZone: "UTC" })} al {checkOut.toLocaleDateString("es-PE", { timeZone: "UTC" })}
-              </div>
-            </td>
-            <td className="text-right py-2 align-top">{(roomTotal / nights).toFixed(2)}</td>
-            <td className="text-right py-2 align-top font-bold">{Number(roomTotal).toFixed(2)}</td>
-          </tr>
-          {booking.extras?.map((extra: any, index: number) => (
-            <tr key={`extra-${index}`}>
-              <td className="py-2 align-top font-bold">{extra.quantity}</td>
-              <td className="py-2 font-bold uppercase">{extra.item_name}</td>
-              <td className="text-right py-2 align-top">{Number(extra.price).toFixed(2)}</td>
-              <td className="text-right py-2 align-top font-bold">{(extra.price * extra.quantity).toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div className="border-t border-dashed border-black pt-3 mb-4 space-y-1">
-        <div className="flex justify-between font-bold text-sm">
-          <span>IMPORTE TOTAL:</span>
-          <span>S/ {Number(total).toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between mt-1">
-          <span>MONTO PAGADO:</span>
-          <span>S/ {Number(amountPaid).toFixed(2)}</span>
-        </div>
-        {pendingBalance > 0.009 && (
-          <div className="flex justify-between font-bold">
-            <span>SALDO PENDIENTE:</span>
-            <span>S/ {pendingBalance.toFixed(2)}</span>
-          </div>
-        )}
-      </div>
-
-      <div className="text-center mt-4">
-        <p className="font-bold text-sm">¡GRACIAS POR SU PREFERENCIA!</p>
-        <p className="mt-2 text-[10px] leading-tight">Solicite su boleta o factura electrónica en recepción.</p>
       </div>
     </>
   );

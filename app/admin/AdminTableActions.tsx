@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useDialog } from "../useDialog";
 import { CheckCircle, X, DollarSign, Edit3, Calendar, ShoppingCart, Trash2, MessageCircle, Printer, FileWarning } from "lucide-react";
-import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, fetchRucData, fetchDniData, cancelBooking } from "@/app/actions";
+import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteBookingExtra, cancelBooking } from "@/app/actions";
 import ThermalTicket from "./ThermalTicket";
 import Link from "next/link";
 import { type Comprobante, NOMBRE_COMPROBANTE, numeroComprobante } from "@/lib/cpe";
@@ -29,9 +29,7 @@ interface AdminTableActionsProps {
   extras?: any[];
   guestName: string;
   roomName: string;
-  roomType?: string;
   guestPhone?: string;
-  guestDocument?: string;
   paymentMethod?: string;
   onDelete: (formData: FormData) => void;
   products?: any[];
@@ -51,9 +49,7 @@ export function AdminTableActions({
   extras = [],
   guestName,
   roomName,
-  roomType,
   guestPhone,
-  guestDocument,
   paymentMethod,
   onDelete,
   products = [],
@@ -81,66 +77,13 @@ export function AdminTableActions({
   
   // Facturación States
   const [isPrinting, setIsPrinting] = useState(false);
-  // null = ticket interno; con un comprobante = representación impresa del XML de SUNAT
+  // Boleta o factura de SUNAT que se está imprimiendo
   const [ticketComprobante, setTicketComprobante] = useState<Comprobante | null>(null);
-  const [billingDocument, setBillingDocument] = useState("");
-  const [billingName, setBillingName] = useState("");
-  const [billingAddress, setBillingAddress] = useState("");
-  const [includeRoomType, setIncludeRoomType] = useState(false);
-  const [isFetchingRuc, setIsFetchingRuc] = useState(false);
-  const [billingPaymentMethod, setBillingPaymentMethod] = useState("Efectivo");
-  const [billingAmountPaid, setBillingAmountPaid] = useState("0");
   const paymentDialogRef = useDialog(isPaymentModalOpen, () => setIsPaymentModalOpen(false), !loading);
   const editDialogRef = useDialog(isEditModalOpen, () => setIsEditModalOpen(false), !loading);
   const extrasDialogRef = useDialog(isExtrasModalOpen, () => setIsExtrasModalOpen(false), !loading);
   const billingDialogRef = useDialog(isBillingModalOpen, () => setIsBillingModalOpen(false));
 
-  const handleFetchDocument = async () => {
-    const esRuc = billingDocument.length === 11;
-    if (!esRuc && billingDocument.length !== 8) {
-      alert("Ingresa un DNI de 8 dígitos o un RUC de 11");
-      return;
-    }
-
-    setIsFetchingRuc(true);
-    try {
-      const result = esRuc
-        ? await fetchRucData(billingDocument)
-        : await fetchDniData(billingDocument);
-
-      if (esRuc && result.data && result.data.nombre) {
-        setBillingName(result.data.nombre);
-        if (result.data.direccion) {
-          const fullAddress = [
-            result.data.direccion,
-            result.data.distrito,
-            result.data.provincia,
-            result.data.departamento
-          ].filter(Boolean).join(" - ");
-          setBillingAddress(fullAddress);
-        } else {
-          setBillingAddress("");
-        }
-      } else if (!esRuc && result.data) {
-        // Algunas APIs devuelven "nombre", otras devuelven "nombres", "apellidoPaterno", etc.
-        if (result.data.nombre) {
-          setBillingName(result.data.nombre);
-        } else if (result.data.nombres) {
-          setBillingName(`${result.data.nombres} ${result.data.apellidoPaterno || ""} ${result.data.apellidoMaterno || ""}`.trim());
-        } else {
-          alert("DNI no encontrado o inválido.");
-        }
-        setBillingAddress(""); // Usualmente DNI no devuelve dirección
-      } else {
-        alert(result.error || `${esRuc ? "RUC" : "DNI"} no encontrado o inválido.`);
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Error conectando con el servidor. Inténtalo de nuevo.");
-    }
-    setIsFetchingRuc(false);
-  };
-  
   const extrasTotal = extras.reduce((sum, e) => sum + (e.price * e.quantity), 0);
   const grandTotal = totalPrice + extrasTotal;
 
@@ -297,37 +240,19 @@ export function AdminTableActions({
     window.open(url, '_blank');
   };
 
-  const mockBookingForTicket = {
+  // Datos de la reserva que la boleta no trae en su XML
+  const bookingForTicket = {
     check_in: checkIn,
     check_out: checkOut,
-    total_price: grandTotal, // Incluye extras
-    base_price: totalPrice, // Precio solo del alojamiento
-    extras: extras, // Array de consumos adicionales
-    customer_name: billingName || guestName,
-    customer_document: billingDocument || undefined,
-    customer_address: billingAddress || undefined,
-    room_id: roomName,
-    room_type: includeRoomType ? roomType : undefined,
-    payment_method: billingPaymentMethod,
-    amount_paid: Number(billingAmountPaid) || 0,
-  };
-
-  const handleOpenBilling = () => {
-    // Valores por defecto al abrir (todos editables antes de imprimir)
-    setBillingDocument(guestDocument || "");
-    setBillingName(guestName);
-    setBillingPaymentMethod(formaDePago(paymentMethod));
-    setBillingAmountPaid((isFullyPaid ? grandTotal : effectiveAmountPaid).toFixed(2));
-    setIsBillingModalOpen(true);
+    payment_method: formaDePago(paymentMethod),
   };
 
   return (
     <>
-      {mounted && isPrinting && createPortal(
+      {mounted && isPrinting && ticketComprobante && createPortal(
         <ThermalTicket
-          booking={mockBookingForTicket}
+          booking={bookingForTicket}
           bookingId={bookingId}
-          isCancelled={isCancelled}
           comprobante={ticketComprobante}
         />,
         document.body
@@ -337,7 +262,7 @@ export function AdminTableActions({
         {/* === GRUPO DE ACCIONES SEGURAS === */}
         <div className="flex items-center gap-1.5 bg-white p-1.5 rounded-2xl border border-stone-200 shadow-sm">
           <button
-            onClick={handleOpenBilling}
+            onClick={() => setIsBillingModalOpen(true)}
             className={`group relative flex items-center justify-center w-11 h-11 md:w-8 md:h-8 rounded-xl transition-all hover:-translate-y-0.5 ${
               isCancelled 
                 ? "bg-rose-50 text-rose-500 hover:bg-rose-100 hover:text-rose-700" 
@@ -837,124 +762,6 @@ export function AdminTableActions({
                   </p>
                 )}
               </div>
-
-            <h3 className="text-[10px] font-black uppercase text-stone-500 mb-2 tracking-wider">
-              Ticket interno (no es boleta ni factura)
-            </h3>
-            <div className="space-y-3 mb-2">
-              <div>
-                <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
-                  DNI o RUC del cliente
-                </label>
-                <div className="flex gap-2">
-                  <input aria-label="DNI o RUC del cliente"
-                    type="text"
-                    inputMode="numeric"
-                    value={billingDocument}
-                    onChange={(e) => setBillingDocument(e.target.value.replace(/\D/g, ''))}
-                    maxLength={11}
-                    placeholder="DNI (8) o RUC (11)"
-                    className="flex-1 border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold"
-                  />
-                  <button
-                    onClick={handleFetchDocument}
-                    disabled={isFetchingRuc || (billingDocument.length !== 8 && billingDocument.length !== 11)}
-                    className="px-3 bg-zinc-800 text-white rounded-lg text-xs font-bold disabled:opacity-50"
-                  >
-                    {isFetchingRuc ? "..." : "Buscar"}
-                  </button>
-                </div>
-              </div>
-              <div>
-                <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
-                  Nombre o razón social
-                </label>
-                <input aria-label="Nombre o razón social"
-                  type="text"
-                  value={billingName}
-                  onChange={(e) => setBillingName(e.target.value.toUpperCase())}
-                  placeholder="Nombres completos"
-                  className="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold uppercase"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
-                  Dirección (Opcional)
-                </label>
-                <input aria-label="Dirección (opcional)"
-                  type="text"
-                  value={billingAddress}
-                  onChange={(e) => setBillingAddress(e.target.value.toUpperCase())}
-                  placeholder="Ej. Av. Principal 123"
-                  className="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold uppercase"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
-                    Forma de Pago
-                  </label>
-                  <select aria-label="Forma de pago"
-                    value={billingPaymentMethod}
-                    onChange={(e) => setBillingPaymentMethod(e.target.value)}
-                    className="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold bg-white"
-                  >
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Yape / Plin">Yape / Plin</option>
-                    <option value="Tarjeta / Online">Tarjeta / Online</option>
-                    <option value="Transferencia">Transferencia</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-stone-500 mb-1">
-                    Monto Pagado (S/)
-                  </label>
-                  <input aria-label="Monto pagado (S/)"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max={grandTotal}
-                    value={billingAmountPaid}
-                    onChange={(e) => setBillingAmountPaid(e.target.value)}
-                    className="w-full border border-stone-200 rounded-lg px-3 py-1.5 text-sm font-bold"
-                  />
-                </div>
-              </div>
-              <p className={`text-[10px] font-bold uppercase tracking-wide -mt-1 ${
-                (grandTotal - Number(billingAmountPaid || 0)) > 0.009 ? "text-rose-600" : "text-emerald-700"
-              }`}>
-                {(grandTotal - Number(billingAmountPaid || 0)) > 0.009
-                  ? `Saldo pendiente en el comprobante: S/ ${(grandTotal - Number(billingAmountPaid || 0)).toFixed(2)}`
-                  : "Se imprimirá como pagado en su totalidad"}
-              </p>
-
-              <div className="flex items-center gap-2 mt-2 pb-1">
-                <input
-                  type="checkbox"
-                  id="includeRoomType"
-                  checked={includeRoomType}
-                  onChange={(e) => setIncludeRoomType(e.target.checked)}
-                  className="w-4 h-4 text-stone-900 bg-stone-100 border-stone-300 rounded focus:ring-stone-900"
-                />
-                <label htmlFor="includeRoomType" className="text-xs font-bold text-stone-600 cursor-pointer select-none">
-                  Incluir tipo de habitación (Ej. Matrimonial)
-                </label>
-              </div>
-            </div>
-            </div>
-
-            <div className="pt-2 shrink-0 mt-2 border-t border-stone-100">
-              <button
-                onClick={() => {
-                  setTicketComprobante(null);
-                  setIsBillingModalOpen(false);
-                  setIsPrinting(true);
-                }}
-                className="w-full py-2.5 bg-stone-900 text-white rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-stone-800 transition shadow-lg shadow-stone-900/20"
-              >
-                Imprimir ticket interno
-              </button>
             </div>
           </div>
         </div>,
