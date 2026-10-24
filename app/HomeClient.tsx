@@ -1146,7 +1146,8 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
       <nav aria-label="Principal" className="fixed top-0 w-full bg-white z-[100] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-b border-stone-100 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24 md:h-32">
-            <div className="flex-shrink-0 z-[110]">
+            {/* El logo se agranda con scale (el PNG trae mucho margen): el ancho fijo reserva ese espacio para que no tape el menú */}
+            <div className="flex-shrink-0 z-[110] w-[120px] md:w-[180px]">
               <a href="#inicio" onClick={closeMenu}>
                 <img
                   src="/logoo.png"
@@ -1157,7 +1158,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             </div>
 
             {/* --- MENÚ DE NAVEGACIÓN PROFESIONAL (ICONOS CON COLOR DE MARCA) --- */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden lg:flex items-center xl:gap-1">
               {[
                 { name: "Inicio", href: "#inicio", icon: HomeIcon },
                 { name: "Habitaciones", href: "#habitaciones", icon: Bed },
@@ -1168,11 +1169,11 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="group relative px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-600 hover:text-rose-500 transition-colors duration-300"
+                  className="group relative px-2.5 xl:px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-stone-600 whitespace-nowrap hover:text-rose-500 transition-colors duration-300"
                 >
                   <item.icon
                     size={16}
-                    className="text-rose-500 group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 drop-shadow-sm"
+                    className="hidden xl:block text-rose-500 group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 drop-shadow-sm"
                   />
                   {item.name}
                   <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-rose-500 -translate-x-1/2 transition-all duration-300 group-hover:w-1/2 rounded-full"></span>
@@ -1180,9 +1181,9 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               ))}
             </div>
 
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-3 xl:gap-4 flex-shrink-0">
               {currentUser ? (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 xl:gap-4">
                   {isStaff && (
                     <a
                       href="/admin"
@@ -1199,7 +1200,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                     <div className="p-1.5 rounded-full border border-stone-200 group-hover:border-rose-500 transition-colors">
                       <User size={16} strokeWidth={1.5} />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-widest">
+                    <span className="hidden xl:inline max-w-[10rem] truncate text-xs font-bold uppercase tracking-widest">
                       {userName}
                     </span>
                   </a>
@@ -1216,7 +1217,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                 /* BOTÓN ACCEDER ESTILO CÁPSULA */
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="group flex items-center gap-2 bg-stone-50 border border-stone-200 hover:border-rose-500/30 hover:bg-rose-50 text-stone-600 hover:text-rose-500 px-5 py-2.5 rounded-full transition-all duration-300 text-[11px] font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
+                  className="group flex items-center gap-2 bg-stone-50 border border-stone-200 hover:border-rose-500/30 hover:bg-rose-50 text-stone-600 hover:text-rose-500 px-4 xl:px-5 py-2.5 rounded-full whitespace-nowrap transition-all duration-300 text-[11px] font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
                 >
                   <div className="bg-white p-1 rounded-full group-hover:scale-110 transition-transform">
                     <LogIn size={14} className="text-rose-500" />
@@ -1226,7 +1227,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               )}
               <a
                 href="#habitaciones"
-                className="btn-shimmer bg-rose-500 text-white px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-rose-900/40 transform hover:-translate-y-0.5"
+                className="btn-shimmer bg-rose-500 text-white px-5 xl:px-7 py-3 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg hover:shadow-rose-900/40 transform hover:-translate-y-0.5"
               >
                 Reservar
               </a>
@@ -1235,7 +1236,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={isMenuOpen}
-              className="md:hidden z-[110] p-2 text-rose-900"
+              className="lg:hidden z-[110] p-2 text-rose-900"
             >
               {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
             </button>
@@ -1245,7 +1246,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
         {/* --- MENÚ MÓVIL --- */}
         <div
           className={`fixed inset-0 bg-white z-[105] flex flex-col justify-center items-center transition-all duration-300 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
-            } md:hidden`}
+            } lg:hidden`}
         >
           <div className="flex flex-col space-y-8 text-center items-center">
             <a
