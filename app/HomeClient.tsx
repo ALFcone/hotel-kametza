@@ -337,6 +337,15 @@ function AuthModal({
                 ? "Ingresar y Reservar"
                 : "Crear Cuenta"}
           </button>
+          {!isLogin && (
+            <p className="text-[11px] text-stone-500 text-center leading-snug">
+              Al crear tu cuenta tratamos tus datos según nuestra{" "}
+              <a href="/privacidad" target="_blank" className="font-bold underline underline-offset-2 hover:text-rose-900">
+                Política de privacidad
+              </a>
+              .
+            </p>
+          )}
         </form>
 
         <div className="mt-6 text-center text-xs text-stone-500">
@@ -773,6 +782,12 @@ function BookingModal({
                 </>
               )}
             </button>
+            <p className="text-[11px] text-stone-500 text-center leading-snug">
+              Usamos tus datos solo para gestionar tu reserva.{" "}
+              <a href="/privacidad" target="_blank" className="font-bold underline underline-offset-2 hover:text-rose-600">
+                Política de privacidad
+              </a>
+            </p>
           </form>
         </div>
       </div>
@@ -2125,6 +2140,9 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <div>
               <p className="font-bold text-stone-800 text-xs">© {new Date().getFullYear()} Hotel Kametza. Todos los derechos reservados.</p>
               <p className="text-[10px] text-stone-700 mt-1">RUC: 10282984984</p>
+              <a href="/privacidad" className="inline-block mt-2 py-1 text-xs font-bold text-stone-700 underline underline-offset-2 hover:text-rose-600">
+                Política de privacidad
+              </a>
             </div>
             {/* Aviso del Libro de Reclamaciones (Indecopi): libro abierto + la frase, enlazado a la hoja virtual */}
             <a

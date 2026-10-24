@@ -278,7 +278,11 @@ export default function FormularioReclamacion() {
         </button>
         <p className="text-xs text-stone-600 max-w-md">
           La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo
-          para interponer una denuncia ante el Indecopi.
+          para interponer una denuncia ante el Indecopi. Usamos tus datos solo para atender esta hoja (
+          <a href="/privacidad" target="_blank" className="font-bold underline underline-offset-2 hover:text-rose-700">
+            Política de privacidad
+          </a>
+          ).
         </p>
       </div>
     </form>

@@ -322,6 +322,15 @@ export default function LoginPage() {
               </>
             )}
           </button>
+          {!isLogin && (
+            <p className="text-[11px] text-stone-500 text-center leading-snug">
+              Al crear tu cuenta tratamos tus datos según nuestra{" "}
+              <Link href="/privacidad" target="_blank" className="font-bold underline underline-offset-2 hover:text-rose-600">
+                Política de privacidad
+              </Link>
+              .
+            </p>
+          )}
         </form>
 
         {/* Enlace para cambiar entre Login y Registro */}
