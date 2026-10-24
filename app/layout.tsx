@@ -9,6 +9,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -25,7 +26,7 @@ const title = "Hotel Kametza | Ayacucho";
 const description = "Un refugio donde la historia colonial se encuentra con el confort contemporáneo.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kametzahotel.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title,
   description,
   openGraph: {
