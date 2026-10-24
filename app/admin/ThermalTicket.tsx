@@ -2,6 +2,7 @@ import React from "react";
 import QRCode from "react-qr-code";
 import { HOTEL_RUC } from "@/lib/site";
 import { ZONA_PERU } from "@/lib/fecha-peru";
+import { codigoReserva } from "@/lib/reserva";
 import {
   type Comprobante,
   NOMBRE_COMPROBANTE,
@@ -42,7 +43,7 @@ export default function ThermalTicket({ booking, bookingId, isCancelled = false,
       </div>
 
       {comprobante ? (
-        <TicketOficial booking={booking} comprobante={comprobante} />
+        <TicketOficial booking={booking} bookingId={bookingId} comprobante={comprobante} />
       ) : (
         <TicketInterno booking={booking} bookingId={bookingId} isCancelled={isCancelled} now={now} />
       )}
@@ -50,24 +51,33 @@ export default function ThermalTicket({ booking, bookingId, isCancelled = false,
   );
 }
 
-function TicketOficial({ booking, comprobante: c }: { booking: any; comprobante: Comprobante }) {
+// Misma estructura que el ticket interno; los datos fiscales (cliente, ítems, IGV, total) salen del XML de SUNAT.
+function TicketOficial({ booking, bookingId, comprobante: c }: { booking: any; bookingId: number; comprobante: Comprobante }) {
   const nombre = NOMBRE_COMPROBANTE[c.tipo];
-  const etiquetaDoc = (c.cliente_tipo_doc && NOMBRE_DOC_IDENTIDAD[c.cliente_tipo_doc]) || "DOC";
+  const etiquetaDoc = (c.cliente_tipo_doc && NOMBRE_DOC_IDENTIDAD[c.cliente_tipo_doc]) || "DOC.";
   const moneda = c.moneda === "PEN" ? "S/" : c.moneda;
+
+  // Las fechas de la estancia van bajo el ítem de hospedaje, como en el ticket interno
+  const estancia = booking.check_in && booking.check_out
+    ? `Del ${fechaPeru(booking.check_in)} al ${fechaPeru(booking.check_out)}`
+    : null;
+  const itemEstancia = Math.max(0, c.items.findIndex((i) => /hosped|aloja|habitac/i.test(i.descripcion)));
 
   return (
     <>
       <div className="border-t border-b border-dashed border-black py-2 mb-4 text-center">
         <h2 className="font-bold text-base">{nombre}</h2>
         <p className="text-sm font-bold tracking-widest mt-1">{numeroComprobante(c)}</p>
+        {bookingId > 0 && <p className="text-[10px] mt-1">RESERVA {codigoReserva(bookingId)}</p>}
       </div>
 
       <div className="mb-4 space-y-1">
-        <p><strong>FECHA EMISIÓN:</strong> {fechaPeru(c.fecha_emision)}</p>
+        <p><strong>FECHA:</strong> {fechaPeru(c.fecha_emision)}</p>
         <p><strong>CLIENTE:</strong> {c.cliente_nombre || "CLIENTE VARIOS"}</p>
         {c.cliente_num_doc && <p><strong>{etiquetaDoc}:</strong> {c.cliente_num_doc}</p>}
-        <p><strong>MONEDA:</strong> {c.moneda === "PEN" ? "SOLES (PEN)" : c.moneda}</p>
-        {booking.room_id && <p><strong>HABITACIÓN:</strong> {booking.room_id}</p>}
+        {booking.customer_address && <p><strong>DIRECCIÓN:</strong> {booking.customer_address}</p>}
+        {/* Sin línea de habitación: el número ya viene en la descripción del XML */}
+        {booking.payment_method && <p><strong>FORMA DE PAGO:</strong> {booking.payment_method}</p>}
       </div>
 
       <table className="w-full mb-4 text-[11px] table-fixed break-words">
@@ -82,10 +92,15 @@ function TicketOficial({ booking, comprobante: c }: { booking: any; comprobante:
         <tbody>
           {c.items.map((item, index) => (
             <tr key={index}>
-              <td className="py-1 align-top">{item.cantidad}</td>
-              <td className="py-1 uppercase">{item.descripcion}</td>
-              <td className="text-right py-1 align-top">{item.precioUnitario.toFixed(2)}</td>
-              <td className="text-right py-1 align-top">{item.total.toFixed(2)}</td>
+              <td className="py-2 align-top font-bold">{item.cantidad}</td>
+              <td className="py-2">
+                <span className="font-bold uppercase">{item.descripcion}</span>
+                {index === itemEstancia && estancia && (
+                  <div className="text-[10px] mt-0.5 opacity-90 leading-tight">{estancia}</div>
+                )}
+              </td>
+              <td className="text-right py-2 align-top">{item.precioUnitario.toFixed(2)}</td>
+              <td className="text-right py-2 align-top font-bold">{item.total.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
@@ -102,7 +117,7 @@ function TicketOficial({ booking, comprobante: c }: { booking: any; comprobante:
           <span>IGV:</span>
           <span>{moneda} {Number(c.igv).toFixed(2)}</span>
         </div>
-        <div className="flex justify-between font-bold text-sm mt-2 border-t border-black pt-1">
+        <div className="flex justify-between font-bold text-sm mt-1">
           <span>IMPORTE TOTAL:</span>
           <span>{moneda} {Number(c.total).toFixed(2)}</span>
         </div>
@@ -141,7 +156,7 @@ function TicketInterno({ booking, bookingId, isCancelled, now }: { booking: any;
       <div className="border-t border-b border-dashed border-black py-2 mb-4 text-center">
         <h2 className="font-bold text-base">COMPROBANTE INTERNO DE PAGO</h2>
         <p className="text-[10px] mt-1">NO VÁLIDO COMO BOLETA NI FACTURA</p>
-        <p className="text-sm font-bold tracking-widest mt-1">RESERVA N.° {bookingId.toString().padStart(6, "0")}</p>
+        <p className="text-sm font-bold tracking-widest mt-1">RESERVA {codigoReserva(bookingId)}</p>
         {isCancelled && <p className="font-bold mt-1">RESERVA ANULADA</p>}
       </div>
 

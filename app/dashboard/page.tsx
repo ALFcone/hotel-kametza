@@ -14,6 +14,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { cancelBooking } from "../actions";
 import { HORA_CHECK_IN, hoyPeru } from "@/lib/fecha-peru";
+import { codigoReserva } from "@/lib/reserva";
 import { useDialog } from "../useDialog";
 import {
   CalendarDays,
@@ -772,10 +773,7 @@ export default function Dashboard() {
                                 {booking.rooms?.name || "Habitación"}
                               </h3>
                               <p className="text-stone-500 text-[10px] font-bold uppercase tracking-[0.2em]">
-                                TICKET: RES-
-                                {(booking.id + 100)
-                                  .toString()
-                                  .padStart(5, "0")}
+                                TICKET: {codigoReserva(booking.id)}
                               </p>
                             </div>
                             {/* Status Badge */}

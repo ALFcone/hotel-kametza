@@ -14,6 +14,7 @@ import { adminRegisterPayment, adminUpdateBookingDates, addBookingExtra, deleteB
 import ThermalTicket from "./ThermalTicket";
 import Link from "next/link";
 import { type Comprobante, NOMBRE_COMPROBANTE, numeroComprobante } from "@/lib/cpe";
+import { codigoReserva, formaDePago } from "@/lib/reserva";
 import Swal from "sweetalert2";
 import { BRAND_COLORS } from "@/lib/brand-colors";
 
@@ -146,15 +147,6 @@ export function AdminTableActions({
   const effectiveAmountPaid = (amountPaid !== null && amountPaid !== undefined)
     ? amountPaid
     : ((status === "pagado" || status === "approved") ? totalPrice : 0);
-
-  const paymentMethodLabel = (m?: string) => {
-    const key = (m || "").toLowerCase();
-    if (key.includes("yape") || key.includes("plin")) return "Yape / Plin";
-    if (key.includes("tarjeta") || key.includes("pos") || key.includes("online")) return "Tarjeta / Online";
-    if (key.includes("transferencia") || key.includes("bcp") || key.includes("bbva")) return "Transferencia";
-    if (key.includes("recepcion") || key.includes("efectivo") || key.includes("cash")) return "Efectivo";
-    return "Efectivo";
-  };
 
   const balance = grandTotal - effectiveAmountPaid;
   const isFullyPaid = balance <= 0;
@@ -324,7 +316,7 @@ export function AdminTableActions({
     // Valores por defecto al abrir (todos editables antes de imprimir)
     setBillingDocument(guestDocument || "");
     setBillingName(guestName);
-    setBillingPaymentMethod(paymentMethodLabel(paymentMethod));
+    setBillingPaymentMethod(formaDePago(paymentMethod));
     setBillingAmountPaid((isFullyPaid ? grandTotal : effectiveAmountPaid).toFixed(2));
     setIsBillingModalOpen(true);
   };
@@ -460,7 +452,7 @@ export function AdminTableActions({
               </div>
               <div>
                 <h3 className="font-bold text-stone-900">Registrar Pago</h3>
-                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva #{bookingId}</p>
+                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva {codigoReserva(bookingId)}</p>
               </div>
             </div>
 
@@ -550,7 +542,7 @@ export function AdminTableActions({
               </div>
               <div>
                 <h3 className="font-bold text-stone-900">Editar Reserva</h3>
-                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva #{bookingId}</p>
+                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva {codigoReserva(bookingId)}</p>
               </div>
             </div>
 
@@ -656,7 +648,7 @@ export function AdminTableActions({
               </div>
               <div>
                 <h3 className="font-bold text-stone-900">Consumos Extras</h3>
-                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva #{bookingId}</p>
+                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva {codigoReserva(bookingId)}</p>
               </div>
             </div>
 
@@ -797,7 +789,7 @@ export function AdminTableActions({
               </div>
               <div>
                 <h3 className="font-bold text-stone-900">Imprimir comprobante</h3>
-                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva #{bookingId}</p>
+                <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Reserva {codigoReserva(bookingId)}</p>
               </div>
             </div>
 
@@ -816,6 +808,11 @@ export function AdminTableActions({
                           <p className="text-[10px] text-stone-500 uppercase truncate">
                             {NOMBRE_COMPROBANTE[c.tipo]} · S/ {Number(c.total).toFixed(2)}
                           </p>
+                          {Math.abs(Number(c.total) - grandTotal) >= 0.01 && (
+                            <p className="text-[10px] font-bold text-amber-700 leading-snug mt-0.5">
+                              No coincide con el total de la reserva (S/ {grandTotal.toFixed(2)})
+                            </p>
+                          )}
                         </div>
                         <button
                           onClick={() => {

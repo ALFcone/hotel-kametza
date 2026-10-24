@@ -13,6 +13,7 @@ import { getSupabaseServer } from "@/lib/supabase-server";
 import { leerXmlComprobante } from "@/lib/cpe-xml";
 import { HOTEL_RUC } from "@/lib/site";
 import { HORA_CHECK_IN } from "@/lib/fecha-peru";
+import { codigoReserva } from "@/lib/reserva";
 
 const ROOM_IMAGES_BUCKET = "rooms";
 // Debe coincidir con el tope de la política bookings_insert_huesped (supabase/reservas_pendientes.sql)
@@ -933,7 +934,7 @@ export async function leerComprobanteXml(xml: string) {
     .maybeSingle();
   if (errorTabla?.code === "42P01" || errorTabla?.code === "PGRST205") return { error: ERROR_TABLA_COMPROBANTES };
   if (existente) {
-    avisos.push(`Este comprobante ya está registrado${existente.booking_id ? ` en la reserva #${existente.booking_id}` : ""}.`);
+    avisos.push(`Este comprobante ya está registrado${existente.booking_id ? ` en la reserva ${codigoReserva(existente.booking_id)}` : ""}.`);
   }
 
   // Reservas para enlazar: las más recientes, primero las que coinciden con el documento o el total del XML.

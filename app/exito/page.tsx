@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { Suspense } from "react";
 import { BRAND_COLORS } from "@/lib/brand-colors";
+import { codigoReserva } from "@/lib/reserva";
 
 /** Confetti Component */
 function Confetti() {
@@ -127,9 +128,7 @@ function PaymentContent() {
   const isApproved = method === "online" && status === "approved";
   const isFailure = method === "online" && status === "failure";
 
-  const formattedId = id
-    ? `RES-${(Number(id) + 100).toString().padStart(5, "0")}`
-    : "---";
+  const formattedId = id ? codigoReserva(Number(id)) : "---";
 
   // Determine timeline state
   const timelineSteps = [

@@ -22,6 +22,7 @@ import AdminComprobantes, { type ComprobanteListado } from "./AdminComprobantes"
 import MobileMoreMenu from "./MobileMoreMenu";
 import { type Comprobante, COLUMNAS_COMPROBANTE } from "@/lib/cpe";
 import { ZONA_PERU, fechaPeru, hoyPeru } from "@/lib/fecha-peru";
+import { codigoReserva, formaDePago } from "@/lib/reserva";
 import {
   Calendar,
   CheckCircle,
@@ -99,10 +100,6 @@ function calculateNights(checkIn: string, checkOut: string) {
   const diffTime = Math.abs(end.getTime() - start.getTime());
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 }
-
-const formatTicket = (id: number) => {
-  return (100 + id).toString().padStart(5, "0");
-};
 
 /** Insignia "vs. período anterior" para las tarjetas KPI del Resumen. */
 function ChangeBadge({ pct }: { pct: number }) {
@@ -1370,7 +1367,7 @@ export default async function AdminPage(props: {
                             <td className="py-5 px-6">
                               <div className="flex items-center">
                                 <span className={`inline-flex items-center justify-center px-2 py-1.5 rounded-lg text-[10px] font-black tracking-[0.1em] shadow-sm border ${isCancelled ? "bg-stone-50 text-stone-500 border-stone-200 line-through" : "bg-gradient-to-r from-amber-100 to-amber-50 text-amber-700 border-amber-200"}`}>
-                                  RES-{formatTicket(booking.id)}
+                                  {codigoReserva(booking.id)}
                                 </span>
                               </div>
                             </td>
@@ -1817,7 +1814,13 @@ export default async function AdminPage(props: {
                 userRole={role}
                 comprobantes={comprobantes.map((c): ComprobanteListado => {
                   const reserva = c.booking_id ? allBookings.find((b: any) => b.id === c.booking_id) : null;
-                  return { ...c, habitacion: reserva ? String(getRoomNumber(reserva.room_id)) : "" };
+                  return {
+                    ...c,
+                    habitacion: reserva ? String(getRoomNumber(reserva.room_id)) : "",
+                    formaPago: reserva ? formaDePago(reserva.payment_method) : "",
+                    checkIn: reserva?.check_in ?? "",
+                    checkOut: reserva?.check_out ?? "",
+                  };
                 })}
               />
             </div>

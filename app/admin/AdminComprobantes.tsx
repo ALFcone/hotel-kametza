@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { leerComprobanteXml, guardarComprobante, eliminarComprobante } from "../actions";
 import { type Comprobante, NOMBRE_COMPROBANTE, NOMBRE_DOC_IDENTIDAD, numeroComprobante } from "@/lib/cpe";
 import { BRAND_COLORS } from "@/lib/brand-colors";
+import { codigoReserva } from "@/lib/reserva";
 import ThermalTicket from "./ThermalTicket";
 
 // SUNAT Operaciones en Línea (pide la Clave SOL en su propia página; nunca pasa por este sistema)
@@ -14,6 +15,10 @@ const SUNAT_SOL_URL = "https://e-menu.sunat.gob.pe/cl-ti-itmenu/MenuInternet.htm
 
 export interface ComprobanteListado extends Comprobante {
   habitacion: string;
+  // Datos de la reserva enlazada (vacíos si no tiene)
+  formaPago: string;
+  checkIn: string;
+  checkOut: string;
 }
 
 type Lectura = Awaited<ReturnType<typeof leerComprobanteXml>>;
@@ -99,7 +104,7 @@ export default function AdminComprobantes({
       setError(res.error);
       return;
     }
-    setExito(`${numeroComprobante(lectura.data)} registrado${reservaId ? ` en la reserva #${reservaId}` : ""}.`);
+    setExito(`${numeroComprobante(lectura.data)} registrado${reservaId ? ` en la reserva ${codigoReserva(Number(reservaId))}` : ""}.`);
     limpiar();
   };
 
@@ -127,7 +132,7 @@ export default function AdminComprobantes({
     <div className="space-y-6">
       {mounted && imprimiendo && createPortal(
         <ThermalTicket
-          booking={{ room_id: imprimiendo.habitacion }}
+          booking={{ payment_method: imprimiendo.formaPago, check_in: imprimiendo.checkIn, check_out: imprimiendo.checkOut }}
           bookingId={imprimiendo.booking_id ?? 0}
           comprobante={imprimiendo}
         />,
@@ -236,7 +241,7 @@ export default function AdminComprobantes({
                 <option value="">Sin enlazar a una reserva</option>
                 {lectura.candidatas.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.coincide ? "✓ " : ""}#{c.id} · {c.huesped}{c.habitacion ? ` · Hab. ${c.habitacion}` : ""} · {fechaPeru(c.checkIn)} · {soles(c.total)}{c.cancelada ? " · anulada" : ""}
+                    {c.coincide ? "✓ " : ""}{codigoReserva(c.id)} ·{c.huesped}{c.habitacion ? ` · Hab. ${c.habitacion}` : ""} · {fechaPeru(c.checkIn)} · {soles(c.total)}{c.cancelada ? " · anulada" : ""}
                   </option>
                 ))}
               </select>
@@ -289,7 +294,7 @@ export default function AdminComprobantes({
                   </p>
                   <p className="text-sm text-stone-700 mt-1 truncate">
                     {c.cliente_nombre || "Cliente varios"}
-                    {c.booking_id ? ` · Reserva #${c.booking_id}` : " · Sin reserva"}
+                    {c.booking_id ? ` · Reserva ${codigoReserva(c.booking_id)}` : " · Sin reserva"}
                     {c.habitacion ? ` · Hab. ${c.habitacion}` : ""}
                   </p>
                 </div>
