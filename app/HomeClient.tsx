@@ -16,6 +16,7 @@ import { supabase } from "@/lib/supabase";
 import Swal from "sweetalert2";
 import { createBooking } from "./actions";
 import { hoyPeru } from "@/lib/fecha-peru";
+import { HOTEL_WHATSAPP } from "@/lib/site";
 import {
   Tv,
   Wifi,
@@ -2031,9 +2032,20 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <div className="bg-white p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-stone-200/50 border border-stone-100 relative">
               <div className="absolute -top-6 -right-6 w-24 h-24 bg-rose-100 rounded-full blur-2xl opacity-60"></div>
               <h3 className="text-2xl font-serif font-bold text-stone-900 mb-2 relative z-10">Envíanos un mensaje</h3>
-              <p className="text-stone-500 text-sm mb-8 relative z-10">Te responderemos a la brevedad posible.</p>
-              
-              <form className="space-y-5 relative z-10" onSubmit={(e) => { e.preventDefault(); alert('Mensaje enviado. ¡Gracias por contactarnos!'); }}>
+              <p className="text-stone-500 text-sm mb-8 relative z-10">Se abrirá WhatsApp con tu mensaje listo para enviar.</p>
+
+              <form
+                className="space-y-5 relative z-10"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const datos = new FormData(e.currentTarget);
+                  const texto =
+                    `Hola Hotel Kametza, soy ${String(datos.get("name")).trim()}` +
+                    ` (${String(datos.get("email")).trim()}).\n\n${String(datos.get("message")).trim()}`;
+                  window.open(`https://wa.me/${HOTEL_WHATSAPP}?text=${encodeURIComponent(texto)}`, "_blank", "noopener,noreferrer");
+                  e.currentTarget.reset();
+                }}
+              >
                 <div>
                   <label htmlFor="contact-name" className="text-[10px] font-bold uppercase tracking-widest text-stone-500 ml-2 block mb-1">Nombre Completo</label>
                   <input id="contact-name" name="name" autoComplete="name" type="text" required className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-sm" placeholder="Ej. Carlos Mendoza" />
@@ -2046,9 +2058,15 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
                   <label htmlFor="contact-message" className="text-[10px] font-bold uppercase tracking-widest text-stone-500 ml-2 block mb-1">Tu Consulta</label>
                   <textarea id="contact-message" name="message" required rows={4} className="w-full bg-stone-50 border border-stone-200 p-4 rounded-2xl outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-sm resize-none" placeholder="¿En qué podemos ayudarte?"></textarea>
                 </div>
-                <button type="submit" className="w-full bg-stone-900 text-white font-bold py-4 rounded-2xl hover:bg-rose-500 transition-all shadow-lg hover:shadow-rose-900/20 text-sm tracking-widest uppercase mt-4">
-                  Enviar Mensaje
+                <button type="submit" className="w-full flex items-center justify-center gap-2 bg-stone-900 text-white font-bold py-4 rounded-2xl hover:bg-rose-500 transition-all shadow-lg hover:shadow-rose-900/20 text-sm tracking-widest uppercase mt-4">
+                  <MessageSquare size={18} aria-hidden="true" /> Enviar por WhatsApp
                 </button>
+                <p className="text-[11px] text-stone-500 text-center leading-snug">
+                  Tus datos se usan solo para responderte.{" "}
+                  <a href="/privacidad" target="_blank" className="font-bold underline underline-offset-2 hover:text-rose-600">
+                    Política de privacidad
+                  </a>
+                </p>
               </form>
             </div>
           </div>

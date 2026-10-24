@@ -12,3 +12,5 @@ export const HOTEL_TITULAR = "MARCELINA BERMUDO ESCALANTE DE RUA";
 export const HOTEL_DIRECCION = "Jr. Las Américas #154, Ayacucho";
 export const HOTEL_EMAIL = "kametzahotelayacucho@gmail.com";
 export const HOTEL_TELEFONO = "920 042 099";
+// WhatsApp del hotel en formato internacional, sin "+" (para enlaces wa.me)
+export const HOTEL_WHATSAPP = "51966556622";
