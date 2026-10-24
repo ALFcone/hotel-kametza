@@ -1344,13 +1344,13 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
       >
         <div className="absolute inset-0 z-0">
           <Image
-            src="/hero.png"
-            alt="Hotel Kametza Exterior"
+            src="/plaza-ayacucho.jpg"
+            alt="Plaza Mayor de Ayacucho con la Catedral y el monumento a Sucre"
             fill
             sizes="100vw"
             loading="eager"
             fetchPriority="high"
-            className="object-cover object-center"
+            className="object-cover object-[center_40%]"
           />
           {/* OVERLAY OSCURECIDO PARA QUE EL TEXTO BLANCO RESALTE MÁS */}
           <div className="absolute inset-0 bg-[#3a0614]/40 mix-blend-multiply" />
@@ -1505,6 +1505,18 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             <div className="w-1.5 h-3 bg-white rounded-full"></div>
           </a>
         </div>
+
+        {/* Crédito que exige la licencia CC BY-SA 4.0 de la foto de fondo */}
+        <p className="absolute bottom-2 right-3 z-20 text-[10px] text-stone-500">
+          Foto:{" "}
+          <a href="https://commons.wikimedia.org/wiki/File:PLAZA_MAYOR_DE_AYACUCHO.jpg" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">
+            Pollinhhsano
+          </a>
+          ,{" "}
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-stone-700">
+            CC BY-SA 4.0
+          </a>
+        </p>
       </section>
       {/* --- SECCIÓN SERVICIOS ESTILO BENTO GRID --- */}
       <section id="habitaciones" className="min-h-screen flex flex-col justify-center py-24 relative z-10 w-full">
