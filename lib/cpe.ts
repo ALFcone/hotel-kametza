@@ -61,7 +61,7 @@ export function aComprobante({ comprobante_reservas, ...fila }: any): Comprobant
 export interface ComprobanteImpreso extends Comprobante {
   habitaciones: string[];
   formaPago: string; // vacío si no está enlazado a ninguna reserva
-  estancias: string[]; // "Del 23/10/2026 al 26/10/2026", sin repetir
+  estancias: string[]; // "Del 23/10/2026 al 26/10/2026"; si las fechas difieren, "Hab. 301: del …" por habitación
   totalReservas: number; // suma de las reservas enlazadas (habitación + consumos)
 }
 

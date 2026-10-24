@@ -224,11 +224,17 @@ export default async function AdminPage(props: {
     const reservas = c.reservas
       .map((id) => allBookings.find((b: any) => b.id === id))
       .filter((b): b is any => !!b);
+    const habitaciones = reservas.map((b) => String(rooms?.find((r) => r.id === b.room_id)?.room_number ?? b.room_id));
+    const fechas = reservas.map((b) => `del ${fechaCorta(b.check_in)} al ${fechaCorta(b.check_out)}`);
+    // Con las mismas fechas basta una línea; si son distintas, cada una lleva su habitación
+    const estancias = new Set(fechas).size <= 1
+      ? fechas.slice(0, 1).map((f) => f.charAt(0).toUpperCase() + f.slice(1))
+      : fechas.map((f, i) => `Hab. ${habitaciones[i]}: ${f}`);
     return {
       ...c,
-      habitaciones: reservas.map((b) => String(rooms?.find((r) => r.id === b.room_id)?.room_number ?? b.room_id)),
+      habitaciones,
       formaPago: reservas[0] ? formaDePago(reservas[0].payment_method) : "",
-      estancias: [...new Set(reservas.map((b) => `Del ${fechaCorta(b.check_in)} al ${fechaCorta(b.check_out)}`))],
+      estancias,
       totalReservas: reservas.reduce(
         (suma, b) =>
           suma + Number(b.total_price || 0) +
