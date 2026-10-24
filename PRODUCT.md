@@ -39,7 +39,7 @@ Hotel independiente con trato directo y local, que combina reserva y pago en lí
 
 ## Brand Commitments
 
-El logo actual, el rosa #e3004f y las tipografías Playfair Display y Montserrat son identidad existente que el usuario marcó como vinculante. Nombre: "Hotel Kametza". Descriptor vigente: "Un refugio donde la historia colonial se encuentra con el confort contemporáneo."
+El logo actual, el rosa #e3004f y las tipografías Playfair Display y Montserrat son identidad existente que el usuario marcó como vinculante. Nombre: "Hotel Kametza". Descriptor vigente: "Descanso tranquilo, limpieza impecable y una atención de primera." El hotel es moderno (no colonial) y solo es hotel, no "Hotel & Suites"; sus prioridades son el descanso del huésped, la higiene y el servicio.
 
 ## Evidence on Hand
 

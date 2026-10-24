@@ -1379,23 +1379,15 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             {/* SUBTÍTULO CLÁSICO CON ACENTO DEL LOGO */}
             <h2 className="text-2xl md:text-4xl font-serif italic text-white font-bold tracking-wider drop-shadow-lg flex items-center gap-4">
               <span className="h-px w-10 md:w-16 bg-gradient-to-r from-transparent to-rose-500/80"></span>
-              Hotel & Suites
+              Hotel en Ayacucho
               <span className="h-px w-10 md:w-16 bg-gradient-to-l from-transparent to-rose-500/80"></span>
             </h2>
           </div>
           
           <p className="text-sm md:text-lg text-white max-w-2xl mx-auto mt-12 mb-8 font-normal leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] text-center tracking-widest uppercase">
-            Un refugio donde la historia colonial se encuentra con el confort
+            Descanso tranquilo, limpieza impecable y una atención de primera
           </p>
 
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex items-center gap-2.5 bg-white px-5 py-2.5 rounded-full shadow-xl">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
-              <span className="text-[10px] md:text-xs text-stone-800 font-bold tracking-widest uppercase">
-                Mejor Tarifa Garantizada Reservando Aquí
-              </span>
-            </div>
-          </div>
 
           {/* --- BUSCADOR PROFESIONAL BOLD --- */}
           <div className="bg-white p-2 md:p-3 rounded-2xl md:rounded-full shadow-[0_20px_40px_rgba(227,0,79,0.15)] max-w-4xl mx-auto flex flex-col md:flex-row items-center border border-rose-100 mb-8 divide-y md:divide-y-0 md:divide-x divide-stone-100">
@@ -2118,7 +2110,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               { }
               <img src="/logoo.png" alt="Hotel Kametza" className="h-24 mb-6" />
               <p className="text-stone-700 text-sm leading-relaxed mb-8 max-w-sm font-medium">
-                Un refugio exclusivo donde la historia colonial se encuentra con el confort contemporáneo en el corazón de Ayacucho.
+                Hotel moderno en Ayacucho. Habitaciones tranquilas y siempre limpias, con una atención de primera para que descanses de verdad.
               </p>
               <div className="flex gap-4">
                 <a href="https://www.facebook.com/share/1KhmvycDcR/" target="_blank" className="w-11 h-11 bg-white shadow-sm border border-stone-200 hover:border-[#1877F2] group rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">

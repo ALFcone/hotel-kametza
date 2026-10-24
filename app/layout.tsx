@@ -23,7 +23,7 @@ const playfair = Playfair_Display({
 });
 
 const title = "Hotel Kametza | Ayacucho";
-const description = "Un refugio donde la historia colonial se encuentra con el confort contemporáneo.";
+const description = "Hotel moderno en Ayacucho: descanso tranquilo, limpieza impecable y atención de primera.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
