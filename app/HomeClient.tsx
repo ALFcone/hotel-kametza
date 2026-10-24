@@ -1356,8 +1356,6 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
           />
           {/* Video de la plaza encima de la foto; aparece con un fundido cuando empieza a reproducirse */}
           <VideoFondo src="/video/huamanga.mp4" className="absolute inset-0 w-full h-full object-cover" />
-          {/* OVERLAY OSCURECIDO PARA QUE EL TEXTO BLANCO RESALTE MÁS */}
-          <div className="absolute inset-0 bg-[#3a0614]/40 mix-blend-multiply" />
           {/* Termina oscuro, sin lavarse a crema: el corte con Habitaciones queda limpio */}
           <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-900/40 to-stone-950/75" />
         </div>
@@ -1373,8 +1371,8 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
               <div className="h-[1px] w-16 md:w-32 bg-gradient-to-l from-transparent to-white/80"></div>
             </div>
             
-            {/* NOMBRE DEL HOTEL: COLOR SOLIDO IGUAL AL LOGO (muestreado de logoo.png) */}
-            <h1 className="text-[clamp(2.5rem,14vw,3.75rem)] md:text-8xl lg:text-[9rem] font-serif font-black text-rose-600 tracking-[0.15em] leading-none uppercase py-2 [text-shadow:0_0_35px_rgba(255,255,255,0.35),0_0_12px_rgba(255,255,255,0.25),0_8px_15px_rgba(0,0,0,0.9)]">
+            {/* NOMBRE DEL HOTEL: rojo del logo, un tono más claro y con filo blanco fino para que no se pierda sobre el video oscuro */}
+            <h1 className="text-[clamp(2.5rem,14vw,3.75rem)] md:text-8xl lg:text-[9rem] font-serif font-black text-rose-500 tracking-[0.15em] leading-none uppercase py-2 [text-shadow:0_0_1px_rgba(255,255,255,0.95),0_0_2px_rgba(255,255,255,0.6),0_0_28px_rgba(255,255,255,0.25),0_6px_16px_rgba(0,0,0,0.85)]">
               Kametza
             </h1>
             
@@ -1386,7 +1384,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             </h2>
           </div>
           
-          <p className="text-sm md:text-lg text-white max-w-2xl mx-auto mt-12 mb-8 font-light leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] text-center tracking-widest uppercase">
+          <p className="text-sm md:text-lg text-white max-w-2xl mx-auto mt-12 mb-8 font-normal leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] text-center tracking-widest uppercase">
             Un refugio donde la historia colonial se encuentra con el confort
           </p>
 
