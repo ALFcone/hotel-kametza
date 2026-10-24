@@ -209,10 +209,18 @@ export default function WalkInForm({ rooms }: { rooms: Room[] }) {
               type="date"
               name="checkIn"
               required
+              min={hoyPeru()}
               value={checkIn}
               onClick={(e) => e.currentTarget.showPicker()}
               onChange={(e) => {
-                setCheckIn(e.target.value);
+                const entrada = e.target.value;
+                setCheckIn(entrada);
+                // Si la salida queda en o antes de la entrada, pasa al día siguiente de la entrada
+                if (entrada && checkOut <= entrada) {
+                  const siguiente = new Date(`${entrada}T12:00:00Z`);
+                  siguiente.setUTCDate(siguiente.getUTCDate() + 1);
+                  setCheckOut(siguiente.toISOString().slice(0, 10));
+                }
                 setCustomPrice("");
               }}
               className="w-full p-4 bg-stone-50/50 rounded-2xl border border-stone-200 text-xs font-bold outline-none text-stone-700 focus:bg-white focus:ring-2 focus:ring-amber-600/20 focus:border-amber-600 transition-all shadow-inner shadow-stone-100/50 cursor-pointer"
