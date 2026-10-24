@@ -10,6 +10,7 @@
 import { useState, useRef, useEffect } from "react";
 import { adminCreateBooking, searchGuestByDocument, checkRoomAvailability } from "../actions";
 import { Calendar, User, Phone, MapPin, DollarSign, FileText, Bed, Search, Loader2, CheckCircle2, XCircle, StickyNote } from "lucide-react";
+import { hoyPeru } from "@/lib/fecha-peru";
 
 interface Room {
   id: number;
@@ -20,8 +21,8 @@ interface Room {
 
 export default function WalkInForm({ rooms }: { rooms: Room[] }) {
   const [selectedRoomId, setSelectedRoomId] = useState<number>(rooms[0]?.id || 0);
-  const [checkIn, setCheckIn] = useState<string>(() => new Date().toISOString().split("T")[0]);
-  const [checkOut, setCheckOut] = useState<string>(() => new Date(Date.now() + 86400000).toISOString().split("T")[0]);
+  const [checkIn, setCheckIn] = useState<string>(() => hoyPeru());
+  const [checkOut, setCheckOut] = useState<string>(() => hoyPeru(1));
   const [customPrice, setCustomPrice] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSearchingDni, setIsSearchingDni] = useState(false);

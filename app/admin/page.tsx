@@ -21,6 +21,7 @@ import AdminStaffManagement from "./AdminStaffManagement";
 import AdminComprobantes, { type ComprobanteListado } from "./AdminComprobantes";
 import MobileMoreMenu from "./MobileMoreMenu";
 import { type Comprobante, COLUMNAS_COMPROBANTE } from "@/lib/cpe";
+import { ZONA_PERU, fechaPeru, hoyPeru } from "@/lib/fecha-peru";
 import {
   Calendar,
   CheckCircle,
@@ -158,7 +159,7 @@ export default async function AdminPage(props: {
   const showBookingsToolbar = ["resumen", "estado", "calendario", "historial"].includes(activeTab);
 
   // A. FECHAS Y PARÁMETROS
-  const today = new Date().toISOString().split("T")[0];
+  const today = hoyPeru();
   const dateFrom = searchParams.from || today;
   const dateTo = searchParams.to || today;
   const filterDate = dateFrom;
@@ -169,6 +170,7 @@ export default async function AdminPage(props: {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: ZONA_PERU,
   });
 
   // B. CONSULTAS (en paralelo; productos y personal solo en las pestañas que los usan)
@@ -227,7 +229,7 @@ export default async function AdminPage(props: {
   // C. FILTRADO (Reservas creadas o que inician en el rango de fechas)
   const filteredBookings = allBookings?.filter((b) => {
     const checkInDate = b.check_in ? b.check_in.toString().substring(0, 10) : "";
-    const createdAtDate = b.created_at ? b.created_at.toString().substring(0, 10) : "";
+    const createdAtDate = b.created_at ? fechaPeru(b.created_at) : "";
     
     const isCheckInInRange = checkInDate >= dateFrom && checkInDate <= dateTo;
     const isCreatedInRange = createdAtDate >= dateFrom && createdAtDate <= dateTo;
@@ -274,7 +276,7 @@ export default async function AdminPage(props: {
   const salesInRange =
     allBookings?.filter((b) => {
       if (!b.created_at) return false;
-      const createdAtDate = b.created_at.substring(0, 10);
+      const createdAtDate = fechaPeru(b.created_at);
       return (
         createdAtDate >= dateFrom &&
         createdAtDate <= dateTo &&
@@ -343,7 +345,7 @@ export default async function AdminPage(props: {
 
   const prevSalesInRange = allBookings?.filter((b) => {
     if (!b.created_at) return false;
-    const createdAtDate = b.created_at.substring(0, 10);
+    const createdAtDate = fechaPeru(b.created_at);
     return (
       createdAtDate >= prevDateFrom &&
       createdAtDate <= prevDateTo &&
@@ -430,7 +432,7 @@ export default async function AdminPage(props: {
     const daySales = allBookings?.filter(
       (b) =>
         b.created_at &&
-        b.created_at.startsWith(dateStr) &&
+        fechaPeru(b.created_at) === dateStr &&
         (b.status === "pagado" || b.status === "approved" || b.status === "parcial")
     ) || [];
     const total = daySales.reduce((acc, b) => acc + getPaidAmount(b), 0);
@@ -1694,7 +1696,7 @@ export default async function AdminPage(props: {
                         <div className="flex">
                           {calendarDays.map((d, i) => {
                             const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-                            const isToday = d.toDateString() === new Date().toDateString();
+                            const isToday = d.toISOString().split("T")[0] === today;
                             return (
                               <div key={i} className={`flex flex-col items-center justify-center py-2 border-l border-stone-200 w-[55px] shrink-0 ${isToday ? "bg-blue-50/80 rounded-t-lg border-blue-200" : isWeekend ? "bg-stone-50/80 rounded-t-lg" : ""}`}>
                                 <span className={`text-[10px] font-bold uppercase ${isToday ? "text-blue-600" : isWeekend ? "text-amber-700" : "text-stone-500"}`}>
@@ -1734,8 +1736,8 @@ export default async function AdminPage(props: {
                               <div className="flex h-full relative">
                                 {calendarDays.map((d, i) => {
                                   const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-                                  const isToday = d.toDateString() === new Date().toDateString();
                                   const dayDateStr = d.toISOString().split("T")[0];
+                                  const isToday = dayDateStr === today;
                                   return (
                                     <div key={i} className={`border-r border-stone-200 w-[55px] shrink-0 transition-colors relative group/slot ${isToday ? "bg-blue-50/20" : isWeekend ? "bg-stone-50/50" : "hover:bg-stone-50/30"}`}>
                                       {isToday && (

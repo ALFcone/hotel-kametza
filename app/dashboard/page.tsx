@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import Image from "next/image";
 import { cancelBooking } from "../actions";
+import { HORA_CHECK_IN, hoyPeru } from "@/lib/fecha-peru";
 import { useDialog } from "../useDialog";
 import {
   CalendarDays,
@@ -102,10 +103,9 @@ function getStats(bookings: any[]) {
   }, 0);
 
   // Próximo check-in
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
+  const today = hoyPeru();
   const upcoming = active
-    .filter((b) => new Date(b.check_in) >= now)
+    .filter((b) => b.check_in >= today)
     .sort(
       (a, b) =>
         new Date(a.check_in).getTime() - new Date(b.check_in).getTime()
@@ -115,8 +115,9 @@ function getStats(bookings: any[]) {
   let daysUntil: number | null = null;
   if (upcoming.length > 0) {
     nextCheckIn = upcoming[0].check_in;
-    daysUntil = Math.ceil(
-      (new Date(upcoming[0].check_in).getTime() - now.getTime()) /
+    // Ambas son fechas sin hora (medianoche UTC): la resta da días enteros
+    daysUntil = Math.round(
+      (new Date(upcoming[0].check_in).getTime() - new Date(today).getTime()) /
         (1000 * 60 * 60 * 24)
     );
   }
@@ -704,8 +705,8 @@ export default function Dashboard() {
                   
                   const statusConf = getStatusConfig(effectiveStatus);
                   
-                  // Calcular si faltan más de 24 horas para el check-in (asumiendo check-in 14:00 por defecto)
-                  const checkInDate = new Date(`${booking.check_in}T14:00:00`);
+                  // Calcular si faltan más de 24 horas para el check-in (14:00 hora de Perú, igual que el servidor)
+                  const checkInDate = new Date(`${booking.check_in}T${HORA_CHECK_IN}`);
                   const now = new Date();
                   const hoursToCheckIn = (checkInDate.getTime() - now.getTime()) / (1000 * 60 * 60);
                   const canCancel = hoursToCheckIn >= 24;

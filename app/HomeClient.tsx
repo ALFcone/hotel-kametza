@@ -15,6 +15,7 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import Swal from "sweetalert2";
 import { createBooking } from "./actions";
+import { hoyPeru } from "@/lib/fecha-peru";
 import {
   Tv,
   Wifi,
@@ -400,7 +401,7 @@ function BookingModal({
     setDocNumber(e.target.value);
   };
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = hoyPeru();
 
   useEffect(() => {
     if (defaultCheckIn) setCheckIn(defaultCheckIn);
@@ -1004,7 +1005,7 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
 
   const [globalCheckIn, setGlobalCheckIn] = useState("");
   const [globalCheckOut, setGlobalCheckOut] = useState("");
-  const today = new Date().toISOString().split("T")[0];
+  const today = hoyPeru();
 
   const [showAuthModal, setShowAuthModal] = useState(false);
    

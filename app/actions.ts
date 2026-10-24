@@ -12,6 +12,7 @@ import { revalidatePath } from "next/cache";
 import { getSupabaseServer } from "@/lib/supabase-server";
 import { leerXmlComprobante } from "@/lib/cpe-xml";
 import { HOTEL_RUC } from "@/lib/site";
+import { HORA_CHECK_IN } from "@/lib/fecha-peru";
 
 const ROOM_IMAGES_BUCKET = "rooms";
 // Debe coincidir con el tope de la política bookings_insert_huesped (supabase/reservas_pendientes.sql)
@@ -251,7 +252,7 @@ export async function cancelBooking(bookingId: number) {
   if (!existing) return { error: "Reserva no encontrada." };
 
   if (!isStaff) {
-    const hoursToCheckIn = (new Date(`${existing.check_in}T14:00:00`).getTime() - Date.now()) / 3600000;
+    const hoursToCheckIn = (new Date(`${existing.check_in}T${HORA_CHECK_IN}`).getTime() - Date.now()) / 3600000;
     if (hoursToCheckIn < 24) {
       return { error: "Solo se puede cancelar con 24 horas de anticipación. Contacta a recepción." };
     }

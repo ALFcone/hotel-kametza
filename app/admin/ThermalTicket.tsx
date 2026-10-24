@@ -1,6 +1,7 @@
 import React from "react";
 import QRCode from "react-qr-code";
 import { HOTEL_RUC } from "@/lib/site";
+import { ZONA_PERU } from "@/lib/fecha-peru";
 import {
   type Comprobante,
   NOMBRE_COMPROBANTE,
@@ -26,7 +27,7 @@ const fechaPeru = (iso: string) => {
 export default function ThermalTicket({ booking, bookingId, isCancelled = false, comprobante }: ThermalTicketProps) {
   if (!booking) return null;
 
-  const now = new Date().toLocaleString("es-PE");
+  const now = new Date().toLocaleString("es-PE", { timeZone: ZONA_PERU });
 
   return (
     <div id="print-section" className="thermal-ticket hidden print:block text-black bg-white p-4 font-mono text-[11px] w-[302px] mx-auto absolute top-0 left-0 z-[99999] h-screen">
@@ -169,7 +170,8 @@ function TicketInterno({ booking, bookingId, isCancelled, now }: { booking: any;
             <td className="py-2">
               <span className="font-bold uppercase">Servicio de Alojamiento</span>
               <div className="text-[10px] mt-0.5 opacity-90 leading-tight">
-                Del {checkIn.toLocaleDateString("es-PE")} al {checkOut.toLocaleDateString("es-PE")}
+                {/* check_in/check_out son fechas sin hora (medianoche UTC): se muestran en UTC para no restar un día */}
+                Del {checkIn.toLocaleDateString("es-PE", { timeZone: "UTC" })} al {checkOut.toLocaleDateString("es-PE", { timeZone: "UTC" })}
               </div>
             </td>
             <td className="text-right py-2 align-top">{(roomTotal / nights).toFixed(2)}</td>

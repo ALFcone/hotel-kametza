@@ -1,6 +1,7 @@
 "use client";
 
 import { Download } from "lucide-react";
+import { hoyPeru } from "@/lib/fecha-peru";
 
 export default function DownloadButton({ data, extrasData }: { data: any[], extrasData?: any[] }) {
   const downloadReport = () => {
@@ -77,7 +78,7 @@ export default function DownloadButton({ data, extrasData }: { data: any[], extr
     link.href = url;
     link.setAttribute(
       "download",
-      `Reporte_Kametza_${new Date().toISOString().split("T")[0]}.csv`
+      `Reporte_Kametza_${hoyPeru()}.csv`
     );
     document.body.appendChild(link);
     link.click();
