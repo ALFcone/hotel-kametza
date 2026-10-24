@@ -17,6 +17,7 @@ import Swal from "sweetalert2";
 import { createBooking } from "./actions";
 import { hoyPeru } from "@/lib/fecha-peru";
 import { HOTEL_WHATSAPP } from "@/lib/site";
+import VideoFondo from "./VideoFondo";
 import {
   Tv,
   Wifi,
@@ -1352,6 +1353,8 @@ export default function HomeClient({ initialRooms }: { initialRooms: Room[] }) {
             fetchPriority="high"
             className="object-cover object-[center_40%]"
           />
+          {/* Video de la plaza encima de la foto; aparece con un fundido cuando empieza a reproducirse */}
+          <VideoFondo src="/video/huamanga.mp4" className="absolute inset-0 w-full h-full object-cover" />
           {/* OVERLAY OSCURECIDO PARA QUE EL TEXTO BLANCO RESALTE MÁS */}
           <div className="absolute inset-0 bg-[#3a0614]/40 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-stone-900/40 to-parchment" />
